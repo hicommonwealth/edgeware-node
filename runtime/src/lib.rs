@@ -28,6 +28,7 @@ extern crate srml_consensus as consensus;
 extern crate srml_timestamp as timestamp;
 extern crate srml_balances as balances;
 extern crate srml_upgrade_key as upgrade_key;
+extern crate edge_identity as identity;
 
 #[cfg(feature = "std")]
 use parity_codec::{Encode, Decode};
@@ -177,6 +178,12 @@ impl upgrade_key::Trait for Runtime {
 	type Event = Event;
 }
 
+impl identity::Trait for Runtime {
+  type Claim = Vec<u8>;
+	/// The uniquitous event type.
+	type Event = Event;
+}
+
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId>) where
 		Block = Block,
@@ -187,6 +194,7 @@ construct_runtime!(
 		Consensus: consensus::{Module, Call, Storage, Config<T>, Log(AuthoritiesChange), Inherent},
 		Balances: balances,
 		UpgradeKey: upgrade_key,
+    Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 

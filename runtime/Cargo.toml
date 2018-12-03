@@ -25,6 +25,8 @@ srml-timestamp = { git = "https://github.com/paritytech/substrate" }
 srml-upgrade-key = { git = "https://github.com/paritytech/substrate" }
 substrate-client = { git = "https://github.com/paritytech/substrate", optional = true }
 sr-version = { git = "https://github.com/paritytech/substrate" }
+#edge_identity = { git = "https://github.com/hicommonwealth/edge_identity" }
+edge_identity = { path = "../../edge_identity" }
 
 [features]
 default = ["std"]
@@ -46,5 +48,6 @@ std = [
 	"serde_derive",
 	"serde/std",
 	"safe-mix/std",
-	"substrate-client"
+	"substrate-client",
+  "edge_identity/std",
 ]
