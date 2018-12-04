@@ -31,9 +31,12 @@ substrate-network = { git = "https://github.com/paritytech/substrate" }
 substrate-consensus-aura = { git = "https://github.com/paritytech/substrate" }
 substrate-client = { git = "https://github.com/paritytech/substrate", default-features = false }
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate" }
-edgeware-runtime = { path = "runtime" }
 structopt = "0.2.13"
-#edge_identity = { git = "https://github.com/hicommonwealth/edge_identity" }
+edge_identity = { git = "https://github.com/hicommonwealth/edge_identity" }
+edgeware-runtime = { path = "runtime" }
+
+
+
 
 [build-dependencies]
 vergen = "2"

@@ -1,5 +1,13 @@
 use primitives::{AuthorityId, ed25519};
-use edgeware_runtime::{AccountId, GenesisConfig, ConsensusConfig, TimestampConfig, BalancesConfig, UpgradeKeyConfig, IdentityConfig};
+use edgeware_runtime::{
+	AccountId,
+	GenesisConfig,
+	ConsensusConfig,
+	TimestampConfig,
+	BalancesConfig,
+	UpgradeKeyConfig,
+	IdentityConfig
+};
 use substrate_service;
 
 // Note this is the URL for the telemetry server
@@ -99,9 +107,9 @@ fn testnet_genesis(initial_authorities: Vec<AuthorityId>, endowed_accounts: Vec<
 			key: upgrade_key,
 			_genesis_phantom_data: Default::default(),
 		}),
-    identity: Some(IdentityConfig {
-      claims_issuers: initial_authorities.clone(),
-			_genesis_phantom_data: Default::default(),
-    }),
+	    identity: Some(IdentityConfig {
+	      claims_issuers: initial_authorities.clone(),
+				_genesis_phantom_data: Default::default(),
+	    }),
 	}
 }
