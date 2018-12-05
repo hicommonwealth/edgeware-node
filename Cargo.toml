@@ -33,6 +33,7 @@ substrate-client = { git = "https://github.com/paritytech/substrate", default-fe
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate" }
 structopt = "0.2.13"
 edge_identity = { git = "https://github.com/hicommonwealth/edge_identity" }
+#edge_identity = { path = "../edge_identity" }
 edgeware-runtime = { path = "runtime" }
 
 

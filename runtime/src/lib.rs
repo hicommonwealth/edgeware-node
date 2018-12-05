@@ -182,6 +182,7 @@ impl upgrade_key::Trait for Runtime {
 
 impl identity::Trait for Runtime {
 	type Claim = Vec<u8>;
+  type IdentityIndex = u32;
 	/// The uniquitous event type.
 	type Event = Event;
 }
@@ -196,7 +197,7 @@ construct_runtime!(
 		Consensus: consensus::{Module, Call, Storage, Config<T>, Log(AuthoritiesChange), Inherent},
 		Balances: balances,
 		UpgradeKey: upgrade_key,
-	Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
+  	Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 
