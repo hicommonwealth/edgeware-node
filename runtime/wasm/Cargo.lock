@@ -172,7 +172,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "edge_identity"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_identity#726a411c4e6473d62f392e6198ff44005b0108f2"
+source = "git+https://github.com/hicommonwealth/edge_identity#ea897b0cba913d0ad6d2bf0946a7b614731ffefe"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",

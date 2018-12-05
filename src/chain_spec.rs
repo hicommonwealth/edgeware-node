@@ -108,7 +108,7 @@ fn testnet_genesis(initial_authorities: Vec<AuthorityId>, endowed_accounts: Vec<
 			_genesis_phantom_data: Default::default(),
 		}),
 	    identity: Some(IdentityConfig {
-	      claims_issuers: initial_authorities.clone(),
+	      claims_issuers: initial_authorities.iter().map(|&a| a.into()).collect(),
 				_genesis_phantom_data: Default::default(),
 	    }),
 	}
