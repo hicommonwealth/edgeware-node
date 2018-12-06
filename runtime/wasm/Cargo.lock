@@ -170,6 +170,50 @@ version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "edge_bridge"
+version = "0.1.0"
+source = "git+https://github.com/hicommonwealth/edge_bridge#2efaa40d416e41ff129c3b07f96d1f22b2320de1"
+dependencies = [
+ "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sr-io 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-std 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-balances 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-consensus 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-democracy 0.1.0 (git+https://github.com/paritytech/substrate/)",
+ "srml-session 0.1.0 (git+https://github.com/paritytech/substrate/)",
+ "srml-support 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-system 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-timestamp 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+]
+
+[[package]]
+name = "edge_delegation"
+version = "0.1.0"
+source = "git+https://github.com/hicommonwealth/edge_delegation#8e9e38a790fe40abc33b4bcef67551331a5cb62e"
+dependencies = [
+ "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_derive 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sr-io 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-std 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-balances 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-support 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-system 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+]
+
+[[package]]
 name = "edge_identity"
 version = "0.1.0"
 source = "git+https://github.com/hicommonwealth/edge_identity#868ddaee026e1fc2ef11e59c5b42b496484a4334"
@@ -193,6 +237,8 @@ dependencies = [
 name = "edgeware-runtime"
 version = "0.9.0"
 dependencies = [
+ "edge_bridge 0.1.0 (git+https://github.com/hicommonwealth/edge_bridge)",
+ "edge_delegation 0.1.0 (git+https://github.com/hicommonwealth/edge_delegation)",
  "edge_identity 0.1.0 (git+https://github.com/hicommonwealth/edge_identity)",
  "integer-sqrt 0.1.0 (git+https://github.com/paritytech/integer-sqrt-rs.git)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -205,6 +251,7 @@ dependencies = [
  "srml-balances 0.1.0 (git+https://github.com/paritytech/substrate)",
  "srml-consensus 0.1.0 (git+https://github.com/paritytech/substrate)",
  "srml-executive 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-session 0.1.0 (git+https://github.com/paritytech/substrate/)",
  "srml-support 0.1.0 (git+https://github.com/paritytech/substrate)",
  "srml-system 0.1.0 (git+https://github.com/paritytech/substrate)",
  "srml-timestamp 0.1.0 (git+https://github.com/paritytech/substrate)",
@@ -1058,6 +1105,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "srml-democracy"
+version = "0.1.0"
+source = "git+https://github.com/paritytech/substrate/#0e852691cc28c544dd38b808db4a083870ef2a4c"
+dependencies = [
+ "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sr-io 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-std 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-balances 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-support 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-system 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+]
+
+[[package]]
 name = "srml-executive"
 version = "0.1.0"
 source = "git+https://github.com/paritytech/substrate#3a8a3925c5cc9a10cbdd2253391e6956b9026332"
@@ -1083,6 +1149,26 @@ dependencies = [
  "serde 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
  "sr-std 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+]
+
+[[package]]
+name = "srml-session"
+version = "0.1.0"
+source = "git+https://github.com/paritytech/substrate/#0e852691cc28c544dd38b808db4a083870ef2a4c"
+dependencies = [
+ "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.80 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sr-io 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "sr-std 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-consensus 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-support 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-system 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-timestamp 0.1.0 (git+https://github.com/paritytech/substrate)",
  "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
 ]
 
@@ -1694,6 +1780,8 @@ dependencies = [
 "checksum crossbeam-utils 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c55913cc2799171a550e307918c0a360e8c16004820291bf3b638969b4a01816"
 "checksum crunchy 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "a2f4a431c5c9f662e1200b7c7f02c34e91361150e382089a8f2dec3ba680cbda"
 "checksum crunchy 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c240f247c278fa08a6d4820a6a222bfc6e0d999e51ba67be94f44c905b2161f2"
+"checksum edge_bridge 0.1.0 (git+https://github.com/hicommonwealth/edge_bridge)" = "<none>"
+"checksum edge_delegation 0.1.0 (git+https://github.com/hicommonwealth/edge_delegation)" = "<none>"
 "checksum edge_identity 0.1.0 (git+https://github.com/hicommonwealth/edge_identity)" = "<none>"
 "checksum elastic-array 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "88d4851b005ef16de812ea9acdb7bece2f0a40dd86c07b85631d7dafa54537bb"
 "checksum environmental 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "db746025e3ea695bfa0ae744dbacd5fcfc8db51b9760cf8bd0ab69708bb93c49"
@@ -1797,8 +1885,10 @@ dependencies = [
 "checksum sr-version 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
 "checksum srml-balances 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
 "checksum srml-consensus 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
+"checksum srml-democracy 0.1.0 (git+https://github.com/paritytech/substrate/)" = "<none>"
 "checksum srml-executive 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
 "checksum srml-metadata 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
+"checksum srml-session 0.1.0 (git+https://github.com/paritytech/substrate/)" = "<none>"
 "checksum srml-support 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
 "checksum srml-system 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"
 "checksum srml-timestamp 0.1.0 (git+https://github.com/paritytech/substrate)" = "<none>"

@@ -27,10 +27,15 @@ extern crate srml_executive as executive;
 extern crate srml_consensus as consensus;
 extern crate srml_timestamp as timestamp;
 extern crate srml_balances as balances;
+extern crate srml_session as session;
 extern crate srml_upgrade_key as upgrade_key;
 extern crate edge_identity;
+extern crate edge_delegation;
+extern crate edge_bridge;
 
 use edge_identity::identity;
+use edge_delegation::delegation;
+use edge_bridge::bridge;
 
 #[cfg(feature = "std")]
 use parity_codec::{Encode, Decode};
@@ -40,7 +45,7 @@ use primitives::bytes;
 use primitives::AuthorityId;
 use primitives::OpaqueMetadata;
 use runtime_primitives::{ApplyResult, transaction_validity::TransactionValidity,
-	Ed25519Signature, generic, traits::{self, BlakeTwo256, Block as BlockT}
+	Ed25519Signature, generic, traits::{self, BlakeTwo256, Block as BlockT, Convert}
 };
 #[cfg(feature = "std")]
 use runtime_primitives::traits::ApiRef;
@@ -72,6 +77,8 @@ pub type BlockNumber = u64;
 
 /// Index of an account's extrinsic in the chain.
 pub type Nonce = u64;
+
+pub type SessionKey = AuthorityId;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -161,6 +168,20 @@ impl timestamp::Trait for Runtime {
 	type Moment = u64;
 }
 
+/// Session key conversion.
+pub struct SessionKeyConversion;
+impl Convert<AccountId, SessionKey> for SessionKeyConversion {
+    fn convert(a: AccountId) -> SessionKey {
+        a.to_fixed_bytes().into()
+    }
+}
+
+impl session::Trait for Runtime {
+    type ConvertAccountIdToSessionKey = SessionKeyConversion;
+    type OnSessionChange = ();
+    type Event = Event;
+}
+
 impl balances::Trait for Runtime {
 	/// The type for recording an account's balance.
 	type Balance = u128;
@@ -187,6 +208,14 @@ impl identity::Trait for Runtime {
 	type Event = Event;
 }
 
+impl delegation::Trait for Runtime {
+    type Event = Event;
+}
+
+impl bridge::Trait for Runtime {
+    type Event = Event;
+}
+
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId>) where
 		Block = Block,
@@ -196,8 +225,11 @@ construct_runtime!(
 		Timestamp: timestamp::{Module, Call, Storage, Config<T>, Inherent},
 		Consensus: consensus::{Module, Call, Storage, Config<T>, Log(AuthoritiesChange), Inherent},
 		Balances: balances,
+    Session: session,
 		UpgradeKey: upgrade_key,
   	Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
+    Delegation: delegation::{Module, Call, Storage, Event<T>},
+    Bridge: bridge::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 

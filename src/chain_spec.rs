@@ -3,10 +3,12 @@ use edgeware_runtime::{
 	AccountId,
 	GenesisConfig,
 	ConsensusConfig,
+  SessionConfig,
 	TimestampConfig,
 	BalancesConfig,
 	UpgradeKeyConfig,
-	IdentityConfig
+	IdentityConfig,
+  BridgeConfig,
 };
 use substrate_service;
 
@@ -103,13 +105,22 @@ fn testnet_genesis(initial_authorities: Vec<AuthorityId>, endowed_accounts: Vec<
 			balances: endowed_accounts.iter().map(|&k|(k, (1 << 60))).collect(),
 			_genesis_phantom_data: Default::default(),
 		}),
+		session: Some(SessionConfig {
+			validators: initial_authorities.iter().cloned().map(Into::into).collect(),
+			session_length: 10,
+			_genesis_phantom_data: Default::default(),
+		}),
 		upgrade_key: Some(UpgradeKeyConfig {
 			key: upgrade_key,
 			_genesis_phantom_data: Default::default(),
 		}),
-	    identity: Some(IdentityConfig {
-	      claims_issuers: initial_authorities.iter().map(|&a| a.into()).collect(),
-				_genesis_phantom_data: Default::default(),
-	    }),
+		identity: Some(IdentityConfig {
+			claims_issuers: initial_authorities.iter().cloned().map(Into::into).collect(),
+			_genesis_phantom_data: Default::default(),
+		}),
+		bridge: Some(BridgeConfig {
+			authorities: initial_authorities.iter().cloned().map(Into::into).collect(),
+			_genesis_phantom_data: Default::default(),
+		}),
 	}
 }
