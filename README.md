@@ -5,9 +5,6 @@ A Parity Substrate node implementing our edgeware-related modules.
 ## Implemented Modules
 
 * [edge_identity](https://github.com/hicommonwealth/edge_identity)
-
-## TBD Modules
-
 * [edge_bridge](https://github.com/hicommonwealth/edge_bridge)
 * [edge_delegation](https://github.com/hicommonwealth/edge_delegation)
 
@@ -17,11 +14,11 @@ A Parity Substrate node implementing our edgeware-related modules.
   - [Cargo.toml](Cargo.toml)
   - [runtime/Cargo.toml](runtime/Cargo.toml)
   - [runtime/wasm/Cargo.toml](runtime/wasm/Cargo.toml) (be sure to have `default-features = false`)
-2. Changes to [the runtime](runtime/lib.rs):
+2. Changes to [the runtime](runtime/src/lib.rs):
   - Add it as an `extern crate`.
   - Implement its `Trait` with production types.
   - Add it to the `construct_runtime` macro with all implemented components.
-3. Changes to [the chain spec](src/chain_spec.rs):
+3. If its storage contains `config` elements, then you need to modify [the chain spec](src/chain_spec.rs):
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
