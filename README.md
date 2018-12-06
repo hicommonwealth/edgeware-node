@@ -4,9 +4,19 @@ A Parity Substrate node implementing our edgeware-related modules.
 
 ## Implemented Modules
 
-* [edge_identity](https://github.com/hicommonwealth/edge_identity)
-* [edge_bridge](https://github.com/hicommonwealth/edge_bridge)
-* [edge_delegation](https://github.com/hicommonwealth/edge_delegation)
+### Edge
+
+* [Identity](https://github.com/hicommonwealth/edge_identity)
+* [Bridge](https://github.com/hicommonwealth/edge_bridge)
+* [Delegation](https://github.com/hicommonwealth/edge_delegation)
+
+### SRML
+
+* [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
+* [Consensus](https://github.com/paritytech/substrate/tree/master/srml/consensus)
+* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
+* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
+* [UpgradeKey](https://github.com/paritytech/substrate/tree/master/srml/upgrade-key)
 
 ## Adding A Module
 
