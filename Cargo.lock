@@ -494,7 +494,7 @@ dependencies = [
 [[package]]
 name = "edge_bridge"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_bridge#5b9776acf87e2c7003aed74e4e21246a746fed56"
+source = "git+https://github.com/hicommonwealth/edge_bridge#cb93af1db48f9590e5f4fed832094070bafe9f49"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -518,7 +518,7 @@ dependencies = [
 [[package]]
 name = "edge_delegation"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_delegation#c67d0cbbc4ecfcd07a771b0b6cd9282bbee815cc"
+source = "git+https://github.com/hicommonwealth/edge_delegation#ec2e0424619aef879d70adfc360b60165391a5b6"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
