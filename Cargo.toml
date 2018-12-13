@@ -36,6 +36,7 @@ edge_identity = { git = "https://github.com/hicommonwealth/edge_identity" }
 edgeware-runtime = { path = "runtime" }
 edge_bridge = { git = "https://github.com/hicommonwealth/edge_bridge" }
 edge_delegation = { git = "https://github.com/hicommonwealth/edge_delegation" }
+edge_governance = { git = "https://github.com/hicommonwealth/edge_governance" }
 
 
 [build-dependencies]

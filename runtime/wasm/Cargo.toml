@@ -28,6 +28,7 @@ sr-version = { git = "https://github.com/paritytech/substrate", default-features
 edge_identity = { git = "https://github.com/hicommonwealth/edge_identity", default-features = false }
 edge_delegation = { git = "https://github.com/hicommonwealth/edge_delegation", default-features = false }
 edge_bridge = { git = "https://github.com/hicommonwealth/edge_bridge", default-features = false }
+edge_governance = { git = "https://github.com/hicommonwealth/edge_governance", default-features = false }
 
 [features]
 default = []
@@ -51,6 +52,7 @@ std = [
   "edge_identity/std",
   "edge_delegation/std",
   "edge_bridge/std",
+  "edge_governance/std",
 ]
 
 [profile.release]

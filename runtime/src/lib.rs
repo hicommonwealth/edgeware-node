@@ -32,10 +32,12 @@ extern crate srml_upgrade_key as upgrade_key;
 extern crate edge_identity;
 extern crate edge_delegation;
 extern crate edge_bridge;
+extern crate edge_governance;
 
 use edge_identity::identity;
 use edge_delegation::delegation;
 use edge_bridge::bridge;
+use edge_governance::governance;
 
 #[cfg(feature = "std")]
 use parity_codec::{Encode, Decode};
@@ -216,6 +218,10 @@ impl bridge::Trait for Runtime {
     type Event = Event;
 }
 
+impl governance::Trait for Runtime {
+    type Event = Event;
+}
+
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId>) where
 		Block = Block,
@@ -230,6 +236,7 @@ construct_runtime!(
   	Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
     Delegation: delegation::{Module, Call, Storage, Event<T>},
     Bridge: bridge::{Module, Call, Storage, Config<T>, Event<T>},
+    Governance: governance::{Module, Call, Storage, Event<T>},
 	}
 );
 
