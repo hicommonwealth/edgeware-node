@@ -9,6 +9,7 @@ A Parity Substrate node implementing our edgeware-related modules.
 * [Identity](https://github.com/hicommonwealth/edge_identity)
 * [Bridge](https://github.com/hicommonwealth/edge_bridge)
 * [Delegation](https://github.com/hicommonwealth/edge_delegation)
+* [Governance](https://github.com/hicommonwealth/edge_governance)
 
 ### SRML
 
