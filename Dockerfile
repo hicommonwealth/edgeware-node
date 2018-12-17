@@ -11,9 +11,9 @@ RUN install_clean build-essential \
     cargo
 
 ARG PROFILE=release
-WORKDIR /edgeware-node
+WORKDIR /edgeware
 
-COPY . /edgeware-node
+COPY . /edgeware
 
 RUN cargo build --$PROFILE
 
@@ -23,7 +23,7 @@ FROM phusion/baseimage:0.11
 LABEL maintainer="chevdor@gmail.com"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
-COPY --from=builder /edgeware-node/target/$PROFILE/edgeware /usr/local/bin
+COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
 
 RUN rm -rf /usr/lib/python* && \
 	mkdir -p /root/.local/share/Substrate && \
