@@ -1,12 +1,13 @@
-FROM alpine:edge AS builder
+FROM phusion/baseimage:0.11 AS builder
 LABEL maintainer="chevdor@gmail.com"
-LABEL description="This is the build stage for Substrate. Here we create the binary."
+LABEL description="This is the build stage. Here we create the binary."
 
-RUN apk add build-base \
-    cmake \
-    linux-headers \
-    openssl-dev \
+RUN install_clean build-essential \
+    pkg-config \
     clang \
+    libssl-dev \
+    openssl \
+    cmake \
     cargo
 
 ARG PROFILE=release
@@ -18,15 +19,11 @@ RUN cargo build --$PROFILE
 
 # ===== SECOND STAGE ======
 
-FROM alpine:edge
+FROM phusion/baseimage:0.11
 LABEL maintainer="chevdor@gmail.com"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
 COPY --from=builder /edgeware-node/target/$PROFILE/edgeware /usr/local/bin
-
-RUN apk add --no-cache ca-certificates \
-    libstdc++ \
-    openssl
 
 RUN rm -rf /usr/lib/python* && \
 	mkdir -p /root/.local/share/Substrate && \
