@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "0.9.0"
+version = "0.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 
 [lib]
@@ -11,24 +11,26 @@ integer-sqrt = { git = "https://github.com/paritytech/integer-sqrt-rs.git" }
 safe-mix = { version = "1.0", default-features = false}
 parity-codec-derive = { version = "^2.1" }
 parity-codec = { version = "^2.1", default-features = false }
-substrate-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
-substrate-client = { git = "https://github.com/paritytech/substrate", default-features = false }
-sr-std = { git = "https://github.com/paritytech/substrate", default-features = false }
-sr-io = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-support = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-consensus = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-session = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-executive = { git = "https://github.com/paritytech/substrate", default-features = false }
-sr-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-upgrade-key = { git = "https://github.com/paritytech/substrate", default-features = false }
-sr-version = { git = "https://github.com/paritytech/substrate", default-features = false }
-edge_identity = { git = "https://github.com/hicommonwealth/edge_identity", default-features = false }
+substrate-primitives = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+substrate-client = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+sr-std = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+sr-io = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-support = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-balances = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-consensus = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-executive = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-aura = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "v0.9" }
+sr-primitives = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-session = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-system = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-timestamp = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+srml-upgrade-key = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+sr-version = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
+substrate-consensus-aura-primitives = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
 edge_delegation = { git = "https://github.com/hicommonwealth/edge_delegation", default-features = false }
 edge_bridge = { git = "https://github.com/hicommonwealth/edge_bridge", default-features = false }
 edge_governance = { git = "https://github.com/hicommonwealth/edge_governance", default-features = false }
+edge_identity = { git = "https://github.com/hicommonwealth/edge_identity", default-features = false }
 
 [features]
 default = []
@@ -42,17 +44,18 @@ std = [
 	"srml-support/std",
 	"srml-balances/std",
 	"srml-consensus/std",
-	"srml-session/std",
 	"srml-executive/std",
+	"srml-aura/std",
 	"sr-primitives/std",
+	"srml-session/std",
 	"srml-system/std",
 	"srml-timestamp/std",
 	"srml-upgrade-key/std",
 	"sr-version/std",
-  "edge_identity/std",
   "edge_delegation/std",
   "edge_bridge/std",
   "edge_governance/std",
+  "edge_identity/std",
 ]
 
 [profile.release]
