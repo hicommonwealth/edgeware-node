@@ -8,14 +8,26 @@ RUN install_clean build-essential \
     libssl-dev \
     openssl \
     cmake \
-    cargo
+    git \
+    curl
 
 ARG PROFILE=release
 WORKDIR /edgeware
 
 COPY . /edgeware
 
-RUN cargo build --$PROFILE
+# Update rust dependencies
+ENV RUSTUP_HOME "/edgeware/.rustup"
+ENV CARGO_HOME "/edgeware/.cargo"
+RUN curl -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH "$PATH:/edgeware/.cargo/bin"
+RUN rustup update nightly
+RUN RUSTUP_TOOLCHAIN=stable cargo install --git https://github.com/alexcrichton/wasm-gc
+
+# Build runtime and binary
+RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+RUN cd /edgeware/runtime/wasm && ./build.sh
+RUN cd /edgeware && RUSTUP_TOOLCHAIN=stable cargo build --$PROFILE
 
 # ===== SECOND STAGE ======
 
