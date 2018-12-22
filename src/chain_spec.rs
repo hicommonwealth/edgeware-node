@@ -27,6 +27,8 @@ pub enum Alternative {
 	Development,
 	/// Whatever the current runtime is, with simple Alice/Bob auths.
 	LocalTestnet,
+    /// Whatever the current runtime is, with all lock droppers and valid authorities
+    Edgeware,
 }
 
 impl Alternative {
@@ -71,7 +73,35 @@ impl Alternative {
 				None,
 				None
 			),
-		})
+            Alternative::Edgeware => {
+                // Read LockDrop data in from local JSON file
+                let mut file = File::open("lockdrop.json").unwrap();
+                let mut data = String::new();
+                file.read_to_string(&mut data).unwrap();
+
+                // Read data from temp file generated from LockDrop data
+                let json = Json::from_str(&data).unwrap();
+                let authorities: Vec<AuthorityId> = json.find_path(&["Authorities"]).unwrap();
+                let lockers: Vec<AuthorityId> = json.find_path(&["LockDroppers"]).unwrap();
+                let upgrading_key = AccountId = json.find_path(&["UpgradeKey"]).unwrap();
+
+                // Create chainspec using LockDrop data
+                return ChainSpec::from_genesis(
+                    "Edgeware Testnet",
+                    "edgeware_testnet",
+                    || testnet_genesis(
+                        authorities,
+                        lock,
+                        upgrading_key,
+                        vec![],
+                        None,
+                        None,
+                        None,
+                        None
+                    )
+                );
+		    }
+        })
 	}
 
 	pub(crate) fn from(s: &str) -> Option<Self> {
