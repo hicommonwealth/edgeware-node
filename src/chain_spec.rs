@@ -108,6 +108,7 @@ impl Alternative {
 		match s {
 			"dev" => Some(Alternative::Development),
 			"local" => Some(Alternative::LocalTestnet),
+            "edgeware" => Some(Alternative::Edgeware),
 			_ => None,
 		}
 	}
