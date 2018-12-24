@@ -1,6 +1,6 @@
 [package]
 name = "edgeware"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 build = "build.rs"
 
@@ -32,12 +32,12 @@ substrate-consensus-aura = { git = "https://github.com/paritytech/substrate", br
 substrate-client = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 structopt = "0.2.13"
+
 edgeware-runtime = { path = "runtime" }
 node-executor = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 edge-delegation = { git = "https://github.com/hicommonwealth/edge-delegation" }
 edge-governance = { git = "https://github.com/hicommonwealth/edge-governance" }
 edge-identity = { git = "https://github.com/hicommonwealth/edge-identity" }
-
 
 [build-dependencies]
 vergen = "2"
