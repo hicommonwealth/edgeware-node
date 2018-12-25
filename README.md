@@ -1,6 +1,6 @@
 # edgeware-node
 
-A Parity Substrate node implementing our edgeware-related modules.
+A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ## Implemented Modules
 
