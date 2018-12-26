@@ -8,7 +8,6 @@ use edgeware_runtime::{
 	BalancesConfig,
 	UpgradeKeyConfig,
 	IdentityConfig,
-  BridgeConfig,
 };
 use substrate_service;
 
@@ -47,7 +46,7 @@ impl Alternative {
 				None,
 				None,
 				None,
-				None
+        None
 			),
 			Alternative::LocalTestnet => ChainSpec::from_genesis(
 				"Local Testnet",
@@ -69,7 +68,7 @@ impl Alternative {
 				None,
 				None,
 				None,
-				None
+        None
 			),
 		})
 	}
@@ -111,9 +110,6 @@ fn testnet_genesis(initial_authorities: Vec<AuthorityId>, endowed_accounts: Vec<
 		}),
 		identity: Some(IdentityConfig {
 			claims_issuers: initial_authorities.iter().cloned().map(Into::into).collect(),
-		}),
-		bridge: Some(BridgeConfig {
-			authorities: initial_authorities.iter().cloned().map(Into::into).collect(),
 		}),
 	}
 }
