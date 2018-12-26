@@ -34,10 +34,10 @@ substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate", 
 structopt = "0.2.13"
 edgeware-runtime = { path = "runtime" }
 node-executor = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
-edge_bridge = { git = "https://github.com/hicommonwealth/edge_bridge" }
-edge_delegation = { git = "https://github.com/hicommonwealth/edge_delegation" }
-edge_governance = { git = "https://github.com/hicommonwealth/edge_governance" }
-edge_identity = { git = "https://github.com/hicommonwealth/edge_identity" }
+edge-bridge = { git = "https://github.com/hicommonwealth/edge_bridge" }
+edge-delegation = { git = "https://github.com/hicommonwealth/edge_delegation" }
+edge-governance = { git = "https://github.com/hicommonwealth/edge_governance" }
+edge-identity = { git = "https://github.com/hicommonwealth/edge_identity" }
 
 
 [build-dependencies]
