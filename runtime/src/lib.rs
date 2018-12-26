@@ -33,12 +33,10 @@ extern crate srml_session as session;
 extern crate substrate_consensus_aura_primitives as consensus_aura;
 extern crate edge_identity;
 extern crate edge_delegation;
-extern crate edge_bridge;
 extern crate edge_governance;
 
 use edge_identity::identity;
 use edge_delegation::delegation;
-use edge_bridge::bridge;
 use edge_governance::governance;
 
 use rstd::prelude::*;
@@ -205,22 +203,20 @@ impl upgrade_key::Trait for Runtime {
 	type Event = Event;
 }
 impl identity::Trait for Runtime {
+	/// The type for making a claim to an identity.
 	type Claim = Vec<u8>;
-  type IdentityIndex = u32;
 	/// The uniquitous event type.
 	type Event = Event;
 }
 
 impl delegation::Trait for Runtime {
-    type Event = Event;
-}
-
-impl bridge::Trait for Runtime {
-    type Event = Event;
+	/// The uniquitous event type.
+  type Event = Event;
 }
 
 impl governance::Trait for Runtime {
-    type Event = Event;
+	/// The uniquitous event type.
+  type Event = Event;
 }
 
 construct_runtime!(
@@ -238,7 +234,6 @@ construct_runtime!(
 		UpgradeKey: upgrade_key,
   	Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
     Delegation: delegation::{Module, Call, Storage, Event<T>},
-    Bridge: bridge::{Module, Call, Storage, Config<T>, Event<T>},
     Governance: governance::{Module, Call, Storage, Event<T>},
 	}
 );

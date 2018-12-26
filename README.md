@@ -6,7 +6,6 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ### Edge
 
-* [Bridge](https://github.com/hicommonwealth/edge_bridge)
 * [Delegation](https://github.com/hicommonwealth/edge_delegation)
 * [Governance](https://github.com/hicommonwealth/edge_governance)
 * [Identity](https://github.com/hicommonwealth/edge_identity)
@@ -35,7 +34,6 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
-5. (Optional) If using new types, add them to the API options in [Edge Api](https://github.com/hicommonwealth/edge_api).
 
 ## Usage
 

@@ -552,33 +552,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "edge_bridge"
+name = "edge-delegation"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_bridge#28a703c5aa09c3a9fc55c77a15a0ab5d984d32fb"
-dependencies = [
- "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde 1.0.82 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_derive 1.0.82 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "sr-std 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-balances 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-consensus 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-democracy 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-session 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-support 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-system 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-timestamp 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
-]
-
-[[package]]
-name = "edge_delegation"
-version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_delegation#e5a0ce9b61fc46b7a925557325def4b3e2215baf"
+source = "git+https://github.com/hicommonwealth/edge-delegation#dbd978d1cd93a6a4e8eb4225509a78699b8a8b25"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -596,9 +572,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "edge_governance"
+name = "edge-governance"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_governance#16445671142c84b24736aa8bc9d6df0387f4f9ef"
+source = "git+https://github.com/hicommonwealth/edge-governance#46d2fd450d356254a48b7e8828153cacde2b9516"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -616,9 +592,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "edge_identity"
+name = "edge-identity"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge_identity#c06d4e24bcaa4bea067590e141677de2b774050d"
+source = "git+https://github.com/hicommonwealth/edge-identity#db9a389cb6256218633fcaf603ef2d9965a6368a"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -640,10 +616,9 @@ name = "edgeware"
 version = "0.0.0"
 dependencies = [
  "ctrlc 3.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "edge_bridge 0.1.0 (git+https://github.com/hicommonwealth/edge_bridge)",
- "edge_delegation 0.1.0 (git+https://github.com/hicommonwealth/edge_delegation)",
- "edge_governance 0.1.0 (git+https://github.com/hicommonwealth/edge_governance)",
- "edge_identity 0.1.0 (git+https://github.com/hicommonwealth/edge_identity)",
+ "edge-delegation 0.1.0 (git+https://github.com/hicommonwealth/edge-delegation)",
+ "edge-governance 0.1.0 (git+https://github.com/hicommonwealth/edge-governance)",
+ "edge-identity 0.1.0 (git+https://github.com/hicommonwealth/edge-identity)",
  "edgeware-runtime 0.0.0",
  "error-chain 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "exit-future 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -675,10 +650,9 @@ dependencies = [
 name = "edgeware-runtime"
 version = "0.0.0"
 dependencies = [
- "edge_bridge 0.1.0 (git+https://github.com/hicommonwealth/edge_bridge)",
- "edge_delegation 0.1.0 (git+https://github.com/hicommonwealth/edge_delegation)",
- "edge_governance 0.1.0 (git+https://github.com/hicommonwealth/edge_governance)",
- "edge_identity 0.1.0 (git+https://github.com/hicommonwealth/edge_identity)",
+ "edge-delegation 0.1.0 (git+https://github.com/hicommonwealth/edge-delegation)",
+ "edge-governance 0.1.0 (git+https://github.com/hicommonwealth/edge-governance)",
+ "edge-identity 0.1.0 (git+https://github.com/hicommonwealth/edge-identity)",
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4322,10 +4296,9 @@ dependencies = [
 "checksum digest 0.7.6 (registry+https://github.com/rust-lang/crates.io-index)" = "03b072242a8cbaf9c145665af9d250c59af3b958f83ed6824e13533cf76d5b90"
 "checksum discard 1.0.4 (registry+https://github.com/rust-lang/crates.io-index)" = "212d0f5754cb6769937f4501cc0e67f4f4483c8d2c3e1e922ee9edbe4ab4c7c0"
 "checksum ed25519-dalek 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)" = "cd66d8a16ef71c23cf5eeb2140d8d3cd293457c6c7fd6804b593397a933fcf1e"
-"checksum edge_bridge 0.1.0 (git+https://github.com/hicommonwealth/edge_bridge)" = "<none>"
-"checksum edge_delegation 0.1.0 (git+https://github.com/hicommonwealth/edge_delegation)" = "<none>"
-"checksum edge_governance 0.1.0 (git+https://github.com/hicommonwealth/edge_governance)" = "<none>"
-"checksum edge_identity 0.1.0 (git+https://github.com/hicommonwealth/edge_identity)" = "<none>"
+"checksum edge-delegation 0.1.0 (git+https://github.com/hicommonwealth/edge-delegation)" = "<none>"
+"checksum edge-governance 0.1.0 (git+https://github.com/hicommonwealth/edge-governance)" = "<none>"
+"checksum edge-identity 0.1.0 (git+https://github.com/hicommonwealth/edge-identity)" = "<none>"
 "checksum either 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3be565ca5c557d7f59e7cfcf1844f9e3033650c929c6566f511e8005f205c1d0"
 "checksum elastic-array 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "88d4851b005ef16de812ea9acdb7bece2f0a40dd86c07b85631d7dafa54537bb"
 "checksum env_logger 0.5.13 (registry+https://github.com/rust-lang/crates.io-index)" = "15b0a4d2e39f8420210be8b27eeda28029729e2fd4291019455016c348240c38"
