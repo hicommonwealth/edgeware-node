@@ -12,7 +12,7 @@ use edgeware_runtime::{
 use substrate_service;
 
 // Note this is the URL for the telemetry server
-//const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
 /// Specialised `ChainSpec`. This is a specialisation of the general Substrate ChainSpec type.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
@@ -73,7 +73,7 @@ impl Alternative {
         None
 			),
             Alternative::Edgeware => {
-                match ChainSpec::from_json_file(std::path::PathBuf::from("lockdrop.json")) {
+                match ChainSpec::from_json_file(std::path::PathBuf::from("edgeware_testnet.json")) {
                     Ok(spec) => spec,
                     Err(_) => panic!()
                 }
