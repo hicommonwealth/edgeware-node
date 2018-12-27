@@ -52,12 +52,12 @@ You will also need to install the following packages:
 
 Linux:
 ```
-sudo apt install cmake pkg-config libssl-dev git
+sudo apt install cmake pkg-config libssl-dev git clang libclang-dev
 ```
 
 Mac:
 ```
-brew install cmake pkg-config openssl git
+brew install cmake pkg-config openssl git llvm
 ```
 
 ### Building
