@@ -26,6 +26,8 @@ pub enum Alternative {
 	Development,
 	/// Whatever the current runtime is, with simple Alice/Bob auths.
 	LocalTestnet,
+    /// Whatever the current runtime is, with all lock droppers and valid authorities
+    Edgeware,
 }
 
 impl Alternative {
@@ -70,13 +72,20 @@ impl Alternative {
 				None,
         None
 			),
-		})
+            Alternative::Edgeware => {
+                match ChainSpec::from_json_file(std::path::PathBuf::from("lockdrop.json")) {
+                    Ok(spec) => spec,
+                    Err(_) => panic!()
+                }
+            }
+        }) 
 	}
 
 	pub(crate) fn from(s: &str) -> Option<Self> {
 		match s {
 			"dev" => Some(Alternative::Development),
 			"local" => Some(Alternative::LocalTestnet),
+            "edgeware" => Some(Alternative::Edgeware),
 			_ => None,
 		}
 	}
