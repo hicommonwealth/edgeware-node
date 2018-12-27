@@ -4,7 +4,7 @@
   "bootNodes": [
     "/ip4/18.223.143.102/tcp/30333/p2p/QmWxBrcf5UNQxGrDw6WmraAinsat7SrM5HQnhEgcPuDAcY"
   ],
-  "telemetryUrl": null,
+  "telemetryUrl":  "wss://telemetry.polkadot.io/submit/",
   "protocolId": null,
   "consensusEngine": null,
   "properties": null,

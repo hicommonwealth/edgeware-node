@@ -29,6 +29,7 @@ substrate-service = { git = "https://github.com/paritytech/substrate", branch = 
 substrate-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 substrate-network = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 substrate-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
+substrate-telemetry = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 substrate-client = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 structopt = "0.2.13"
