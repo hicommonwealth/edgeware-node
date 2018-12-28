@@ -220,7 +220,7 @@ dependencies = [
 [[package]]
 name = "edge-governance"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge-governance#5cd428aa5bc3ade154bd82a2ef36dfcf22db89ad"
+source = "git+https://github.com/hicommonwealth/edge-governance#46d2fd450d356254a48b7e8828153cacde2b9516"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
