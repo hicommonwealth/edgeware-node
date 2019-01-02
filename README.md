@@ -72,5 +72,5 @@ cargo build --release
 If you've rebuilt the runtime and are using the default development chain storage location (`~/.local/share/Substrate/chains/development/`), run the `./purge-chain.sh` script to clear your old chain's history.
 
 ```
-./target/release/edgeware --dev
+./target/release/edgeware --chain edgeware
 ```
