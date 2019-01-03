@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 
 [dependencies]
@@ -56,7 +56,7 @@ std = [
 	"safe-mix/std",
 	"substrate-client",
 	"substrate-consensus-aura-primitives/std",
-  "edge-delegation/std",
-  "edge-governance/std",
-  "edge-identity/std",
+	"edge-delegation/std",
+	"edge-governance/std",
+	"edge-identity/std",
 ]
