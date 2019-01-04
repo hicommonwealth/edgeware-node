@@ -33,18 +33,19 @@ substrate-telemetry = { git = "https://github.com/paritytech/substrate", branch 
 substrate-client = { git = "https://github.com/paritytech/substrate", branch = "v0.9", default-features = false }
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 structopt = "0.2.13"
-
-edgeware-runtime = { path = "runtime" }
 node-executor = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
-edge-delegation = { git = "https://github.com/hicommonwealth/edge-delegation" }
-edge-governance = { git = "https://github.com/hicommonwealth/edge-governance" }
-edge-identity = { git = "https://github.com/hicommonwealth/edge-identity" }
+edgeware-runtime = { path = "runtime" }
 
 [build-dependencies]
 vergen = "2"
 
 [workspace]
-members = [ "runtime" ]
+members = [
+  "runtime",
+  "modules/edge-delegation",
+  "modules/edge-governance",
+  "modules/edge-identity"
+]
 exclude = [ "runtime/wasm" ]
 
 [profile.release]

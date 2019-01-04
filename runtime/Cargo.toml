@@ -28,9 +28,9 @@ srml-upgrade-key = { git = "https://github.com/paritytech/substrate", branch = "
 substrate-client = { git = "https://github.com/paritytech/substrate", branch = "v0.9", optional = true }
 sr-version = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
 substrate-consensus-aura-primitives = { git = "https://github.com/paritytech/substrate", branch = "v0.9" }
-edge-delegation = { git = "https://github.com/hicommonwealth/edge-delegation" }
-edge-governance = { git = "https://github.com/hicommonwealth/edge-governance" }
-edge-identity = { git = "https://github.com/hicommonwealth/edge-identity" }
+edge-delegation = { path = "../modules/edge-delegation" }
+edge-governance = { path = "../modules/edge-governance" }
+edge-identity = { path = "../modules/edge-identity" }
 
 [features]
 default = ["std"]

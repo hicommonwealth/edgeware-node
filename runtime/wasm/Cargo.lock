@@ -199,7 +199,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "edge-delegation"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge-delegation#dbd978d1cd93a6a4e8eb4225509a78699b8a8b25"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -219,7 +218,6 @@ dependencies = [
 [[package]]
 name = "edge-governance"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/edge-governance#cb498631385a2b14476083c122f2ab4aaf6d7f32"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -239,7 +237,6 @@ dependencies = [
 [[package]]
 name = "edge-identity"
 version = "0.1.1"
-source = "git+https://github.com/hicommonwealth/edge-identity#db3b56acefd0d51564d8276261793d14cb1b1013"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -258,11 +255,11 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
- "edge-delegation 0.1.0 (git+https://github.com/hicommonwealth/edge-delegation)",
- "edge-governance 0.1.0 (git+https://github.com/hicommonwealth/edge-governance)",
- "edge-identity 0.1.1 (git+https://github.com/hicommonwealth/edge-identity)",
+ "edge-delegation 0.1.0",
+ "edge-governance 0.1.0",
+ "edge-identity 0.1.1",
  "integer-sqrt 0.1.0 (git+https://github.com/paritytech/integer-sqrt-rs.git)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1918,9 +1915,6 @@ dependencies = [
 "checksum crossbeam-utils 0.6.3 (registry+https://github.com/rust-lang/crates.io-index)" = "41ee4864f4797060e52044376f7d107429ce1fb43460021b126424b7180ee21a"
 "checksum crunchy 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "a2f4a431c5c9f662e1200b7c7f02c34e91361150e382089a8f2dec3ba680cbda"
 "checksum crunchy 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "c240f247c278fa08a6d4820a6a222bfc6e0d999e51ba67be94f44c905b2161f2"
-"checksum edge-delegation 0.1.0 (git+https://github.com/hicommonwealth/edge-delegation)" = "<none>"
-"checksum edge-governance 0.1.0 (git+https://github.com/hicommonwealth/edge-governance)" = "<none>"
-"checksum edge-identity 0.1.1 (git+https://github.com/hicommonwealth/edge-identity)" = "<none>"
 "checksum elastic-array 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "88d4851b005ef16de812ea9acdb7bece2f0a40dd86c07b85631d7dafa54537bb"
 "checksum environmental 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "db746025e3ea695bfa0ae744dbacd5fcfc8db51b9760cf8bd0ab69708bb93c49"
 "checksum error-chain 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)" = "07e791d3be96241c77c43846b665ef1384606da2cd2a48730abe606a12906e02"
