@@ -125,16 +125,12 @@ mod tests {
         t.into()
     }
 
-    fn publish_identity_attestation(who: H256, attestation: &[u8]) -> super::Result {
-        Identity::attest(Origin::signed(who), attestation.to_vec())
+    fn register_identity(who: H256, identity: &[u8]) -> super::Result {
+        Identity::register(Origin::signed(who), identity.to_vec())
     }
 
-    fn link_identity_with_proof(
-        who: H256,
-        identity_hash: H256,
-        proof_link: &[u8],
-    ) -> super::Result {
-        Identity::link(Origin::signed(who), identity_hash, proof_link.to_vec())
+    fn attest_to_identity(who: H256, identity_hash: H256, attestation: &[u8]) -> super::Result {
+        Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
     }
 
     fn add_metadata_to_account(
@@ -162,56 +158,56 @@ mod tests {
     }
 
     #[test]
-    fn propose_should_work() {
+    fn register_should_work() {
         with_externalities(&mut new_test_ext(), || {
             System::set_block_number(1);
 
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
             let public: H256 = pair.public().0.into();
 
-            assert_ok!(publish_identity_attestation(public, message));
+            assert_ok!(register_identity(public, identity));
             assert_eq!(
                 System::events(),
                 vec![EventRecord {
                     phase: Phase::ApplyExtrinsic(0),
-                    event: Event::identity(RawEvent::Attested(identity_hash, public))
+                    event: Event::identity(RawEvent::Register(identity_hash, public))
                 }]
             );
         });
     }
 
     #[test]
-    fn propose_and_link_should_work() {
+    fn register_and_attest_should_work() {
         with_externalities(&mut new_test_ext(), || {
             System::set_block_number(1);
 
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
             let public: H256 = pair.public().0.into();
 
-            assert_ok!(publish_identity_attestation(public, message));
+            assert_ok!(register_identity(public, identity));
 
-            let proof_link: &[u8] = b"www.proof.com/link_of_extra_proof";
-            assert_ok!(link_identity_with_proof(public, identity_hash, proof_link));
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
             assert_eq!(
                 System::events(),
                 vec![
                     EventRecord {
                         phase: Phase::ApplyExtrinsic(0),
-                        event: Event::identity(RawEvent::Attested(identity_hash, public))
+                        event: Event::identity(RawEvent::Register(identity_hash, public))
                     },
                     EventRecord {
                         phase: Phase::ApplyExtrinsic(0),
-                        event: Event::identity(RawEvent::Linked(identity_hash, public))
+                        event: Event::identity(RawEvent::Attest(identity_hash, public))
                     }
                 ]
             );
@@ -219,27 +215,27 @@ mod tests {
     }
 
     #[test]
-    fn link_without_publish_should_not_work() {
+    fn attest_without_register_should_not_work() {
         with_externalities(&mut new_test_ext(), || {
             System::set_block_number(1);
 
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let public: H256 = pair.public().0.into();
 
-            let proof_link: &[u8] = b"www.proof.com/link_of_extra_proof";
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
             assert_eq!(
-                link_identity_with_proof(public, identity_hash, proof_link),
+                attest_to_identity(public, identity_hash, attestation),
                 Err("Identity does not exist")
             );
         });
     }
 
     #[test]
-    fn link_from_different_account_should_not_work() {
+    fn attest_from_different_account_should_not_work() {
         with_externalities(&mut new_test_ext(), || {
             System::set_block_number(1);
 
@@ -249,15 +245,15 @@ mod tests {
             let other: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let public: H256 = pair.public().0.into();
             let other_pub: H256 = other.public().0.into();
 
-            assert_ok!(publish_identity_attestation(public, message));
-            let proof_link: &[u8] = b"www.proof.com/link_of_extra_proof";
+            assert_ok!(register_identity(public, identity));
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
             assert_eq!(
-                link_identity_with_proof(other_pub, identity_hash, proof_link),
+                attest_to_identity(other_pub, identity_hash, attestation),
                 Err("Stored identity does not match sender")
             );
         });
@@ -270,8 +266,8 @@ mod tests {
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
             let public: H256 = pair.public().0.into();
 
@@ -279,7 +275,7 @@ mod tests {
             let display_name: &[u8] = b"drewstone";
             let tagline: &[u8] = b"hello world!";
 
-            assert_ok!(publish_identity_attestation(public, message));
+            assert_ok!(register_identity(public, identity));
             assert_ok!(add_metadata_to_account(
                 public,
                 identity_hash,
@@ -291,15 +287,15 @@ mod tests {
     }
 
     #[test]
-    fn add_metadata_without_publish_should_not_work() {
+    fn add_metadata_without_register_should_not_work() {
         with_externalities(&mut new_test_ext(), || {
             System::set_block_number(1);
 
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let public: H256 = pair.public().0.into();
 
             let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
@@ -323,8 +319,8 @@ mod tests {
             let other: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let public: H256 = pair.public().0.into();
             let other_pub: H256 = other.public().0.into();
 
@@ -332,7 +328,7 @@ mod tests {
             let display_name: &[u8] = b"drewstone";
             let tagline: &[u8] = b"hello world!";
 
-            assert_ok!(publish_identity_attestation(public, message));
+            assert_ok!(register_identity(public, identity));
             assert_eq!(
                 add_metadata_to_account(other_pub, identity_hash, avatar, display_name, tagline),
                 Err("Stored identity does not match sender")
@@ -346,8 +342,8 @@ mod tests {
             System::set_block_number(1);
 
             let issuer = H256::from(1);
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let claim: &[u8] = b"is over 25 years of age";
 
             assert_eq!(
@@ -366,8 +362,8 @@ mod tests {
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
             let public: H256 = pair.public().0.into();
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let claim: &[u8] = b"is over 25 years of age";
 
             assert_eq!(
@@ -385,12 +381,12 @@ mod tests {
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
             let public: H256 = pair.public().0.into();
 
-            assert_ok!(publish_identity_attestation(public, message));
+            assert_ok!(register_identity(public, identity));
 
             let issuer = H256::from(1);
             let claim: &[u8] = b"is over 25 years of age";
@@ -404,8 +400,8 @@ mod tests {
             System::set_block_number(1);
 
             let issuer = H256::from(1);
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
             assert_eq!(
                 remove_claim_from_identity(issuer, identity_hash),
@@ -423,8 +419,8 @@ mod tests {
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
             let public: H256 = pair.public().0.into();
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
             assert_eq!(
                 remove_claim_from_identity(public, identity_hash),
@@ -441,11 +437,11 @@ mod tests {
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
-            let message: &[u8] = b"github.com/drewstone";
-            let identity_hash = BlakeTwo256::hash_of(&message.to_vec());
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let public: H256 = pair.public().0.into();
 
-            assert_ok!(publish_identity_attestation(public, message));
+            assert_ok!(register_identity(public, identity));
 
             let issuer = H256::from(1);
             let claim: &[u8] = b"is over 25 years of age";

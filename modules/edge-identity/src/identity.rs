@@ -47,7 +47,7 @@ pub trait Trait: system::Trait {
     type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
-pub type LinkedProof = Vec<u8>;
+pub type Attestation = Vec<u8>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
@@ -61,8 +61,8 @@ pub struct MetadataRecord {
 #[derive(Encode, Decode, PartialEq)]
 pub struct IdentityRecord<AccountId> {
     pub account: AccountId,
-    pub attestation: Vec<u8>,
-    pub proof: Option<LinkedProof>,
+    pub identity: Vec<u8>,
+    pub proof: Option<Attestation>,
     pub metadata: Option<MetadataRecord>,
 }
 
@@ -78,9 +78,9 @@ decl_module! {
         /// implementations could provide a mechanism for a trusted set of
         /// authorities to delete a squatted identity OR implement storage
         /// rent to disincentivize it.
-        pub fn attest(origin, attestation: Vec<u8>) -> Result {
+        pub fn register(origin, identity: Vec<u8>) -> Result {
             let _sender = ensure_signed(origin)?;
-            let hash = T::Hashing::hash_of(&attestation);
+            let hash = T::Hashing::hash_of(&identity);
 
             ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 
@@ -90,12 +90,12 @@ decl_module! {
 
             let record = IdentityRecord {
                 account: _sender.clone(),
-                attestation: attestation,
+                identity: identity,
                 proof: None,
                 metadata: None,
             };
             <IdentityOf<T>>::insert(hash, record);
-            Self::deposit_event(RawEvent::Attested(hash, _sender.into()));
+            Self::deposit_event(RawEvent::Register(hash, _sender.into()));
             Ok(())
         }
 
@@ -104,7 +104,7 @@ decl_module! {
         ///
         /// Current implementation overwrites all proofs if safety checks
         /// pass.
-        pub fn link(origin, identity_hash: T::Hash, proof_link: LinkedProof) -> Result {
+        pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
             let _sender = ensure_signed(origin)?;
             let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 
@@ -115,9 +115,9 @@ decl_module! {
             // currently this implements no check against updating
             // proof links
             let mut new_record = record;
-            new_record.proof = Some(proof_link);
+            new_record.proof = Some(attestation);
             <IdentityOf<T>>::insert(identity_hash, new_record);
-            Self::deposit_event(RawEvent::Linked(identity_hash, _sender.into()));
+            Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into()));
             Ok(())
         }
 
@@ -187,8 +187,8 @@ decl_event!(
     pub enum Event<T> where <T as system::Trait>::Hash,
                             <T as system::Trait>::AccountId,
                             <T as Trait>::Claim {
-        Attested(Hash, AccountId),
-        Linked(Hash, AccountId),
+        Register(Hash, AccountId),
+        Attest(Hash, AccountId),
         AddedClaim(Hash, Claim, AccountId),
         RemovedClaim(Hash, Claim, AccountId),
     }
