@@ -1,6 +1,7 @@
 doc
-target
+target/
+modules/*/target/
+runtime/wasm/target/
 .idea/
 Dockerfile
 .dockerignore
-runtime/wasm/target

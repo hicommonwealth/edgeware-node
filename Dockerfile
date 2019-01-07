@@ -36,6 +36,7 @@ LABEL maintainer="chevdor@gmail.com"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
 COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
+COPY --from=builder /edgeware/edgeware_testnet.json /usr/local/bin
 
 RUN rm -rf /usr/lib/python* && \
 	mkdir -p /root/.local/share/Substrate && \
@@ -44,4 +45,5 @@ RUN rm -rf /usr/lib/python* && \
 EXPOSE 30333 9933 9944
 VOLUME ["/data"]
 
-CMD ["/usr/local/bin/edgeware", "--dev", "--ws-external"]
+WORKDIR /usr/local/bin
+CMD ["edgeware", "--chain", "edgeware", "--ws-external"]
