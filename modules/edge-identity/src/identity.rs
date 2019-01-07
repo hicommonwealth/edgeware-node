@@ -40,7 +40,7 @@ use runtime_support::dispatch::Result;
 use runtime_support::{Parameter, StorageMap, StorageValue};
 use system::ensure_signed;
 
-pub trait Trait: system::Trait {
+pub trait Trait: session::Trait {
     /// The claims type
     type Claim: Parameter + MaybeSerializeDebug;
     /// The overarching event type.
@@ -58,10 +58,19 @@ pub struct MetadataRecord {
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
+#[derive(Encode, Decode, Copy, Clone, Eq, PartialEq, Default)]
+pub enum IdentityStage {
+    Registered,
+    Attested,
+    Verified
+}
+
+#[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
 pub struct IdentityRecord<AccountId> {
     pub account: AccountId,
     pub identity: Vec<u8>,
+    pub stage: IdentityStage,
     pub proof: Option<Attestation>,
     pub metadata: Option<MetadataRecord>,
 }
@@ -91,10 +100,18 @@ decl_module! {
             let record = IdentityRecord {
                 account: _sender.clone(),
                 identity: identity,
+                stage: Registered,
                 proof: None,
                 metadata: None,
             };
             <IdentityOf<T>>::insert(hash, record);
+
+            // TODO: configure this expiration
+            let expiration = <system::Module<T>>::block_number() + 1000;
+            let mut timeouts = Self::identity_timeouts();
+            timeouts.push((hash, expiration));
+            <IdentityTimeouts<T>>::put(timeouts);
+
             Self::deposit_event(RawEvent::Register(hash, _sender.into()));
             Ok(())
         }
@@ -116,8 +133,33 @@ decl_module! {
             // proof links
             let mut new_record = record;
             new_record.proof = Some(attestation);
+            new_record.stage = Attested;
             <IdentityOf<T>>::insert(identity_hash, new_record);
+
+            // bump timeout before verification
+            // TODO: configure this timeout
+            let expiration = <system::Module<T>>::block_number() + 1000;
+            let mut timeouts = Self::identity_timeouts();
+            timeouts.retain(|(hash, _)| hash != identity_hash);
+            timeouts.push((identity_hash, expiration));
+            <IdentityTimeouts<T>>::put(timeouts);
+
             Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into()));
+            Ok(())
+        }
+
+        pub fn verify(origin, identity_hash: T::Hash) -> Result {
+            let _sender = ensure_signed(origin)?;
+            ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
+
+            let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+            let mut new_record = record;
+            new_record.stage = Verified;
+            <IdentityOf<T>>::insert(identity_hash, new_record);
+
+            let mut timeouts = Self::identity_timeouts();
+            timeouts.retain(|(hash, _)| hash != identity_hash);
+            <IdentityTimeouts<T>>::put(timeouts);
             Ok(())
         }
 
@@ -182,6 +224,32 @@ decl_module! {
     }
 }
 
+impl<T: Trait> Module<T> {
+    fn delete_identity(identity_hash: T::Hash) {
+        // assumes the identity has already been removed from timeout vectors
+        let mut idents = Self::identities();
+        idents.retain(|&hash| hash != identity_hash);
+        <Identities<T>>::put(idents);
+        <IdentityOf<T>>::remove(identity_hash);
+    }
+
+    fn new_session() {
+        let currBlock = <system::Module<T>>::block_number();
+        let (expired, valid) = Self::identity_timeouts()
+            .into_iter()
+            .partition(|(_, expiration)| currBlock > expiration);
+        expired.for_each(move |(hash, _)| Self::delete_identity(hash));
+        <IdentityTimeouts<T>>::put(valid);
+    }
+}
+
+impl<X, T: Trait> session::OnSessionChange<X> for Module<T>
+{
+    fn on_session_change(_: X, _: bool) {
+        Self::new_session();
+    }
+}
+
 /// An event in this module.
 decl_event!(
     pub enum Event<T> where <T as system::Trait>::Hash,
@@ -198,8 +266,12 @@ decl_storage! {
     trait Store for Module<T: Trait> as Identity {
         /// The hashed identities.
         pub Identities get(identities): Vec<(T::Hash)>;
+        /// List of identities awaiting attestation or verification.
+        pub IdentityTimeouts get(identity_timeouts): Vec<(T::Hash, T::BlockNumber)>;
         /// Actual identity for a given hash, if it's current.
         pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId>>;
+        /// Accounts granted power to verify identities
+        pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
         /// The set of active claims issuers
         pub ClaimsIssuers get(claims_issuers) config(): Vec<T::AccountId>;
         /// The claims mapping for identity records: (claims_issuer, claim)
