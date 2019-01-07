@@ -6,9 +6,9 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ### Edge
 
-* [Delegation](https://github.com/hicommonwealth/edge_delegation)
-* [Governance](https://github.com/hicommonwealth/edge_governance)
-* [Identity](https://github.com/hicommonwealth/edge_identity)
+* [Delegation](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-delegation)
+* [Governance](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-governance)
+* [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
 
 ### SRML
 
