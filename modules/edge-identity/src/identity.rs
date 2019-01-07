@@ -30,8 +30,8 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
-extern crate srml_balances as balances;
 extern crate srml_system as system;
+extern crate srml_session as session;
 
 use codec::Codec;
 use rstd::prelude::*;
@@ -58,7 +58,7 @@ pub struct MetadataRecord {
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
-#[derive(Encode, Decode, Copy, Clone, Eq, PartialEq, Default)]
+#[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
 pub enum IdentityStage<BlockNumber> {
     Registered(BlockNumber),
     Attested(BlockNumber),
@@ -93,17 +93,16 @@ decl_module! {
 
             ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 
-            let blockExpiry = get_expiration_block();
-
+            let expirationBlock = Self::get_expiration_block();
             <Identities<T>>::mutate(|idents| idents.push(hash.clone()));
-            <IdentityTimeouts<T>>::mutate(|t| t.push((hash, blockExpiry)));
             <IdentityOf<T>>::insert(hash, IdentityRecord {
                 account: _sender.clone(),
                 identity: identity,
-                stage: Registered(blockExpiry),
+                stage: IdentityStage::Registered(expirationBlock),
                 proof: None,
                 metadata: None,
             });
+            <IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expirationBlock)));
 
             Self::deposit_event(RawEvent::Register(hash, _sender.into()));
             Ok(())
@@ -121,20 +120,20 @@ decl_module! {
             // Check that original sender and current sender match
             ensure!(record.account == _sender, "Stored identity does not match sender");
 
-            // bump timeout before verification
-            let blockExpiry = Self::get_expiration_block();
-            <IdentityTimeouts<T>>::mutate(|timeouts| {
-                timeouts.retain(|(hash, _)| hash != identity_hash)
-                    .push((identity_hash, blockExpiry))
-            });
+            let expirationBlock = Self::get_expiration_block();
 
             // TODO: Decide how we want to process proof updates
             // currently this implements no check against updating
             // proof links
             let mut new_record = record;
             new_record.proof = Some(attestation);
-            new_record.stage = Attested(blockExpiry);
+            new_record.stage = IdentityStage::Attested(expirationBlock);
             <IdentityOf<T>>::insert(identity_hash, new_record);
+
+            <IdentitiesPending<T>>::mutate(|idents| {
+                idents.retain(|(hash, _)| hash != &identity_hash);
+                idents.push((identity_hash, expirationBlock))
+            });
 
             Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into()));
             Ok(())
@@ -145,14 +144,14 @@ decl_module! {
         pub fn verify(origin, identity_hash: T::Hash) -> Result {
             let _sender = ensure_signed(origin)?;
             ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
-
             let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+
             let mut new_record = record;
-            new_record.stage = Verified;
+            new_record.stage = IdentityStage::Verified;
             <IdentityOf<T>>::insert(identity_hash, new_record);
 
-            <IdentityTimeouts<T>>::mutate(|timeouts| {
-                timeouts.retain(|(hash, _) hash != identity_hash)
+            <IdentitiesPending<T>>::mutate(|idents| {
+                idents.retain(|(hash, _)| hash != &identity_hash)
             });
 
             Self::deposit_event(RawEvent::Verify(identity_hash, _sender.into()));
@@ -224,35 +223,28 @@ impl<T: Trait> Module<T> {
     /// Returns the expiration block of an identity registered or attested
     /// this block.
     fn get_expiration_block() -> T::BlockNumber {
-        let blockNum = <system::Module<T>>::block_number();
-        blockNum + <VerificationTimeLimit<T>>::get()
+        <system::Module<T>>::block_number() + <ExpirationTime<T>>::get()
     }
 
-    /// Removes a hash and its metadata from storage
-    fn delete_identity(identity_hash: T::Hash) {
-        // assumes the identity has already been removed from timeout vectors
-        <Identities<T>>::mutate(|idents| {
-            idents.retain(|(hash, _) hash != identity_hash)
-        });
-        <IdentityOf<T>>::remove(identity_hash);
-    }
-
-    fn process_identity_timeouts() {
+    /// Deletes all identities expiring this session.
+    fn process_expirations() {
         let currBlock = <system::Module<T>>::block_number();
-        let (expired, valid) = Self::identity_timeouts().into_iter()
-            .partition(|(_, expiration)| currBlock > expiration);
-        expired.for_each(move |(hash, _)| {
-            Self::delete_identity(hash);
-            Self::deposit_event(RawEvent::Expired(hash))
+        let (expired, valid) : (Vec<_>, _) = <IdentitiesPending<T>>::get().into_iter()
+            .partition(|(_, expiration)| currBlock > *expiration);
+        
+        expired.into_iter().for_each(move |(exp_hash, _)| {
+            <Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
+            <IdentityOf<T>>::remove(exp_hash);
+            Self::deposit_event(RawEvent::Expired(exp_hash))
         });
-        <IdentityTimeouts<T>>::put(valid);
+        <IdentitiesPending<T>>::put(valid);
     }
 }
 
 impl<X, T: Trait> session::OnSessionChange<X> for Module<T>
 {
     fn on_session_change(_: X, _: bool) {
-        Self::process_identity_timeouts();
+        Self::process_expirations();
     }
 }
 
@@ -275,12 +267,12 @@ decl_storage! {
     trait Store for Module<T: Trait> as Identity {
         /// The hashed identities.
         pub Identities get(identities): Vec<(T::Hash)>;
-        /// Number of blocks allowed between register/attest or attest/verify.
-        pub VerificationTimeLimit get() config(): T::BlockNumber;
-        /// List of identities awaiting attestation or verification and expiry blocks
-        pub IdentityTimeouts get(identity_timeouts): Vec<(T::Hash, T::BlockNumber)>;
         /// Actual identity for a given hash, if it's current.
         pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::BlockNumber>>;
+        /// List of identities awaiting attestation or verification and associated expirations
+        pub IdentitiesPending get(identities_pending): Vec<(T::Hash, T::BlockNumber)>;
+        /// Number of blocks allowed between register/attest or attest/verify.
+        pub ExpirationTime get(expiration_time) config(): T::BlockNumber;
         /// Accounts granted power to verify identities
         pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
         /// The set of active claims issuers
