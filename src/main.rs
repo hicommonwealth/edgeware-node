@@ -21,7 +21,6 @@ extern crate substrate_transaction_pool as transaction_pool;
 #[macro_use]
 extern crate substrate_service;
 extern crate edgeware_runtime;
-#[macro_use]
 extern crate structopt;
 extern crate node_executor;
 extern crate sr_primitives as runtime_primitives;
