@@ -31,16 +31,15 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
-extern crate srml_session as session;
+extern crate srml_timestamp as timestamp;
 
-use codec::Codec;
 use rstd::prelude::*;
-use runtime_primitives::traits::{As, Hash, MaybeSerializeDebug, Member, SimpleArithmetic};
+use runtime_primitives::traits::{Hash, MaybeSerializeDebug};
 use runtime_support::dispatch::Result;
 use runtime_support::{Parameter, StorageMap, StorageValue};
 use system::ensure_signed;
 
-pub trait Trait: session::Trait {
+pub trait Trait: timestamp::Trait {
     /// The claims type
     type Claim: Parameter + MaybeSerializeDebug;
     /// The overarching event type.
@@ -62,7 +61,7 @@ pub struct MetadataRecord {
 pub enum IdentityStage<BlockNumber> {
     Registered(BlockNumber),
     Attested(BlockNumber),
-    Verified
+    Verified,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -93,16 +92,16 @@ decl_module! {
 
             ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 
-            let expirationBlock = Self::get_expiration_block();
+            let expiration_block = Self::get_expiration_block();
             <Identities<T>>::mutate(|idents| idents.push(hash.clone()));
             <IdentityOf<T>>::insert(hash, IdentityRecord {
                 account: _sender.clone(),
                 identity: identity,
-                stage: IdentityStage::Registered(expirationBlock),
+                stage: IdentityStage::Registered(expiration_block),
                 proof: None,
                 metadata: None,
             });
-            <IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expirationBlock)));
+            <IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expiration_block)));
 
             Self::deposit_event(RawEvent::Register(hash, _sender.into()));
             Ok(())
@@ -117,22 +116,26 @@ decl_module! {
             let _sender = ensure_signed(origin)?;
             let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 
+            if record.stage == IdentityStage::Verified {
+                return Err("Already verified");
+            }
+
             // Check that original sender and current sender match
             ensure!(record.account == _sender, "Stored identity does not match sender");
 
-            let expirationBlock = Self::get_expiration_block();
+            let expiration_block = Self::get_expiration_block();
 
             // TODO: Decide how we want to process proof updates
             // currently this implements no check against updating
             // proof links
             let mut new_record = record;
             new_record.proof = Some(attestation);
-            new_record.stage = IdentityStage::Attested(expirationBlock);
+            new_record.stage = IdentityStage::Attested(expiration_block);
             <IdentityOf<T>>::insert(identity_hash, new_record);
 
             <IdentitiesPending<T>>::mutate(|idents| {
                 idents.retain(|(hash, _)| hash != &identity_hash);
-                idents.push((identity_hash, expirationBlock))
+                idents.push((identity_hash, expiration_block))
             });
 
             Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into()));
@@ -145,6 +148,12 @@ decl_module! {
             let _sender = ensure_signed(origin)?;
             ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
             let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+
+            match record.stage {
+                IdentityStage::Registered(_) => return Err("No attestation to verify"),
+                IdentityStage::Verified => return Err("Already verified"),
+                IdentityStage::Attested(_) => ()
+            }
 
             let mut new_record = record;
             new_record.stage = IdentityStage::Verified;
@@ -226,12 +235,13 @@ impl<T: Trait> Module<T> {
         <system::Module<T>>::block_number() + <ExpirationTime<T>>::get()
     }
 
-    /// Deletes all identities expiring this session.
+    /// Deletes all identities expiring this block
     fn process_expirations() {
-        let currBlock = <system::Module<T>>::block_number();
-        let (expired, valid) : (Vec<_>, _) = <IdentitiesPending<T>>::get().into_iter()
-            .partition(|(_, expiration)| currBlock > *expiration);
-        
+        let curr_block = <system::Module<T>>::block_number();
+        let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
+            .into_iter()
+            .partition(|(_, expiration)| curr_block >= *expiration);
+
         expired.into_iter().for_each(move |(exp_hash, _)| {
             <Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
             <IdentityOf<T>>::remove(exp_hash);
@@ -241,9 +251,8 @@ impl<T: Trait> Module<T> {
     }
 }
 
-impl<X, T: Trait> session::OnSessionChange<X> for Module<T>
-{
-    fn on_session_change(_: X, _: bool) {
+impl<T: Trait> timestamp::OnTimestampSet<T::Moment> for Module<T> {
+    fn on_timestamp_set(_moment: T::Moment) {
         Self::process_expirations();
     }
 }

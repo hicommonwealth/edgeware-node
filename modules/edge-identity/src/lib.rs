@@ -23,7 +23,6 @@ extern crate serde;
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
 #[cfg(feature = "std")]
-#[macro_use]
 extern crate serde_derive;
 #[cfg(test)]
 #[macro_use]
@@ -41,10 +40,9 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
+extern crate srml_consensus as consensus;
 extern crate srml_system as system;
-
-use rstd::prelude::*;
-use runtime_support::dispatch::Result;
+extern crate srml_timestamp as timestamp;
 
 pub mod identity;
 pub use identity::{Event, Module, RawEvent, Trait};
@@ -54,17 +52,20 @@ pub use identity::{Event, Module, RawEvent, Trait};
 mod tests {
     use super::*;
 
-    use primitives::{Blake2Hasher, Hasher, H256};
+    use primitives::{Blake2Hasher, H256};
+    use rstd::prelude::*;
     use runtime_io::ed25519::Pair;
     use runtime_io::with_externalities;
+    use runtime_support::dispatch::Result;
     use system::{EventRecord, Phase};
     // The testing primitives are very useful for avoiding having to work with
     // public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
     use runtime_primitives::{
-        testing::{Digest, DigestItem, Header},
-        traits::{BlakeTwo256, Hash},
+        testing::{Digest, DigestItem, Header as TestHeader},
+        traits::{BlakeTwo256, Hash, Header},
         BuildStorage,
     };
+    use timestamp::OnTimestampSet;
 
     impl_outer_origin! {
         pub enum Origin for Test {}
@@ -77,7 +78,7 @@ mod tests {
     }
 
     impl_outer_dispatch! {
-        pub enum Call for Test where origin: Origin {}
+        pub enum Call for Test where origin: Origin { }
     }
 
     // For testing the module, we construct most of a mock runtime. This means
@@ -93,11 +94,21 @@ mod tests {
         type Hashing = BlakeTwo256;
         type Digest = Digest;
         type AccountId = H256;
-        type Header = Header;
+        type Header = TestHeader;
         type Event = Event;
         type Log = DigestItem;
     }
-
+    impl consensus::Trait for Test {
+        const NOTE_OFFLINE_POSITION: u32 = 1;
+        type Log = DigestItem;
+        type SessionKey = u64;
+        type InherentOfflineReport = ();
+    }
+    impl timestamp::Trait for Test {
+        const TIMESTAMP_SET_POSITION: u32 = 0;
+        type Moment = u64;
+        type OnTimestampSet = Identity;
+    }
     impl Trait for Test {
         type Claim = Vec<u8>;
         type Event = Event;
@@ -116,6 +127,8 @@ mod tests {
         // We use default for brevity, but you can configure as desired if needed.
         t.extend(
             identity::GenesisConfig::<Test> {
+                expiration_time: 1,
+                verifiers: [H256::from(9)].to_vec(),
                 claims_issuers: [H256::from(1), H256::from(2), H256::from(3)].to_vec(),
             }
             .build_storage()
@@ -125,12 +138,16 @@ mod tests {
         t.into()
     }
 
-    fn register_identity(who: H256, identity: &[u8]) -> super::Result {
+    fn register_identity(who: H256, identity: &[u8]) -> Result {
         Identity::register(Origin::signed(who), identity.to_vec())
     }
 
-    fn attest_to_identity(who: H256, identity_hash: H256, attestation: &[u8]) -> super::Result {
+    fn attest_to_identity(who: H256, identity_hash: H256, attestation: &[u8]) -> Result {
         Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
+    }
+
+    fn verify_identity(who: H256, identity_hash: H256) -> Result {
+        Identity::verify(Origin::signed(who), identity_hash)
     }
 
     fn add_metadata_to_account(
@@ -139,7 +156,7 @@ mod tests {
         avatar: &[u8],
         display_name: &[u8],
         tagline: &[u8],
-    ) -> super::Result {
+    ) -> Result {
         Identity::add_metadata(
             Origin::signed(who),
             identity_hash,
@@ -149,11 +166,11 @@ mod tests {
         )
     }
 
-    fn add_claim_to_identity(who: H256, identity_hash: H256, claim: &[u8]) -> super::Result {
+    fn add_claim_to_identity(who: H256, identity_hash: H256, claim: &[u8]) -> Result {
         Identity::add_claim(Origin::signed(who), identity_hash, claim.to_vec())
     }
 
-    fn remove_claim_from_identity(who: H256, identity_hash: H256) -> super::Result {
+    fn remove_claim_from_identity(who: H256, identity_hash: H256) -> Result {
         Identity::remove_claim(Origin::signed(who), identity_hash)
     }
 
@@ -178,6 +195,25 @@ mod tests {
                     event: Event::identity(RawEvent::Register(identity_hash, public))
                 }]
             );
+        });
+    }
+
+    #[test]
+    fn register_twice_should_not_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+            assert_err!(
+                register_identity(public, identity),
+                "Identity already exists"
+            )
         });
     }
 
@@ -227,9 +263,9 @@ mod tests {
             let public: H256 = pair.public().0.into();
 
             let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-            assert_eq!(
+            assert_err!(
                 attest_to_identity(public, identity_hash, attestation),
-                Err("Identity does not exist")
+                "Identity does not exist"
             );
         });
     }
@@ -252,10 +288,272 @@ mod tests {
 
             assert_ok!(register_identity(public, identity));
             let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-            assert_eq!(
+            assert_err!(
                 attest_to_identity(other_pub, identity_hash, attestation),
-                Err("Stored identity does not match sender")
+                "Stored identity does not match sender"
             );
+        });
+    }
+
+    #[test]
+    fn register_attest_and_verify_should_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+            let verifier = H256::from(9);
+            assert_ok!(verify_identity(verifier, identity_hash));
+
+            assert_eq!(
+                System::events(),
+                vec![
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Register(identity_hash, public))
+                    },
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Attest(identity_hash, public))
+                    },
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Verify(identity_hash, verifier))
+                    }
+                ]
+            );
+        });
+    }
+
+    #[test]
+    fn verify_before_register_should_not_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+            let verifier: H256 = H256::from(9);
+            assert_err!(
+                verify_identity(verifier, identity_hash),
+                "Identity does not exist"
+            );
+        });
+    }
+
+    #[test]
+    fn verify_before_attest_should_not_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let verifier = H256::from(9);
+            assert_err!(
+                verify_identity(verifier, identity_hash),
+                "No attestation to verify"
+            );
+        });
+    }
+
+    #[test]
+    fn verify_twice_should_not_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+            let verifier = H256::from(9);
+            assert_ok!(verify_identity(verifier, identity_hash));
+            assert_err!(verify_identity(verifier, identity_hash), "Already verified");
+        });
+    }
+
+    #[test]
+    fn attest_after_verify_should_not_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+            let verifier = H256::from(9);
+            assert_ok!(verify_identity(verifier, identity_hash));
+            assert_err!(
+                attest_to_identity(public, identity_hash, attestation),
+                "Already verified"
+            );
+        });
+    }
+
+    #[test]
+    fn verify_from_nonverifier_should_not_work() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+            assert_err!(
+                verify_identity(public, identity_hash),
+                "Sender not a verifier"
+            );
+        });
+    }
+
+    #[test]
+    fn register_should_expire() {
+        with_externalities(&mut new_test_ext(), || {
+            System::initialise(&1, &Default::default(), &Default::default());
+            Identity::on_timestamp_set(0);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let header = System::finalise();
+            System::initialise(&2, &Header::hash(&header), &Default::default());
+            Identity::on_timestamp_set(0);
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_err!(
+                attest_to_identity(public, identity_hash, attestation),
+                "Identity does not exist"
+            );
+
+            assert_eq!(
+                System::events(),
+                vec![EventRecord {
+                    phase: Phase::ApplyExtrinsic(0),
+                    event: Event::identity(RawEvent::Expired(identity_hash))
+                },]
+            );
+        });
+    }
+
+    #[test]
+    fn attest_should_expire() {
+        with_externalities(&mut new_test_ext(), || {
+            System::initialise(&1, &Default::default(), &Default::default());
+            Identity::on_timestamp_set(0);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+            let header = System::finalise();
+            System::initialise(&2, &Header::hash(&header), &Default::default());
+            Identity::on_timestamp_set(0);
+
+            let verifier: H256 = H256::from(9);
+            assert_err!(
+                verify_identity(verifier, identity_hash),
+                "Identity does not exist"
+            );
+
+            assert_eq!(
+                System::events(),
+                vec![EventRecord {
+                    phase: Phase::ApplyExtrinsic(0),
+                    event: Event::identity(RawEvent::Expired(identity_hash))
+                },]
+            );
+        });
+    }
+
+    #[test]
+    fn verify_should_not_expire() {
+        with_externalities(&mut new_test_ext(), || {
+            System::set_block_number(1);
+
+            let pair: Pair = Pair::from_seed(&hex!(
+                "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+            ));
+            let identity: &[u8] = b"github.com/drewstone";
+            let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+            let public: H256 = pair.public().0.into();
+
+            assert_ok!(register_identity(public, identity));
+
+            let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+            assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+            let verifier = H256::from(9);
+            assert_ok!(verify_identity(verifier, identity_hash));
+
+            let header = System::finalise();
+            System::initialise(&2, &Header::hash(&header), &Default::default());
+            Identity::on_timestamp_set(0);
+
+            assert_err!(
+                register_identity(public, identity),
+                "Identity already exists"
+            )
         });
     }
 
@@ -301,9 +599,9 @@ mod tests {
             let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
             let display_name: &[u8] = b"drewstone";
             let tagline: &[u8] = b"hello world!";
-            assert_eq!(
+            assert_err!(
                 add_metadata_to_account(public, identity_hash, avatar, display_name, tagline),
-                Err("Identity does not exist")
+                "Identity does not exist"
             );
         });
     }
@@ -329,9 +627,9 @@ mod tests {
             let tagline: &[u8] = b"hello world!";
 
             assert_ok!(register_identity(public, identity));
-            assert_eq!(
+            assert_err!(
                 add_metadata_to_account(other_pub, identity_hash, avatar, display_name, tagline),
-                Err("Stored identity does not match sender")
+                "Stored identity does not match sender"
             );
         });
     }
@@ -346,9 +644,9 @@ mod tests {
             let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let claim: &[u8] = b"is over 25 years of age";
 
-            assert_eq!(
+            assert_err!(
                 add_claim_to_identity(issuer, identity_hash, claim),
-                Err("Invalid identity record")
+                "Invalid identity record"
             );
         });
     }
@@ -366,9 +664,9 @@ mod tests {
             let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
             let claim: &[u8] = b"is over 25 years of age";
 
-            assert_eq!(
+            assert_err!(
                 add_claim_to_identity(public, identity_hash, claim),
-                Err("Invalid claims issuer")
+                "Invalid claims issuer"
             );
         });
     }
@@ -403,9 +701,9 @@ mod tests {
             let identity: &[u8] = b"github.com/drewstone";
             let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
-            assert_eq!(
+            assert_err!(
                 remove_claim_from_identity(issuer, identity_hash),
-                Err("Invalid identity record")
+                "Invalid identity record"
             );
         });
     }
@@ -422,9 +720,9 @@ mod tests {
             let identity: &[u8] = b"github.com/drewstone";
             let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
-            assert_eq!(
+            assert_err!(
                 remove_claim_from_identity(public, identity_hash),
-                Err("Invalid claims issuer")
+                "Invalid claims issuer"
             );
         });
     }
@@ -448,9 +746,9 @@ mod tests {
             assert_ok!(add_claim_to_identity(issuer, identity_hash, claim));
 
             let another_issuer = H256::from(2);
-            assert_eq!(
+            assert_err!(
                 remove_claim_from_identity(another_issuer, identity_hash),
-                Err("No existing claim under issuer")
+                "No existing claim under issuer"
             );
         });
     }
