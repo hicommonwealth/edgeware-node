@@ -611,10 +611,8 @@ dependencies = [
  "sr-io 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
  "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
  "sr-std 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-consensus 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
  "srml-support 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
  "srml-system 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
- "srml-timestamp 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
  "substrate-keyring 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
  "substrate-primitives 0.1.0 (git+https://github.com/paritytech/substrate?branch=v0.9)",
 ]

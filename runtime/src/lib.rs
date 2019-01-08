@@ -169,7 +169,7 @@ impl timestamp::Trait for Runtime {
     const TIMESTAMP_SET_POSITION: u32 = 0;
     /// A timestamp: seconds since the unix epoch.
     type Moment = u64;
-    type OnTimestampSet = (Aura, Identity);
+    type OnTimestampSet = Aura;
 }
 
 /// Session key conversion.

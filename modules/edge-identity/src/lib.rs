@@ -39,9 +39,7 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
-extern crate srml_consensus as consensus;
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 
 pub mod identity;
 pub use identity::{Event, Module, RawEvent, Trait};
@@ -60,11 +58,10 @@ mod tests {
     // The testing primitives are very useful for avoiding having to work with
     // public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
     use runtime_primitives::{
-        testing::{Digest, DigestItem, Header as TestHeader},
-        traits::{BlakeTwo256, Hash, Header},
+        testing::{Digest, DigestItem, Header},
+        traits::{BlakeTwo256, Hash, OnFinalise},
         BuildStorage,
     };
-    use timestamp::OnTimestampSet;
 
     impl_outer_origin! {
         pub enum Origin for Test {}
@@ -93,20 +90,9 @@ mod tests {
         type Hashing = BlakeTwo256;
         type Digest = Digest;
         type AccountId = H256;
-        type Header = TestHeader;
+        type Header = Header;
         type Event = Event;
         type Log = DigestItem;
-    }
-    impl consensus::Trait for Test {
-        const NOTE_OFFLINE_POSITION: u32 = 1;
-        type Log = DigestItem;
-        type SessionKey = u64;
-        type InherentOfflineReport = ();
-    }
-    impl timestamp::Trait for Test {
-        const TIMESTAMP_SET_POSITION: u32 = 0;
-        type Moment = u64;
-        type OnTimestampSet = Identity;
     }
     impl Trait for Test {
         type Claim = Vec<u8>;
@@ -452,8 +438,7 @@ mod tests {
     #[test]
     fn register_should_expire() {
         with_externalities(&mut new_test_ext(), || {
-            System::initialise(&1, &Default::default(), &Default::default());
-            Identity::on_timestamp_set(0);
+            System::set_block_number(1);
 
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
@@ -465,9 +450,11 @@ mod tests {
 
             assert_ok!(register_identity(public, identity));
 
-            let header = System::finalise();
-            System::initialise(&2, &Header::hash(&header), &Default::default());
-            Identity::on_timestamp_set(0);
+            <Identity as OnFinalise<u64>>::on_finalise(1);
+            System::set_block_number(2);
+
+            <Identity as OnFinalise<u64>>::on_finalise(2);
+            System::set_block_number(3);
 
             let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
             assert_err!(
@@ -477,10 +464,16 @@ mod tests {
 
             assert_eq!(
                 System::events(),
-                vec![EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::identity(RawEvent::Expired(identity_hash))
-                },]
+                vec![
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Register(identity_hash, public))
+                    },
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Expired(identity_hash))
+                    },
+                ]
             );
         });
     }
@@ -488,8 +481,7 @@ mod tests {
     #[test]
     fn attest_should_expire() {
         with_externalities(&mut new_test_ext(), || {
-            System::initialise(&1, &Default::default(), &Default::default());
-            Identity::on_timestamp_set(0);
+            System::set_block_number(1);
 
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
@@ -504,9 +496,11 @@ mod tests {
             let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
             assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
-            let header = System::finalise();
-            System::initialise(&2, &Header::hash(&header), &Default::default());
-            Identity::on_timestamp_set(0);
+            <Identity as OnFinalise<u64>>::on_finalise(1);
+            System::set_block_number(2);
+
+            <Identity as OnFinalise<u64>>::on_finalise(2);
+            System::set_block_number(3);
 
             let verifier: H256 = H256::from(9);
             assert_err!(
@@ -516,10 +510,20 @@ mod tests {
 
             assert_eq!(
                 System::events(),
-                vec![EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::identity(RawEvent::Expired(identity_hash))
-                },]
+                vec![
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Register(identity_hash, public))
+                    },
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Attest(identity_hash, public))
+                    },
+                    EventRecord {
+                        phase: Phase::ApplyExtrinsic(0),
+                        event: Event::identity(RawEvent::Expired(identity_hash))
+                    },
+                ]
             );
         });
     }
@@ -545,9 +549,11 @@ mod tests {
             let verifier = H256::from(9);
             assert_ok!(verify_identity(verifier, identity_hash));
 
-            let header = System::finalise();
-            System::initialise(&2, &Header::hash(&header), &Default::default());
-            Identity::on_timestamp_set(0);
+            <Identity as OnFinalise<u64>>::on_finalise(1);
+            System::set_block_number(2);
+
+            <Identity as OnFinalise<u64>>::on_finalise(2);
+            System::set_block_number(3);
 
             assert_err!(
                 register_identity(public, identity),
@@ -560,6 +566,7 @@ mod tests {
     fn add_metadata_should_work() {
         with_externalities(&mut new_test_ext(), || {
             System::set_block_number(1);
+
             let pair: Pair = Pair::from_seed(&hex!(
                 "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
             ));
