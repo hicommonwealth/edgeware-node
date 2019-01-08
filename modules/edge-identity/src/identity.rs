@@ -75,9 +75,9 @@ decl_module! {
     pub struct Module<T: Trait> for enum Call where origin: T::Origin {
         fn deposit_event() = default;
 
-        /// Publish an identity with the hash of the signature. Ensures that
-        /// all identities are unique, so that no two identities of the same
-        /// can be published.
+        /// Register an identity with the hash of the signature. Ensures that
+        /// all identities are unique, so that no duplicate identities can be
+        /// registered.
         ///
         /// Current implementation suffers from squatter attacks. Additional
         /// implementations could provide a mechanism for a trusted set of
@@ -105,8 +105,8 @@ decl_module! {
             Ok(())
         }
 
-        /// Link an external proof to an existing identity iff the sender
-        /// is the original publisher of said identity.
+        /// Attest that the sender is the original publisher of said identity
+        /// by linking to an external proof.
         ///
         /// Current implementation overwrites all proofs if safety checks
         /// pass.
@@ -140,8 +140,8 @@ decl_module! {
             Ok(())
         }
 
-        /// Verify an existing identity based on its attested proof.
-        /// Can only be performed by a list of pre-selected verifiers.
+        /// Verify an existing identity based on its attested proof. Sender
+        /// be specified on the pre-selected list of verifiers.
         pub fn verify(origin, identity_hash: T::Hash) -> Result {
             let _sender = ensure_signed(origin)?;
             ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
@@ -168,7 +168,6 @@ decl_module! {
         /// Add metadata to sender's account.
         // TODO: make all options and only updated provided?
         // TODO: limit the max length of these user-submitted types?
-        // TODO: add a field relating to verification?
         pub fn add_metadata(origin, identity_hash: T::Hash, avatar: Vec<u8>, display_name: Vec<u8>, tagline: Vec<u8>) -> Result {
             let _sender = ensure_signed(origin)?;
             let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
@@ -224,6 +223,8 @@ decl_module! {
             Ok(())
         }
 
+        /// Check all pending identities for expiration when each block is
+        /// finalised. Once an identity expires, it is deleted from storage.
         fn on_finalise(n: T::BlockNumber) {
             let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
                 .into_iter()
