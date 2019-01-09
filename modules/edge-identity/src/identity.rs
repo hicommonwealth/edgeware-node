@@ -55,9 +55,9 @@ pub struct MetadataRecord {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
-pub enum IdentityStage<BlockNumber> {
-	Registered(BlockNumber),
-	Attested(BlockNumber),
+pub enum IdentityStage {
+	Registered,
+	Attested,
 	Verified,
 }
 
@@ -66,7 +66,8 @@ pub enum IdentityStage<BlockNumber> {
 pub struct IdentityRecord<AccountId, BlockNumber> {
 	pub account: AccountId,
 	pub identity: Vec<u8>,
-	pub stage: IdentityStage<BlockNumber>,
+	pub stage: IdentityStage,
+	pub expiration_time: Option<BlockNumber>,
 	pub proof: Option<Attestation>,
 	pub metadata: Option<MetadataRecord>,
 }
@@ -95,7 +96,8 @@ decl_module! {
 			<IdentityOf<T>>::insert(hash, IdentityRecord {
 				account: _sender.clone(),
 				identity: identity,
-				stage: IdentityStage::Registered(expiration),
+				stage: IdentityStage::Registered,
+				expiration_time: Some(expiration),
 				proof: None,
 				metadata: None,
 			});
@@ -126,10 +128,12 @@ decl_module! {
 			// TODO: Decide how we want to process proof updates
 			// currently this implements no check against updating
 			// proof links
-			let mut new_record = record;
-			new_record.proof = Some(attestation);
-			new_record.stage = IdentityStage::Attested(expiration);
-			<IdentityOf<T>>::insert(identity_hash, new_record);
+			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+				proof: Some(attestation),
+				stage: IdentityStage::Attested,
+				expiration_time: Some(expiration),
+				..record
+			});
 
 			<IdentitiesPending<T>>::mutate(|idents| {
 				idents.retain(|(hash, _)| hash != &identity_hash);
@@ -146,16 +150,17 @@ decl_module! {
 			let _sender = ensure_signed(origin)?;
 			ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
-
 			match record.stage {
-				IdentityStage::Registered(_) => return Err("No attestation to verify"),
+				IdentityStage::Registered => return Err("No attestation to verify"),
 				IdentityStage::Verified => return Err("Already verified"),
-				IdentityStage::Attested(_) => ()
+				IdentityStage::Attested => ()
 			}
 
-			let mut new_record = record;
-			new_record.stage = IdentityStage::Verified;
-			<IdentityOf<T>>::insert(identity_hash, new_record);
+			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+				stage: IdentityStage::Verified,
+				expiration_time: None,
+				..record
+			});
 
 			<IdentitiesPending<T>>::mutate(|idents| {
 				idents.retain(|(hash, _)| hash != &identity_hash)

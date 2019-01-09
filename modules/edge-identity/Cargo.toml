@@ -1,6 +1,6 @@
 [package]
 name = "edge-identity"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["Drew Stone <drew@commonwealth.im>"]
 
 [dependencies]
