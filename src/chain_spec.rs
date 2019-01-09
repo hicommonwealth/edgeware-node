@@ -1,6 +1,6 @@
 use edgeware_runtime::{
 	AccountId, BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
-	TimestampConfig, UpgradeKeyConfig,
+	TimestampConfig, UpgradeKeyConfig, GovernanceConfig
 };
 use primitives::{ed25519, AuthorityId};
 use substrate_service;
@@ -157,9 +157,12 @@ fn testnet_genesis(
 			key: upgrade_key,
 		}),
 		identity: Some(IdentityConfig {
-	  verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),
-	  expiration_time: 10000,
+			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),
+			expiration_time: 10000,
 			claims_issuers: initial_authorities.iter().cloned().map(Into::into).collect(),
+		}),
+		governance: Some(GovernanceConfig {
+			voting_time: (60 / 5) * 60 * 24 * 7, // 1 week
 		}),
 	}
 }

@@ -33,7 +33,7 @@ extern crate srml_system as system;
 
 use rstd::prelude::*;
 use system::ensure_signed;
-use runtime_support::{StorageValue, StorageMap, Parameter};
+use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
 use codec::Encode;
@@ -50,21 +50,23 @@ pub enum ProposalStage {
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
 pub enum ProposalCategory {
 	Signaling,
-	Funding(u32), // TODO: convert this into a Balance
+	Funding,
 	Upgrade,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct ProposalRecord<AccountId> {
+pub struct ProposalRecord<AccountId, BlockNumber> {
 	pub index: u32,
 	pub author: AccountId,
 	pub stage: ProposalStage,
+	pub transition_block: Option<BlockNumber>,
 	pub category: ProposalCategory,
 	pub title: Vec<u8>,
 	pub contents: Vec<u8>,
 	// TODO: separate comments into different object, for storage reasons
 	pub comments: Vec<(Vec<u8>, AccountId)>,
+	// TODO: for actions, we might need more data
 }
 
 pub trait Trait: system::Trait {
@@ -87,24 +89,21 @@ decl_module! {
 			buf.extend_from_slice(&_sender.encode());
 			buf.extend_from_slice(&contents.as_ref());
 			let hash = T::Hashing::hash(&buf[..]);
-			ensure!(<ProposalOf<T>>::get(&hash) == None, "Proposal already exists");
+			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
 
-			// construct proposal
 			let index = <ProposalCount<T>>::get();
 			<ProposalCount<T>>::mutate(|i| *i += 1);
-			let record = ProposalRecord { index: index,
-										  author: _sender.clone(),
-										  stage: ProposalStage::PreVoting,
-										  category: category,
-										  title: title,
-										  contents: contents,
-										  comments: vec![] };
-
-			// add new record to storage
-			<ProposalOf<T>>::insert(&hash, record);
-			let mut proposals = Self::proposals();
-			proposals.push(hash.clone());
-			<Proposals<T>>::put(proposals);
+			<ProposalOf<T>>::insert(hash, ProposalRecord {
+				index: index,
+				author: _sender.clone(),
+				stage: ProposalStage::PreVoting,
+				category: category,
+				transition_block: None,
+				title: title,
+				contents: contents,
+				comments: vec![]
+			});
+			<Proposals<T>>::mutate(|proposals| proposals.push(hash));
 			Self::deposit_event(RawEvent::NewProposal(_sender, hash));
 			Ok(())
 		}
@@ -112,11 +111,14 @@ decl_module! {
 		// TODO: give comments unique numbers/ids?
 		pub fn add_comment(origin, proposal_hash: T::Hash, comment: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			// TODO: can we mut borrow somehow?
-			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
-			let mut new_record = record;
-			new_record.comments.push((comment, _sender.clone()));
-			<ProposalOf<T>>::insert(&proposal_hash, new_record);
+			let record = <ProposalOf<T>>::get(proposal_hash).ok_or("Proposal does not exist")?;
+			// TODO: store comments separately to prevent all this cloning?
+			let mut new_comments = record.comments.clone();
+			new_comments.push((comment, _sender.clone()));
+			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
+				comments: new_comments,
+				..record
+			});
 			Self::deposit_event(RawEvent::NewComment(_sender, proposal_hash));
 			Ok(())
 		}
@@ -127,19 +129,16 @@ decl_module! {
 
 			// only permit original author to advance
 			ensure!(record.author == _sender, "Proposal must be advanced by author");
-			let next_stage = match record.stage {
-				ProposalStage::PreVoting => ProposalStage::Voting,
-				ProposalStage::Voting    => ProposalStage::Completed,
-				ProposalStage::Completed => { return Err("Proposal already completed") },
-			};
-			let mut new_record = record;
-			new_record.stage = next_stage;
-			<ProposalOf<T>>::insert(&proposal_hash, new_record);
-			if next_stage == ProposalStage::Voting {
-				Self::deposit_event(RawEvent::VotingStarted(proposal_hash));
-			} else if next_stage == ProposalStage::Completed {
-				Self::deposit_event(RawEvent::VotingCompleted(proposal_hash));
-			}
+			ensure!(record.stage == ProposalStage::PreVoting, "Proposal not in pre-voting stage");
+			
+			let transition_block = <system::Module<T>>::block_number() + Self::voting_time();
+			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
+				stage: ProposalStage::Voting,
+				transition_block: Some(transition_block),
+				..record
+			});
+			<ActiveProposals<T>>::mutate(|proposals| proposals.push((proposal_hash, transition_block)));
+			Self::deposit_event(RawEvent::VotingStarted(proposal_hash, transition_block));
 			Ok(())
 		}
 
@@ -148,7 +147,6 @@ decl_module! {
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
 			ensure!(record.stage == ProposalStage::Voting, "Proposal not in voting stage");
 
-			// TODO: This does not allow updating one's vote; should we support this?
 			if Self::vote_of((proposal_hash, _sender.clone())).is_none() {
 				<ProposalVoters<T>>::mutate(proposal_hash, |voters| voters.push(_sender.clone()));
 			}
@@ -156,15 +154,39 @@ decl_module! {
 			Self::deposit_event(RawEvent::VoteSubmitted(proposal_hash, _sender, vote));
 			Ok(())
 		}
+
+		/// Check all active proposals to see if they're completed. If so, update
+		/// them in storage and emit an event.
+		fn on_finalise(n: T::BlockNumber) {
+			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
+				.into_iter()
+				.partition(|(_, completion)| n >= *completion);
+			
+			<ActiveProposals<T>>::put(active);
+			finished.into_iter().for_each(move |(completed_hash, _)| {
+				match <ProposalOf<T>>::get(completed_hash) {
+					Some(proposal) => {
+						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
+							stage: ProposalStage::Completed,
+							transition_block: None,
+							..proposal
+						});
+						Self::deposit_event(RawEvent::VotingCompleted(completed_hash));
+					},
+					None => { } // TODO: emit an error here?
+				}
+			});
+		}
 	}
 }
 
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
-							<T as system::Trait>::AccountId {
+							<T as system::Trait>::AccountId,
+							<T as system::Trait>::BlockNumber {
 		NewProposal(AccountId, Hash),
 		NewComment(AccountId, Hash),
-		VotingStarted(Hash),
+		VotingStarted(Hash, BlockNumber),
 		VoteSubmitted(Hash, AccountId, bool),
 		VotingCompleted(Hash),
 	}
@@ -172,10 +194,19 @@ decl_event!(
 
 decl_storage! {
 	trait Store for Module<T: Trait> as Governance {
+		/// The total number of proposals created thus far.
 		pub ProposalCount get(proposal_count) : u32;
+		/// A list of all extant proposals.
 		pub Proposals get(proposals): Vec<T::Hash>;
-		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId>>;
+		/// A list of active proposals along with the block at which they complete.
+		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::BlockNumber)>;
+		/// Amount of time a proposal remains in "Voting" stage, in blocks.
+		pub VotingTime get(voting_time) config(): T::BlockNumber;
+		/// Map for retrieving the information about any proposal from its hash.
+		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+		/// Map for retrieving the users who've voted on any particular proposal.
 		pub ProposalVoters get(proposal_voters): map T::Hash => Vec<T::AccountId>;
+		/// Map for retrieving the actual votes of users on any particular proposal.
 		pub VoteOf get(vote_of): map (T::Hash, T::AccountId) => Option<bool>;
 	}
 }
