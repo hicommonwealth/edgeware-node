@@ -600,7 +600,7 @@ dependencies = [
 
 [[package]]
 name = "edge-identity"
-version = "0.1.2"
+version = "0.1.3"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -619,7 +619,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "ctrlc 3.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "edgeware-runtime 0.1.1",
@@ -656,7 +656,7 @@ version = "0.1.1"
 dependencies = [
  "edge-delegation 0.1.2",
  "edge-governance 0.1.2",
- "edge-identity 0.1.2",
+ "edge-identity 0.1.3",
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",

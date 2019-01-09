@@ -52,186 +52,186 @@ pub use delegation::{Module, Trait, RawEvent, Event};
 // Tests for Delegation Module
 #[cfg(test)]
 mod tests {
-    use super::*;
+	use super::*;
 
-    use system::{EventRecord, Phase};
-    use runtime_io::with_externalities;
-    use primitives::{H256, Blake2Hasher};
-    // The testing primitives are very useful for avoiding having to work with signatures
-    // or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
-    use runtime_primitives::{
-        BuildStorage, traits::{BlakeTwo256}, testing::{Digest, DigestItem, Header}
-    };
+	use system::{EventRecord, Phase};
+	use runtime_io::with_externalities;
+	use primitives::{H256, Blake2Hasher};
+	// The testing primitives are very useful for avoiding having to work with signatures
+	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
+	use runtime_primitives::{
+		BuildStorage, traits::{BlakeTwo256}, testing::{Digest, DigestItem, Header}
+	};
 
 
-    impl_outer_origin! {
-        pub enum Origin for Test {}
-    }
+	impl_outer_origin! {
+		pub enum Origin for Test {}
+	}
 
-    impl_outer_event! {
-        pub enum Event for Test {
-            delegation<T>, balances<T>,
-        }
-    }
+	impl_outer_event! {
+		pub enum Event for Test {
+			delegation<T>, balances<T>,
+		}
+	}
 
-    impl_outer_dispatch! {
-        pub enum Call for Test where origin: Origin {}
-    }
+	impl_outer_dispatch! {
+		pub enum Call for Test where origin: Origin {}
+	}
 
-    // For testing the module, we construct most of a mock runtime. This means
-    // first constructing a configuration type (`Test`) which `impl`s each of the
-    // configuration traits of modules we want to use.
-    #[derive(Clone, Eq, PartialEq)]
-    pub struct Test;
-    impl system::Trait for Test {
-        type Origin = Origin;
-        type Index = u64;
-        type BlockNumber = u64;
-        type Hash = H256;
-        type Hashing = BlakeTwo256;
-        type Digest = Digest;
-        type AccountId = H256;
-        type Header = Header;
-        type Event = Event;
-        type Log = DigestItem;
-    }
+	// For testing the module, we construct most of a mock runtime. This means
+	// first constructing a configuration type (`Test`) which `impl`s each of the
+	// configuration traits of modules we want to use.
+	#[derive(Clone, Eq, PartialEq)]
+	pub struct Test;
+	impl system::Trait for Test {
+		type Origin = Origin;
+		type Index = u64;
+		type BlockNumber = u64;
+		type Hash = H256;
+		type Hashing = BlakeTwo256;
+		type Digest = Digest;
+		type AccountId = H256;
+		type Header = Header;
+		type Event = Event;
+		type Log = DigestItem;
+	}
 
-    impl balances::Trait for Test {
-        type Balance = u64;
-        type AccountIndex = u64;
-        type OnFreeBalanceZero = ();
-        type EnsureAccountLiquid = ();
-        type Event = Event;
-    }
+	impl balances::Trait for Test {
+		type Balance = u64;
+		type AccountIndex = u64;
+		type OnFreeBalanceZero = ();
+		type EnsureAccountLiquid = ();
+		type Event = Event;
+	}
 
-    impl Trait for Test {
-        type Event = Event;
-    }
+	impl Trait for Test {
+		type Event = Event;
+	}
 
-    pub type System = system::Module<Test>;
-    pub type Delegation = Module<Test>;
+	pub type System = system::Module<Test>;
+	pub type Delegation = Module<Test>;
 
-    // This function basically just builds a genesis storage key/value store according to
-    // our desired mockup.
-    fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-        let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
-        // We use default for brevity, but you can configure as desired if needed.
-        t.into()
-    }
+	// This function basically just builds a genesis storage key/value store according to
+	// our desired mockup.
+	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
+		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		// We use default for brevity, but you can configure as desired if needed.
+		t.into()
+	}
 
-    fn delegate_to(who: H256, to_account: H256) -> super::Result {
-        Delegation::delegate_to(Origin::signed(who), to_account)
-    }
+	fn delegate_to(who: H256, to_account: H256) -> super::Result {
+		Delegation::delegate_to(Origin::signed(who), to_account)
+	}
 
-    fn undelegate_from(who: H256, from_account: H256) -> super::Result {
-        Delegation::undelegate_from(Origin::signed(who), from_account)
-    }
+	fn undelegate_from(who: H256, from_account: H256) -> super::Result {
+		Delegation::undelegate_from(Origin::signed(who), from_account)
+	}
 
-    #[test]
-    fn unit_delegate_should_work() {
-        with_externalities(&mut new_test_ext(), || {
-            System::set_block_number(1);
-            let a : Vec<H256> = (1..3).map(|v| H256::from(v)).collect();
+	#[test]
+	fn unit_delegate_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let a : Vec<H256> = (1..3).map(|v| H256::from(v)).collect();
 
-            assert_ok!(delegate_to(a[0], a[1]));
-            assert_eq!(System::events(), vec![
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
-                }]
-            );
-            assert_eq!(Delegation::tally_delegation(a.clone()),
-                       vec![(a[0], a[1]), (a[1], a[1])]);
-        });
-    }
+			assert_ok!(delegate_to(a[0], a[1]));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
+				}]
+			);
+			assert_eq!(Delegation::tally_delegation(a.clone()),
+					   vec![(a[0], a[1]), (a[1], a[1])]);
+		});
+	}
 
-    #[test]
-    fn multistep_delegate_should_work() {
-        with_externalities(&mut new_test_ext(), || {
-            System::set_block_number(1);
-            let a : Vec<H256> = (1..5).map(|v| H256::from(v)).collect();
-            
-            assert_ok!(delegate_to(a[0], a[1]));
-            assert_eq!(System::events(), vec![
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
-                }]
-            );
+	#[test]
+	fn multistep_delegate_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let a : Vec<H256> = (1..5).map(|v| H256::from(v)).collect();
+			
+			assert_ok!(delegate_to(a[0], a[1]));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
+				}]
+			);
 
-            assert_ok!(delegate_to(a[1], a[2]));
-            assert_eq!(System::events(), vec![
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
-                },
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(a[1], a[2]))
-                }]
-            );
-            assert_eq!(Delegation::tally_delegation(a.clone()),
-                       vec![(a[0], a[2]), (a[1], a[2]), (a[2], a[2]), (a[3], a[3])]);
-        });
-    }
+			assert_ok!(delegate_to(a[1], a[2]));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(a[1], a[2]))
+				}]
+			);
+			assert_eq!(Delegation::tally_delegation(a.clone()),
+					   vec![(a[0], a[2]), (a[1], a[2]), (a[2], a[2]), (a[3], a[3])]);
+		});
+	}
 
-    #[test]
-    fn self_delegate_should_fail() {
-        with_externalities(&mut new_test_ext(), || {
-            System::set_block_number(1);
-            let a = H256::from(1);
-            assert_eq!(delegate_to(a, a), Err("Invalid delegation"));
-            assert_eq!(System::events(), vec![]);
-            assert_eq!(Delegation::tally_delegation(vec![a]), vec![(a, a)]);
-        });
-    }
+	#[test]
+	fn self_delegate_should_fail() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let a = H256::from(1);
+			assert_eq!(delegate_to(a, a), Err("Invalid delegation"));
+			assert_eq!(System::events(), vec![]);
+			assert_eq!(Delegation::tally_delegation(vec![a]), vec![(a, a)]);
+		});
+	}
 
-    #[test]
-    fn cycle_delegate_should_fail() {
-        with_externalities(&mut new_test_ext(), || {
-            System::set_block_number(1);
-            let a : Vec<H256> = (1..3).map(|v| H256::from(v)).collect();
-            
-            assert_ok!(delegate_to(a[0], a[1]));
-            assert_eq!(System::events(), vec![
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
-                }]
-            );
-            assert_eq!(delegate_to(a[1], a[0]), Err("Invalid delegation"));
-            
-            // ensure failure did not add event
-            assert_eq!(System::events(), vec![
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
-                }]
-            );
-            assert_eq!(Delegation::tally_delegation(a.clone()),
-                       vec![(a[0], a[1]), (a[1], a[1])])
-        });
-    }
+	#[test]
+	fn cycle_delegate_should_fail() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let a : Vec<H256> = (1..3).map(|v| H256::from(v)).collect();
+			
+			assert_ok!(delegate_to(a[0], a[1]));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
+				}]
+			);
+			assert_eq!(delegate_to(a[1], a[0]), Err("Invalid delegation"));
+			
+			// ensure failure did not add event
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
+				}]
+			);
+			assert_eq!(Delegation::tally_delegation(a.clone()),
+					   vec![(a[0], a[1]), (a[1], a[1])])
+		});
+	}
 
-    #[test]
-    fn unit_undelegate_should_work() {
-        with_externalities(&mut new_test_ext(), || {
-            System::set_block_number(1);
+	#[test]
+	fn unit_undelegate_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
 
-            assert_ok!(delegate_to(H256::from(1), H256::from(2)));
-            assert_ok!(undelegate_from(H256::from(1), H256::from(2)));
-            assert_eq!(System::events(), vec![
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Delegated(H256::from(1), H256::from(2)))
-                },
-                EventRecord {
-                    phase: Phase::ApplyExtrinsic(0),
-                    event: Event::delegation(RawEvent::Undelegated(H256::from(1), H256::from(2)))
-                }]
-            );
-        });
-    }
+			assert_ok!(delegate_to(H256::from(1), H256::from(2)));
+			assert_ok!(undelegate_from(H256::from(1), H256::from(2)));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Delegated(H256::from(1), H256::from(2)))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::delegation(RawEvent::Undelegated(H256::from(1), H256::from(2)))
+				}]
+			);
+		});
+	}
 
-    // TODO: write undelegate tests that should fail
+	// TODO: write undelegate tests that should fail
 }

@@ -40,80 +40,80 @@ use runtime_support::{StorageValue, StorageMap, Parameter};
 use runtime_support::dispatch::Result;
 
 pub trait Trait: balances::Trait {
-    /// The overarching event type.
-    type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	/// The overarching event type.
+	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
 decl_module! {
-    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-        fn deposit_event() = default;
+	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		fn deposit_event() = default;
 
-        pub fn delegate_to(origin, to: T::AccountId) -> Result {
-            let _sender = ensure_signed(origin)?;
-            // Check that no delegation cycle exists
-            ensure!(!Self::has_delegation_cycle(&_sender, to.clone()), "Invalid delegation");
-            // Update the delegate to Some(delegate)
-            <DelegatesOf<T>>::insert(&_sender, &to);
-            // Fire delegation event
-            Self::deposit_event(RawEvent::Delegated(_sender, to));
+		pub fn delegate_to(origin, to: T::AccountId) -> Result {
+			let _sender = ensure_signed(origin)?;
+			// Check that no delegation cycle exists
+			ensure!(!Self::has_delegation_cycle(&_sender, to.clone()), "Invalid delegation");
+			// Update the delegate to Some(delegate)
+			<DelegatesOf<T>>::insert(&_sender, &to);
+			// Fire delegation event
+			Self::deposit_event(RawEvent::Delegated(_sender, to));
 
-            Ok(())
-        }
+			Ok(())
+		}
 
-        pub fn undelegate_from(origin, from: T::AccountId) -> Result {
-            let _sender = ensure_signed(origin)?;
-            // Check sender is not delegating to itself
-            ensure!(_sender != from, "Invalid undelegation");
-            // Update the delegate to the sender, None type throws an error due to missing Trait bound
-            <DelegatesOf<T>>::remove(&_sender);
-            // Fire delegation event
-            Self::deposit_event(RawEvent::Undelegated(_sender, from));
+		pub fn undelegate_from(origin, from: T::AccountId) -> Result {
+			let _sender = ensure_signed(origin)?;
+			// Check sender is not delegating to itself
+			ensure!(_sender != from, "Invalid undelegation");
+			// Update the delegate to the sender, None type throws an error due to missing Trait bound
+			<DelegatesOf<T>>::remove(&_sender);
+			// Fire delegation event
+			Self::deposit_event(RawEvent::Undelegated(_sender, from));
 
-            Ok(())
-        }
-    }
+			Ok(())
+		}
+	}
 }
 
 impl<T: Trait> Module<T> {
-    /// Implement rudimentary DFS to find if "to"'s delegation ever leads to "from"
-    pub fn has_delegation_cycle(from: &T::AccountId, to: T::AccountId) -> bool {
-        // Loop over delegation path of "to" to check if "from" exists
-        if from == &to {
-            return true;
-        }
-        match Self::delegate_of(&to) {
-            Some(delegate) => Self::has_delegation_cycle(from, delegate),
-            None => false,
-        }
-    }
+	/// Implement rudimentary DFS to find if "to"'s delegation ever leads to "from"
+	pub fn has_delegation_cycle(from: &T::AccountId, to: T::AccountId) -> bool {
+		// Loop over delegation path of "to" to check if "from" exists
+		if from == &to {
+			return true;
+		}
+		match Self::delegate_of(&to) {
+			Some(delegate) => Self::has_delegation_cycle(from, delegate),
+			None => false,
+		}
+	}
 
-    /// Get the last node at the end of a delegation path for a given account
-    pub fn get_sink_delegator(start: T::AccountId) -> T::AccountId {
-        match Self::delegate_of(&start) {
-            Some(delegate) => Self::get_sink_delegator(delegate),
-            None => start,
-        }
-    }
+	/// Get the last node at the end of a delegation path for a given account
+	pub fn get_sink_delegator(start: T::AccountId) -> T::AccountId {
+		match Self::delegate_of(&start) {
+			Some(delegate) => Self::get_sink_delegator(delegate),
+			None => start,
+		}
+	}
 
-    /// Tallies the "sink" delegators along a delegation path for each account
-    pub fn tally_delegation(accounts: Vec<T::AccountId>) -> Vec<(T::AccountId, T::AccountId)> {
-        accounts.into_iter()
-            .map(|a| (a.clone(), Self::get_sink_delegator(a)))
-            .collect()
-    }
+	/// Tallies the "sink" delegators along a delegation path for each account
+	pub fn tally_delegation(accounts: Vec<T::AccountId>) -> Vec<(T::AccountId, T::AccountId)> {
+		accounts.into_iter()
+			.map(|a| (a.clone(), Self::get_sink_delegator(a)))
+			.collect()
+	}
 }
 
 /// An event in this module.
 decl_event!(
-    pub enum Event<T> where <T as system::Trait>::AccountId {
-        Delegated(AccountId, AccountId),
-        Undelegated(AccountId, AccountId),
-    }
+	pub enum Event<T> where <T as system::Trait>::AccountId {
+		Delegated(AccountId, AccountId),
+		Undelegated(AccountId, AccountId),
+	}
 );
 
 decl_storage! {
-    trait Store for Module<T: Trait> as Delegation {
-        /// The map of strict delegates for each account
-        pub DelegatesOf get(delegate_of): map T::AccountId => Option<T::AccountId>;
-    }
+	trait Store for Module<T: Trait> as Delegation {
+		/// The map of strict delegates for each account
+		pub DelegatesOf get(delegate_of): map T::AccountId => Option<T::AccountId>;
+	}
 }
