@@ -23,7 +23,6 @@ extern crate serde;
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
 #[cfg(feature = "std")]
-#[macro_use]
 extern crate serde_derive;
 #[cfg(test)]
 #[macro_use]
@@ -41,16 +40,15 @@ extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
 
-use codec::Encode;
-use rstd::prelude::*;
-use runtime_support::dispatch::Result;
-
 pub mod governance;
 pub use governance::{Module, Trait, RawEvent, Event};
 
 #[cfg(test)]
 mod tests {
 	use super::*;
+	use rstd::prelude::*;
+	use codec::Encode;
+	use runtime_support::dispatch::Result;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
 	use runtime_io::ed25519::Pair;
@@ -58,7 +56,9 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage, traits::{BlakeTwo256}, testing::{Digest, DigestItem, Header}
+		BuildStorage,
+		traits::{BlakeTwo256, OnFinalise},
+		testing::{Digest, DigestItem, Header}
 	};
 
 	impl_outer_origin! {
@@ -101,24 +101,29 @@ mod tests {
 	pub type Governance = Module<Test>;
 
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
+		t.extend(
+			governance::GenesisConfig::<Test> {
+				voting_time: 1,
+			}.build_storage().unwrap().0,
+		);
 		t.into()
 	}
 
-	fn propose(who: H256, title: &[u8], proposal: &[u8], category: governance::ProposalCategory) -> super::Result {
+	fn propose(who: H256, title: &[u8], proposal: &[u8], category: governance::ProposalCategory) -> Result {
 		Governance::create_proposal(Origin::signed(who), title.to_vec(), proposal.to_vec(), category)
 	}
 
-	fn add_comment(who: H256, proposal_hash: H256, comment: &[u8]) -> super::Result {
+	fn add_comment(who: H256, proposal_hash: H256, comment: &[u8]) -> Result {
 		Governance::add_comment(Origin::signed(who), proposal_hash, comment.to_vec())
 	}
 
-	fn advance_proposal(who: H256, proposal_hash: H256) -> super::Result {
+	fn advance_proposal(who: H256, proposal_hash: H256) -> Result {
 		Governance::advance_proposal(Origin::signed(who), proposal_hash)
 	}
 
-	fn submit_vote(who: H256, proposal_hash: H256, vote: bool) -> super::Result {
+	fn submit_vote(who: H256, proposal_hash: H256, vote: bool) -> Result {
 		Governance::submit_vote(Origin::signed(who), proposal_hash, vote)
 	}
 
@@ -146,7 +151,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(12);
+			let category = governance::ProposalCategory::Funding;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -239,22 +244,20 @@ mod tests {
 			// create a comment and an invalid hash
 			let comment: &[u8] = b"pls do not do this";
 			let hash: H256 = public.clone();
-			assert_eq!(add_comment(public, hash, comment), Err("Proposal does not exist"));
+			assert_err!(add_comment(public, hash, comment), "Proposal does not exist");
 		});
 	}
 
 	#[test]
-	fn advance_proposal_should_work_until_completed() {
+	fn advance_proposal_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(12);
+			let category = governance::ProposalCategory::Funding;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
 			assert_ok!(advance_proposal(public, hash));
-			assert_ok!(advance_proposal(public, hash));
-			assert_eq!(advance_proposal(public, hash), Err("Proposal already completed"));
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
@@ -262,13 +265,91 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash))
+					event: Event::governance(RawEvent::VotingStarted(hash, 2))
+				},]
+			);
+		});
+	}
+
+	#[test]
+	fn advance_proposal_if_voting_should_fail() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let category = governance::ProposalCategory::Funding;
+			let (title, proposal) = generate_proposal();
+			let hash = build_proposal_hash(public, &proposal);
+			assert_ok!(propose(public, title, proposal, category));
+			assert_ok!(advance_proposal(public, hash));
+			assert_err!(advance_proposal(public, hash),
+									"Proposal not in pre-voting stage");
+		});
+	}
+
+	#[test]
+	fn voting_proposal_should_advance() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let category = governance::ProposalCategory::Funding;
+			let (title, proposal) = generate_proposal();
+			let hash = build_proposal_hash(public, &proposal);
+			assert_ok!(propose(public, title, proposal, category));
+			assert_ok!(advance_proposal(public, hash));
+
+			<Governance as OnFinalise<u64>>::on_finalise(1);
+			System::set_block_number(2);
+
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::governance(RawEvent::NewProposal(public, hash))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::governance(RawEvent::VotingStarted(hash, 2))
+				},]
+			);
+
+			<Governance as OnFinalise<u64>>::on_finalise(2);
+			System::set_block_number(3);
+
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::governance(RawEvent::NewProposal(public, hash))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::governance(RawEvent::VotingStarted(hash, 2))
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
 					event: Event::governance(RawEvent::VotingCompleted(hash))
-				},]
+				}]
 			);
+		});
+	}
+
+	#[test]
+	fn advance_proposal_if_completed_should_fail() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let category = governance::ProposalCategory::Funding;
+			let (title, proposal) = generate_proposal();
+			let hash = build_proposal_hash(public, &proposal);
+			assert_ok!(propose(public, title, proposal, category));
+			assert_err!(submit_vote(public, hash, true), "Proposal not in voting stage");
+			assert_ok!(advance_proposal(public, hash));
+			
+			<Governance as OnFinalise<u64>>::on_finalise(1);
+			System::set_block_number(2);
+
+			<Governance as OnFinalise<u64>>::on_finalise(2);
+			System::set_block_number(3);
+
+			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
 		});
 	}
 
@@ -277,14 +358,14 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(12);
+			let category = governance::ProposalCategory::Funding;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 
 			let other_pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"));
 			let other_public: H256 = other_pair.public().0.into();
 			assert_ok!(propose(public, title, proposal, category));
-			assert_eq!(advance_proposal(other_public, hash), Err("Proposal must be advanced by author"));
+			assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
 		});
 	}
 
@@ -293,7 +374,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(12);
+			let category = governance::ProposalCategory::Funding;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -306,7 +387,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash))
+					event: Event::governance(RawEvent::VotingStarted(hash, 2))
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
@@ -321,14 +402,20 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(12);
+			let category = governance::ProposalCategory::Funding;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
-			assert_eq!(submit_vote(public, hash, true), Err("Proposal not in voting stage"));
+			assert_err!(submit_vote(public, hash, true), "Proposal not in voting stage");
 			assert_ok!(advance_proposal(public, hash));
-			assert_ok!(advance_proposal(public, hash));
-			assert_eq!(submit_vote(public, hash, true), Err("Proposal not in voting stage"));
+			
+			<Governance as OnFinalise<u64>>::on_finalise(1);
+			System::set_block_number(2);
+
+			<Governance as OnFinalise<u64>>::on_finalise(2);
+			System::set_block_number(3);
+
+			assert_err!(submit_vote(public, hash, true), "Proposal not in voting stage");
 		});
 	}
 } 
