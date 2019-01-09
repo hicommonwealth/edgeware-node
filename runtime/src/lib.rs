@@ -236,7 +236,7 @@ construct_runtime!(
 		UpgradeKey: upgrade_key,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Event<T>},
-		Governance: governance::{Module, Call, Storage, Event<T>},
+		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 
