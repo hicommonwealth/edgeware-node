@@ -78,6 +78,7 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event() = default;
 
+		/// Creates a new governance proposal in the chosen category.
 		pub fn create_proposal(origin, title: Vec<u8>, contents: Vec<u8>, category: ProposalCategory) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!title.is_empty(), "Proposal must have title");
@@ -108,6 +109,7 @@ decl_module! {
 			Ok(())
 		}
 
+		/// Add a new comment to an existing governance proposal.
 		// TODO: give comments unique numbers/ids?
 		pub fn add_comment(origin, proposal_hash: T::Hash, comment: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
@@ -123,6 +125,8 @@ decl_module! {
 			Ok(())
 		}
 
+		/// Advance a governance proposal into the "voting" stage. Can only be
+		/// performed by the original author of the proposal.
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
@@ -142,6 +146,8 @@ decl_module! {
 			Ok(())
 		}
 
+		/// Submit or update a vote on a proposal. The proposal must be in the
+		/// "voting" stage.
 		pub fn submit_vote(origin, proposal_hash: T::Hash, vote: bool) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
@@ -184,10 +190,16 @@ decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
 							<T as system::Trait>::BlockNumber {
+		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
+		/// Emitted at comment creation: (Commentor, ProposalHash)
 		NewComment(AccountId, Hash),
+		/// Emitted when voting begins: (ProposalHash, VotingEndTime)
 		VotingStarted(Hash, BlockNumber),
+		/// Emitted when a vote is submitted: (ProposalHash, Voter, Vote)
 		VoteSubmitted(Hash, AccountId, bool),
+		/// Emitted when voting is completed: (ProposalHash)
+		// TODO: also have this contain the final result
 		VotingCompleted(Hash),
 	}
 );
