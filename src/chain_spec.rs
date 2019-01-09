@@ -162,7 +162,7 @@ fn testnet_genesis(
 			claims_issuers: initial_authorities.iter().cloned().map(Into::into).collect(),
 		}),
 		governance: Some(GovernanceConfig {
-			voting_time: (60 / 5) * 60 * 24 * 7, // 1 week
+			voting_time: 10000,
 		}),
 	}
 }
