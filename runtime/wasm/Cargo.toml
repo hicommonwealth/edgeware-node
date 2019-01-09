@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "0.1.2"
+version = "0.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 
 [lib]

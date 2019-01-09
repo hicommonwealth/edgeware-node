@@ -198,7 +198,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "edge-delegation"
-version = "0.1.2"
+version = "0.1.0"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -217,7 +217,7 @@ dependencies = [
 
 [[package]]
 name = "edge-governance"
-version = "0.1.2"
+version = "0.1.0"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -236,7 +236,7 @@ dependencies = [
 
 [[package]]
 name = "edge-identity"
-version = "0.1.2"
+version = "0.1.0"
 dependencies = [
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -254,11 +254,11 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "0.1.1"
+version = "0.1.0"
 dependencies = [
- "edge-delegation 0.1.2",
- "edge-governance 0.1.2",
- "edge-identity 0.1.2",
+ "edge-delegation 0.1.0",
+ "edge-governance 0.1.0",
+ "edge-identity 0.1.0",
  "integer-sqrt 0.1.0 (git+https://github.com/paritytech/integer-sqrt-rs.git)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
