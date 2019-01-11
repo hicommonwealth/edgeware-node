@@ -69,6 +69,7 @@ pub struct IdentityRecord<AccountId, BlockNumber> {
 	pub stage: IdentityStage,
 	pub expiration_time: Option<BlockNumber>,
 	pub proof: Option<Attestation>,
+	pub verifications: Option<Vec<(AccountId, bool)>>,
 	pub metadata: Option<MetadataRecord>,
 }
 
@@ -86,8 +87,9 @@ decl_module! {
 		/// rent to disincentivize it.
 		pub fn register(origin, identity: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			let hash = T::Hashing::hash_of(&identity);
+			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
 
+			let hash = T::Hashing::hash_of(&identity);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 
 			let expiration = <system::Module<T>>::block_number() + Self::expiration_time();
@@ -99,6 +101,7 @@ decl_module! {
 				stage: IdentityStage::Registered,
 				expiration_time: Some(expiration),
 				proof: None,
+				verifications: None,
 				metadata: None,
 			});
 			<IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expiration)));
@@ -114,6 +117,8 @@ decl_module! {
 		/// pass.
 		pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
 			let _sender = ensure_signed(origin)?;
+			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
+
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 
 			if record.stage == IdentityStage::Verified {
@@ -146,8 +151,9 @@ decl_module! {
 
 		/// Verify an existing identity based on its attested proof. Sender
 		/// be specified on the pre-selected list of verifiers.
-		pub fn verify(origin, identity_hash: T::Hash) -> Result {
+		pub fn verify(origin, identity_hash: T::Hash, vote: bool) -> Result {
 			let _sender = ensure_signed(origin)?;
+
 			ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 			match record.stage {
@@ -156,17 +162,59 @@ decl_module! {
 				IdentityStage::Attested => ()
 			}
 
-			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-				stage: IdentityStage::Verified,
-				expiration_time: None,
-				..record
-			});
+			// Check the number of verifications the record has and ensure all are valid
+			let mut valid_verifications: Vec<(T::AccountId, bool)> = [(_sender.clone(), vote)].to_vec();
+			let acct = record.account.clone();
+			if let Some(verifications) = record.verifications {
+				valid_verifications = verifications.clone()
+					.into_iter()
+					.filter(|v| Self::verifiers().contains(&v.0))
+					.collect();
+				valid_verifications.push((_sender.clone(), vote));
+			}
 
-			<IdentitiesPending<T>>::mutate(|idents| {
-				idents.retain(|(hash, _)| hash != &identity_hash)
-			});
+			let yes_votes: Vec<T::AccountId> = valid_verifications.clone()
+				.into_iter()
+				.filter(|v| v.1 == true)
+				.map(|v| v.0)
+				.collect();
 
-			Self::deposit_event(RawEvent::Verify(identity_hash, _sender.into()));
+			let no_votes: Vec<T::AccountId> = valid_verifications.clone()
+				.into_iter()
+				.filter(|v| v.1 == false)
+				.map(|v| v.0)
+				.collect();
+
+			// Check if we have gather a supermajority of no votes
+			// TODO: What does it mean to fail a verification? If malicious
+			//		 behavior, we should punish the sending account somehow.
+			if no_votes.len() * 3 >= 2 * Self::verifiers().len() {
+				Self::remove_pending_identity(&identity_hash, true);
+				<FrozenAccounts<T>>::mutate(|froze| froze.push(acct));
+				Self::deposit_event(RawEvent::Failed(identity_hash, record.account.into()));
+			} else {
+				// Check if we have gathered a supermajority of yes votes
+				let mut stage = IdentityStage::Attested;
+				let mut expiration_time = record.expiration_time;
+				let registrar = record.account.clone();
+				if yes_votes.len() * 3 >= 2 * Self::verifiers().len() {
+					stage = IdentityStage::Verified;
+					expiration_time = None;
+				}
+				// Insert updated identity record back into the collection
+				<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+					stage: stage,
+					expiration_time: expiration_time,
+					verifications: Some(valid_verifications),
+					..record
+				});
+
+				if stage == IdentityStage::Verified {
+					Self::remove_pending_identity(&identity_hash, false);
+					Self::deposit_event(RawEvent::Verify(identity_hash, registrar.into(), yes_votes));
+				}
+			}
+
 			Ok(())
 		}
 
@@ -245,6 +293,21 @@ decl_module! {
 	}
 }
 
+impl<T: Trait> Module<T> {
+	/// Removes all data about a pending identity given the hash of the record
+	pub fn remove_pending_identity(identity_hash: &T::Hash, malicious: bool) {
+		// If triggered by a malicious party's actions, delete all data
+		if malicious {
+			<Identities<T>>::mutate(|idents| idents.retain(|hash| hash != identity_hash));
+			<IdentityOf<T>>::remove(identity_hash);			
+		}
+
+		<IdentitiesPending<T>>::mutate(|idents| {
+			idents.retain(|(hash, _)| hash != identity_hash)
+		});
+	}
+}
+
 /// An event in this module.
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
@@ -252,7 +315,8 @@ decl_event!(
 							<T as Trait>::Claim {
 		Register(Hash, AccountId),
 		Attest(Hash, AccountId),
-		Verify(Hash, AccountId),
+		Verify(Hash, AccountId, Vec<AccountId>),
+		Failed(Hash, AccountId),
 		Expired(Hash),
 		AddedClaim(Hash, Claim, AccountId),
 		RemovedClaim(Hash, Claim, AccountId),
@@ -268,6 +332,8 @@ decl_storage! {
 		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::BlockNumber>>;
 		/// List of identities awaiting attestation or verification and associated expirations
 		pub IdentitiesPending get(identities_pending): Vec<(T::Hash, T::BlockNumber)>;
+		/// List of malicious identities who submit failed attestations
+		pub FrozenAccounts get(frozen_accounts): Vec<T::AccountId>;
 		/// Number of blocks allowed between register/attest or attest/verify.
 		pub ExpirationTime get(expiration_time) config(): T::BlockNumber;
 		/// Accounts granted power to verify identities
