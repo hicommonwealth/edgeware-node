@@ -194,17 +194,21 @@ impl<T: Trait> Module<T> {
 		voters.iter().for_each(|voter| {
 			// tally number of delegates for each vote
 			if let Some(vote) = Self::vote_of((proposal_hash, voter.clone())) {
+				// TODO: unfortunately this is an O(n^2) (or worse) solution, should improve
+				let delegations = <delegation::Module<T>>::get_delegates_to(voter.clone());
+				let mut votes = 1 + delegations.len();
+				// remove the voting contributions of all delegators who themselves voted
+				delegations.into_iter().for_each(|delegator| {
+					if voters.contains(&delegator) {
+						votes -= 1 + <delegation::Module<T>>::get_delegates_to(delegator).len();
+					}
+				});
 
-				// remote active voters from pool of delegates
-				// TODO: unfortunately this is an O(n^2) solution, should improve
-				let voting_power = 1 + <delegation::Module<T>>::get_delegates_to(voter.clone())
-					.into_iter()
-					.filter(|delegator| !voters.contains(delegator))
-					.count();
+				// submit votes
 				if vote == true {
-					yes += voting_power;
+					yes += votes;
 				} else {
-					no += voting_power;
+					no += votes;
 				}
 			}
 		});
