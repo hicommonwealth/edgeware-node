@@ -69,6 +69,7 @@ pub struct IdentityRecord<AccountId, BlockNumber> {
 	pub stage: IdentityStage,
 	pub expiration_time: Option<BlockNumber>,
 	pub proof: Option<Attestation>,
+	pub verifications: Option<Vec<AccountId>>,
 	pub metadata: Option<MetadataRecord>,
 }
 
@@ -99,6 +100,7 @@ decl_module! {
 				stage: IdentityStage::Registered,
 				expiration_time: Some(expiration),
 				proof: None,
+				verifications: None,
 				metadata: None,
 			});
 			<IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expiration)));
@@ -156,11 +158,38 @@ decl_module! {
 				IdentityStage::Attested => ()
 			}
 
-			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-				stage: IdentityStage::Verified,
-				expiration_time: None,
-				..record
-			});
+			// Check the number of verifications the record has and ensure all are valid
+			match record.verifications {
+				Some(verifications) => {
+					// Filter for valid verifications from valid verifiers
+					let mut valid_verifications: Vec<T::AccountId> = verifications.clone()
+						.into_iter()
+					    .filter(|v| Self::verifiers().contains(&v))
+					    .collect();
+
+					valid_verifications.push(_sender.clone());
+
+					// Check if we have gathered a supermajority of valid verifications 
+					let mut stage = IdentityStage::Attested;
+					if valid_verifications.len() * 3 >= 2 * Self::verifiers().len() {
+						stage = IdentityStage::Verified;
+					}
+
+					<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+						stage: stage,
+						expiration_time: None,
+						verifications: Some(valid_verifications),
+						..record
+					});
+				},
+				None => {
+					<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+						stage: IdentityStage::Verified,
+						expiration_time: None,
+						..record
+					});
+				},
+			}
 
 			<IdentitiesPending<T>>::mutate(|idents| {
 				idents.retain(|(hash, _)| hash != &identity_hash)
