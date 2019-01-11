@@ -186,6 +186,7 @@ decl_module! {
 					<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
 						stage: IdentityStage::Verified,
 						expiration_time: None,
+						verifications: Some(vec![_sender.clone()]),
 						..record
 					});
 				},
