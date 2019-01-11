@@ -104,7 +104,7 @@ mod tests {
 
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
-	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
+	fn new_test_ext(verifiers: Vec<H256>) -> sr_io::TestExternalities<Blake2Hasher> {
 		let mut t = system::GenesisConfig::<Test>::default()
 			.build_storage()
 			.unwrap()
@@ -113,7 +113,7 @@ mod tests {
 		t.extend(
 			identity::GenesisConfig::<Test> {
 				expiration_time: 1,
-				verifiers: [H256::from(9)].to_vec(),
+				verifiers: verifiers,
 				claims_issuers: [H256::from(1), H256::from(2), H256::from(3)].to_vec(),
 			}
 			.build_storage()
@@ -161,7 +161,7 @@ mod tests {
 
 	#[test]
 	fn register_should_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -185,7 +185,7 @@ mod tests {
 
 	#[test]
 	fn register_twice_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -204,7 +204,7 @@ mod tests {
 
 	#[test]
 	fn register_and_attest_should_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -237,7 +237,7 @@ mod tests {
 
 	#[test]
 	fn attest_without_register_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -257,7 +257,7 @@ mod tests {
 
 	#[test]
 	fn attest_from_different_account_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -282,7 +282,7 @@ mod tests {
 
 	#[test]
 	fn register_attest_and_verify_should_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -314,7 +314,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, verifier))
+						event: Event::identity(RawEvent::Verify(identity_hash, public, [verifier].to_vec()))
 					}
 				]
 			);
@@ -323,7 +323,7 @@ mod tests {
 
 	#[test]
 	fn verify_before_register_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let identity: &[u8] = b"github.com/drewstone";
@@ -338,7 +338,7 @@ mod tests {
 
 	#[test]
 	fn verify_before_attest_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -361,7 +361,7 @@ mod tests {
 
 	#[test]
 	fn verify_twice_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -385,7 +385,7 @@ mod tests {
 
 	#[test]
 	fn attest_after_verify_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -412,7 +412,7 @@ mod tests {
 
 	#[test]
 	fn verify_from_nonverifier_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -437,7 +437,7 @@ mod tests {
 
 	#[test]
 	fn register_should_expire() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -480,7 +480,7 @@ mod tests {
 
 	#[test]
 	fn attest_should_expire() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -530,7 +530,7 @@ mod tests {
 
 	#[test]
 	fn verify_should_not_expire() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -563,8 +563,61 @@ mod tests {
 	}
 
 	#[test]
+	fn verify_with_two_thirds_should_work() {
+		with_externalities(&mut new_test_ext([
+			H256::from(9), H256::from(10), H256::from(11),
+		].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+			let public: H256 = pair.public().0.into();
+
+			assert_ok!(register_identity(public, identity));
+
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			let verifier_1 = H256::from(9);
+			assert_ok!(verify_identity(verifier_1, identity_hash, true));
+
+			let verifier_2 = H256::from(10);
+			assert_ok!(verify_identity(verifier_2, identity_hash, true));
+
+			<Identity as OnFinalise<u64>>::on_finalise(1);
+			System::set_block_number(2);
+
+			<Identity as OnFinalise<u64>>::on_finalise(2);
+			System::set_block_number(3);
+
+			assert_eq!(
+				System::events(),
+				vec![
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Register(identity_hash, public))
+					},
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Attest(identity_hash, public))
+					},
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Verify(identity_hash, public, [verifier_1, verifier_2].to_vec()))
+					},
+				]
+			);
+		});
+	}
+
+
+	#[test]
 	fn add_metadata_should_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -592,7 +645,7 @@ mod tests {
 
 	#[test]
 	fn add_metadata_without_register_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -614,7 +667,7 @@ mod tests {
 
 	#[test]
 	fn add_metadata_from_different_account_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -642,7 +695,7 @@ mod tests {
 
 	#[test]
 	fn add_claim_without_valid_identity_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let issuer = H256::from(1);
@@ -659,7 +712,7 @@ mod tests {
 
 	#[test]
 	fn add_claim_as_invalid_issuer_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -679,7 +732,7 @@ mod tests {
 
 	#[test]
 	fn add_claim_valid_should_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -700,7 +753,7 @@ mod tests {
 
 	#[test]
 	fn remove_claim_without_valid_identity_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let issuer = H256::from(1);
@@ -716,7 +769,7 @@ mod tests {
 
 	#[test]
 	fn remove_claim_as_invalid_issuer_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
@@ -735,7 +788,7 @@ mod tests {
 
 	#[test]
 	fn remove_claim_not_issued_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
 			System::set_block_number(1);
 
 			let pair: Pair = Pair::from_seed(&hex!(
