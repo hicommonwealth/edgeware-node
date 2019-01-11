@@ -183,10 +183,11 @@ decl_module! {
 					});
 				},
 				None => {
+					let vs = [_sender.clone()].to_vec();
 					<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
 						stage: IdentityStage::Verified,
 						expiration_time: None,
-						verifications: Some(vec![_sender.clone()]),
+						verifications: Some(vs),
 						..record
 					});
 				},
