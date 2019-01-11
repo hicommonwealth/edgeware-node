@@ -30,16 +30,14 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-
-extern crate srml_balances as balances;
 extern crate srml_system as system;
 
 use rstd::prelude::*;
 use system::ensure_signed;
-use runtime_support::{StorageValue, StorageMap, Parameter};
+use runtime_support::{StorageMap};
 use runtime_support::dispatch::Result;
 
-pub trait Trait: balances::Trait {
+pub trait Trait: system::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
@@ -48,24 +46,26 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event() = default;
 
-		pub fn delegate_to(origin, to: T::AccountId) -> Result {
+		pub fn delegate(origin, to: T::AccountId) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Check that no delegation cycle exists
 			ensure!(!Self::has_delegation_cycle(&_sender, to.clone()), "Invalid delegation");
 			// Update the delegate to Some(delegate)
 			<DelegatesOf<T>>::insert(&_sender, &to);
+			<DelegatesTo<T>>::mutate(&to, |delegated| delegated.push(_sender.clone()));
 			// Fire delegation event
 			Self::deposit_event(RawEvent::Delegated(_sender, to));
 
 			Ok(())
 		}
 
-		pub fn undelegate_from(origin, from: T::AccountId) -> Result {
+		pub fn undelegate(origin, from: T::AccountId) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Check sender is not delegating to itself
 			ensure!(_sender != from, "Invalid undelegation");
 			// Update the delegate to the sender, None type throws an error due to missing Trait bound
 			<DelegatesOf<T>>::remove(&_sender);
+			<DelegatesTo<T>>::mutate(&from, |delegated| delegated.retain(|u| u != &_sender));
 			// Fire delegation event
 			Self::deposit_event(RawEvent::Undelegated(_sender, from));
 
@@ -95,6 +95,13 @@ impl<T: Trait> Module<T> {
 		}
 	}
 
+	pub fn get_delegates_to(who: T::AccountId) -> Vec<T::AccountId> {
+		return Self::delegate_to(who)
+			.into_iter()
+			.flat_map(Self::get_delegates_to)
+			.collect();
+	}
+
 	/// Tallies the "sink" delegators along a delegation path for each account
 	pub fn tally_delegation(accounts: Vec<T::AccountId>) -> Vec<(T::AccountId, T::AccountId)> {
 		accounts.into_iter()
@@ -115,5 +122,8 @@ decl_storage! {
 	trait Store for Module<T: Trait> as Delegation {
 		/// The map of strict delegates for each account
 		pub DelegatesOf get(delegate_of): map T::AccountId => Option<T::AccountId>;
+		/// The map of users who have been delegated to, storing accounts who have 
+		/// directly delegated to them.
+		pub DelegatesTo get(delegate_to): map T::AccountId => Vec<T::AccountId>;
 	}
 }

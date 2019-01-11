@@ -30,6 +30,7 @@ extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
+extern crate edge_delegation as delegation;
 
 use rstd::prelude::*;
 use system::ensure_signed;
@@ -69,7 +70,7 @@ pub struct ProposalRecord<AccountId, BlockNumber> {
 	// TODO: for actions, we might need more data
 }
 
-pub trait Trait: system::Trait {
+pub trait Trait: delegation::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
@@ -170,19 +171,44 @@ decl_module! {
 			
 			<ActiveProposals<T>>::put(active);
 			finished.into_iter().for_each(move |(completed_hash, _)| {
-				match <ProposalOf<T>>::get(completed_hash) {
-					Some(proposal) => {
-						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
-							stage: ProposalStage::Completed,
-							transition_block: None,
-							..proposal
-						});
-						Self::deposit_event(RawEvent::VotingCompleted(completed_hash));
-					},
-					None => { } // TODO: emit an error here?
+				// tally votes and update each finished proposal to "completed"
+				if let Some(proposal) = <ProposalOf<T>>::get(completed_hash) {
+					let (yes, no) = Self::tally_proposal(completed_hash);
+					<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
+						stage: ProposalStage::Completed,
+						transition_block: None,
+						..proposal
+					});
+					Self::deposit_event(RawEvent::VotingCompleted(completed_hash, yes, no));
 				}
 			});
 		}
+	}
+}
+
+impl<T: Trait> Module<T> {
+	fn tally_proposal(proposal_hash: T::Hash) -> (usize, usize) {
+		let mut yes = 0;
+		let mut no = 0;
+		let voters = <ProposalVoters<T>>::get(proposal_hash);
+		voters.iter().for_each(|voter| {
+			// tally number of delegates for each vote
+			if let Some(vote) = Self::vote_of((proposal_hash, voter.clone())) {
+
+				// remote active voters from pool of delegates
+				// TODO: unfortunately this is an O(n^2) solution, should improve
+				let voting_power = 1 + <delegation::Module<T>>::get_delegates_to(voter.clone())
+					.into_iter()
+					.filter(|delegator| !voters.contains(delegator))
+					.count();
+				if vote == true {
+					yes += voting_power;
+				} else {
+					no += voting_power;
+				}
+			}
+		});
+		return (yes, no);
 	}
 }
 
@@ -198,9 +224,8 @@ decl_event!(
 		VotingStarted(Hash, BlockNumber),
 		/// Emitted when a vote is submitted: (ProposalHash, Voter, Vote)
 		VoteSubmitted(Hash, AccountId, bool),
-		/// Emitted when voting is completed: (ProposalHash)
-		// TODO: also have this contain the final result
-		VotingCompleted(Hash),
+		/// Emitted when voting is completed: (ProposalHash, YesVotes, NoVotes)
+		VotingCompleted(Hash, usize, usize),
 	}
 );
 

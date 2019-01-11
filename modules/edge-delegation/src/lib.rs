@@ -39,8 +39,6 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-
-extern crate srml_balances as balances;
 extern crate srml_system as system;
 
 use rstd::prelude::*;
@@ -70,7 +68,7 @@ mod tests {
 
 	impl_outer_event! {
 		pub enum Event for Test {
-			delegation<T>, balances<T>,
+			delegation<T>
 		}
 	}
 
@@ -94,14 +92,6 @@ mod tests {
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
-	}
-
-	impl balances::Trait for Test {
-		type Balance = u64;
-		type AccountIndex = u64;
-		type OnFreeBalanceZero = ();
-		type EnsureAccountLiquid = ();
-		type Event = Event;
 	}
 
 	impl Trait for Test {
