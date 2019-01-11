@@ -131,8 +131,8 @@ mod tests {
 		Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
 	}
 
-	fn verify_identity(who: H256, identity_hash: H256) -> Result {
-		Identity::verify(Origin::signed(who), identity_hash)
+	fn verify_identity(who: H256, identity_hash: H256, vote: bool) -> Result {
+		Identity::verify(Origin::signed(who), identity_hash, vote)
 	}
 
 	fn add_metadata_to_account(
@@ -299,7 +299,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash));
+			assert_ok!(verify_identity(verifier, identity_hash, true));
 
 			assert_eq!(
 				System::events(),
@@ -330,7 +330,7 @@ mod tests {
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 			let verifier: H256 = H256::from(9);
 			assert_err!(
-				verify_identity(verifier, identity_hash),
+				verify_identity(verifier, identity_hash, true),
 				"Identity does not exist"
 			);
 		});
@@ -353,7 +353,7 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_err!(
-				verify_identity(verifier, identity_hash),
+				verify_identity(verifier, identity_hash, true),
 				"No attestation to verify"
 			);
 		});
@@ -378,8 +378,8 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash));
-			assert_err!(verify_identity(verifier, identity_hash), "Already verified");
+			assert_ok!(verify_identity(verifier, identity_hash, true));
+			assert_err!(verify_identity(verifier, identity_hash, true), "Already verified");
 		});
 	}
 
@@ -402,7 +402,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash));
+			assert_ok!(verify_identity(verifier, identity_hash, true));
 			assert_err!(
 				attest_to_identity(public, identity_hash, attestation),
 				"Already verified"
@@ -429,7 +429,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			assert_err!(
-				verify_identity(public, identity_hash),
+				verify_identity(public, identity_hash, true),
 				"Sender not a verifier"
 			);
 		});
@@ -504,7 +504,7 @@ mod tests {
 
 			let verifier: H256 = H256::from(9);
 			assert_err!(
-				verify_identity(verifier, identity_hash),
+				verify_identity(verifier, identity_hash, true),
 				"Identity does not exist"
 			);
 
@@ -547,7 +547,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash));
+			assert_ok!(verify_identity(verifier, identity_hash, true));
 
 			<Identity as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);

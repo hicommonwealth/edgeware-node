@@ -69,7 +69,7 @@ pub struct IdentityRecord<AccountId, BlockNumber> {
 	pub stage: IdentityStage,
 	pub expiration_time: Option<BlockNumber>,
 	pub proof: Option<Attestation>,
-	pub verifications: Option<Vec<AccountId>>,
+	pub verifications: Option<Vec<(AccountId, bool)>>,
 	pub metadata: Option<MetadataRecord>,
 }
 
@@ -148,7 +148,7 @@ decl_module! {
 
 		/// Verify an existing identity based on its attested proof. Sender
 		/// be specified on the pre-selected list of verifiers.
-		pub fn verify(origin, identity_hash: T::Hash) -> Result {
+		pub fn verify(origin, identity_hash: T::Hash, vote: bool) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
@@ -159,45 +159,52 @@ decl_module! {
 			}
 
 			// Check the number of verifications the record has and ensure all are valid
-			match record.verifications {
-				Some(verifications) => {
-					// Filter for valid verifications from valid verifiers
-					let mut valid_verifications: Vec<T::AccountId> = verifications.clone()
-						.into_iter()
-					    .filter(|v| Self::verifiers().contains(&v))
-					    .collect();
-
-					valid_verifications.push(_sender.clone());
-
-					// Check if we have gathered a supermajority of valid verifications 
-					let mut stage = IdentityStage::Attested;
-					if valid_verifications.len() * 3 >= 2 * Self::verifiers().len() {
-						stage = IdentityStage::Verified;
-					}
-
-					<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-						stage: stage,
-						expiration_time: None,
-						verifications: Some(valid_verifications),
-						..record
-					});
-				},
-				None => {
-					let vs = [_sender.clone()].to_vec();
-					<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-						stage: IdentityStage::Verified,
-						expiration_time: None,
-						verifications: Some(vs),
-						..record
-					});
-				},
+			let mut valid_verifications: Vec<(T::AccountId, bool)> = [(_sender.clone(), vote)].to_vec();
+			if let Some(verifications) = record.verifications {
+				valid_verifications = verifications.clone()
+					.into_iter()
+					.filter(|v| Self::verifiers().contains(&v.0))
+					.collect();
+				valid_verifications.push((_sender.clone(), vote));
 			}
 
-			<IdentitiesPending<T>>::mutate(|idents| {
-				idents.retain(|(hash, _)| hash != &identity_hash)
+			let yes_votes: Vec<(T::AccountId, bool)> = valid_verifications.clone()
+				.into_iter()
+				.filter(|v| v.1 == true)
+				.collect();
+
+			let no_votes: Vec<(T::AccountId, bool)> = valid_verifications.clone()
+				.into_iter()
+				.filter(|v| v.1 == false)
+				.collect();
+
+			// Check if we have gathered a supermajority of yes votes
+			let mut stage = IdentityStage::Attested;
+			let mut expiration_time = record.expiration_time;
+			if yes_votes.len() * 3 >= 2 * Self::verifiers().len() {
+				stage = IdentityStage::Verified;
+				expiration_time = None;
+			}
+
+			// Check if we have gather a supermajority of no votes
+			// TODO: What does it mean to fail a verification? If malicious
+			//		 behavior, we should punish the sending account somehow.
+			if no_votes.len() * 3 >= 2 * Self::verifiers().len() {
+				Self::remove_pending_identity(&identity_hash);
+			}
+
+			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+				stage: stage,
+				expiration_time: expiration_time,
+				verifications: Some(valid_verifications),
+				..record
 			});
 
-			Self::deposit_event(RawEvent::Verify(identity_hash, _sender.into()));
+			if stage == IdentityStage::Verified {
+				Self::remove_pending_identity(&identity_hash);
+				Self::deposit_event(RawEvent::Verify(identity_hash, _sender.into()));
+			}
+
 			Ok(())
 		}
 
@@ -273,6 +280,14 @@ decl_module! {
 			});
 			<IdentitiesPending<T>>::put(valid);
 		}
+	}
+}
+
+impl<T: Trait> Module<T> {
+	pub fn remove_pending_identity(identity_hash: &T::Hash) {
+		<IdentitiesPending<T>>::mutate(|idents| {
+			idents.retain(|(hash, _)| hash != identity_hash)
+		});
 	}
 }
 
