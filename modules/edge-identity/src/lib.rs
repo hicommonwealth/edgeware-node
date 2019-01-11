@@ -563,6 +563,41 @@ mod tests {
 	}
 
 	#[test]
+	fn malicious_attest_should_lock() {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+			let public: H256 = pair.public().0.into();
+
+			assert_ok!(register_identity(public, identity));
+
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			let verifier = H256::from(9);
+			assert_ok!(verify_identity(verifier, identity_hash, false));
+
+			<Identity as OnFinalise<u64>>::on_finalise(1);
+			System::set_block_number(2);
+
+			<Identity as OnFinalise<u64>>::on_finalise(2);
+			System::set_block_number(3);
+
+			let new_identity: &[u8] = b"github.com/drstone";
+			assert_err!(
+				register_identity(public, new_identity),
+				"Sender account is frozen"
+			)
+		});
+	}
+
+	#[test]
 	fn verify_with_two_thirds_should_work() {
 		with_externalities(&mut new_test_ext([
 			H256::from(9), H256::from(10), H256::from(11),

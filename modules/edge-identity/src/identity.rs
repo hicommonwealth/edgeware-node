@@ -164,6 +164,7 @@ decl_module! {
 
 			// Check the number of verifications the record has and ensure all are valid
 			let mut valid_verifications: Vec<(T::AccountId, bool)> = [(_sender.clone(), vote)].to_vec();
+			let acct = record.account.clone();
 			if let Some(verifications) = record.verifications {
 				valid_verifications = verifications.clone()
 					.into_iter()
@@ -189,6 +190,7 @@ decl_module! {
 			//		 behavior, we should punish the sending account somehow.
 			if no_votes.len() * 3 >= 2 * Self::verifiers().len() {
 				Self::remove_pending_identity(&identity_hash, true);
+				<FrozenAccounts<T>>::mutate(|froze| froze.push(acct));
 				Self::deposit_event(RawEvent::Failed(identity_hash, record.account.into()));
 			} else {
 				// Check if we have gathered a supermajority of yes votes
