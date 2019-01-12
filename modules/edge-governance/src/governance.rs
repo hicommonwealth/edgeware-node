@@ -187,28 +187,47 @@ decl_module! {
 }
 
 impl<T: Trait> Module<T> {
+	/// Gets the first voter in the delegation chain of given account
+	fn get_first_delegator(voters: &Vec<T::AccountId>, who: T::AccountId) -> T::AccountId {
+		match <delegation::Module<T>>::delegate_of(&who) {
+			Some(delegate) => match voters.iter().find(|&v| v == &delegate) {
+				Some(voter) => voter.clone(),
+				None => Self::get_first_delegator(voters, who),
+			}
+			None => who,
+		}
+	}
+
+	/// Collect all pairs of (delegator, voter) for a given vote
+	fn tally_delegation(voters: Vec<T::AccountId>) -> Vec<(T::AccountId, T::AccountId)> {
+		// first, get a set of all "implicated" voters
+		let mut all_children: Vec<T::AccountId> = voters
+			.iter()
+			.cloned()
+			.flat_map(<delegation::Module<T>>::get_delegates_to)
+			.collect();
+		all_children.sort_unstable();
+		all_children.dedup();
+
+		// then, trace each "back up the tree" until we find an explicit voter
+		return all_children
+			.into_iter()
+			.map(|c| (c.clone(), Self::get_first_delegator(&voters, c)))
+			.collect();
+	}
+
+	/// Tally results given a proposal including delegations
 	fn tally_proposal(proposal_hash: T::Hash) -> (usize, usize) {
 		let mut yes = 0;
 		let mut no = 0;
 		let voters = <ProposalVoters<T>>::get(proposal_hash);
-		voters.iter().for_each(|voter| {
-			// tally number of delegates for each vote
+		let delegations = Self::tally_delegation(voters);
+		delegations.iter().for_each(|(_, voter)| {
 			if let Some(vote) = Self::vote_of((proposal_hash, voter.clone())) {
-				// TODO: unfortunately this is an O(n^2) (or worse) solution, should improve
-				let delegations = <delegation::Module<T>>::get_delegates_to(voter.clone());
-				let mut votes = 1 + delegations.len();
-				// remove the voting contributions of all delegators who themselves voted
-				delegations.into_iter().for_each(|delegator| {
-					if voters.contains(&delegator) {
-						votes -= 1 + <delegation::Module<T>>::get_delegates_to(delegator).len();
-					}
-				});
-
-				// submit votes
 				if vote == true {
-					yes += votes;
+					yes += 1;
 				} else {
-					no += votes;
+					no += 1;
 				}
 			}
 		});

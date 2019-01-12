@@ -95,18 +95,12 @@ impl<T: Trait> Module<T> {
 		}
 	}
 
+	/// Recursively get all accounts who delegated to the given account 
 	pub fn get_delegates_to(who: T::AccountId) -> Vec<T::AccountId> {
 		return Self::delegate_to(who)
 			.into_iter()
 			.flat_map(Self::get_delegates_to)
 			.collect();
-	}
-
-	/// Tallies the "sink" delegators along a delegation path for each account
-	pub fn tally_delegation(accounts: Vec<T::AccountId>) -> Vec<(T::AccountId, T::AccountId)> {
-		accounts.into_iter()
-			.map(|a| (a.clone(), Self::get_sink_delegator(a)))
-			.collect()
 	}
 }
 
