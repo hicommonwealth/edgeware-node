@@ -26,7 +26,7 @@ RUN RUSTUP_TOOLCHAIN=stable cargo install --git https://github.com/alexcrichton/
 
 # Build runtime and binary
 RUN rustup target add wasm32-unknown-unknown --toolchain nightly
-RUN cd /edgeware/runtime/wasm && ./build.sh
+RUN cd /edgeware/node/runtime/wasm && ./build.sh
 RUN cd /edgeware && RUSTUP_TOOLCHAIN=stable cargo build --$PROFILE
 
 # ===== SECOND STAGE ======
