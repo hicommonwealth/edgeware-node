@@ -50,7 +50,7 @@ std = [
 	"srml-aura/std",
 	"sr-primitives/std",
 	"srml-contract/std",
-  "srml-grandpa/std",
+	"srml-grandpa/std",
 	"srml-session/std",
 	"srml-system/std",
 	"srml-timestamp/std",

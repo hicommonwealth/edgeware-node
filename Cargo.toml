@@ -43,10 +43,10 @@ vergen = "2"
 
 [workspace]
 members = [
-  "node/runtime",
-  "modules/edge-delegation",
-  "modules/edge-governance",
-  "modules/edge-identity"
+	"node/runtime",
+	"modules/edge-delegation",
+	"modules/edge-governance",
+	"modules/edge-identity"
 ]
 exclude = [ "node/runtime/wasm" ]
 

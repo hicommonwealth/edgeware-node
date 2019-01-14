@@ -50,16 +50,16 @@ std = [
 	"srml-aura/std",
 	"sr-primitives/std",
 	"srml-contract/std",
-  "srml-grandpa/std",
+	"srml-grandpa/std",
 	"srml-session/std",
 	"srml-system/std",
 	"srml-timestamp/std",
 	"srml-upgrade-key/std",
 	"sr-version/std",
 	"node-primitives/std",
-  "edge-delegation/std",
-  "edge-governance/std",
-  "edge-identity/std",
+	"edge-delegation/std",
+	"edge-governance/std",
+	"edge-identity/std",
 ]
 
 [profile.release]
