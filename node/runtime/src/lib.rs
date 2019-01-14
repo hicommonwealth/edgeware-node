@@ -35,6 +35,7 @@ extern crate srml_session as session;
 extern crate srml_system as system;
 extern crate srml_timestamp as timestamp;
 extern crate srml_upgrade_key as upgrade_key;
+extern crate node_primitives;
 extern crate substrate_consensus_aura_primitives as consensus_aura;
 
 use edge_delegation::delegation;
@@ -45,13 +46,16 @@ use client::{block_builder::api as block_builder_api, runtime_api};
 use consensus_aura::api as aura_api;
 #[cfg(feature = "std")]
 use primitives::bytes;
-use primitives::{Ed25519AuthorityId, OpaqueMetadata};
+use primitives::OpaqueMetadata;
+use node_primitives::{
+	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, SessionKey, Signature
+};
 use rstd::prelude::*;
 use runtime_primitives::{
 	generic,
-	traits::{self, BlakeTwo256, Block as BlockT, Convert, ProvideInherent, NumberFor, DigestFor},
+	traits::{BlakeTwo256, Block as BlockT, Convert, ProvideInherent, NumberFor, DigestFor},
 	transaction_validity::TransactionValidity,
-	ApplyResult, BasicInherentData, CheckInherentError, Ed25519Signature,
+	ApplyResult, BasicInherentData, CheckInherentError,
 };
 use grandpa::fg_primitives::{self, ScheduledChange};
 #[cfg(feature = "std")]
@@ -67,47 +71,6 @@ pub use runtime_primitives::{Perbill, Permill};
 pub use srml_support::{RuntimeMetadata, StorageValue};
 pub use timestamp::BlockPeriod;
 pub use timestamp::Call as TimestampCall;
-
-/// Alias to Ed25519 pubkey that identifies an account on the chain.
-pub type AccountId = primitives::H256;
-
-/// A hash of some data used by the chain.
-pub type Hash = primitives::H256;
-
-/// Index of a block number in the chain.
-pub type BlockNumber = u64;
-
-/// Index of an account's extrinsic in the chain.
-pub type Nonce = u64;
-
-pub type SessionKey = Ed25519AuthorityId;
-
-/// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
-/// the specifics of the runtime. They can then be made to be agnostic over specific formats
-/// of data like extrinsics, allowing for them to continue syncing the network through upgrades
-/// to even the core datastructures.
-pub mod opaque {
-	use super::*;
-
-	/// Opaque, encoded, unchecked extrinsic.
-	#[derive(PartialEq, Eq, Clone, Default, Encode, Decode)]
-	#[cfg_attr(feature = "std", derive(Serialize, Deserialize, Debug))]
-	pub struct UncheckedExtrinsic(#[cfg_attr(feature = "std", serde(with = "bytes"))] pub Vec<u8>);
-	impl traits::Extrinsic for UncheckedExtrinsic {
-		fn is_signed(&self) -> Option<bool> {
-			None
-		}
-	}
-	/// Opaque block header type.
-	pub type Header =
-		generic::Header<BlockNumber, BlakeTwo256, generic::DigestItem<Hash, SessionKey>>;
-	/// Opaque block type.
-	pub type Block = generic::Block<Header, UncheckedExtrinsic>;
-	/// Opaque block identifier type.
-	pub type BlockId = generic::BlockId<Block>;
-	/// Opaque session key type.
-	pub type SessionKey = Ed25519AuthorityId;
-}
 
 /// This runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
@@ -132,7 +95,7 @@ impl system::Trait for Runtime {
 	/// The identifier used to distinguish between accounts.
 	type AccountId = AccountId;
 	/// The index type for storing how many extrinsics an account has signed.
-	type Index = Nonce;
+	type Index = Index;
 	/// The index type for blocks.
 	type BlockNumber = BlockNumber;
 	/// The type for hashing blocks and tries.
@@ -191,10 +154,9 @@ impl session::Trait for Runtime {
 
 impl balances::Trait for Runtime {
 	/// The type for recording an account's balance.
-	type Balance = u128;
-	/// The type for recording indexing into the account enumeration. If this ever overflows, there
-	/// will be problems!
-	type AccountIndex = u32;
+	type Balance = Balance;
+	/// The type for recording indexing into the account enumeration.
+	type AccountIndex = AccountIndex;
 	/// What to do if an account's free balance gets zeroed.
 	type OnFreeBalanceZero = (Contract, ());
 	/// Restrict whether an account can transfer funds. We don't place any further restrictions.
@@ -240,7 +202,7 @@ impl governance::Trait for Runtime {
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, SessionKey>) where
 		Block = Block,
-		NodeBlock = opaque::Block,
+		NodeBlock = node_primitives::Block,
 		InherentData = BasicInherentData
 	{
 		System: system::{default, Log(ChangesTrieRoot)},
@@ -270,9 +232,9 @@ pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 pub type BlockId = generic::BlockId<Block>;
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic =
-	generic::UncheckedMortalExtrinsic<Address, Nonce, Call, Ed25519Signature>;
+	generic::UncheckedMortalExtrinsic<Address, Index, Call, Signature>;
 /// Extrinsic type that has already been checked.
-pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Nonce, Call>;
+pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Index, Call>;
 /// Executive: handles dispatch to the various modules.
 pub type Executive = executive::Executive<Runtime, Block, Context, Balances, AllModules>;
 

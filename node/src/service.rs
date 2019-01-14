@@ -6,7 +6,8 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use transaction_pool::{self, txpool::{Pool as TransactionPool}};
-use edgeware_runtime::{self, GenesisConfig, opaque::Block, RuntimeApi};
+use node_primitives::{Block, InherentData};
+use edgeware_runtime::{self, GenesisConfig, RuntimeApi};
 use substrate_service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
 	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor,
@@ -17,7 +18,6 @@ use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, Nothing
 use client;
 use grandpa;
 use primitives::ed25519::Pair;
-use runtime_primitives::BasicInherentData as InherentData;
 
 pub use substrate_executor::NativeExecutor;
 // Our native executor instance.

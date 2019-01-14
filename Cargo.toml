@@ -6,7 +6,7 @@ build = "build.rs"
 
 [[bin]]
 name = "edgeware"
-path = "src/main.rs"
+path = "node/src/main.rs"
 
 [dependencies]
 error-chain = "0.12"
@@ -35,19 +35,20 @@ substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate" }
 substrate-basic-authorship = { git = "https://github.com/paritytech/substrate" }
 structopt = "0.2.13"
 node-executor = { git = "https://github.com/paritytech/substrate" }
-edgeware-runtime = { path = "runtime" }
+node-primitives = { git = "https://github.com/paritytech/substrate" }
+edgeware-runtime = { path = "node/runtime" }
 
 [build-dependencies]
 vergen = "2"
 
 [workspace]
 members = [
-  "runtime",
+  "node/runtime",
   "modules/edge-delegation",
   "modules/edge-governance",
   "modules/edge-identity"
 ]
-exclude = [ "runtime/wasm" ]
+exclude = [ "node/runtime/wasm" ]
 
 [profile.release]
 # Substrate runtime requires unwinding.

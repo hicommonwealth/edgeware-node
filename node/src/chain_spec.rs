@@ -1,7 +1,8 @@
 use edgeware_runtime::{
-	AccountId, BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
+	BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
 	TimestampConfig, UpgradeKeyConfig, GrandpaConfig, ContractConfig, GovernanceConfig
 };
+use node_primitives::AccountId;
 use primitives::{ed25519, Ed25519AuthorityId};
 use substrate_service;
 
