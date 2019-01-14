@@ -28,6 +28,7 @@ extern crate edge_identity;
 extern crate srml_aura as aura;
 extern crate srml_balances as balances;
 extern crate srml_consensus as consensus;
+extern crate srml_contract as contract;
 extern crate srml_executive as executive;
 extern crate srml_grandpa as grandpa;
 extern crate srml_session as session;
@@ -195,7 +196,7 @@ impl balances::Trait for Runtime {
 	/// will be problems!
 	type AccountIndex = u32;
 	/// What to do if an account's free balance gets zeroed.
-	type OnFreeBalanceZero = ();
+	type OnFreeBalanceZero = (Contract, ());
 	/// Restrict whether an account can transfer funds. We don't place any further restrictions.
 	type EnsureAccountLiquid = ();
 	/// The uniquitous event type.
@@ -204,6 +205,12 @@ impl balances::Trait for Runtime {
 
 impl upgrade_key::Trait for Runtime {
 	/// The uniquitous event type.
+	type Event = Event;
+}
+
+impl contract::Trait for Runtime {
+	type Gas = u64;
+	type DetermineContractAddress = contract::SimpleAddressDeterminator<Runtime>;
 	type Event = Event;
 }
 
@@ -244,6 +251,7 @@ construct_runtime!(
 		Session: session,
 		UpgradeKey: upgrade_key,
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
+		Contract: contract::{Module, Call, Config<T>, Event<T>},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},

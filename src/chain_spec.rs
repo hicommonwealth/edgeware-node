@@ -1,6 +1,6 @@
 use edgeware_runtime::{
 	AccountId, BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
-	TimestampConfig, UpgradeKeyConfig, GrandpaConfig, GovernanceConfig
+	TimestampConfig, UpgradeKeyConfig, GrandpaConfig, ContractConfig, GovernanceConfig
 };
 use primitives::{ed25519, Ed25519AuthorityId};
 use substrate_service;
@@ -160,6 +160,15 @@ fn testnet_genesis(
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.clone().into_iter().map(|k| (k, 1)).collect(),
+		}),
+		contract: Some(ContractConfig {
+			contract_fee: 21,
+			call_base_fee: 135,
+			create_base_fee: 175,
+			gas_price: 1,
+			max_depth: 1024,
+			block_gas_limit: 10_000_000,
+			current_schedule: Default::default(),
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),

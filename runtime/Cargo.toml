@@ -21,6 +21,7 @@ srml-consensus = { git = "https://github.com/paritytech/substrate" }
 srml-aura = { git = "https://github.com/paritytech/substrate" }
 srml-executive = { git = "https://github.com/paritytech/substrate" }
 sr-primitives = { git = "https://github.com/paritytech/substrate" }
+srml-contract = { git = "https://github.com/paritytech/substrate" }
 srml-grandpa = { git = "https://github.com/paritytech/substrate" }
 srml-session = { git = "https://github.com/paritytech/substrate" }
 srml-system = { git = "https://github.com/paritytech/substrate" }
@@ -47,6 +48,7 @@ std = [
 	"srml-executive/std",
 	"srml-aura/std",
 	"sr-primitives/std",
+	"srml-contract/std",
   "srml-grandpa/std",
 	"srml-session/std",
 	"srml-system/std",
