@@ -75,7 +75,7 @@ pub struct IdentityRecord<AccountId, BlockNumber> {
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-		fn deposit_event() = default;
+		fn deposit_event<T>() = default;
 
 		/// Register an identity with the hash of the signature. Ensures that
 		/// all identities are unique, so that no duplicate identities can be

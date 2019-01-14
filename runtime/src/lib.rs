@@ -29,6 +29,7 @@ extern crate srml_aura as aura;
 extern crate srml_balances as balances;
 extern crate srml_consensus as consensus;
 extern crate srml_executive as executive;
+extern crate srml_grandpa as grandpa;
 extern crate srml_session as session;
 extern crate srml_system as system;
 extern crate srml_timestamp as timestamp;
@@ -43,14 +44,15 @@ use client::{block_builder::api as block_builder_api, runtime_api};
 use consensus_aura::api as aura_api;
 #[cfg(feature = "std")]
 use primitives::bytes;
-use primitives::{AuthorityId, OpaqueMetadata};
+use primitives::{Ed25519AuthorityId, OpaqueMetadata};
 use rstd::prelude::*;
 use runtime_primitives::{
 	generic,
-	traits::{self, BlakeTwo256, Block as BlockT, Convert, ProvideInherent},
+	traits::{self, BlakeTwo256, Block as BlockT, Convert, ProvideInherent, NumberFor, DigestFor},
 	transaction_validity::TransactionValidity,
 	ApplyResult, BasicInherentData, CheckInherentError, Ed25519Signature,
 };
+use grandpa::fg_primitives::{self, ScheduledChange};
 #[cfg(feature = "std")]
 use version::NativeVersion;
 use version::RuntimeVersion;
@@ -77,7 +79,7 @@ pub type BlockNumber = u64;
 /// Index of an account's extrinsic in the chain.
 pub type Nonce = u64;
 
-pub type SessionKey = AuthorityId;
+pub type SessionKey = Ed25519AuthorityId;
 
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
@@ -97,13 +99,13 @@ pub mod opaque {
 	}
 	/// Opaque block header type.
 	pub type Header =
-		generic::Header<BlockNumber, BlakeTwo256, generic::DigestItem<Hash, AuthorityId>>;
+		generic::Header<BlockNumber, BlakeTwo256, generic::DigestItem<Hash, SessionKey>>;
 	/// Opaque block type.
 	pub type Block = generic::Block<Header, UncheckedExtrinsic>;
 	/// Opaque block identifier type.
 	pub type BlockId = generic::BlockId<Block>;
 	/// Opaque session key type.
-	pub type SessionKey = AuthorityId;
+	pub type SessionKey = Ed25519AuthorityId;
 }
 
 /// This runtime version.
@@ -156,7 +158,7 @@ impl consensus::Trait for Runtime {
 	/// The position in the block's extrinsics that the note-offline inherent must be placed.
 	const NOTE_OFFLINE_POSITION: u32 = 1;
 	/// The identifier we use to refer to authorities.
-	type SessionKey = AuthorityId;
+	type SessionKey = SessionKey;
 	// The aura module handles offline-reports internally
 	// rather than using an explicit report system.
 	type InherentOfflineReport = ();
@@ -182,7 +184,7 @@ impl Convert<AccountId, SessionKey> for SessionKeyConversion {
 
 impl session::Trait for Runtime {
 	type ConvertAccountIdToSessionKey = SessionKeyConversion;
-	type OnSessionChange = ();
+	type OnSessionChange = (grandpa::SyncedAuthorities<Runtime>);
 	type Event = Event;
 }
 
@@ -204,6 +206,13 @@ impl upgrade_key::Trait for Runtime {
 	/// The uniquitous event type.
 	type Event = Event;
 }
+
+impl grandpa::Trait for Runtime {
+	type SessionKey = SessionKey;
+	type Log = Log;
+	type Event = Event;
+}
+
 impl identity::Trait for Runtime {
 	/// The type for making a claim to an identity.
 	type Claim = Vec<u8>;
@@ -222,7 +231,7 @@ impl governance::Trait for Runtime {
 }
 
 construct_runtime!(
-	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId>) where
+	pub enum Runtime with Log(InternalLog: DigestItem<Hash, SessionKey>) where
 		Block = Block,
 		NodeBlock = opaque::Block,
 		InherentData = BasicInherentData
@@ -234,6 +243,7 @@ construct_runtime!(
 		Balances: balances,
 		Session: session,
 		UpgradeKey: upgrade_key,
+		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
@@ -265,7 +275,7 @@ impl_runtime_apis! {
 			VERSION
 		}
 
-		fn authorities() -> Vec<AuthorityId> {
+		fn authorities() -> Vec<SessionKey> {
 			Consensus::authorities()
 		}
 
@@ -324,6 +334,26 @@ impl_runtime_apis! {
 	impl runtime_api::TaggedTransactionQueue<Block> for Runtime {
 		fn validate_transaction(tx: <Block as BlockT>::Extrinsic) -> TransactionValidity {
 			Executive::validate_transaction(tx)
+		}
+	}
+
+	impl fg_primitives::GrandpaApi<Block> for Runtime {
+		fn grandpa_pending_change(digest: DigestFor<Block>)
+			-> Option<ScheduledChange<NumberFor<Block>>>
+		{
+			for log in digest.logs.iter().filter_map(|l| match l {
+				Log(InternalLog::grandpa(grandpa_signal)) => Some(grandpa_signal),
+				_=> None
+			}) {
+				if let Some(change) = Grandpa::scrape_digest_change(log) {
+					return Some(change);
+				}
+			}
+			None
+		}
+
+		fn grandpa_authorities() -> Vec<(SessionKey, u64)> {
+			Grandpa::grandpa_authorities()
 		}
 	}
 

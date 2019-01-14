@@ -46,7 +46,7 @@ pub trait Trait: balances::Trait {
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-		fn deposit_event() = default;
+		fn deposit_event<T>() = default;
 
 		pub fn delegate_to(origin, to: T::AccountId) -> Result {
 			let _sender = ensure_signed(origin)?;
