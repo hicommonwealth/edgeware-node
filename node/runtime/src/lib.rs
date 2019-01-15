@@ -32,8 +32,10 @@ extern crate srml_contract as contract;
 extern crate srml_executive as executive;
 extern crate srml_grandpa as grandpa;
 extern crate srml_session as session;
+extern crate srml_staking as staking;
 extern crate srml_system as system;
 extern crate srml_timestamp as timestamp;
+extern crate srml_treasury as treasury;
 extern crate srml_upgrade_key as upgrade_key;
 extern crate node_primitives;
 extern crate substrate_consensus_aura_primitives as consensus_aura;
@@ -115,7 +117,7 @@ impl system::Trait for Runtime {
 }
 
 impl aura::Trait for Runtime {
-	type HandleReport = ();
+	type HandleReport = aura::StakingSlasher<Runtime>;
 }
 
 impl consensus::Trait for Runtime {
@@ -148,7 +150,7 @@ impl Convert<AccountId, SessionKey> for SessionKeyConversion {
 
 impl session::Trait for Runtime {
 	type ConvertAccountIdToSessionKey = SessionKeyConversion;
-	type OnSessionChange = (grandpa::SyncedAuthorities<Runtime>);
+	type OnSessionChange = (Staking, grandpa::SyncedAuthorities<Runtime>);
 	type Event = Event;
 }
 
@@ -158,15 +160,27 @@ impl balances::Trait for Runtime {
 	/// The type for recording indexing into the account enumeration.
 	type AccountIndex = AccountIndex;
 	/// What to do if an account's free balance gets zeroed.
-	type OnFreeBalanceZero = (Contract, ());
+	type OnFreeBalanceZero = ((Staking, Contract), ());
 	/// Restrict whether an account can transfer funds. We don't place any further restrictions.
-	type EnsureAccountLiquid = ();
+	type EnsureAccountLiquid = Staking;
 	/// The uniquitous event type.
 	type Event = Event;
 }
 
 impl upgrade_key::Trait for Runtime {
 	/// The uniquitous event type.
+	type Event = Event;
+}
+
+impl staking::Trait for Runtime {
+	type OnRewardMinted = Treasury;
+	type Event = Event;
+}
+
+// TODO: replace ApproveOrigin and RejectOrigin with voting-related origins
+impl treasury::Trait for Runtime {
+	type ApproveOrigin = system::EnsureRoot<AccountId>;
+	type RejectOrigin = system::EnsureRoot<AccountId>;
 	type Event = Event;
 }
 
@@ -211,9 +225,11 @@ construct_runtime!(
 		Aura: aura::{Module},
 		Balances: balances,
 		Session: session,
+		Staking: staking,
 		UpgradeKey: upgrade_key,
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Contract: contract::{Module, Call, Config<T>, Event<T>},
+		Treasury: treasury,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},

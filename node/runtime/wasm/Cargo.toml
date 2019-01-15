@@ -24,8 +24,10 @@ sr-primitives = { git = "https://github.com/paritytech/substrate", default-featu
 srml-contract = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-grandpa = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-session = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-staking = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-treasury = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-upgrade-key = { git = "https://github.com/paritytech/substrate", default-features = false }
 sr-version = { git = "https://github.com/paritytech/substrate", default-features = false }
 node-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
@@ -52,8 +54,10 @@ std = [
 	"srml-contract/std",
 	"srml-grandpa/std",
 	"srml-session/std",
+	"srml-staking/std",
 	"srml-system/std",
 	"srml-timestamp/std",
+	"srml-treasury/std",
 	"srml-upgrade-key/std",
 	"sr-version/std",
 	"node-primitives/std",
