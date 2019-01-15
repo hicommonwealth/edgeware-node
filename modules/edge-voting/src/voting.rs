@@ -34,11 +34,14 @@ extern crate sr_io as runtime_io;
 extern crate srml_balances as balances;
 extern crate srml_system as system;
 
+use std::collections::HashMap;
+
 use rstd::prelude::*;
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap, Parameter};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
+use runtime_primitives::traits::{Zero};
 use codec::Encode;
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -122,7 +125,7 @@ pub trait Trait: balances::Trait {
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-		fn deposit_event() = default;
+		fn deposit_event<T>() = default;
 
 		pub fn create_vote(
 			origin,
@@ -222,7 +225,25 @@ decl_module! {
 	}
 }
 
-impl<T: Trait> Module<T> {}
+
+impl<T: Trait> Module<T> {
+	pub fn tally(vote_id: u64) -> Vec<([u8; 32], T::Balance)> {
+		let mut voted: HashMap<T::Hash, bool> = HashMap::new();
+		let mut tally: Vec<([u8; 32], T::Balance)> = vec![];
+
+		if let Some(record) = <VoteRecords<T>>::get(vote_id) {
+			record.outcomes.iter().for_each(|o| {
+				tally.push((o.clone(), Zero::zero()));
+			});
+
+			record.reveals.iter().for_each(|r| {
+				voted.insert(T::Hashing::hash_of(&r.0.encode()), true);
+			});
+		}
+
+		return tally;
+	}
+}
 
 /// An event in this module.
 decl_event!(
