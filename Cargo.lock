@@ -618,6 +618,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-voting"
+version = "0.1.0"
+
+[[package]]
 name = "edgeware"
 version = "0.1.2"
 dependencies = [
