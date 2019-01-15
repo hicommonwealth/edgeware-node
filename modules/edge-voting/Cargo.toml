@@ -2,7 +2,6 @@
 name = "edge-voting"
 version = "0.1.0"
 authors = ["Drew Stone <drew@commonwealth.im>"]
-edition = "2019"
 
 [dependencies]
 hex-literal = "0.1.0"
