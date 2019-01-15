@@ -1,6 +1,8 @@
 use edgeware_runtime::{
-	BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
-	TimestampConfig, UpgradeKeyConfig, GrandpaConfig, ContractConfig, GovernanceConfig
+	Permill, Perbill,
+	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
+	TimestampConfig, TreasuryConfig, StakingConfig, UpgradeKeyConfig, GrandpaConfig,
+	IdentityConfig, GovernanceConfig
 };
 use node_primitives::AccountId;
 use primitives::{ed25519, Ed25519AuthorityId};
@@ -156,6 +158,20 @@ fn testnet_genesis(
 			validators: initial_authorities.iter().cloned().map(Into::into).collect(),
 			session_length: 10,
 		}),
+		staking: Some(StakingConfig {
+			current_era: 0,
+			intentions: initial_authorities.iter().cloned().map(Into::into).collect(),
+			minimum_validator_count: 1,
+			validator_count: 2,
+			sessions_per_era: 5,
+			bonding_duration: 2 * 60 * 12,
+			offline_slash: Perbill::zero(),
+			session_reward: Perbill::zero(),
+			current_offline_slash: 0,
+			current_session_reward: 0,
+			offline_slash_grace: 0,
+			invulnerables: initial_authorities.iter().cloned().map(Into::into).collect(),
+		}),
 		upgrade_key: Some(UpgradeKeyConfig {
 			key: upgrade_key,
 		}),
@@ -170,6 +186,12 @@ fn testnet_genesis(
 			max_depth: 1024,
 			block_gas_limit: 10_000_000,
 			current_schedule: Default::default(),
+		}),
+		treasury: Some(TreasuryConfig {
+			proposal_bond: Permill::from_percent(5),
+			proposal_bond_minimum: 1_000_000,
+			spend_period: 12 * 60 * 24,
+			burn: Permill::from_percent(50),
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),
