@@ -1,9 +1,12 @@
 use edgeware_runtime::{
-	AccountId, BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
-	TimestampConfig, UpgradeKeyConfig, GovernanceConfig
+	BalancesConfig, ConsensusConfig, GenesisConfig, IdentityConfig, SessionConfig,
+	TimestampConfig, UpgradeKeyConfig, GrandpaConfig, ContractConfig, GovernanceConfig
 };
-use primitives::{ed25519, AuthorityId};
+use node_primitives::AccountId;
+use primitives::{ed25519, Ed25519AuthorityId};
 use substrate_service;
+
+type SessionKey = Ed25519AuthorityId;
 
 // Note this is the URL for the telemetry server
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -127,7 +130,7 @@ impl Alternative {
 }
 
 fn testnet_genesis(
-	initial_authorities: Vec<AuthorityId>,
+	initial_authorities: Vec<SessionKey>,
 	endowed_accounts: Vec<AccountId>,
 	upgrade_key: AccountId,
 ) -> GenesisConfig {
@@ -155,6 +158,18 @@ fn testnet_genesis(
 		}),
 		upgrade_key: Some(UpgradeKeyConfig {
 			key: upgrade_key,
+		}),
+		grandpa: Some(GrandpaConfig {
+			authorities: initial_authorities.clone().into_iter().map(|k| (k, 1)).collect(),
+		}),
+		contract: Some(ContractConfig {
+			contract_fee: 21,
+			call_base_fee: 135,
+			create_base_fee: 175,
+			gas_price: 1,
+			max_depth: 1024,
+			block_gas_limit: 10_000_000,
+			current_schedule: Default::default(),
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),

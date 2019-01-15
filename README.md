@@ -6,16 +6,18 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ### Edge
 
-* [Delegation](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-delegation)
-* [Governance](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-governance)
-* [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
+* [Delegation](modules/edge-delegation)
+* [Governance](modules/edge-governance)
+* [Identity](modules/edge-identity)
 
 ### SRML
 
 * [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
 * [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
 * [Consensus](https://github.com/paritytech/substrate/tree/master/srml/consensus)
+* [Contract](https://github.com/paritytech/substrate/tree/master/srml/contract)
 * [Executive](https://github.com/paritytech/substrate/tree/master/srml/executive)
+* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
 * [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
 * [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
 * [UpgradeKey](https://github.com/paritytech/substrate/tree/master/srml/upgrade-key)
@@ -24,13 +26,13 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 1. Add its github repo to:
   - [Cargo.toml](Cargo.toml)
-  - [runtime/Cargo.toml](runtime/Cargo.toml)
-  - [runtime/wasm/Cargo.toml](runtime/wasm/Cargo.toml) (be sure to have `default-features = false`)
-2. Changes to [the runtime](runtime/src/lib.rs):
+  - [node/runtime/Cargo.toml](node/runtime/Cargo.toml)
+  - [node/runtime/wasm/Cargo.toml](node/runtime/wasm/Cargo.toml) (be sure to have `default-features = false`)
+2. Changes to [the runtime](node/runtime/src/lib.rs):
   - Add it as an `extern crate`.
   - Implement its `Trait` with production types.
   - Add it to the `construct_runtime` macro with all implemented components.
-3. If its storage contains `config` elements, then you need to modify [the chain spec](src/chain_spec.rs):
+3. If its storage contains `config` elements, then you need to modify [the chain spec](node/src/chain_spec.rs):
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.

@@ -76,7 +76,7 @@ pub trait Trait: system::Trait {
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-		fn deposit_event() = default;
+		fn deposit_event<T>() = default;
 
 		/// Creates a new governance proposal in the chosen category.
 		pub fn create_proposal(origin, title: Vec<u8>, contents: Vec<u8>, category: ProposalCategory) -> Result {
