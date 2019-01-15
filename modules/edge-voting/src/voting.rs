@@ -136,6 +136,9 @@ decl_module! {
 			let _sender = ensure_signed(origin)?;
 			ensure!(vote_type == VoteType::Binary || vote_type == VoteType::MultiOption, "Unsupported vote type");
 
+			if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
+			if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
+
 			let id = Self::vote_record_count() + 1;
 			let create_time = <system::Module<T>>::block_number();
 			let init_time = <system::Module<T>>::block_number() + initialization_time;
