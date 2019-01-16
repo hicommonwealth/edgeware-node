@@ -23,10 +23,8 @@ extern crate serde;
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
 #[cfg(feature = "std")]
-#[macro_use]
 extern crate serde_derive;
 #[cfg(test)]
-#[macro_use]
 extern crate hex_literal;
 #[macro_use] extern crate parity_codec_derive;
 #[macro_use] extern crate srml_support;
@@ -43,8 +41,6 @@ extern crate sr_io as runtime_io;
 extern crate srml_balances as balances;
 extern crate srml_system as system;
 
-use rstd::prelude::*;
-use runtime_support::dispatch::Result;
 
 pub mod delegation;
 pub use delegation::{Module, Trait, RawEvent, Event};
@@ -53,7 +49,8 @@ pub use delegation::{Module, Trait, RawEvent, Event};
 #[cfg(test)]
 mod tests {
 	use super::*;
-
+	use rstd::prelude::*;
+	use runtime_support::dispatch::Result;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher};
@@ -119,11 +116,11 @@ mod tests {
 		t.into()
 	}
 
-	fn delegate_to(who: H256, to_account: H256) -> super::Result {
+	fn delegate_to(who: H256, to_account: H256) -> Result {
 		Delegation::delegate_to(Origin::signed(who), to_account)
 	}
 
-	fn undelegate_from(who: H256, from_account: H256) -> super::Result {
+	fn undelegate_from(who: H256, from_account: H256) -> Result {
 		Delegation::undelegate_from(Origin::signed(who), from_account)
 	}
 
@@ -140,6 +137,8 @@ mod tests {
 					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
 				}]
 			);
+			assert_eq!(Delegation::delegate_of(a[0]), Some(a[1]));
+			assert_eq!(Delegation::delegate_of(a[1]), None);
 			assert_eq!(Delegation::tally_delegation(a.clone()),
 					   vec![(a[0], a[1]), (a[1], a[1])]);
 		});
@@ -170,6 +169,10 @@ mod tests {
 					event: Event::delegation(RawEvent::Delegated(a[1], a[2]))
 				}]
 			);
+			assert_eq!(Delegation::delegate_of(a[0]), Some(a[1]));
+			assert_eq!(Delegation::delegate_of(a[1]), Some(a[2]));
+			assert_eq!(Delegation::delegate_of(a[2]), None);
+			assert_eq!(Delegation::delegate_of(a[3]), None);
 			assert_eq!(Delegation::tally_delegation(a.clone()),
 					   vec![(a[0], a[2]), (a[1], a[2]), (a[2], a[2]), (a[3], a[3])]);
 		});
@@ -182,6 +185,7 @@ mod tests {
 			let a = H256::from(1);
 			assert_eq!(delegate_to(a, a), Err("Invalid delegation"));
 			assert_eq!(System::events(), vec![]);
+			assert_eq!(Delegation::delegate_of(a), None);
 			assert_eq!(Delegation::tally_delegation(vec![a]), vec![(a, a)]);
 		});
 	}
@@ -208,6 +212,8 @@ mod tests {
 					event: Event::delegation(RawEvent::Delegated(a[0], a[1]))
 				}]
 			);
+			assert_eq!(Delegation::delegate_of(a[0]), Some(a[1]));
+			assert_eq!(Delegation::delegate_of(a[1]), None);
 			assert_eq!(Delegation::tally_delegation(a.clone()),
 					   vec![(a[0], a[1]), (a[1], a[1])])
 		});
@@ -230,6 +236,7 @@ mod tests {
 					event: Event::delegation(RawEvent::Undelegated(H256::from(1), H256::from(2)))
 				}]
 			);
+			assert_eq!(Delegation::delegate_of(H256::from(1)), None);
 		});
 	}
 

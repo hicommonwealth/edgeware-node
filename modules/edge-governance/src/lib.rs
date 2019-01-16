@@ -41,7 +41,10 @@ extern crate sr_io as runtime_io;
 extern crate srml_system as system;
 
 pub mod governance;
-pub use governance::{Module, Trait, RawEvent, Event};
+pub use governance::{
+	Module, Trait, RawEvent, Event,
+	ProposalStage, ProposalCategory, ProposalRecord
+};
 
 #[cfg(test)]
 mod tests {
@@ -146,6 +149,24 @@ mod tests {
 		return (title, proposal);
 	}
 
+	fn make_record(
+		author: H256,
+		title: &[u8],
+		contents: &[u8],
+		category: ProposalCategory)
+		-> ProposalRecord<H256, u64> {
+			ProposalRecord {
+				index: 0,
+				author: author,
+				stage: ProposalStage::PreVoting,
+				category: category,
+				transition_block: None,
+				title: title.to_vec(),
+				contents: contents.to_vec(),
+				comments: vec![],
+			}
+	}
+
 	#[test]
 	fn propose_should_work() {
 		with_externalities(&mut new_test_ext(), || {
@@ -175,6 +196,20 @@ mod tests {
 					phase: Phase::ApplyExtrinsic(0),
 					event: Event::governance(RawEvent::NewProposal(public, hash2))
 				},]
+			);
+			assert_eq!(Governance::proposal_count(), 2);
+			assert_eq!(Governance::proposals(), vec![hash, hash2]);
+			assert_eq!(Governance::active_proposals(), vec![]);
+			assert_eq!(
+				Governance::proposal_of(hash),
+				Some(make_record(public, title, proposal, category))
+			);
+			assert_eq!(
+				Governance::proposal_of(hash2),
+				Some(ProposalRecord {
+					index: 1,
+					..make_record(public, title2, proposal2, category)
+				})
 			);
 		});
 	}
@@ -232,6 +267,13 @@ mod tests {
 				phase: Phase::ApplyExtrinsic(0),
 				event: Event::governance(RawEvent::NewComment(public, hash))
 			});
+			assert_eq!(
+				Governance::proposal_of(hash),
+				Some(ProposalRecord {
+					comments: vec![(comment.to_vec(), public)],
+					..make_record(public, title, proposal, category)
+				})
+			);
 		});
 	}
 
@@ -268,6 +310,15 @@ mod tests {
 					event: Event::governance(RawEvent::VotingStarted(hash, 2))
 				},]
 			);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 2)]);
+			assert_eq!(
+				Governance::proposal_of(hash),
+				Some(ProposalRecord {
+					stage: ProposalStage::Voting,
+					transition_block: Some(2),
+					..make_record(public, title, proposal, category)
+				})
+			);
 		});
 	}
 
@@ -296,6 +347,16 @@ mod tests {
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
 			assert_ok!(advance_proposal(public, hash));
+
+			assert_eq!(Governance::active_proposals(), vec![(hash, 2)]);
+			assert_eq!(
+				Governance::proposal_of(hash),
+				Some(ProposalRecord {
+					stage: ProposalStage::Voting,
+					transition_block: Some(2),
+					..make_record(public, title, proposal, category)
+				})
+			);
 
 			<Governance as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);
@@ -327,6 +388,16 @@ mod tests {
 					phase: Phase::ApplyExtrinsic(0),
 					event: Event::governance(RawEvent::VotingCompleted(hash))
 				}]
+			);
+
+			assert_eq!(Governance::active_proposals(), vec![]);
+			assert_eq!(
+				Governance::proposal_of(hash),
+				Some(ProposalRecord {
+					stage: ProposalStage::Completed,
+					transition_block: None,
+					..make_record(public, title, proposal, category)
+				})
 			);
 		});
 	}
@@ -394,6 +465,8 @@ mod tests {
 					event: Event::governance(RawEvent::VoteSubmitted(hash, public, true))
 				},]
 			);
+			assert_eq!(Governance::proposal_voters(hash), vec![public]);
+			assert_eq!(Governance::vote_of((hash, public)), Some(true));
 		});
 	}
 

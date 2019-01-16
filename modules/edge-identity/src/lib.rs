@@ -42,7 +42,10 @@ extern crate substrate_primitives as primitives;
 extern crate srml_system as system;
 
 pub mod identity;
-pub use identity::{Event, Module, RawEvent, Trait};
+pub use identity::{
+	Event, Module, RawEvent, Trait,
+	IdentityStage, MetadataRecord, IdentityRecord
+};
 
 // Tests for Identity Module
 #[cfg(test)]
@@ -159,6 +162,18 @@ mod tests {
 		Identity::remove_claim(Origin::signed(who), identity_hash)
 	}
 
+	fn default_identity_record(public: H256, identity: &[u8]) -> IdentityRecord<H256, u64> {
+		IdentityRecord {
+			account: public,
+			identity: identity.to_vec(),
+			stage: IdentityStage::Registered,
+			expiration_time: Some(2),
+			proof: None,
+			verifications: None,
+			metadata: None
+		}
+	}
+
 	#[test]
 	fn register_should_work() {
 		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
@@ -180,6 +195,12 @@ mod tests {
 					event: Event::identity(RawEvent::Register(identity_hash, public))
 				}]
 			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
+			);
 		});
 	}
 
@@ -198,7 +219,7 @@ mod tests {
 			assert_err!(
 				register_identity(public, identity),
 				"Identity already exists"
-			)
+			);
 		});
 	}
 
@@ -231,6 +252,16 @@ mod tests {
 						event: Event::identity(RawEvent::Attest(identity_hash, public))
 					}
 				]
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Attested,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity)
+				})
 			);
 		});
 	}
@@ -317,6 +348,18 @@ mod tests {
 						event: Event::identity(RawEvent::Verify(identity_hash, public, [verifier].to_vec()))
 					}
 				]
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_time: None,
+					proof: Some(attestation.to_vec()),
+					verifications: Some(vec![(verifier, true)]),
+					..default_identity_record(public, identity)
+				})
 			);
 		});
 	}
@@ -475,6 +518,9 @@ mod tests {
 					},
 				]
 			);
+			assert_eq!(Identity::identities(), vec![]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
 
@@ -525,6 +571,9 @@ mod tests {
 					},
 				]
 			);
+			assert_eq!(Identity::identities(), vec![]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
 
@@ -558,7 +607,19 @@ mod tests {
 			assert_err!(
 				register_identity(public, identity),
 				"Identity already exists"
-			)
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_time: None,
+					proof: Some(attestation.to_vec()),
+					verifications: Some(vec![(verifier, true)]),
+					..default_identity_record(public, identity)
+				})
+			);
 		});
 	}
 
@@ -593,7 +654,11 @@ mod tests {
 			assert_err!(
 				register_identity(public, new_identity),
 				"Sender account is frozen"
-			)
+			);
+			assert_eq!(Identity::identities(), vec![]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(Identity::frozen_accounts(), vec![public]);
+			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
 
@@ -646,6 +711,18 @@ mod tests {
 					},
 				]
 			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_time: None,
+					proof: Some(attestation.to_vec()),
+					verifications: Some(vec![(verifier_1, true), (verifier_2, true)]),
+					..default_identity_record(public, identity)
+				})
+			);
 		});
 	}
 
@@ -675,6 +752,20 @@ mod tests {
 				display_name,
 				tagline
 			));
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			let default_record = default_identity_record(public, identity);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					metadata: Some(MetadataRecord {
+					avatar: avatar.to_vec(),
+					display_name: display_name.to_vec(),
+					tagline: tagline.to_vec(),
+					}),
+					..default_record
+				})
+			);
 		});
 	}
 
@@ -783,6 +874,7 @@ mod tests {
 			let issuer = H256::from(1);
 			let claim: &[u8] = b"is over 25 years of age";
 			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim));
+			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);
 		});
 	}
 

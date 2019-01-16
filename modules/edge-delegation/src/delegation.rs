@@ -36,7 +36,7 @@ extern crate srml_system as system;
 
 use rstd::prelude::*;
 use system::ensure_signed;
-use runtime_support::{StorageValue, StorageMap, Parameter};
+use runtime_support::{StorageMap};
 use runtime_support::dispatch::Result;
 
 pub trait Trait: balances::Trait {
