@@ -52,8 +52,16 @@ decl_module! {
 			let _sender = ensure_signed(origin)?;
 			// Check that no delegation cycle exists
 			ensure!(!Self::has_delegation_cycle(&_sender, to.clone()), "Invalid delegation");
-			// Update the delegate to Some(delegate)
+			// Update the delegate of _sender -> Some(to)
 			<DelegatesOf<T>>::insert(&_sender, &to);
+			// Update the delegates of to to include _sender
+			if let Some(mut delegates) = <DelegatesTo<T>>::get(to.clone()) {
+				delegates.push(_sender.clone());
+				<DelegatesTo<T>>::insert(to.clone(), delegates);
+			} else {
+				<DelegatesTo<T>>::insert(to.clone(), vec![_sender.clone()]);
+			}
+			
 			// Fire delegation event
 			Self::deposit_event(RawEvent::Delegated(_sender, to));
 
@@ -66,6 +74,17 @@ decl_module! {
 			ensure!(_sender != from, "Invalid undelegation");
 			// Update the delegate to the sender, None type throws an error due to missing Trait bound
 			<DelegatesOf<T>>::remove(&_sender);
+			// Update the delegates of to remove _sender
+			if let Some(mut delegates) = <DelegatesTo<T>>::get(from.clone()) {
+				let index = delegates.iter().position(|d| d == &_sender.clone()).unwrap();
+				delegates.remove(index);
+
+				if delegates.len() == 0 {
+					<DelegatesTo<T>>::remove(from.clone());
+				} else {
+					<DelegatesTo<T>>::insert(from.clone(), delegates);	
+				}
+			}
 			// Fire delegation event
 			Self::deposit_event(RawEvent::Undelegated(_sender, from));
 
@@ -115,5 +134,7 @@ decl_storage! {
 	trait Store for Module<T: Trait> as Delegation {
 		/// The map of strict delegates for each account
 		pub DelegatesOf get(delegate_of): map T::AccountId => Option<T::AccountId>;
+		/// The map of accounts delegating to a specific account
+		pub DelegatesTo get(delegates_to): map T::AccountId => Option<Vec<T::AccountId>>;
 	}
 }
