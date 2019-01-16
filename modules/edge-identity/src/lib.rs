@@ -213,12 +213,19 @@ mod tests {
 				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
 			));
 			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 			let public: H256 = pair.public().0.into();
 
 			assert_ok!(register_identity(public, identity));
 			assert_err!(
 				register_identity(public, identity),
 				"Identity already exists"
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
 			);
 		});
 	}
@@ -283,6 +290,9 @@ mod tests {
 				attest_to_identity(public, identity_hash, attestation),
 				"Identity does not exist"
 			);
+			assert_eq!(Identity::identities(), vec![]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
 
@@ -307,6 +317,12 @@ mod tests {
 			assert_err!(
 				attest_to_identity(other_pub, identity_hash, attestation),
 				"Stored identity does not match sender"
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
 			);
 		});
 	}
@@ -376,6 +392,9 @@ mod tests {
 				verify_identity(verifier, identity_hash, true),
 				"Identity does not exist"
 			);
+			assert_eq!(Identity::identities(), vec![]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
 
@@ -398,6 +417,12 @@ mod tests {
 			assert_err!(
 				verify_identity(verifier, identity_hash, true),
 				"No attestation to verify"
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
 			);
 		});
 	}
@@ -423,6 +448,18 @@ mod tests {
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, true));
 			assert_err!(verify_identity(verifier, identity_hash, true), "Already verified");
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_time: None,
+					proof: Some(attestation.to_vec()),
+					verifications: Some(vec![(verifier, true)]),
+					..default_identity_record(public, identity)
+				})
+			);
 		});
 	}
 
@@ -450,6 +487,18 @@ mod tests {
 				attest_to_identity(public, identity_hash, attestation),
 				"Already verified"
 			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_time: None,
+					proof: Some(attestation.to_vec()),
+					verifications: Some(vec![(verifier, true)]),
+					..default_identity_record(public, identity)
+				})
+			);
 		});
 	}
 
@@ -474,6 +523,16 @@ mod tests {
 			assert_err!(
 				verify_identity(public, identity_hash, true),
 				"Sender not a verifier"
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Attested,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity)
+				})
 			);
 		});
 	}
@@ -788,6 +847,9 @@ mod tests {
 				add_metadata_to_account(public, identity_hash, avatar, display_name, tagline),
 				"Identity does not exist"
 			);
+			assert_eq!(Identity::identities(), vec![]);
+			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
 
@@ -816,6 +878,12 @@ mod tests {
 				add_metadata_to_account(other_pub, identity_hash, avatar, display_name, tagline),
 				"Stored identity does not match sender"
 			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
+			);
 		});
 	}
 
@@ -833,6 +901,7 @@ mod tests {
 				add_claim_to_identity(issuer, identity_hash, claim),
 				"Invalid identity record"
 			);
+			assert_eq!(Identity::claims(identity_hash), vec![]);
 		});
 	}
 
@@ -853,6 +922,7 @@ mod tests {
 				add_claim_to_identity(public, identity_hash, claim),
 				"Invalid claims issuer"
 			);
+			assert_eq!(Identity::claims(identity_hash), vec![]);
 		});
 	}
 
@@ -891,6 +961,7 @@ mod tests {
 				remove_claim_from_identity(issuer, identity_hash),
 				"Invalid identity record"
 			);
+			assert_eq!(Identity::claims(identity_hash), vec![]);
 		});
 	}
 
@@ -910,6 +981,7 @@ mod tests {
 				remove_claim_from_identity(public, identity_hash),
 				"Invalid claims issuer"
 			);
+			assert_eq!(Identity::claims(identity_hash), vec![]);
 		});
 	}
 
@@ -936,6 +1008,7 @@ mod tests {
 				remove_claim_from_identity(another_issuer, identity_hash),
 				"No existing claim under issuer"
 			);
+			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);
 		});
 	}
 }
