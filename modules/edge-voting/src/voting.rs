@@ -33,6 +33,7 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
+extern crate edge_delegation as delegation;
 
 use std::collections::HashMap;
 
@@ -41,7 +42,8 @@ use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap, Parameter};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
-use runtime_primitives::traits::{Zero};
+use runtime_primitives::traits::{Zero, One};
+use runtime_primitives::traits::{As, CheckedMul, CheckedAdd, CheckedSub};
 use codec::Encode;
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -120,7 +122,7 @@ pub struct VoteRecord<AccountId, BlockNumber> {
 	pub winning_outcome: Option<[u8; 32]>,
 }
 
-pub trait Trait: balances::Trait {
+pub trait Trait: balances::Trait + delegation::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
@@ -230,21 +232,109 @@ decl_module! {
 
 
 impl<T: Trait> Module<T> {
-	pub fn tally(vote_id: u64) -> Vec<([u8; 32], T::Balance)> {
-		let mut voted: HashMap<T::Hash, bool> = HashMap::new();
-		let mut tally: Vec<([u8; 32], T::Balance)> = vec![];
+	pub fn tally(vote_id: u64) -> Option<HashMap<[u8; 32], T::Balance>> {
+		let mut voted: HashMap<T::Hash, [u8; 32]> = HashMap::new();
+		let mut undelegating: Vec<T::AccountId> = vec![];
 
 		if let Some(record) = <VoteRecords<T>>::get(vote_id) {
-			record.outcomes.iter().for_each(|o| {
-				tally.push((o.clone(), Zero::zero()));
+			let mut outcomes: Vec<([u8; 32], T::Balance)> = record.outcomes
+				.clone()
+				.into_iter()
+				.map(|o| (o, Zero::zero()))
+				.collect();
+
+			let mut tally: HashMap<[u8; 32], usize> = HashMap::new();
+			for inx in 0..outcomes.len() {
+				tally.insert(outcomes[inx].0, inx);
+			}
+
+			// Tally all votes, track voters and their voted alternatives
+			record.reveals.clone().into_iter().for_each(|r| {
+				// Add voting record into hashmap for fast lookup
+				voted.insert(T::Hashing::hash_of(&r.0.encode()), r.1);
+				// Get weight of voter by summing over weight of its delegates
+				let weight: T::Balance = Self::get_delegate_weight(r.0.clone(), record.data.tally_type);
+				// Get index of voter's alternative in the outcome tally
+				let index: usize = outcomes.iter().position(|&o| o.0 == r.1).unwrap();
+				outcomes[index].1 = outcomes[index].1.checked_add(&weight).unwrap();
+
+				if <delegation::Module<T>>::delegate_of(r.0.clone()).is_none() {
+					undelegating.push(r.0.clone());
+				}
 			});
 
-			record.reveals.iter().for_each(|r| {
-				voted.insert(T::Hashing::hash_of(&r.0.encode()), true);
-			});
+			// Iterate over undelegating nodes to find duplicate votes, subtract them
+			while !undelegating.is_empty() {
+				// Remove first element in the queue
+				let elt = undelegating.remove(0);
+				let elt_hash = T::Hashing::hash_of(&elt.encode());
+				let alternative = voted.get(&elt_hash).unwrap();
+				// Get delegates of the voter
+				if let Some(delegates) = <delegation::Module<T>>::delegates_to(elt.clone()) {
+					for d in delegates {
+						// Check if any delegate of the voter has also voted, using its hash
+						let d_hash = T::Hashing::hash_of(&d.encode());
+						if voted.contains_key(&d_hash) {
+							let index: usize = outcomes.iter().position(|&o| &o.0 == alternative).unwrap();
+							// Subtract the voting delegate's vote from the delegator's alternative tally
+							// i.e. if A delegates to B and both vote for different alternatives. We honor
+							//		A's vote by subtracting the weight from B's chosen alternative tally.
+							let d_weight = Self::get_delegate_weight(d.clone(), record.data.tally_type);
+							outcomes[index].1 = outcomes[index].1.checked_sub(&d_weight).unwrap();
+
+							if let Some(d_delegates) = <delegation::Module<T>>::delegates_to(d) {
+								d_delegates.into_iter().for_each(|dd| undelegating.push(dd))
+							}
+						}
+					}
+				}
+			}
 		}
 
-		return tally;
+		return None;
+	}
+
+	pub fn get_delegate_weight(voter: T::AccountId, tally_type: TallyType) -> T::Balance {
+		if let Some(dels) = <delegation::Module<T>>::delegates_to(voter.clone()) {
+			return if tally_type == TallyType::OnePerson {
+				// One person one vote yields one vote for each delegate + one's own vote
+				dels.into_iter()
+					.map(|d| Self::get_delegate_weight(d, tally_type))
+					.fold(Zero::zero(), |a: T::Balance, b| a.checked_add(&b).unwrap())
+					.checked_add(&One::one())
+					.unwrap()
+			} else if tally_type == TallyType::OneCoin {
+				// One coin one vote yields the sum of delegates balances + one's own balance
+				dels.into_iter()
+					.map(|d| Self::get_delegate_weight(d, tally_type))
+					.fold(Zero::zero(), |a: T::Balance, b| a.checked_add(&b).unwrap())
+					.checked_add(&<balances::Module<T>>::total_balance(&voter))
+					.unwrap()
+			} else {
+				// No valid tally type
+				Zero::zero()
+			}
+		} else {
+			return if tally_type == TallyType::OnePerson {
+				// Voter has no delegates, votes with his/her own weight
+				One::one()
+			} else if tally_type == TallyType::OneCoin {
+				// Voter has no delegates, votes with his/her own balance
+				<balances::Module<T>>::total_balance(&voter)
+			} else {
+				// No valid tally type
+				Zero::zero()
+			}
+		}
+	}
+
+	pub fn get_blank_tally(tally_outcomes: Vec<[u8; 32]>) -> HashMap<[u8; 32], T::Balance> {
+		let mut tally_map: HashMap<[u8; 32], T::Balance> = HashMap::new();
+		for o in tally_outcomes {
+			tally_map.insert(o, Zero::zero());
+		}
+
+		return tally_map;
 	}
 }
 
