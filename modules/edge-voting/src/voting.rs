@@ -116,6 +116,8 @@ pub struct VoteRecord<AccountId, BlockNumber> {
 	pub data: VoteData<AccountId, BlockNumber>,
 	// Vote outcomes
 	pub outcomes: Vec<[u8; 32]>,
+	// Winning outcome
+	pub winning_outcome: Option<[u8; 32]>,
 }
 
 pub trait Trait: balances::Trait {
@@ -152,6 +154,7 @@ decl_module! {
 				commitments: vec![],
 				reveals: vec![],
 				outcomes: outcomes,
+				winning_outcome: None,
 				data: VoteData {
 					initiator: _sender.clone(),
 					stage: VoteStage::PreVoting,
