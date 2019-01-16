@@ -39,11 +39,11 @@ use std::collections::HashMap;
 
 use rstd::prelude::*;
 use system::ensure_signed;
-use runtime_support::{StorageValue, StorageMap, Parameter};
+use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
 use runtime_primitives::traits::{Zero, One};
-use runtime_primitives::traits::{As, CheckedMul, CheckedAdd, CheckedSub};
+use runtime_primitives::traits::{CheckedAdd, CheckedSub};
 use codec::Encode;
 
 #[cfg_attr(feature = "std", derive(Debug))]
