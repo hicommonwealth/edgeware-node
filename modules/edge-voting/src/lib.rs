@@ -130,16 +130,12 @@ mod tests {
 	fn create_vote(
 		who: H256,
 		vote_type: voting::VoteType,
-		initialization_time: u64,
-		expiration_time: u64,
 		is_commit_reveal: bool,
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]]
 	) -> Result {
 		Voting::create_vote(Origin::signed(who),
 							vote_type,
-							initialization_time,
-							expiration_time,
 							is_commit_reveal,
 							tally_type,
 							outcomes.to_vec())
@@ -159,30 +155,26 @@ mod tests {
 		return public;
 	}
 
-	fn generate_1p1v_public_binary_vote() -> (voting::VoteType, u64, u64, bool, voting::TallyType, [[u8; 32]; 2]) {
+	fn generate_1p1v_public_binary_vote() -> (voting::VoteType, bool, voting::TallyType, [[u8; 32]; 2]) {
 		let vote_type = VoteType::Binary;
 		let tally_type = TallyType::OnePerson;
-		let init_time = 1;
-		let expire_time = 1;
 		let is_commit_reveal = false;
 		let yes_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 		let no_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-		return (vote_type, init_time, expire_time, is_commit_reveal, tally_type, [yes_outcome, no_outcome]);
+		return (vote_type, is_commit_reveal, tally_type, [yes_outcome, no_outcome]);
 	}
 
-	fn generate_1p1v_public_multi_vote() -> (voting::VoteType, u64, u64, bool, voting::TallyType, [[u8; 32]; 4]) {
+	fn generate_1p1v_public_multi_vote() -> (voting::VoteType, bool, voting::TallyType, [[u8; 32]; 4]) {
 		let vote_type = VoteType::MultiOption;
 		let tally_type = TallyType::OnePerson;
-		let init_time = 1;
-		let expire_time = 1;
 		let is_commit_reveal = false;
 		let one_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 		let two_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
 		let three_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3];
 		let four_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
-		return (vote_type, init_time, expire_time, is_commit_reveal, tally_type, [
+		return (vote_type, is_commit_reveal, tally_type, [
 			one_outcome,
 			two_outcome,
 			three_outcome,
@@ -194,13 +186,10 @@ mod tests {
 		id: u64,
 		author: H256,
 		vote_type: voting::VoteType,
-		initialization_time: u64,
-		expiration_time: u64,
 		is_commit_reveal: bool,
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]],
-		create_time: u64,
-	) -> VoteRecord<H256, u64> {
+	) -> VoteRecord<H256> {
 		VoteRecord {
 			id: id,
 			is_commit_reveal: is_commit_reveal,
@@ -212,9 +201,6 @@ mod tests {
 				initiator: author,
 				stage: VoteStage::PreVoting,
 				vote_type: vote_type,
-				creation_time: create_time,
-				initialization_time: initialization_time + create_time,
-				expiration_time: expiration_time + create_time + initialization_time,
 				tally_type: tally_type,
 			},
 		}
@@ -226,11 +212,11 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5));
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(Voting::vote_record_count(), 1);
 			assert_eq!(
 				Voting::vote_records(1),
-				Some(make_record(1, public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5, 1))
+				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3))
 			);
 		});
 	}
@@ -241,12 +227,25 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_multi_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5));
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(Voting::vote_record_count(), 1);
 			assert_eq!(
 				Voting::vote_records(1),
-				Some(make_record(1, public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5, 1))
+				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3))
 			);
+		});
+	}
+
+	#[test]
+	fn create_vote_with_one_outcome_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_multi_vote();
+			let outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
+			assert_err!(create_vote(public, vote.0, vote.1, vote.2, &[outcome]), "Invalid multi option outcomes");
+			assert_eq!(Voting::vote_record_count(), 0);
+			assert_eq!(Voting::vote_records(1), None);
 		});
 	}
 }

@@ -95,7 +95,6 @@ pub struct VoteData<AccountId> {
 	pub vote_type: VoteType,
 	// Tally metric
 	pub tally_type: TallyType,
-	// Vote outcomes
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
