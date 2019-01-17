@@ -248,102 +248,76 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
+	// for a given account, finds the voter representing them, aka their
+	// closest voting ancestor on the delegation graph (incl self)
+	fn find_rep(voters: &HashMap<T::Hash, [u8; 32]>, acct: T::AccountId) -> Option<T::AccountId> {
+		if voters.contains_key(&T::Hashing::hash_of(&acct.encode())) {
+			return Some(acct);
+		} else if let Some(parent) = <delegation::Module<T>>::delegate_of(acct) {
+			return Self::find_rep(voters, parent);
+		} else {
+			return None;
+		}
+	}
+
+	// constructs a mapping of accounts to their representatives
+	fn build_rep_map(reps: &mut HashMap<T::Hash, (T::AccountId, T::AccountId)>, voters: &HashMap<T::Hash, [u8; 32]>, acct: T::AccountId) {
+		// if we haven't seen this account yet, find its voting parent
+		let hash = T::Hashing::hash_of(&acct.encode());
+		if reps.contains_key(&hash) {
+			return;
+		} else {
+			if let Some(voter) = Self::find_rep(voters, acct.clone()) {
+				reps.insert(hash, (acct.clone(), voter));
+			}
+		}
+
+		// recurse to children
+		if let Some(ds) = <delegation::Module<T>>::delegates_to(acct) {
+			ds.into_iter().for_each(|d| {
+				Self::build_rep_map(reps, voters, d);
+			});
+		};
+	}
+	
 	pub fn tally(vote_id: u64) -> Option<Vec<([u8; 32], T::Balance)>> {
-		let mut voted: HashMap<T::Hash, [u8; 32]> = HashMap::new();
-		let mut undelegating: Vec<T::AccountId> = vec![];
+		let mut voters: HashMap<T::Hash, [u8; 32]> = HashMap::new();
+		let mut reps: HashMap<T::Hash, (T::AccountId, T::AccountId)> = HashMap::new();
 
 		if let Some(record) = <VoteRecords<T>>::get(vote_id) {
+			// build mapping of voters to their votes
+			record.reveals.clone().into_iter().for_each(|(acct, choice)| {
+				// build a mapping of voters to their votes
+				voters.insert(T::Hashing::hash_of(&acct.encode()), choice);
+			});
+
+			// populate the map
+			record.reveals.clone().into_iter()
+				.for_each(|r| Self::build_rep_map(&mut reps, &voters, r.0));
+
+			// tally up the vote
 			let mut outcomes: Vec<([u8; 32], T::Balance)> = record.outcomes
 				.clone()
 				.into_iter()
 				.map(|o| (o, Zero::zero()))
 				.collect();
 
-			let mut tally: HashMap<[u8; 32], usize> = HashMap::new();
-			for inx in 0..outcomes.len() {
-				tally.insert(outcomes[inx].0, inx);
-			}
+			for (_, (account, rep)) in reps.iter() {
+				let weight: T::Balance = match record.data.tally_type {
+					TallyType::OnePerson => One::one(),
+					TallyType::OneCoin => <balances::Module<T>>::total_balance(account),
+				};
 
-			// Tally all votes, track voters and their voted alternatives
-			record.reveals.clone().into_iter().for_each(|r| {
-				// Add voting record into hashmap for fast lookup
-				voted.insert(T::Hashing::hash_of(&r.0.encode()), r.1);
-				// Get weight of voter by summing over weight of its delegates
-				let weight: T::Balance = Self::get_delegate_weight(r.0.clone(), record.data.tally_type);
-				// Get index of voter's alternative in the outcome tally
-				let index: usize = outcomes.iter().position(|&o| o.0 == r.1).unwrap();
+				// use the representative's choice and the voter's weight
+				let selection = voters.get(&T::Hashing::hash_of(&rep.encode())).unwrap();
+				let index: usize = outcomes.iter().position(|&o| &o.0 == selection).unwrap();
 				outcomes[index].1 = outcomes[index].1.checked_add(&weight).unwrap();
-
-				if <delegation::Module<T>>::delegate_of(r.0.clone()).is_none() {
-					undelegating.push(r.0.clone());
-				}
-			});
-
-			// Iterate over undelegating nodes to find duplicate votes, subtract them
-			while !undelegating.is_empty() {
-				// Remove first element in the queue
-				let elt = undelegating.remove(0);
-				let elt_hash = T::Hashing::hash_of(&elt.encode());
-				let alternative = voted.get(&elt_hash).unwrap();
-				// Get delegates of the voter
-				if let Some(delegates) = <delegation::Module<T>>::delegates_to(elt.clone()) {
-					for d in delegates {
-						// Check if any delegate of the voter has also voted, using its hash
-						let d_hash = T::Hashing::hash_of(&d.encode());
-						if voted.contains_key(&d_hash) {
-							let index: usize = outcomes.iter().position(|&o| &o.0 == alternative).unwrap();
-							// Subtract the voting delegate's vote from the delegator's alternative tally
-							// i.e. if A delegates to B and both vote for different alternatives. We honor
-							//		A's vote by subtracting the weight from B's chosen alternative tally.
-							let d_weight = Self::get_delegate_weight(d.clone(), record.data.tally_type);
-							outcomes[index].1 = outcomes[index].1.checked_sub(&d_weight).unwrap();
-
-							if let Some(d_delegates) = <delegation::Module<T>>::delegates_to(d) {
-								d_delegates.into_iter().for_each(|dd| undelegating.push(dd))
-							}
-						}
-					}
-				}
 			}
 
 			return Some(outcomes);
 		}
 
 		return None;
-	}
-
-	pub fn get_delegate_weight(voter: T::AccountId, tally_type: TallyType) -> T::Balance {
-		if let Some(dels) = <delegation::Module<T>>::delegates_to(voter.clone()) {
-			return if tally_type == TallyType::OnePerson {
-				// One person one vote yields one vote for each delegate + one's own vote
-				dels.into_iter()
-					.map(|d| Self::get_delegate_weight(d, tally_type))
-					.fold(Zero::zero(), |a: T::Balance, b| a.checked_add(&b).unwrap())
-					.checked_add(&One::one())
-					.unwrap()
-			} else if tally_type == TallyType::OneCoin {
-				// One coin one vote yields the sum of delegates balances + one's own balance
-				dels.into_iter()
-					.map(|d| Self::get_delegate_weight(d, tally_type))
-					.fold(Zero::zero(), |a: T::Balance, b| a.checked_add(&b).unwrap())
-					.checked_add(&<balances::Module<T>>::total_balance(&voter))
-					.unwrap()
-			} else {
-				// No valid tally type
-				Zero::zero()
-			}
-		} else {
-			return if tally_type == TallyType::OnePerson {
-				// Voter has no delegates, votes with his/her own weight
-				One::one()
-			} else if tally_type == TallyType::OneCoin {
-				// Voter has no delegates, votes with his/her own balance
-				<balances::Module<T>>::total_balance(&voter)
-			} else {
-				// No valid tally type
-				Zero::zero()
-			}
-		}
 	}
 }
 
