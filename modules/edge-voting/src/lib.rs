@@ -219,7 +219,6 @@ mod tests {
 	) -> VoteRecord<H256, u64> {
 		VoteRecord {
 			id: id,
-			is_commit_reveal: is_commit_reveal,
 			commitments: vec![],
 			reveals: vec![],
 			outcomes: outcomes.to_vec(),
@@ -230,6 +229,7 @@ mod tests {
 				stage: stage,
 				vote_type: vote_type,
 				tally_type: tally_type,
+				is_commit_reveal: is_commit_reveal,
 			},
 		}
 	}
@@ -431,7 +431,7 @@ mod tests {
 			let vote = generate_1p1v_commit_reveal_binary_vote();
 			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(
-				Voting::vote_records(1).unwrap().is_commit_reveal,
+				Voting::vote_records(1).unwrap().data.is_commit_reveal,
 				true
 			);
 			assert_ok!(advance_stage_as_initiator(public, 1));
@@ -450,7 +450,7 @@ mod tests {
 			let vote = generate_1p1v_commit_reveal_binary_vote();
 			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(
-				Voting::vote_records(1).unwrap().is_commit_reveal,
+				Voting::vote_records(1).unwrap().data.is_commit_reveal,
 				true
 			);
 			let public2 = get_test_key_2();

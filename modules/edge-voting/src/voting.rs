@@ -95,6 +95,8 @@ pub struct VoteData<AccountId> {
 	pub vote_type: VoteType,
 	// Tally metric
 	pub tally_type: TallyType,
+	// Flag for commit/reveal voting scheme
+	pub is_commit_reveal: bool,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -102,8 +104,6 @@ pub struct VoteData<AccountId> {
 pub struct VoteRecord<AccountId, Balance> {
 	// Identifier of the vote
 	pub id: u64,
-	// Flag for commit/reveal voting scheme
-	pub is_commit_reveal: bool,
 	// Vote commitments
 	pub commitments: Vec<(AccountId, [u8; 32])>,
 	// Vote reveals with 2^32 possible options
@@ -143,7 +143,6 @@ decl_module! {
 			let id = Self::vote_record_count() + 1;
 			<VoteRecords<T>>::insert(id, VoteRecord {
 				id: id,
-				is_commit_reveal: is_commit_reveal,
 				commitments: vec![],
 				reveals: vec![],
 				outcomes: outcomes,
@@ -154,6 +153,7 @@ decl_module! {
 					stage: VoteStage::PreVoting,
 					vote_type: vote_type,
 					tally_type: tally_type,
+					is_commit_reveal: is_commit_reveal,
 				},
 			});
 
@@ -165,7 +165,7 @@ decl_module! {
 		pub fn commit(origin, vote_id: u64, commit: [u8; 32]) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.is_commit_reveal, "Commitments are not configured for this vote");
+			ensure!(record.data.is_commit_reveal, "Commitments are not configured for this vote");
 			ensure!(record.data.stage == VoteStage::Commit, "Vote is not in commit stage");
 			// TODO: Allow changing of commits before commit stage ends
 			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
@@ -186,7 +186,7 @@ decl_module! {
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
 			// Ensure voter committed
-			if record.is_commit_reveal {
+			if record.data.is_commit_reveal {
 				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
 				let commit: (T::AccountId, [u8; 32]) = record.commitments
 					.iter()
@@ -210,14 +210,14 @@ decl_module! {
 		pub fn advance_stage_as_initiator(origin, vote_id: u64) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.data.initiator == _sender.clone(), "Invalid advance attempt by non-owner");
+			ensure!(record.data.initiator == _sender, "Invalid advance attempt by non-owner");
 			return Self::advance_stage(vote_id);
 		}
 
 		pub fn tally_as_initiator(origin, vote_id: u64) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.data.initiator == _sender.clone(), "Invalid advance attempt by non-owner");
+			ensure!(record.data.initiator == _sender, "Invalid advance attempt by non-owner");
 			ensure!(record.data.stage == VoteStage::Completed, "Vote is not in completed stage");
 
 			if let Some(tally) = Self::tally(vote_id) {
@@ -237,7 +237,7 @@ impl<T: Trait> Module<T> {
 		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 		let curr_stage = record.data.stage;
 		let next_stage = match curr_stage {
-			VoteStage::PreVoting if record.is_commit_reveal => VoteStage::Commit,
+			VoteStage::PreVoting if record.data.is_commit_reveal => VoteStage::Commit,
 			VoteStage::PreVoting | VoteStage::Commit => VoteStage::Voting,
 			VoteStage::Voting => VoteStage::Completed,
 			VoteStage::Completed => return Err("Vote already completed"),
