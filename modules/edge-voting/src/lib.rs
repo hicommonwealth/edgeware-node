@@ -234,4 +234,19 @@ mod tests {
 			);
 		});
 	}
+
+	#[test]
+	fn create_multi_vote_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_multi_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5));
+			assert_eq!(Voting::vote_record_count(), 1);
+			assert_eq!(
+				Voting::vote_records(1),
+				Some(make_record(1, public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5, 1))
+			);
+		});
+	}
 }
