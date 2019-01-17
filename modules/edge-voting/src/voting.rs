@@ -99,7 +99,7 @@ pub struct VoteData<AccountId> {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct VoteRecord<AccountId> {
+pub struct VoteRecord<AccountId, Balance> {
 	// Identifier of the vote
 	pub id: u64,
 	// Flag for commit/reveal voting scheme
@@ -114,6 +114,8 @@ pub struct VoteRecord<AccountId> {
 	pub outcomes: Vec<[u8; 32]>,
 	// Winning outcome
 	pub winning_outcome: Option<[u8; 32]>,
+	// Final tally
+	pub tally: Vec<([u8; 32], Balance)>,
 }
 
 pub trait Trait: balances::Trait + delegation::Trait {
@@ -146,6 +148,7 @@ decl_module! {
 				reveals: vec![],
 				outcomes: outcomes,
 				winning_outcome: None,
+				tally: vec![],
 				data: VoteData {
 					initiator: _sender.clone(),
 					stage: VoteStage::PreVoting,
@@ -164,7 +167,8 @@ decl_module! {
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.is_commit_reveal, "Commitments are not configured for this vote");
 			ensure!(record.data.stage == VoteStage::Commit, "Vote is not in commit stage");
-			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
+			// TODO: Allow changing of commits before commit stage ends
+			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
 
 			// Add commitment to record
 			record.commitments.push((_sender.clone(), commit));
@@ -178,6 +182,7 @@ decl_module! {
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
 			// Check vote is for a valid outcome
 			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
+			// TODO: Allow changing of votes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
 			// Ensure voter committed
@@ -201,6 +206,28 @@ decl_module! {
 			<VoteRecords<T>>::insert(record.id, record);
 			Ok(())
 		}
+
+		pub fn advance_stage_as_initiator(origin, vote_id: u64) -> Result {
+			let _sender = ensure_signed(origin)?;
+			let record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+			ensure!(record.data.initiator == _sender.clone(), "Invalid advance attempt by non-owner");
+			return Self::advance_stage(vote_id);
+		}
+
+		pub fn tally_as_initiator(origin, vote_id: u64) -> Result {
+			let _sender = ensure_signed(origin)?;
+			let record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+			ensure!(record.data.initiator == _sender.clone(), "Invalid advance attempt by non-owner");
+			ensure!(record.data.stage == VoteStage::Completed, "Vote is not in completed stage");
+
+			if let Some(tally) = Self::tally(vote_id) {
+				<VoteRecords<T>>::insert(record.id, VoteRecord {
+					tally: tally,
+					..record
+				});
+			}
+			Ok(())
+		}
 	}
 }
 
@@ -221,7 +248,7 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
-	pub fn tally(vote_id: u64) -> Option<HashMap<[u8; 32], T::Balance>> {
+	pub fn tally(vote_id: u64) -> Option<Vec<([u8; 32], T::Balance)>> {
 		let mut voted: HashMap<T::Hash, [u8; 32]> = HashMap::new();
 		let mut undelegating: Vec<T::AccountId> = vec![];
 
@@ -278,6 +305,8 @@ impl<T: Trait> Module<T> {
 					}
 				}
 			}
+
+			return Some(outcomes);
 		}
 
 		return None;
@@ -331,7 +360,7 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Delegation {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId>>;
+		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId, T::Balance>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(vote_record_count): u64;
 	}

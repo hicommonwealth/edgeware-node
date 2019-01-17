@@ -44,6 +44,8 @@ extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
 
+extern crate rand;
+
 use rstd::prelude::*;
 use runtime_support::dispatch::Result;
 
@@ -54,8 +56,8 @@ pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData};
 // Tests for Delegation Module
 #[cfg(test)]
 mod tests {
-	
 	use super::*;
+	use rand::Rng;
 	use runtime_io::ed25519::Pair;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
@@ -63,7 +65,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage, traits::{BlakeTwo256}, testing::{Digest, DigestItem, Header}
+		BuildStorage, traits::{BlakeTwo256, Hash}, testing::{Digest, DigestItem, Header}
 	};
 
 
@@ -149,16 +151,36 @@ mod tests {
 		Voting::reveal(Origin::signed(who), vote_id, vote, secret)
 	}
 
+	fn advance_stage_as_initiator(who: H256, vote_id: u64) -> Result {
+		Voting::advance_stage_as_initiator(Origin::signed(who), vote_id)
+	}
+
 	fn get_test_key() -> H256 {
 		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 		let public: H256 = pair.public().0.into();
 		return public;
 	}
 
+	fn get_test_key_2() -> H256 {
+		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"));
+		let public: H256 = pair.public().0.into();
+		return public;		
+	}
+
 	fn generate_1p1v_public_binary_vote() -> (voting::VoteType, bool, voting::TallyType, [[u8; 32]; 2]) {
 		let vote_type = VoteType::Binary;
 		let tally_type = TallyType::OnePerson;
 		let is_commit_reveal = false;
+		let yes_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+		let no_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+		return (vote_type, is_commit_reveal, tally_type, [yes_outcome, no_outcome]);
+	}
+
+	fn generate_1p1v_commit_reveal_binary_vote() -> (voting::VoteType, bool, voting::TallyType, [[u8; 32]; 2]) {
+		let vote_type = VoteType::Binary;
+		let tally_type = TallyType::OnePerson;
+		let is_commit_reveal = true;
 		let yes_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 		let no_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
@@ -189,7 +211,8 @@ mod tests {
 		is_commit_reveal: bool,
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]],
-	) -> VoteRecord<H256> {
+		stage: VoteStage
+	) -> VoteRecord<H256, u64> {
 		VoteRecord {
 			id: id,
 			is_commit_reveal: is_commit_reveal,
@@ -197,9 +220,10 @@ mod tests {
 			reveals: vec![],
 			outcomes: outcomes.to_vec(),
 			winning_outcome: None,
+			tally: vec![],
 			data: VoteData {
 				initiator: author,
-				stage: VoteStage::PreVoting,
+				stage: stage,
 				vote_type: vote_type,
 				tally_type: tally_type,
 			},
@@ -216,8 +240,21 @@ mod tests {
 			assert_eq!(Voting::vote_record_count(), 1);
 			assert_eq!(
 				Voting::vote_records(1),
-				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3))
+				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::PreVoting))
 			);
+		});
+	}
+
+	#[test]
+	fn create_binary_vote_with_multi_options_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			let multi_vote = generate_1p1v_public_multi_vote();
+			assert_err!(create_vote(public, vote.0, vote.1, vote.2, &multi_vote.3), "Invalid binary outcomes");
+			assert_eq!(Voting::vote_record_count(), 0);
+			assert_eq!(Voting::vote_records(1), None);
 		});
 	}
 
@@ -231,8 +268,21 @@ mod tests {
 			assert_eq!(Voting::vote_record_count(), 1);
 			assert_eq!(
 				Voting::vote_records(1),
-				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3))
+				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::PreVoting))
 			);
+		});
+	}
+
+	#[test]
+	fn create_multi_vote_with_binary_options_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			let multi_vote = generate_1p1v_public_multi_vote();
+			assert_err!(create_vote(public, multi_vote.0, multi_vote.1, multi_vote.2, &vote.3), "Invalid multi option outcomes");
+			assert_eq!(Voting::vote_record_count(), 0);
+			assert_eq!(Voting::vote_records(1), None);
 		});
 	}
 
@@ -246,6 +296,212 @@ mod tests {
 			assert_err!(create_vote(public, vote.0, vote.1, vote.2, &[outcome]), "Invalid multi option outcomes");
 			assert_eq!(Voting::vote_record_count(), 0);
 			assert_eq!(Voting::vote_records(1), None);
+		});
+	}
+
+	// TODO: Ensure we fix this test when we support these types!
+	#[test]
+	fn create_vote_with_unsupported_type_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_multi_vote();
+			let outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
+			assert_err!(create_vote(public, VoteType::AnonymousRing, vote.1, vote.2, &[outcome]), "Unsupported vote type");
+			assert_eq!(Voting::vote_record_count(), 0);
+			assert_eq!(Voting::vote_records(1), None);
+		});
+	}
+
+	#[test]
+	fn commit_to_nonexistent_record_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let commit_value = rand::thread_rng().gen::<[u8; 32]>();
+			assert_err!(commit(public, 1, commit_value), "Vote record does not exist");
+		});
+	}
+
+	#[test]
+	fn commit_to_non_commit_record_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			let commit_value = rand::thread_rng().gen::<[u8; 32]>();
+			assert_err!(commit(public, 1, commit_value), "Commitments are not configured for this vote");
+		});
+	}
+
+	#[test]
+	fn reveal_to_nonexistent_record_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let commit_value = rand::thread_rng().gen::<[u8; 32]>();
+			assert_err!(reveal(public, 1, commit_value, Some(commit_value)), "Vote record does not exist");
+		});
+	}
+
+	#[test]
+	fn reveal_to_record_before_voting_period_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			let vote_outcome = vote.3[0];
+			assert_err!(reveal(public, 1, vote_outcome, Some(vote_outcome)), "Vote is not in voting stage");
+		});
+	}
+
+	#[test]
+	fn advance_from_non_initiator_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let public2 = get_test_key_2();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_err!(advance_stage_as_initiator(public2, 1), "Invalid advance attempt by non-owner");
+		});
+	}
+
+	#[test]
+	fn advance_from_initiator_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			assert_eq!(
+				Voting::vote_records(1),
+				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::Voting))
+			);
+		});
+	}
+
+	#[test]
+	fn reveal_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			let public2 = get_test_key_2();
+			assert_ok!(reveal(public2, 1, vote.3[0], Some(vote.3[0])));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().reveals,
+				vec![(public2, vote.3[0])]
+			);
+		});
+	}
+
+	#[test]
+	fn complete_after_reveal_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			let public2 = get_test_key_2();
+			assert_ok!(reveal(public2, 1, vote.3[0], Some(vote.3[0])));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().data.stage,
+				VoteStage::Completed
+			);
+		});
+	}
+
+	#[test]
+	fn transition_to_commit_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_commit_reveal_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().is_commit_reveal,
+				true
+			);
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().data.stage,
+				VoteStage::Commit
+			);
+		});
+	}
+
+	#[test]
+	fn reveal_before_commit_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_commit_reveal_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().is_commit_reveal,
+				true
+			);
+			let public2 = get_test_key_2();
+			assert_err!(reveal(public2, 1, vote.3[0], Some(vote.3[0])), "Vote is not in voting stage");
+		});
+	}
+
+	#[test]
+	fn reveal_commit_before_stage_change_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_commit_reveal_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			let public2 = get_test_key_2();
+			let secret = rand::thread_rng().gen::<[u8; 32]>();
+			let mut buf = Vec::new();
+			buf.extend_from_slice(&<[u8; 32]>::from(public2));
+			buf.extend_from_slice(&secret);
+			buf.extend_from_slice(&vote.3[0]);
+			let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
+			assert_ok!(commit(public2, 1, commit_hash));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().commitments,
+				vec![(public2, commit_hash)]
+			);
+
+			assert_err!(reveal(public2, 1, vote.3[0], Some(secret)), "Vote is not in voting stage");
+		});
+	}
+
+	#[test]
+	fn reveal_commit_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_commit_reveal_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			let public2 = get_test_key_2();
+			let secret = rand::thread_rng().gen::<[u8; 32]>();
+			let mut buf = Vec::new();
+			buf.extend_from_slice(&<[u8; 32]>::from(public2));
+			buf.extend_from_slice(&secret);
+			buf.extend_from_slice(&vote.3[0]);
+			let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
+			assert_ok!(commit(public2, 1, commit_hash));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().commitments,
+				vec![(public2, commit_hash)]
+			);
+
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			assert_ok!(reveal(public2, 1, vote.3[0], Some(secret)));
 		});
 	}
 }
