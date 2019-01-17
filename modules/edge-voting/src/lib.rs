@@ -155,6 +155,10 @@ mod tests {
 		Voting::advance_stage_as_initiator(Origin::signed(who), vote_id)
 	}
 
+	fn tally_as_initiator(who: H256, vote_id: u64) -> Result {
+		Voting::tally_as_initiator(Origin::signed(who), vote_id)
+	}
+
 	fn get_test_key() -> H256 {
 		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 		let public: H256 = pair.public().0.into();
@@ -502,6 +506,24 @@ mod tests {
 
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			assert_ok!(reveal(public2, 1, vote.3[0], Some(secret)));
+		});
+	}
+
+	#[test]
+	fn tally_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			assert_ok!(reveal(public, 1, vote.3[0], Some(vote.3[0])));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			assert_ok!(tally_as_initiator(public, 1));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().tally,
+				vec![(vote.3[0], 1), (vote.3[1], 0)]
+			);
 		});
 	}
 }
