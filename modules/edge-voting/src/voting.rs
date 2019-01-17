@@ -49,10 +49,11 @@ use codec::Encode;
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
 pub enum VoteStage {
-	// Before voting stage
-	// TODO: Define or remove
+	// Before voting stage, no votes accepted
 	PreVoting,
-	// Active voting stage, votes allowed
+	// Commit stage, only for commit-reveal-type elections
+	Commit,
+	// Active voting stage, votes (reveals) allowed
 	Voting,
 	// Completed voting stage, no more votes allowed
 	Completed,
@@ -85,19 +86,13 @@ pub enum TallyType {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct VoteData<AccountId, BlockNumber> {
+pub struct VoteData<AccountId> {
 	// creator of vote
 	pub initiator: AccountId,
 	// Stage of the vote
 	pub stage: VoteStage,
 	// Type of vote defined abovoe
 	pub vote_type: VoteType,
-	// Creation time of the record
-	pub creation_time: BlockNumber,
-	// Initialization time of the voting stage
-	pub initialization_time: BlockNumber,
-	// Expiration time of the voting stage
-	pub expiration_time: BlockNumber,
 	// Tally metric
 	pub tally_type: TallyType,
 	// Vote outcomes
@@ -105,7 +100,7 @@ pub struct VoteData<AccountId, BlockNumber> {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct VoteRecord<AccountId, BlockNumber> {
+pub struct VoteRecord<AccountId> {
 	// Identifier of the vote
 	pub id: u64,
 	// Flag for commit/reveal voting scheme
@@ -115,7 +110,7 @@ pub struct VoteRecord<AccountId, BlockNumber> {
 	// Vote reveals with 2^32 possible options
 	pub reveals: Vec<(AccountId, [u8; 32])>,
 	// Vote data record
-	pub data: VoteData<AccountId, BlockNumber>,
+	pub data: VoteData<AccountId>,
 	// Vote outcomes
 	pub outcomes: Vec<[u8; 32]>,
 	// Winning outcome
@@ -134,8 +129,6 @@ decl_module! {
 		pub fn create_vote(
 			origin,
 			vote_type: VoteType,
-			initialization_time: T::BlockNumber,
-			expiration_time: T::BlockNumber,
 			is_commit_reveal: bool,
 			tally_type: TallyType,
 			outcomes: Vec<[u8; 32]>
@@ -147,9 +140,6 @@ decl_module! {
 			if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
 
 			let id = Self::vote_record_count() + 1;
-			let create_time = <system::Module<T>>::block_number();
-			let init_time = <system::Module<T>>::block_number() + initialization_time;
-			let expire_time = <system::Module<T>>::block_number() + initialization_time + expiration_time;
 			<VoteRecords<T>>::insert(id, VoteRecord {
 				id: id,
 				is_commit_reveal: is_commit_reveal,
@@ -161,70 +151,55 @@ decl_module! {
 					initiator: _sender.clone(),
 					stage: VoteStage::PreVoting,
 					vote_type: vote_type,
-					creation_time: create_time,
-					initialization_time: init_time,
-					expiration_time: expire_time,
 					tally_type: tally_type,
 				},
 			});
 
 			<VoteRecordCount<T>>::mutate(|i| *i += 1);
-			Self::deposit_event(RawEvent::VoteCreated(_sender, vote_type, init_time, expire_time));
+			Self::deposit_event(RawEvent::VoteCreated(id, _sender, vote_type));
 			Ok(())
 		}
 
 		pub fn commit(origin, vote_id: u64, commit: [u8; 32]) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(<VoteRecords<T>>::exists(vote_id), "Vote record does not exist");
+			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+			ensure!(record.is_commit_reveal, "Commitments are not configured for this vote");
+			ensure!(record.data.stage == VoteStage::Commit, "Vote is not in commit stage");
+			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
-			match <VoteRecords<T>>::get(vote_id) {
-				Some(mut record) => {
-					// Ensure record is a commit reveal record
-					ensure!(record.is_commit_reveal, "Commitments are not configured for this vote");
-					// Prevent duplicate commitments
-					ensure!(!record.commitments.clone().into_iter().any(|c| c.0 == _sender.clone()), "Duplicate votes are not allowed");
-					// Add commitment to record
-					record.commitments.push((_sender.clone(), commit));
-					<VoteRecords<T>>::insert(record.id, record);
-				},
-				None => { return Err("Vote record does not exist") },
-			}
+			// Add commitment to record
+			record.commitments.push((_sender.clone(), commit));
+			<VoteRecords<T>>::insert(record.id, record);
 			Ok(())
 		}
 
 		pub fn reveal(origin, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			// Check vote record exists
-			ensure!(<VoteRecords<T>>::exists(vote_id), "Vote record does not exist");
+			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
 			// Check vote is for a valid outcome
-			ensure!(<VoteRecords<T>>::get(vote_id).unwrap().outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
-			
-			match <VoteRecords<T>>::get(vote_id) {
-				Some(mut record) => {
-					// Prevent duplicate reveals
-					ensure!(!record.reveals.clone().into_iter().any(|c| c.0 == _sender.clone()), "Duplicate votes are not allowed");
-					// Ensure voter committed
-					if record.is_commit_reveal {
-						ensure!(record.commitments.clone().into_iter().any(|c| c.0 == _sender.clone()), "Duplicate commits are not allowed");
-						let commit: (T::AccountId, [u8; 32]) = record.commitments.clone()
-							.into_iter()
-							.find(|c| c.0 == _sender.clone())
-							.unwrap();
+			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
+			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
-						let mut buf = Vec::new();
-						buf.extend_from_slice(&_sender.encode());
-						buf.extend_from_slice(&secret.unwrap().encode());
-						buf.extend_from_slice(&vote);
-						let hash = T::Hashing::hash_of(&buf);
-						ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
-					}
+			// Ensure voter committed
+			if record.is_commit_reveal {
+				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
+				let commit: (T::AccountId, [u8; 32]) = record.commitments
+					.iter()
+					.find(|c| &c.0 == &_sender)
+					.unwrap()
+					.clone();
 
-					record.reveals.push((_sender.clone(), vote));
-					<VoteRecords<T>>::insert(record.id, record);
-				},
-				None => { return Err("Vote record does not exist") },
+				let mut buf = Vec::new();
+				buf.extend_from_slice(&_sender.encode());
+				buf.extend_from_slice(&secret.unwrap().encode());
+				buf.extend_from_slice(&vote);
+				let hash = T::Hashing::hash_of(&buf);
+				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
 			}
 
+			record.reveals.push((_sender.clone(), vote));
+			<VoteRecords<T>>::insert(record.id, record);
 			Ok(())
 		}
 	}
@@ -232,6 +207,21 @@ decl_module! {
 
 
 impl<T: Trait> Module<T> {
+	pub fn advance_stage(vote_id: u64) -> Result {
+		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+		let curr_stage = record.data.stage;
+		let next_stage = match curr_stage {
+			VoteStage::PreVoting if record.is_commit_reveal => VoteStage::Commit,
+			VoteStage::PreVoting | VoteStage::Commit => VoteStage::Voting,
+			VoteStage::Voting => VoteStage::Completed,
+			VoteStage::Completed => return Err("Vote already completed"),
+		};
+		record.data.stage = next_stage;
+		<VoteRecords<T>>::insert(record.id, record);
+		Self::deposit_event(RawEvent::VoteAdvanced(vote_id, curr_stage, next_stage));
+		Ok(())
+	}
+
 	pub fn tally(vote_id: u64) -> Option<HashMap<[u8; 32], T::Balance>> {
 		let mut voted: HashMap<T::Hash, [u8; 32]> = HashMap::new();
 		let mut undelegating: Vec<T::AccountId> = vec![];
@@ -331,15 +321,18 @@ impl<T: Trait> Module<T> {
 
 /// An event in this module.
 decl_event!(
-	pub enum Event<T> where <T as system::Trait>::AccountId, <T as system::Trait>::BlockNumber {
-		VoteCreated(AccountId, VoteType, BlockNumber, BlockNumber),
+	pub enum Event<T> where <T as system::Trait>::AccountId {
+		/// new vote (id, creator, type of vote)
+		VoteCreated(u64, AccountId, VoteType),
+		/// vote stage transition (id, old stage, new stage)
+		VoteAdvanced(u64, VoteStage, VoteStage),
 	}
 );
 
 decl_storage! {
 	trait Store for Module<T: Trait> as Delegation {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId, T::BlockNumber>>;
+		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(vote_record_count): u64;
 	}
