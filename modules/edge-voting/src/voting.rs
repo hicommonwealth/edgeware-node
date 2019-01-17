@@ -327,15 +327,6 @@ impl<T: Trait> Module<T> {
 			}
 		}
 	}
-
-	pub fn get_blank_tally(tally_outcomes: Vec<[u8; 32]>) -> HashMap<[u8; 32], T::Balance> {
-		let mut tally_map: HashMap<[u8; 32], T::Balance> = HashMap::new();
-		for o in tally_outcomes {
-			tally_map.insert(o, Zero::zero());
-		}
-
-		return tally_map;
-	}
 }
 
 /// An event in this module.

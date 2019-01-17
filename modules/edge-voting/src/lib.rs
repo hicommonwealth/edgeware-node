@@ -49,12 +49,14 @@ use runtime_support::dispatch::Result;
 
 pub mod voting;
 pub use voting::{Module, Trait, RawEvent, Event};
+pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData};
 
 // Tests for Delegation Module
 #[cfg(test)]
 mod tests {
+	
 	use super::*;
-
+	use runtime_io::ed25519::Pair;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher};
@@ -123,5 +125,113 @@ mod tests {
 		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.into()
+	}
+
+	fn create_vote(
+		who: H256,
+		vote_type: voting::VoteType,
+		initialization_time: u64,
+		expiration_time: u64,
+		is_commit_reveal: bool,
+		tally_type: voting::TallyType,
+		outcomes: &[[u8; 32]]
+	) -> Result {
+		Voting::create_vote(Origin::signed(who),
+							vote_type,
+							initialization_time,
+							expiration_time,
+							is_commit_reveal,
+							tally_type,
+							outcomes.to_vec())
+	}
+
+	fn commit(who: H256, vote_id: u64, commit: [u8; 32]) -> Result {
+		Voting::commit(Origin::signed(who), vote_id, commit)
+	}
+
+	fn reveal(who: H256, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
+		Voting::reveal(Origin::signed(who), vote_id, vote, secret)
+	}
+
+	fn get_test_key() -> H256 {
+		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
+		let public: H256 = pair.public().0.into();
+		return public;
+	}
+
+	fn generate_1p1v_public_binary_vote() -> (voting::VoteType, u64, u64, bool, voting::TallyType, [[u8; 32]; 2]) {
+		let vote_type = VoteType::Binary;
+		let tally_type = TallyType::OnePerson;
+		let init_time = 1;
+		let expire_time = 1;
+		let is_commit_reveal = false;
+		let yes_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+		let no_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+		return (vote_type, init_time, expire_time, is_commit_reveal, tally_type, [yes_outcome, no_outcome]);
+	}
+
+	fn generate_1p1v_public_multi_vote() -> (voting::VoteType, u64, u64, bool, voting::TallyType, [[u8; 32]; 4]) {
+		let vote_type = VoteType::MultiOption;
+		let tally_type = TallyType::OnePerson;
+		let init_time = 1;
+		let expire_time = 1;
+		let is_commit_reveal = false;
+		let one_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+		let two_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
+		let three_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3];
+		let four_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
+
+		return (vote_type, init_time, expire_time, is_commit_reveal, tally_type, [
+			one_outcome,
+			two_outcome,
+			three_outcome,
+			four_outcome
+		]);
+	}
+
+	fn make_record(
+		id: u64,
+		author: H256,
+		vote_type: voting::VoteType,
+		initialization_time: u64,
+		expiration_time: u64,
+		is_commit_reveal: bool,
+		tally_type: voting::TallyType,
+		outcomes: &[[u8; 32]],
+		create_time: u64,
+	) -> VoteRecord<H256, u64> {
+		VoteRecord {
+			id: id,
+			is_commit_reveal: is_commit_reveal,
+			commitments: vec![],
+			reveals: vec![],
+			outcomes: outcomes.to_vec(),
+			winning_outcome: None,
+			data: VoteData {
+				initiator: author,
+				stage: VoteStage::PreVoting,
+				vote_type: vote_type,
+				creation_time: create_time,
+				initialization_time: initialization_time + create_time,
+				expiration_time: expiration_time + create_time + initialization_time,
+				tally_type: tally_type,
+			},
+		}
+	}
+
+	#[test]
+	fn create_binary_vote_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5));
+			assert_eq!(Voting::vote_record_count(), 1);
+			assert_eq!(
+				Voting::vote_records(1),
+				Some(make_record(1, public, vote.0, vote.1, vote.2, vote.3, vote.4, &vote.5, 1))
+			);
+		});
 	}
 }
