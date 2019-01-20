@@ -164,8 +164,8 @@ mod tests {
 		Identity::add_claim(Origin::signed(who), identity_hash, claim.to_vec(), issuer_index)
 	}
 
-	fn remove_claim_from_identity(who: H256, identity_hash: H256, issuer_index: usize, claim_index: usize) -> Result {
-		Identity::remove_claim(Origin::signed(who), identity_hash, issuer_index, claim_index)
+	fn remove_claim_from_identity(who: H256, identity_hash: H256, claim_index: usize) -> Result {
+		Identity::remove_claim(Origin::signed(who), identity_hash, claim_index)
 	}
 
 	fn default_identity_record(public: H256, identity: &[u8]) -> IdentityRecord<H256, u64> {
@@ -818,11 +818,8 @@ mod tests {
 			let identity: &[u8] = b"github.com/drewstone";
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
-			let issuers = Identity::claims_issuers();
-			let issuer_index: usize = issuers.iter().position(|id| id == &issuer).unwrap();
-
 			assert_err!(
-				remove_claim_from_identity(issuer, identity_hash, issuer_index, 0),
+				remove_claim_from_identity(issuer, identity_hash, 0),
 				"Invalid identity record"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![]);
@@ -841,11 +838,19 @@ mod tests {
 			let identity: &[u8] = b"github.com/drewstone";
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
+			assert_ok!(register_identity(public, identity));
+
+			let issuer = H256::from(1);
+			let claim: &[u8] = b"is over 25 years of age";
+			let issuers = Identity::claims_issuers();
+			let issuer_index: usize = issuers.iter().position(|id| id == &issuer).unwrap();
+			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim, issuer_index));
+
 			assert_err!(
-				remove_claim_from_identity(public, identity_hash, 0, 0),
-				"Invalid claims issuer"
+				remove_claim_from_identity(public, identity_hash, 0),
+				"No existing claim under issuer"
 			);
-			assert_eq!(Identity::claims(identity_hash), vec![]);
+			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);
 		});
 	}
 
@@ -870,9 +875,8 @@ mod tests {
 			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim, issuer_index));
 
 			let another_issuer = H256::from(2);
-			let another_issuer_index: usize = issuers.iter().position(|id| id == &another_issuer).unwrap();
 			assert_err!(
-				remove_claim_from_identity(another_issuer, identity_hash, another_issuer_index, 0),
+				remove_claim_from_identity(another_issuer, identity_hash, 0),
 				"No existing claim under issuer"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);

@@ -247,11 +247,9 @@ decl_module! {
 		/// Remove a claim as a claims issuer. Ensures that the sender is an active
 		/// claims issuer. Ensures that the sender has issued a claim over the
 		/// identity provided to the module.
-		pub fn remove_claim(origin, identity_hash: T::Hash, issuer_index: usize, claim_index: usize) -> Result {
+		pub fn remove_claim(origin, identity_hash: T::Hash, claim_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 
-			let issuers: Vec<T::AccountId> = Self::claims_issuers();
-			ensure!(issuers[issuer_index] == _sender, "Invalid claims issuer");
 			ensure!(<IdentityOf<T>>::exists(identity_hash), "Invalid identity record");
 
 			let mut claims = Self::claims(identity_hash);
