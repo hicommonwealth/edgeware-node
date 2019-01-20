@@ -40,11 +40,13 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
+extern crate srml_timestamp as timestamp;
+extern crate srml_consensus as consensus;
 
 pub mod identity;
 pub use identity::{
 	Event, Module, RawEvent, Trait,
-	IdentityStage, MetadataRecord, IdentityRecord
+	IdentityStage, IdentityRecord
 };
 
 // Tests for Identity Module
@@ -61,8 +63,8 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		testing::{Digest, DigestItem, Header},
-		traits::{BlakeTwo256, Hash, OnFinalise},
+		testing::{Digest, DigestItem, Header, UintAuthorityId},
+		traits::{BlakeTwo256, Hash},
 		BuildStorage,
 	};
 
@@ -97,11 +99,23 @@ mod tests {
 		type Event = Event;
 		type Log = DigestItem;
 	}
+	impl consensus::Trait for Test {
+		const NOTE_OFFLINE_POSITION: u32 = 1;
+		type Log = DigestItem;
+		type SessionKey = UintAuthorityId;
+		type InherentOfflineReport = ();
+	}
+	impl timestamp::Trait for Test {
+		const TIMESTAMP_SET_POSITION: u32 = 0;
+		type Moment = u64;
+		type OnTimestampSet = ();
+	}
 	impl Trait for Test {
 		type Claim = Vec<u8>;
 		type Event = Event;
 	}
 
+	type Timestamp = timestamp::Module<Test>;
 	type System = system::Module<Test>;
 	type Identity = Module<Test>;
 
@@ -115,7 +129,7 @@ mod tests {
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
 			identity::GenesisConfig::<Test> {
-				expiration_time: 1,
+				expiration_time: 10000,
 				verifiers: verifiers,
 				claims_issuers: [H256::from(1), H256::from(2), H256::from(3)].to_vec(),
 			}
@@ -134,32 +148,24 @@ mod tests {
 		Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
 	}
 
-	fn verify_identity(who: H256, identity_hash: H256, vote: bool) -> Result {
-		Identity::verify(Origin::signed(who), identity_hash, vote)
+	fn verify_identity(who: H256, identity_hash: H256, vote: bool, verifier_index: usize) -> Result {
+		Identity::verify(Origin::signed(who), identity_hash, vote, verifier_index)
 	}
 
-	fn add_metadata_to_account(
-		who: H256,
-		identity_hash: H256,
-		avatar: &[u8],
-		display_name: &[u8],
-		tagline: &[u8],
-	) -> Result {
-		Identity::add_metadata(
-			Origin::signed(who),
-			identity_hash,
-			avatar.to_vec(),
-			display_name.to_vec(),
-			tagline.to_vec(),
-		)
+	fn finalize_verification(who: H256, identity_hash: H256) -> Result {
+		Identity::finalize_verification(Origin::signed(who), identity_hash)
 	}
 
-	fn add_claim_to_identity(who: H256, identity_hash: H256, claim: &[u8]) -> Result {
-		Identity::add_claim(Origin::signed(who), identity_hash, claim.to_vec())
+	fn remove_expired_identity(who: H256, identity_hash: H256) -> Result {
+		Identity::remove_expired_identity(Origin::signed(who), identity_hash)
 	}
 
-	fn remove_claim_from_identity(who: H256, identity_hash: H256) -> Result {
-		Identity::remove_claim(Origin::signed(who), identity_hash)
+	fn add_claim_to_identity(who: H256, identity_hash: H256, claim: &[u8], issuer_index: usize) -> Result {
+		Identity::add_claim(Origin::signed(who), identity_hash, claim.to_vec(), issuer_index)
+	}
+
+	fn remove_claim_from_identity(who: H256, identity_hash: H256, issuer_index: usize, claim_index: usize) -> Result {
+		Identity::remove_claim(Origin::signed(who), identity_hash, issuer_index, claim_index)
 	}
 
 	fn default_identity_record(public: H256, identity: &[u8]) -> IdentityRecord<H256, u64> {
@@ -167,10 +173,9 @@ mod tests {
 			account: public,
 			identity: identity.to_vec(),
 			stage: IdentityStage::Registered,
-			expiration_time: Some(2),
+			expiration_time: 10000,
 			proof: None,
-			verifications: None,
-			metadata: None
+			verifications: [0, 0],
 		}
 	}
 
@@ -195,8 +200,6 @@ mod tests {
 					event: Event::identity(RawEvent::Register(identity_hash, public))
 				}]
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity))
@@ -221,8 +224,6 @@ mod tests {
 				register_identity(public, identity),
 				"Identity already exists"
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity))
@@ -260,8 +261,6 @@ mod tests {
 					}
 				]
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
@@ -290,8 +289,6 @@ mod tests {
 				attest_to_identity(public, identity_hash, attestation),
 				"Identity does not exist"
 			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
@@ -318,8 +315,6 @@ mod tests {
 				attest_to_identity(other_pub, identity_hash, attestation),
 				"Stored identity does not match sender"
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity))
@@ -346,7 +341,8 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash, true));
+			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			assert_ok!(finalize_verification(verifier, identity_hash));
 
 			assert_eq!(
 				System::events(),
@@ -361,19 +357,17 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, public, [verifier].to_vec()))
+						event: Event::identity(RawEvent::Verify(identity_hash, public, 1))
 					}
 				]
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
 					stage: IdentityStage::Verified,
-					expiration_time: None,
+					expiration_time: 0,
 					proof: Some(attestation.to_vec()),
-					verifications: Some(vec![(verifier, true)]),
+					verifications: [0, 1],
 					..default_identity_record(public, identity)
 				})
 			);
@@ -389,11 +383,9 @@ mod tests {
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 			let verifier: H256 = H256::from(9);
 			assert_err!(
-				verify_identity(verifier, identity_hash, true),
+				verify_identity(verifier, identity_hash, true, 0),
 				"Identity does not exist"
 			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
@@ -415,11 +407,9 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_err!(
-				verify_identity(verifier, identity_hash, true),
+				verify_identity(verifier, identity_hash, true, 0),
 				"No attestation to verify"
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity))
@@ -446,17 +436,16 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash, true));
-			assert_err!(verify_identity(verifier, identity_hash, true), "Already verified");
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
+			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			assert_ok!(finalize_verification(verifier, identity_hash));
+			assert_err!(verify_identity(verifier, identity_hash, true, 0), "Already verified");
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
 					stage: IdentityStage::Verified,
-					expiration_time: None,
+					expiration_time: 0,
 					proof: Some(attestation.to_vec()),
-					verifications: Some(vec![(verifier, true)]),
+					verifications: [0, 1],
 					..default_identity_record(public, identity)
 				})
 			);
@@ -482,20 +471,19 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash, true));
+			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			assert_ok!(finalize_verification(verifier, identity_hash));
 			assert_err!(
 				attest_to_identity(public, identity_hash, attestation),
 				"Already verified"
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
 					stage: IdentityStage::Verified,
-					expiration_time: None,
+					expiration_time: 0,
 					proof: Some(attestation.to_vec()),
-					verifications: Some(vec![(verifier, true)]),
+					verifications: [0, 1],
 					..default_identity_record(public, identity)
 				})
 			);
@@ -521,11 +509,9 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			assert_err!(
-				verify_identity(public, identity_hash, true),
+				verify_identity(public, identity_hash, true, 0),
 				"Sender not a verifier"
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
@@ -552,11 +538,9 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity));
 
-			<Identity as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
+			Timestamp::set_timestamp(10001);
 
-			<Identity as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			assert_ok!(remove_expired_identity(public, identity_hash));
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_err!(
@@ -577,8 +561,6 @@ mod tests {
 					},
 				]
 			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
@@ -601,15 +583,13 @@ mod tests {
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
-			<Identity as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
+			Timestamp::set_timestamp(10001);
 
-			<Identity as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			assert_ok!(remove_expired_identity(public, identity_hash));
 
 			let verifier: H256 = H256::from(9);
 			assert_err!(
-				verify_identity(verifier, identity_hash, true),
+				verify_identity(verifier, identity_hash, true, 0),
 				"Identity does not exist"
 			);
 
@@ -630,8 +610,6 @@ mod tests {
 					},
 				]
 			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
@@ -655,27 +633,20 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash, true));
-
-			<Identity as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
-
-			<Identity as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			assert_ok!(finalize_verification(verifier, identity_hash));
 
 			assert_err!(
 				register_identity(public, identity),
 				"Identity already exists"
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
 					stage: IdentityStage::Verified,
-					expiration_time: None,
+					expiration_time: 0,
 					proof: Some(attestation.to_vec()),
-					verifications: Some(vec![(verifier, true)]),
+					verifications: [0, 1],
 					..default_identity_record(public, identity)
 				})
 			);
@@ -701,22 +672,15 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = H256::from(9);
-			assert_ok!(verify_identity(verifier, identity_hash, false));
-
-			<Identity as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
-
-			<Identity as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			assert_ok!(verify_identity(verifier, identity_hash, false, 0));
+			assert_ok!(finalize_verification(verifier, identity_hash));
 
 			let new_identity: &[u8] = b"github.com/drstone";
 			assert_err!(
 				register_identity(public, new_identity),
 				"Sender account is frozen"
 			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(Identity::frozen_accounts(), vec![public]);
+			assert_eq!(Identity::frozen_accounts(public), true);
 			assert_eq!(Identity::identity_of(identity_hash), None);
 		});
 	}
@@ -742,16 +706,12 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier_1 = H256::from(9);
-			assert_ok!(verify_identity(verifier_1, identity_hash, true));
+			assert_ok!(verify_identity(verifier_1, identity_hash, true, 0));
 
 			let verifier_2 = H256::from(10);
-			assert_ok!(verify_identity(verifier_2, identity_hash, true));
-
-			<Identity as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
-
-			<Identity as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			assert_ok!(verify_identity(verifier_2, identity_hash, true, 1));
+			
+			assert_ok!(finalize_verification(verifier_1, identity_hash));
 
 			assert_eq!(
 				System::events(),
@@ -766,123 +726,19 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, public, [verifier_1, verifier_2].to_vec()))
+						event: Event::identity(RawEvent::Verify(identity_hash, public, 2))
 					},
 				]
 			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
 					stage: IdentityStage::Verified,
-					expiration_time: None,
+					expiration_time: 0,
 					proof: Some(attestation.to_vec()),
-					verifications: Some(vec![(verifier_1, true), (verifier_2, true)]),
+					verifications: [0, 2],
 					..default_identity_record(public, identity)
 				})
-			);
-		});
-	}
-
-
-	#[test]
-	fn add_metadata_should_work() {
-		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
-			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
-			let identity: &[u8] = b"github.com/drewstone";
-			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
-
-			let public: H256 = pair.public().0.into();
-
-			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
-			let display_name: &[u8] = b"drewstone";
-			let tagline: &[u8] = b"hello world!";
-
-			assert_ok!(register_identity(public, identity));
-			assert_ok!(add_metadata_to_account(
-				public,
-				identity_hash,
-				avatar,
-				display_name,
-				tagline
-			));
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
-			let default_record = default_identity_record(public, identity);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					metadata: Some(MetadataRecord {
-					avatar: avatar.to_vec(),
-					display_name: display_name.to_vec(),
-					tagline: tagline.to_vec(),
-					}),
-					..default_record
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn add_metadata_without_register_should_not_work() {
-		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
-			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
-			let identity: &[u8] = b"github.com/drewstone";
-			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
-			let public: H256 = pair.public().0.into();
-
-			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
-			let display_name: &[u8] = b"drewstone";
-			let tagline: &[u8] = b"hello world!";
-			assert_err!(
-				add_metadata_to_account(public, identity_hash, avatar, display_name, tagline),
-				"Identity does not exist"
-			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(Identity::identity_of(identity_hash), None);
-		});
-	}
-
-	#[test]
-	fn add_metadata_from_different_account_should_not_work() {
-		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
-			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
-			let other: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
-			));
-			let identity: &[u8] = b"github.com/drewstone";
-			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
-			let public: H256 = pair.public().0.into();
-			let other_pub: H256 = other.public().0.into();
-
-			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
-			let display_name: &[u8] = b"drewstone";
-			let tagline: &[u8] = b"hello world!";
-
-			assert_ok!(register_identity(public, identity));
-			assert_err!(
-				add_metadata_to_account(other_pub, identity_hash, avatar, display_name, tagline),
-				"Stored identity does not match sender"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
 			);
 		});
 	}
@@ -896,9 +752,11 @@ mod tests {
 			let identity: &[u8] = b"github.com/drewstone";
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 			let claim: &[u8] = b"is over 25 years of age";
+			let issuers = Identity::claims_issuers();
+			let issuer_index: usize = issuers.iter().position(|id| id == &issuer).unwrap();
 
 			assert_err!(
-				add_claim_to_identity(issuer, identity_hash, claim),
+				add_claim_to_identity(issuer, identity_hash, claim, issuer_index),
 				"Invalid identity record"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![]);
@@ -919,7 +777,7 @@ mod tests {
 			let claim: &[u8] = b"is over 25 years of age";
 
 			assert_err!(
-				add_claim_to_identity(public, identity_hash, claim),
+				add_claim_to_identity(public, identity_hash, claim, 0),
 				"Invalid claims issuer"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![]);
@@ -943,7 +801,10 @@ mod tests {
 
 			let issuer = H256::from(1);
 			let claim: &[u8] = b"is over 25 years of age";
-			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim));
+
+			let issuers = Identity::claims_issuers();
+			let issuer_index: usize = issuers.iter().position(|id| id == &issuer).unwrap();
+			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim, issuer_index));
 			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);
 		});
 	}
@@ -957,8 +818,11 @@ mod tests {
 			let identity: &[u8] = b"github.com/drewstone";
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
+			let issuers = Identity::claims_issuers();
+			let issuer_index: usize = issuers.iter().position(|id| id == &issuer).unwrap();
+
 			assert_err!(
-				remove_claim_from_identity(issuer, identity_hash),
+				remove_claim_from_identity(issuer, identity_hash, issuer_index, 0),
 				"Invalid identity record"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![]);
@@ -978,7 +842,7 @@ mod tests {
 			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
 
 			assert_err!(
-				remove_claim_from_identity(public, identity_hash),
+				remove_claim_from_identity(public, identity_hash, 0, 0),
 				"Invalid claims issuer"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![]);
@@ -1001,11 +865,14 @@ mod tests {
 
 			let issuer = H256::from(1);
 			let claim: &[u8] = b"is over 25 years of age";
-			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim));
+			let issuers = Identity::claims_issuers();
+			let issuer_index: usize = issuers.iter().position(|id| id == &issuer).unwrap();
+			assert_ok!(add_claim_to_identity(issuer, identity_hash, claim, issuer_index));
 
 			let another_issuer = H256::from(2);
+			let another_issuer_index: usize = issuers.iter().position(|id| id == &another_issuer).unwrap();
 			assert_err!(
-				remove_claim_from_identity(another_issuer, identity_hash),
+				remove_claim_from_identity(another_issuer, identity_hash, another_issuer_index, 0),
 				"No existing claim under issuer"
 			);
 			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);

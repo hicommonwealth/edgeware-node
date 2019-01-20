@@ -31,12 +31,12 @@ extern crate substrate_primitives as primitives;
 extern crate srml_system as system;
 
 use rstd::prelude::*;
-use runtime_primitives::traits::{Hash, MaybeSerializeDebug};
+use runtime_primitives::traits::{Hash, MaybeSerializeDebug, Zero};
 use runtime_support::dispatch::Result;
-use runtime_support::{Parameter, StorageMap, StorageValue};
+use runtime_support::{Parameter, StorageMap};
 use system::ensure_signed;
 
-pub trait Trait: system::Trait {
+pub trait Trait: system::Trait + timestamp::Trait {
 	/// The claims type
 	type Claim: Parameter + MaybeSerializeDebug;
 	/// The overarching event type.
@@ -44,14 +44,6 @@ pub trait Trait: system::Trait {
 }
 
 pub type Attestation = Vec<u8>;
-
-#[cfg_attr(feature = "std", derive(Debug))]
-#[derive(Encode, Decode, PartialEq)]
-pub struct MetadataRecord {
-	pub avatar: Vec<u8>,
-	pub display_name: Vec<u8>,
-	pub tagline: Vec<u8>,
-}
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
@@ -63,14 +55,50 @@ pub enum IdentityStage {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct IdentityRecord<AccountId, BlockNumber> {
+pub struct IdentityRecord<AccountId, Moment> {
 	pub account: AccountId,
 	pub identity: Vec<u8>,
 	pub stage: IdentityStage,
-	pub expiration_time: Option<BlockNumber>,
+	pub expiration_time: Moment,
 	pub proof: Option<Attestation>,
-	pub verifications: Option<Vec<(AccountId, bool)>>,
-	pub metadata: Option<MetadataRecord>,
+					  // no,   yes
+	pub verifications: [u128; 2],
+}
+
+/// An event in this module.
+decl_event!(
+	pub enum Event<T> where <T as system::Trait>::Hash,
+							<T as system::Trait>::AccountId,
+							<T as Trait>::Claim {
+		Register(Hash, AccountId),
+		Attest(Hash, AccountId),
+		Verify(Hash, AccountId, u128),
+		Failed(Hash, AccountId),
+		Expired(Hash),
+		AddedClaim(Hash, Claim, AccountId),
+		RemovedClaim(Hash, Claim, AccountId),
+	}
+);
+
+// TODO: rename "timeouts" "time limit" to ???
+decl_storage! {
+	trait Store for Module<T: Trait> as Identity {
+		/// Actual identity for a given hash, if it's current.
+		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::Moment>>;
+		// Makes sure that one validator can validate identity only once
+		pub VerifiedIdentityBy get(verified_identity_by): map (T::Hash, T::AccountId) => bool;
+		/// List of malicious identities who submit failed attestations
+		pub FrozenAccounts get(frozen_accounts): map T::AccountId => bool;
+		/// Timestamp allowed between register/attest or attest/verify.
+		pub ExpirationTime get(expiration_time) config(): T::Moment;
+		/// Accounts granted power to verify identities
+		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
+		/// The set of active claims issuers
+		pub ClaimsIssuers get(claims_issuers) config(): Vec<T::AccountId>;
+		/// The claims mapping for identity records: (claims_issuer, claim)
+		pub Claims get(claims): map T::Hash => Vec<(T::AccountId, T::Claim)>;
+
+	}
 }
 
 decl_module! {
@@ -87,24 +115,21 @@ decl_module! {
 		/// rent to disincentivize it.
 		pub fn register(origin, identity: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
+			ensure!(!<FrozenAccounts<T>>::get(&_sender.clone()), "Sender account is frozen");
 
 			let hash = T::Hashing::hash_of(&identity);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 
-			let expiration = <system::Module<T>>::block_number() + Self::expiration_time();
+			let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
 
-			<Identities<T>>::mutate(|idents| idents.push(hash.clone()));
 			<IdentityOf<T>>::insert(hash, IdentityRecord {
 				account: _sender.clone(),
 				identity: identity,
 				stage: IdentityStage::Registered,
-				expiration_time: Some(expiration),
+				expiration_time: expiration,
 				proof: None,
-				verifications: None,
-				metadata: None,
+				verifications: [0, 0],
 			});
-			<IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expiration)));
 
 			Self::deposit_event(RawEvent::Register(hash, _sender.into()));
 			Ok(())
@@ -117,9 +142,10 @@ decl_module! {
 		/// pass.
 		pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
+			ensure!(!<FrozenAccounts<T>>::get(&_sender.clone()), "Sender account is frozen");
 
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
 
 			if record.stage == IdentityStage::Verified {
 				return Err("Already verified");
@@ -128,7 +154,7 @@ decl_module! {
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender, "Stored identity does not match sender");
 
-			let expiration = <system::Module<T>>::block_number() + Self::expiration_time();
+			let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
 
 			// TODO: Decide how we want to process proof updates
 			// currently this implements no check against updating
@@ -136,13 +162,8 @@ decl_module! {
 			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
 				proof: Some(attestation),
 				stage: IdentityStage::Attested,
-				expiration_time: Some(expiration),
+				expiration_time: expiration,
 				..record
-			});
-
-			<IdentitiesPending<T>>::mutate(|idents| {
-				idents.retain(|(hash, _)| hash != &identity_hash);
-				idents.push((identity_hash, expiration))
 			});
 
 			Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into()));
@@ -151,103 +172,70 @@ decl_module! {
 
 		/// Verify an existing identity based on its attested proof. Sender
 		/// be specified on the pre-selected list of verifiers.
-		pub fn verify(origin, identity_hash: T::Hash, vote: bool) -> Result {
+		pub fn verify(origin, identity_hash: T::Hash, vote: bool, verifier_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 
-			ensure!(Self::verifiers().contains(&_sender), "Sender not a verifier");
-			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+			ensure!(Self::verifiers()[verifier_index] == _sender, "Sender not a verifier");
+			let mut record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 			match record.stage {
 				IdentityStage::Registered => return Err("No attestation to verify"),
 				IdentityStage::Verified => return Err("Already verified"),
 				IdentityStage::Attested => ()
 			}
 
-			// Check the number of verifications the record has and ensure all are valid
-			let mut valid_verifications: Vec<(T::AccountId, bool)> = [(_sender.clone(), vote)].to_vec();
-			let acct = record.account.clone();
-			if let Some(verifications) = record.verifications {
-				valid_verifications = verifications.clone()
-					.into_iter()
-					.filter(|v| Self::verifiers().contains(&v.0))
-					.collect();
-				valid_verifications.push((_sender.clone(), vote));
-			}
+			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
 
-			let yes_votes: Vec<T::AccountId> = valid_verifications.clone()
-				.into_iter()
-				.filter(|v| v.1 == true)
-				.map(|v| v.0)
-				.collect();
+			ensure!(!<VerifiedIdentityBy<T>>::get((identity_hash, _sender.clone())), "Verifier already verified");
 
-			let no_votes: Vec<T::AccountId> = valid_verifications.clone()
-				.into_iter()
-				.filter(|v| v.1 == false)
-				.map(|v| v.0)
-				.collect();
+			<VerifiedIdentityBy<T>>::insert((identity_hash, _sender.clone()), true);
+			record.verifications[vote as usize] += 1;
 
-			// Check if we have gather a supermajority of no votes
-			// TODO: What does it mean to fail a verification? If malicious
-			//		 behavior, we should punish the sending account somehow.
-			if no_votes.len() * 3 >= 2 * Self::verifiers().len() {
-				Self::remove_pending_identity(&identity_hash, true);
-				<FrozenAccounts<T>>::mutate(|froze| froze.push(acct));
-				Self::deposit_event(RawEvent::Failed(identity_hash, record.account.into()));
-			} else {
-				// Check if we have gathered a supermajority of yes votes
-				let mut stage = IdentityStage::Attested;
-				let mut expiration_time = record.expiration_time;
-				let registrar = record.account.clone();
-				if yes_votes.len() * 3 >= 2 * Self::verifiers().len() {
-					stage = IdentityStage::Verified;
-					expiration_time = None;
-				}
-				// Insert updated identity record back into the collection
-				<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-					stage: stage,
-					expiration_time: expiration_time,
-					verifications: Some(valid_verifications),
-					..record
-				});
-
-				if stage == IdentityStage::Verified {
-					Self::remove_pending_identity(&identity_hash, false);
-					Self::deposit_event(RawEvent::Verify(identity_hash, registrar.into(), yes_votes));
-				}
-			}
+			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+				..record
+			});
 
 			Ok(())
 		}
 
-		/// Add metadata to sender's account.
-		// TODO: make all options and only updated provided?
-		// TODO: limit the max length of these user-submitted types?
-		pub fn add_metadata(origin, identity_hash: T::Hash, avatar: Vec<u8>, display_name: Vec<u8>, tagline: Vec<u8>) -> Result {
-			let _sender = ensure_signed(origin)?;
+		pub fn finalize_verification(_origin, identity_hash: T::Hash) -> Result {
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+			if record.stage == IdentityStage::Verified {
+				return Err("Already verified");
+			}
+			let yes_votes = record.verifications[1];
+			let no_votes = record.verifications[0];
 
-			// Check that original sender and current sender match
-			ensure!(record.account == _sender, "Stored identity does not match sender");
+			let verifiers_length = Self::verifiers().len() as u128;
+			let acct = record.account.clone();
+			if yes_votes * 3 >= 2 * verifiers_length {
+				let stage = IdentityStage::Verified;
+				let expiration_time: T::Moment = T::Moment::zero();
 
-			// TODO: Decide how to process metadata updates, for now it's all or nothing
-			let mut new_record = record;
-			new_record.metadata = Some(MetadataRecord {
-				avatar: avatar,
-				display_name: display_name,
-				tagline: tagline,
-			});
-			<IdentityOf<T>>::insert(identity_hash, new_record);
-			// TODO: worth adding an event?
+				<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+					stage,
+					expiration_time,
+					..record
+				});
+
+				Self::deposit_event(RawEvent::Verify(identity_hash, acct.clone().into(), yes_votes));
+			} else {
+				if no_votes * 3 >= 2 * verifiers_length {
+					<FrozenAccounts<T>>::insert(acct.clone(), true);
+				}
+				<IdentityOf<T>>::remove(identity_hash);
+				Self::deposit_event(RawEvent::Failed(identity_hash, acct.into()));
+			}
 			Ok(())
 		}
 
 		/// Add a claim as a claims issuer. Ensures that the sender is currently
 		/// an active claims issuer. Ensures that the identity exists by checking
 		/// hash exists in the Identities map.
-		pub fn add_claim(origin, identity_hash: T::Hash, claim: T::Claim) -> Result {
+		pub fn add_claim(origin, identity_hash: T::Hash, claim: T::Claim, issuer_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 
 			let issuers: Vec<T::AccountId> = Self::claims_issuers();
-			ensure!(issuers.iter().any(|id| id == &_sender), "Invalid claims issuer");
+			ensure!(issuers[issuer_index] == _sender, "Invalid claims issuer");
 			ensure!(<IdentityOf<T>>::exists(identity_hash), "Invalid identity record");
 
 			let mut claims = Self::claims(identity_hash);
@@ -259,89 +247,29 @@ decl_module! {
 		/// Remove a claim as a claims issuer. Ensures that the sender is an active
 		/// claims issuer. Ensures that the sender has issued a claim over the
 		/// identity provided to the module.
-		pub fn remove_claim(origin, identity_hash: T::Hash) -> Result {
+		pub fn remove_claim(origin, identity_hash: T::Hash, issuer_index: usize, claim_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 
 			let issuers: Vec<T::AccountId> = Self::claims_issuers();
-			ensure!(issuers.iter().any(|id| id == &_sender), "Invalid claims issuer");
+			ensure!(issuers[issuer_index] == _sender, "Invalid claims issuer");
 			ensure!(<IdentityOf<T>>::exists(identity_hash), "Invalid identity record");
 
 			let mut claims = Self::claims(identity_hash);
-			ensure!(claims.iter().any(|claim| claim.0 == _sender.clone()), "No existing claim under issuer");
+			ensure!(claims[claim_index].0 == _sender.clone(), "No existing claim under issuer");
 
-			let index = claims.iter().position(|claim| claim.0 == _sender.clone()).unwrap();
-			claims.remove(index);
+			claims.remove(claim_index);
 			<Claims<T>>::insert(identity_hash, claims);
 
 			Ok(())
 		}
 
-		/// Check all pending identities for expiration when each block is
-		/// finalised. Once an identity expires, it is deleted from storage.
-		fn on_finalise(n: T::BlockNumber) {
-			let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
-				.into_iter()
-				.partition(|(_, expiration)| n >= *expiration);
+		pub fn remove_expired_identity(_origin, identity_hash: T::Hash) -> Result {
+			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+			ensure!(<timestamp::Module<T>>::get() > record.expiration_time, "Identity not expired");
 
-			expired.into_iter().for_each(move |(exp_hash, _)| {
-				<Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
-				<IdentityOf<T>>::remove(exp_hash);
-				Self::deposit_event(RawEvent::Expired(exp_hash))
-			});
-			<IdentitiesPending<T>>::put(valid);
+			<IdentityOf<T>>::remove(identity_hash);
+			Self::deposit_event(RawEvent::Expired(identity_hash));
+			Ok(())
 		}
-	}
-}
-
-impl<T: Trait> Module<T> {
-	/// Removes all data about a pending identity given the hash of the record
-	pub fn remove_pending_identity(identity_hash: &T::Hash, malicious: bool) {
-		// If triggered by a malicious party's actions, delete all data
-		if malicious {
-			<Identities<T>>::mutate(|idents| idents.retain(|hash| hash != identity_hash));
-			<IdentityOf<T>>::remove(identity_hash);			
-		}
-
-		<IdentitiesPending<T>>::mutate(|idents| {
-			idents.retain(|(hash, _)| hash != identity_hash)
-		});
-	}
-}
-
-/// An event in this module.
-decl_event!(
-	pub enum Event<T> where <T as system::Trait>::Hash,
-							<T as system::Trait>::AccountId,
-							<T as Trait>::Claim {
-		Register(Hash, AccountId),
-		Attest(Hash, AccountId),
-		Verify(Hash, AccountId, Vec<AccountId>),
-		Failed(Hash, AccountId),
-		Expired(Hash),
-		AddedClaim(Hash, Claim, AccountId),
-		RemovedClaim(Hash, Claim, AccountId),
-	}
-);
-
-// TODO: rename "timeouts" "time limit" to ???
-decl_storage! {
-	trait Store for Module<T: Trait> as Identity {
-		/// The hashed identities.
-		pub Identities get(identities): Vec<(T::Hash)>;
-		/// Actual identity for a given hash, if it's current.
-		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::BlockNumber>>;
-		/// List of identities awaiting attestation or verification and associated expirations
-		pub IdentitiesPending get(identities_pending): Vec<(T::Hash, T::BlockNumber)>;
-		/// List of malicious identities who submit failed attestations
-		pub FrozenAccounts get(frozen_accounts): Vec<T::AccountId>;
-		/// Number of blocks allowed between register/attest or attest/verify.
-		pub ExpirationTime get(expiration_time) config(): T::BlockNumber;
-		/// Accounts granted power to verify identities
-		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
-		/// The set of active claims issuers
-		pub ClaimsIssuers get(claims_issuers) config(): Vec<T::AccountId>;
-		/// The claims mapping for identity records: (claims_issuer, claim)
-		pub Claims get(claims): map T::Hash => Vec<(T::AccountId, T::Claim)>;
-
 	}
 }
