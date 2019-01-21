@@ -159,6 +159,10 @@ mod tests {
 		Voting::tally_as_initiator(Origin::signed(who), vote_id)
 	}
 
+	fn delegate_to(who: H256, to: H256) -> Result {
+		Delegation::delegate_to(Origin::signed(who), to)
+	}
+
 	fn get_test_key() -> H256 {
 		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 		let public: H256 = pair.public().0.into();
@@ -523,6 +527,46 @@ mod tests {
 			assert_eq!(
 				Voting::vote_records(1).unwrap().tally,
 				vec![(vote.3[0], 1), (vote.3[1], 0)]
+			);
+		});
+	}
+
+	#[test]
+	fn delegation_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			/*  To test delegation, we'll generate a delegation graph, have some
+			 *  users vote, then make sure the vote tallies as expected.
+			 *  Delegation graph:
+			 *    1 --> 2 --> 3 --> 4
+			 *                ^     ^
+			 *                |     |
+			 *                5     6
+			 *  Voters: 2 (0x0), 4 (0x1), 5 (0x0)
+			 *  Expected Tally: 3 votes for 0x0, 3 votes for 0x1
+			 */
+			System::set_block_number(1);
+			// set up delegations
+			let users : Vec<H256> = (0..7).map(|v| H256::from(v)).collect();
+			assert_ok!(delegate_to(users[1], users[2]));
+			assert_ok!(delegate_to(users[2], users[3]));
+			assert_ok!(delegate_to(users[3], users[4]));
+			assert_ok!(delegate_to(users[5], users[3]));
+			assert_ok!(delegate_to(users[6], users[4]));
+
+			let creator = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_ok!(create_vote(creator, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(creator, 1));
+
+			// perform votes
+			assert_ok!(reveal(users[2], 1, vote.3[0], None));
+			assert_ok!(reveal(users[4], 1, vote.3[1], None));
+			assert_ok!(reveal(users[5], 1, vote.3[0], None));
+			assert_ok!(advance_stage_as_initiator(creator, 1));
+			assert_ok!(tally_as_initiator(creator, 1));
+			assert_eq!(
+				Voting::vote_records(1).unwrap().tally,
+				vec![(vote.3[0], 3), (vote.3[1], 3)]
 			);
 		});
 	}
