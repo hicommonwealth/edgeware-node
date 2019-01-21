@@ -127,41 +127,6 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
-		pub fn create_vote(
-			origin,
-			vote_type: VoteType,
-			is_commit_reveal: bool,
-			tally_type: TallyType,
-			outcomes: Vec<[u8; 32]>
-		) -> Result {
-			let _sender = ensure_signed(origin)?;
-			ensure!(vote_type == VoteType::Binary || vote_type == VoteType::MultiOption, "Unsupported vote type");
-
-			if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
-			if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
-
-			let id = Self::vote_record_count() + 1;
-			<VoteRecords<T>>::insert(id, VoteRecord {
-				id: id,
-				commitments: vec![],
-				reveals: vec![],
-				outcomes: outcomes,
-				winning_outcome: None,
-				tally: vec![],
-				data: VoteData {
-					initiator: _sender.clone(),
-					stage: VoteStage::PreVoting,
-					vote_type: vote_type,
-					tally_type: tally_type,
-					is_commit_reveal: is_commit_reveal,
-				},
-			});
-
-			<VoteRecordCount<T>>::mutate(|i| *i += 1);
-			Self::deposit_event(RawEvent::VoteCreated(id, _sender, vote_type));
-			Ok(())
-		}
-
 		pub fn commit(origin, vote_id: u64, commit: [u8; 32]) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -233,6 +198,41 @@ decl_module! {
 
 
 impl<T: Trait> Module<T> {
+	pub fn create_vote(
+		origin,
+		vote_type: VoteType,
+		is_commit_reveal: bool,
+		tally_type: TallyType,
+		outcomes: Vec<[u8; 32]>
+	) -> result::Result<u64, &'static str> {
+		let _sender = ensure_signed(origin)?;
+		ensure!(vote_type == VoteType::Binary || vote_type == VoteType::MultiOption, "Unsupported vote type");
+
+		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
+		if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
+
+		let id = Self::vote_record_count() + 1;
+		<VoteRecords<T>>::insert(id, VoteRecord {
+			id: id,
+			commitments: vec![],
+			reveals: vec![],
+			outcomes: outcomes,
+			winning_outcome: None,
+			tally: vec![],
+			data: VoteData {
+				initiator: _sender.clone(),
+				stage: VoteStage::PreVoting,
+				vote_type: vote_type,
+				tally_type: tally_type,
+				is_commit_reveal: is_commit_reveal,
+			},
+		});
+
+		<VoteRecordCount<T>>::mutate(|i| *i += 1);
+		Self::deposit_event(RawEvent::VoteCreated(id, _sender, vote_type));
+		return Ok(id);
+	}
+
 	pub fn advance_stage(vote_id: u64) -> Result {
 		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 		let curr_stage = record.data.stage;

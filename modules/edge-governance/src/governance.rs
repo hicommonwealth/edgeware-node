@@ -31,6 +31,11 @@ extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
 
+extern crate edge_voting as voting;
+
+use voting::{Module};
+use voting::{TallyType, VoteType};
+
 use rstd::prelude::*;
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
@@ -67,6 +72,7 @@ pub struct ProposalRecord<AccountId, BlockNumber> {
 	// TODO: separate comments into different object, for storage reasons
 	pub comments: Vec<(Vec<u8>, AccountId)>,
 	// TODO: for actions, we might need more data
+	pub vote_id: u64,
 }
 
 pub trait Trait: system::Trait {
@@ -80,7 +86,7 @@ decl_module! {
 
 		/// Creates a new governance proposal in the chosen category.
 		pub fn create_proposal(origin, title: Vec<u8>, contents: Vec<u8>, category: ProposalCategory) -> Result {
-			let _sender = ensure_signed(origin)?;
+			let _sender = ensure_signed(origin.clone())?;
 			ensure!(!title.is_empty(), "Proposal must have title");
 			ensure!(!contents.is_empty(), "Proposal must not be empty");
 
@@ -92,6 +98,19 @@ decl_module! {
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
 
+			// create a vote to go along with the proposal
+			let vote_id = <voting::Module<T>>::create_vote(
+				origin,
+				VoteType::Binary,
+				false, // not commit-reveal
+				TallyType::OnePerson, // ?
+				// TODO: make these static, or exposed by voting somehow
+				vec![
+					[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+					[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+				]
+			)?;
+
 			let index = <ProposalCount<T>>::get();
 			<ProposalCount<T>>::mutate(|i| *i += 1);
 			<ProposalOf<T>>::insert(hash, ProposalRecord {
@@ -102,7 +121,8 @@ decl_module! {
 				transition_block: None,
 				title: title,
 				contents: contents,
-				comments: vec![]
+				comments: vec![],
+				vote_id: vote_id,
 			});
 			<Proposals<T>>::mutate(|proposals| proposals.push(hash));
 			Self::deposit_event(RawEvent::NewProposal(_sender, hash));
@@ -135,6 +155,8 @@ decl_module! {
 			ensure!(record.author == _sender, "Proposal must be advanced by author");
 			ensure!(record.stage == ProposalStage::PreVoting, "Proposal not in pre-voting stage");
 			
+			// prevoting -> voting
+			<voting::Module<T>>::advance_stage(record.vote_id)?;
 			let transition_block = <system::Module<T>>::block_number() + Self::voting_time();
 			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
 				stage: ProposalStage::Voting,
@@ -149,14 +171,14 @@ decl_module! {
 		/// Submit or update a vote on a proposal. The proposal must be in the
 		/// "voting" stage.
 		pub fn submit_vote(origin, proposal_hash: T::Hash, vote: bool) -> Result {
-			let _sender = ensure_signed(origin)?;
+			let _sender = ensure_signed(origin.clone())?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
 			ensure!(record.stage == ProposalStage::Voting, "Proposal not in voting stage");
-
-			if Self::vote_of((proposal_hash, _sender.clone())).is_none() {
-				<ProposalVoters<T>>::mutate(proposal_hash, |voters| voters.push(_sender.clone()));
-			}
-			<VoteOf<T>>::insert((proposal_hash.clone(), _sender.clone()), vote);
+			let vote_bytes = match (vote) {
+				true => [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+				false => [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+			};
+			<voting::Module<T>>::reveal(origin, record.vote_id, vote_bytes, None)?;
 			Self::deposit_event(RawEvent::VoteSubmitted(proposal_hash, _sender, vote));
 			Ok(())
 		}
@@ -172,6 +194,9 @@ decl_module! {
 			finished.into_iter().for_each(move |(completed_hash, _)| {
 				match <ProposalOf<T>>::get(completed_hash) {
 					Some(proposal) => {
+						// voting -> completed
+						// TODO: where do we tally?
+						<voting::Module<T>>::advance_stage(record.vote_id)?;
 						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
 							stage: ProposalStage::Completed,
 							transition_block: None,
@@ -216,9 +241,5 @@ decl_storage! {
 		pub VotingTime get(voting_time) config(): T::BlockNumber;
 		/// Map for retrieving the information about any proposal from its hash.
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
-		/// Map for retrieving the users who've voted on any particular proposal.
-		pub ProposalVoters get(proposal_voters): map T::Hash => Vec<T::AccountId>;
-		/// Map for retrieving the actual votes of users on any particular proposal.
-		pub VoteOf get(vote_of): map (T::Hash, T::AccountId) => Option<bool>;
 	}
 }
