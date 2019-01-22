@@ -46,7 +46,7 @@ extern crate srml_consensus as consensus;
 pub mod identity;
 pub use identity::{
 	Event, Module, RawEvent, Trait,
-	IdentityStage, IdentityRecord
+	IdentityStage, IdentityRecord, MetadataRecord
 };
 
 // Tests for Identity Module
@@ -156,6 +156,22 @@ mod tests {
 		Identity::remove_expired_identity(Origin::signed(who), identity_hash)
 	}
 
+	fn add_metadata_to_account(
+		who: H256,
+		identity_hash: H256,
+		avatar: &[u8],
+		display_name: &[u8],
+		tagline: &[u8],
+	) -> Result {
+		Identity::add_metadata(
+			Origin::signed(who),
+			identity_hash,
+			avatar.to_vec(),
+			display_name.to_vec(),
+			tagline.to_vec(),
+		)
+	}
+
 	fn add_claim_to_identity(who: H256, identity_hash: H256, claim: &[u8], issuer_index: usize) -> Result {
 		Identity::add_claim(Origin::signed(who), identity_hash, claim.to_vec(), issuer_index)
 	}
@@ -172,6 +188,7 @@ mod tests {
 			expiration_time: 10000,
 			proof: None,
 			verifications: [0, 0],
+			metadata: None,
 		}
 	}
 
@@ -728,6 +745,101 @@ mod tests {
 					verifications: [0, 2],
 					..default_identity_record(public, identity)
 				})
+			);
+		});
+	}
+
+	#[test]
+	fn add_metadata_should_work() {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+			let public: H256 = pair.public().0.into();
+
+			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
+			let display_name: &[u8] = b"drewstone";
+			let tagline: &[u8] = b"hello world!";
+
+			assert_ok!(register_identity(public, identity));
+			assert_ok!(add_metadata_to_account(
+				public,
+				identity_hash,
+				avatar,
+				display_name,
+				tagline
+			));
+			let default_record = default_identity_record(public, identity);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					metadata: Some(MetadataRecord {
+					avatar: avatar.to_vec(),
+					display_name: display_name.to_vec(),
+					tagline: tagline.to_vec(),
+					}),
+					..default_record
+				})
+			);
+		});
+	}
+
+	#[test]
+	fn add_metadata_without_register_should_not_work() {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+			let public: H256 = pair.public().0.into();
+
+			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
+			let display_name: &[u8] = b"drewstone";
+			let tagline: &[u8] = b"hello world!";
+			assert_err!(
+				add_metadata_to_account(public, identity_hash, avatar, display_name, tagline),
+				"Identity does not exist"
+			);
+			assert_eq!(Identity::identity_of(identity_hash), None);
+		});
+	}
+
+	#[test]
+	fn add_metadata_from_different_account_should_not_work() {
+		with_externalities(&mut new_test_ext([H256::from(9)].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let other: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+			let public: H256 = pair.public().0.into();
+			let other_pub: H256 = other.public().0.into();
+
+			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
+			let display_name: &[u8] = b"drewstone";
+			let tagline: &[u8] = b"hello world!";
+
+			assert_ok!(register_identity(public, identity));
+			assert_err!(
+				add_metadata_to_account(other_pub, identity_hash, avatar, display_name, tagline),
+				"Stored identity does not match sender"
+			);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
 			);
 		});
 	}

@@ -46,6 +46,14 @@ pub trait Trait: system::Trait + timestamp::Trait {
 pub type Attestation = Vec<u8>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
+#[derive(Encode, Decode, PartialEq)]
+pub struct MetadataRecord {
+	pub avatar: Vec<u8>,
+	pub display_name: Vec<u8>,
+	pub tagline: Vec<u8>,
+}
+
+#[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
 pub enum IdentityStage {
 	Registered,
@@ -63,6 +71,7 @@ pub struct IdentityRecord<AccountId, Moment> {
 	pub proof: Option<Attestation>,
 					  // no,   yes
 	pub verifications: [u128; 2],
+	pub metadata: Option<MetadataRecord>,
 }
 
 /// An event in this module.
@@ -129,6 +138,7 @@ decl_module! {
 				expiration_time: expiration,
 				proof: None,
 				verifications: [0, 0],
+				metadata: None,
 			});
 
 			Self::deposit_event(RawEvent::Register(hash, _sender.into()));
@@ -209,6 +219,28 @@ decl_module! {
 				});
 			}
 
+			Ok(())
+		}
+
+		/// Add metadata to sender's account.
+		// TODO: make all options and only updated provided?
+		// TODO: limit the max length of these user-submitted types?
+		pub fn add_metadata(origin, identity_hash: T::Hash, avatar: Vec<u8>, display_name: Vec<u8>, tagline: Vec<u8>) -> Result {
+			let _sender = ensure_signed(origin)?;
+			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+
+			// Check that original sender and current sender match
+			ensure!(record.account == _sender, "Stored identity does not match sender");
+
+			// TODO: Decide how to process metadata updates, for now it's all or nothing
+			let mut new_record = record;
+			new_record.metadata = Some(MetadataRecord {
+				avatar: avatar,
+				display_name: display_name,
+				tagline: tagline,
+			});
+			<IdentityOf<T>>::insert(identity_hash, new_record);
+			// TODO: worth adding an event?
 			Ok(())
 		}
 
