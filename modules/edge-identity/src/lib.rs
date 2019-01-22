@@ -1024,4 +1024,95 @@ mod tests {
 			assert_eq!(Identity::claims(identity_hash), vec![(issuer, claim.to_vec())]);
 		});
 	}
+
+	#[test]
+	fn remove_identity_if_majority_vote_is_not_reached() {
+		with_externalities(&mut new_test_ext([H256::from(9), H256::from(5), H256::from(4), H256::from(3)].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+			let public: H256 = pair.public().0.into();
+
+			assert_ok!(register_identity(public, identity));
+
+			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let registration_expires_at = now + expiration_time;
+
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let attest_expires_at = now + expiration_time;
+
+			let mut verifier = H256::from(9);
+			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+
+			verifier = H256::from(5);
+			assert_ok!(verify_identity(verifier, identity_hash, true, 1));
+
+			verifier = H256::from(4);
+			assert_ok!(verify_identity(verifier, identity_hash, false, 2));
+
+			verifier = H256::from(3);
+			assert_ok!(verify_identity(verifier, identity_hash, false, 3));
+
+			assert_eq!(
+				System::events(),
+				vec![
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Register(identity_hash, public, registration_expires_at))
+					},
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
+					},
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Failed(identity_hash, public))
+					},
+				]
+			);
+
+			assert_eq!(Identity::frozen_accounts(public), false);
+			assert_eq!(Identity::identity_of(identity_hash), None);
+		});
+	}
+
+	#[test]
+	fn change_verification_vote_before_finalization() {
+		with_externalities(&mut new_test_ext([H256::from(9), H256::from(5), H256::from(4)].to_vec()), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity: &[u8] = b"github.com/drewstone";
+			let identity_hash = BlakeTwo256::hash_of(&identity.to_vec());
+
+			let public: H256 = pair.public().0.into();
+
+			assert_ok!(register_identity(public, identity));
+
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			let verifier = H256::from(9);
+			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+
+			let mut vote = Identity::verified_identity_by((identity_hash, verifier));
+			assert_eq!(vote, Some(true));
+			
+			assert_ok!(verify_identity(verifier, identity_hash, false, 0));
+			vote = Identity::verified_identity_by((identity_hash, verifier));
+			assert_eq!(vote, Some(false));
+		});
+	}
 }
