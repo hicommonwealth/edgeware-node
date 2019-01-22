@@ -152,10 +152,6 @@ mod tests {
 		Identity::verify(Origin::signed(who), identity_hash, vote, verifier_index)
 	}
 
-	fn finalize_verification(who: H256, identity_hash: H256) -> Result {
-		Identity::finalize_verification(Origin::signed(who), identity_hash)
-	}
-
 	fn remove_expired_identity(who: H256, identity_hash: H256) -> Result {
 		Identity::remove_expired_identity(Origin::signed(who), identity_hash)
 	}
@@ -342,7 +338,6 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
-			assert_ok!(finalize_verification(verifier, identity_hash));
 
 			assert_eq!(
 				System::events(),
@@ -437,7 +432,6 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
-			assert_ok!(finalize_verification(verifier, identity_hash));
 			assert_err!(verify_identity(verifier, identity_hash, true, 0), "Already verified");
 			assert_eq!(
 				Identity::identity_of(identity_hash),
@@ -472,7 +466,6 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
-			assert_ok!(finalize_verification(verifier, identity_hash));
 			assert_err!(
 				attest_to_identity(public, identity_hash, attestation),
 				"Already verified"
@@ -634,7 +627,6 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
-			assert_ok!(finalize_verification(verifier, identity_hash));
 
 			assert_err!(
 				register_identity(public, identity),
@@ -673,7 +665,6 @@ mod tests {
 
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, false, 0));
-			assert_ok!(finalize_verification(verifier, identity_hash));
 
 			let new_identity: &[u8] = b"github.com/drstone";
 			assert_err!(
@@ -710,8 +701,6 @@ mod tests {
 
 			let verifier_2 = H256::from(10);
 			assert_ok!(verify_identity(verifier_2, identity_hash, true, 1));
-			
-			assert_ok!(finalize_verification(verifier_1, identity_hash));
 
 			assert_eq!(
 				System::events(),

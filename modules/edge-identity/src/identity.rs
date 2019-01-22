@@ -86,7 +86,7 @@ decl_storage! {
 		/// Actual identity for a given hash, if it's current.
 		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::Moment>>;
 		// Makes sure that one validator can validate identity only once
-		pub VerifiedIdentityBy get(verified_identity_by): map (T::Hash, T::AccountId) => bool;
+		pub VerifiedIdentityBy get(verified_identity_by): map (T::Hash, T::AccountId) => Option<bool>;
 		/// List of malicious identities who submit failed attestations
 		pub FrozenAccounts get(frozen_accounts): map T::AccountId => bool;
 		/// Timestamp allowed between register/attest or attest/verify.
@@ -175,7 +175,8 @@ decl_module! {
 		pub fn verify(origin, identity_hash: T::Hash, vote: bool, verifier_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 
-			ensure!(Self::verifiers()[verifier_index] == _sender, "Sender not a verifier");
+			let verifiers = Self::verifiers();
+			ensure!(verifiers[verifier_index] == _sender, "Sender not a verifier");
 			let mut record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 			match record.stage {
 				IdentityStage::Registered => return Err("No attestation to verify"),
@@ -185,46 +186,29 @@ decl_module! {
 
 			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
 
-			ensure!(!<VerifiedIdentityBy<T>>::get((identity_hash, _sender.clone())), "Verifier already verified");
+			let current_vote_res = <VerifiedIdentityBy<T>>::get((identity_hash, _sender.clone()));
+			match current_vote_res {
+				Some(current_vote) => {
+					ensure!(vote != current_vote, "Already verified with specified vote");
+					record.verifications[current_vote as usize] -= 1;
+				},
+				None => (),
+			}
 
-			<VerifiedIdentityBy<T>>::insert((identity_hash, _sender.clone()), true);
+			<VerifiedIdentityBy<T>>::insert((identity_hash, _sender.clone()), vote);
 			record.verifications[vote as usize] += 1;
 
-			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-				..record
-			});
-
-			Ok(())
-		}
-
-		pub fn finalize_verification(_origin, identity_hash: T::Hash) -> Result {
-			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
-			if record.stage == IdentityStage::Verified {
-				return Err("Already verified");
-			}
-			let yes_votes = record.verifications[1];
-			let no_votes = record.verifications[0];
-
-			let verifiers_length = Self::verifiers().len() as u128;
-			let acct = record.account.clone();
-			if yes_votes * 3 >= 2 * verifiers_length {
-				let stage = IdentityStage::Verified;
-				let expiration_time: T::Moment = T::Moment::zero();
-
+			let yes_majority = record.verifications[1] * 3 >= 2 * verifiers.len() as u128;
+			let no_majority = record.verifications[0] * 3 >= 2 * verifiers.len() as u128;
+			let end_of_vote = record.verifications[0] + record.verifications[1] == verifiers.len() as u128;
+			if yes_majority || no_majority || end_of_vote {
+				return Self::finalize_verification(identity_hash, record, yes_majority, no_majority);
+			} else {
 				<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-					stage,
-					expiration_time,
 					..record
 				});
-
-				Self::deposit_event(RawEvent::Verify(identity_hash, acct.clone().into(), yes_votes));
-			} else {
-				if no_votes * 3 >= 2 * verifiers_length {
-					<FrozenAccounts<T>>::insert(acct.clone(), true);
-				}
-				<IdentityOf<T>>::remove(identity_hash);
-				Self::deposit_event(RawEvent::Failed(identity_hash, acct.into()));
 			}
+
 			Ok(())
 		}
 
@@ -269,5 +253,30 @@ decl_module! {
 			Self::deposit_event(RawEvent::Expired(identity_hash));
 			Ok(())
 		}
+	}
+}
+
+impl<T: Trait> Module<T> {
+	fn finalize_verification(identity_hash: T::Hash, record: IdentityRecord<T::AccountId, T::Moment>, yes_majority: bool, no_majority: bool) -> Result {
+		let acct = record.account.clone();
+		if yes_majority {
+			let stage = IdentityStage::Verified;
+			let expiration_time: T::Moment = T::Moment::zero();
+
+			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+				stage,
+				expiration_time,
+				..record
+			});
+
+			Self::deposit_event(RawEvent::Verify(identity_hash, acct.clone().into(), record.verifications[1]));
+		} else {
+			if no_majority {
+				<FrozenAccounts<T>>::insert(acct.clone(), true);
+			}
+			<IdentityOf<T>>::remove(identity_hash);
+			Self::deposit_event(RawEvent::Failed(identity_hash, acct.into()));
+		}
+		Ok(())
 	}
 }
