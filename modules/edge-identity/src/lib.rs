@@ -205,12 +205,16 @@ mod tests {
 
 			let public: H256 = pair.public().0.into();
 
+			let expiration_time = Identity::expiration_time();
+			let now = Timestamp::get();
+			let expires_at = now + expiration_time;
+
 			assert_ok!(register_identity(public, identity));
 			assert_eq!(
 				System::events(),
 				vec![EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::identity(RawEvent::Register(identity_hash, public))
+					event: Event::identity(RawEvent::Register(identity_hash, public, expires_at))
 				}]
 			);
 			assert_eq!(
@@ -259,18 +263,27 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity));
 
+			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let registration_expires_at = now + expiration_time;
+
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let attest_expires_at = now + expiration_time;
+
 			assert_eq!(
 				System::events(),
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public))
+						event: Event::identity(RawEvent::Register(identity_hash, public, registration_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public))
+						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
 					}
 				]
 			);
@@ -350,8 +363,16 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity));
 
+			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let registration_expires_at = now + expiration_time;
+
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let attest_expires_at = now + expiration_time;
 
 			let verifier = H256::from(9);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
@@ -361,11 +382,11 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public))
+						event: Event::identity(RawEvent::Register(identity_hash, public, registration_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public))
+						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
@@ -548,6 +569,10 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity));
 
+			let expiration_time = Identity::expiration_time();
+			let now = Timestamp::get();
+			let registration_expires_at = now + expiration_time;
+
 			Timestamp::set_timestamp(10001);
 
 			assert_ok!(remove_expired_identity(public, identity_hash));
@@ -563,7 +588,7 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public))
+						event: Event::identity(RawEvent::Register(identity_hash, public, registration_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
@@ -590,8 +615,16 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity));
 
+			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let registration_expires_at = now + expiration_time;
+
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let attest_expires_at = now + expiration_time;
 
 			Timestamp::set_timestamp(10001);
 
@@ -608,11 +641,11 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public))
+						event: Event::identity(RawEvent::Register(identity_hash, public, registration_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public))
+						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
@@ -710,8 +743,16 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity));
 
+			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let registration_expires_at = now + expiration_time;
+
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let attest_expires_at = now + expiration_time;
 
 			let verifier_1 = H256::from(9);
 			assert_ok!(verify_identity(verifier_1, identity_hash, true, 0));
@@ -724,11 +765,11 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public))
+						event: Event::identity(RawEvent::Register(identity_hash, public, registration_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public))
+						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),

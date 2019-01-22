@@ -29,6 +29,7 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
+extern crate srml_timestamp as timestamp;
 
 use rstd::prelude::*;
 use runtime_primitives::traits::{Hash, MaybeSerializeDebug, Zero};
@@ -78,9 +79,10 @@ pub struct IdentityRecord<AccountId, Moment> {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as Trait>::Claim {
-		Register(Hash, AccountId),
-		Attest(Hash, AccountId),
+							<T as Trait>::Claim,
+							<T as timestamp::Trait>::Moment {
+		Register(Hash, AccountId, Moment),
+		Attest(Hash, AccountId, Moment),
 		Verify(Hash, AccountId, u128),
 		Failed(Hash, AccountId),
 		Expired(Hash),
@@ -135,13 +137,13 @@ decl_module! {
 				account: _sender.clone(),
 				identity: identity,
 				stage: IdentityStage::Registered,
-				expiration_time: expiration,
+				expiration_time: expiration.clone(),
 				proof: None,
 				verifications: [0, 0],
 				metadata: None,
 			});
 
-			Self::deposit_event(RawEvent::Register(hash, _sender.into()));
+			Self::deposit_event(RawEvent::Register(hash, _sender.into(), expiration));
 			Ok(())
 		}
 
@@ -172,11 +174,11 @@ decl_module! {
 			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
 				proof: Some(attestation),
 				stage: IdentityStage::Attested,
-				expiration_time: expiration,
+				expiration_time: expiration.clone(),
 				..record
 			});
 
-			Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into()));
+			Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into(), expiration));
 			Ok(())
 		}
 
