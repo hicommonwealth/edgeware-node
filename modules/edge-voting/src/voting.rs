@@ -22,7 +22,7 @@ extern crate serde;
 // Needed for deriving `Serialize` and `Deserialize` for various types.
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
-#[cfg(feature = "std")]
+//#[cfg(feature = "std")]
 
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
@@ -30,13 +30,11 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-
 extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
 
 use std::collections::HashMap;
-
 use rstd::prelude::*;
 use rstd::result;
 use system::ensure_signed;
@@ -44,7 +42,7 @@ use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
 use runtime_primitives::traits::{Zero, One};
-use runtime_primitives::traits::{CheckedAdd, CheckedSub};
+use runtime_primitives::traits::{CheckedAdd};
 use codec::Encode;
 
 #[cfg_attr(feature = "std", derive(Debug))]

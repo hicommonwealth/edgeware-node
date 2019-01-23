@@ -48,8 +48,6 @@ use edge_voting::voting;
 
 use client::{block_builder::api as block_builder_api, runtime_api};
 use consensus_aura::api as aura_api;
-#[cfg(feature = "std")]
-use primitives::bytes;
 use primitives::OpaqueMetadata;
 use node_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, SessionKey, Signature

@@ -194,7 +194,7 @@ decl_module! {
 						// TODO: where and when do we tally?
 						let vote_id = record.vote_id;
 						// TODO: handle possible errors from advance_stage?
-						<voting::Module<T>>::advance_stage(vote_id);
+						let _ = <voting::Module<T>>::advance_stage(vote_id);
 						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
 							stage: ProposalStage::Completed,
 							transition_block: None,
