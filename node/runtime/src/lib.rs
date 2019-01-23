@@ -25,6 +25,7 @@ extern crate sr_version as version;
 extern crate edge_delegation;
 extern crate edge_governance;
 extern crate edge_identity;
+extern crate edge_voting;
 extern crate srml_aura as aura;
 extern crate srml_balances as balances;
 extern crate srml_consensus as consensus;
@@ -43,6 +44,7 @@ extern crate substrate_consensus_aura_primitives as consensus_aura;
 use edge_delegation::delegation;
 use edge_governance::governance;
 use edge_identity::identity;
+use edge_voting::voting;
 
 use client::{block_builder::api as block_builder_api, runtime_api};
 use consensus_aura::api as aura_api;
@@ -205,6 +207,10 @@ impl identity::Trait for Runtime {
 
 impl delegation::Trait for Runtime {
 	/// The uniquitous event type.
+	type Event = Event;
+}
+
+impl voting::Trait for Runtime {
 	type Event = Event;
 }
 

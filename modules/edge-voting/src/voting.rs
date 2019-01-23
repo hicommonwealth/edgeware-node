@@ -38,6 +38,7 @@ extern crate edge_delegation as delegation;
 use std::collections::HashMap;
 
 use rstd::prelude::*;
+use rstd::result;
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
@@ -143,33 +144,7 @@ decl_module! {
 
 		pub fn reveal(origin, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
-			// Check vote is for a valid outcome
-			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
-			// TODO: Allow changing of votes
-			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
-
-			// Ensure voter committed
-			if record.data.is_commit_reveal {
-				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
-				let commit: (T::AccountId, [u8; 32]) = record.commitments
-					.iter()
-					.find(|c| &c.0 == &_sender)
-					.unwrap()
-					.clone();
-
-				let mut buf = Vec::new();
-				buf.extend_from_slice(&_sender.encode());
-				buf.extend_from_slice(&secret.unwrap().encode());
-				buf.extend_from_slice(&vote);
-				let hash = T::Hashing::hash_of(&buf);
-				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
-			}
-
-			record.reveals.push((_sender.clone(), vote));
-			<VoteRecords<T>>::insert(record.id, record);
-			Ok(())
+			return Self::reveal_unsigned(_sender, vote_id, vote, secret);
 		}
 
 		pub fn advance_stage_as_initiator(origin, vote_id: u64) -> Result {
@@ -196,16 +171,15 @@ decl_module! {
 	}
 }
 
-
 impl<T: Trait> Module<T> {
 	pub fn create_vote(
-		origin,
+		sender: T::AccountId,
 		vote_type: VoteType,
 		is_commit_reveal: bool,
 		tally_type: TallyType,
 		outcomes: Vec<[u8; 32]>
 	) -> result::Result<u64, &'static str> {
-		let _sender = ensure_signed(origin)?;
+		// TODO: Origin check? sender?
 		ensure!(vote_type == VoteType::Binary || vote_type == VoteType::MultiOption, "Unsupported vote type");
 
 		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
@@ -220,7 +194,7 @@ impl<T: Trait> Module<T> {
 			winning_outcome: None,
 			tally: vec![],
 			data: VoteData {
-				initiator: _sender.clone(),
+				initiator: sender.clone(),
 				stage: VoteStage::PreVoting,
 				vote_type: vote_type,
 				tally_type: tally_type,
@@ -229,7 +203,7 @@ impl<T: Trait> Module<T> {
 		});
 
 		<VoteRecordCount<T>>::mutate(|i| *i += 1);
-		Self::deposit_event(RawEvent::VoteCreated(id, _sender, vote_type));
+		Self::deposit_event(RawEvent::VoteCreated(id, sender, vote_type));
 		return Ok(id);
 	}
 
@@ -245,6 +219,36 @@ impl<T: Trait> Module<T> {
 		record.data.stage = next_stage;
 		<VoteRecords<T>>::insert(record.id, record);
 		Self::deposit_event(RawEvent::VoteAdvanced(vote_id, curr_stage, next_stage));
+		Ok(())
+	}
+
+	pub fn reveal_unsigned(sender: T::AccountId, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
+		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+		ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
+		// Check vote is for a valid outcome
+		ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
+		// TODO: Allow changing of votes
+		ensure!(!record.reveals.iter().any(|c| &c.0 == &sender), "Duplicate votes are not allowed");
+
+		// Ensure voter committed
+		if record.data.is_commit_reveal {
+			ensure!(record.commitments.iter().any(|c| &c.0 == &sender), "Duplicate commits are not allowed");
+			let commit: (T::AccountId, [u8; 32]) = record.commitments
+				.iter()
+				.find(|c| &c.0 == &sender)
+				.unwrap()
+				.clone();
+
+			let mut buf = Vec::new();
+			buf.extend_from_slice(&sender.encode());
+			buf.extend_from_slice(&secret.unwrap().encode());
+			buf.extend_from_slice(&vote);
+			let hash = T::Hashing::hash_of(&buf);
+			ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
+		}
+
+		record.reveals.push((sender.clone(), vote));
+		<VoteRecords<T>>::insert(record.id, record);
 		Ok(())
 	}
 
