@@ -479,7 +479,11 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingCompleted(hash, vote_id))
+					event: Event::governance(RawEvent::VotingCompleted(
+						hash,
+						vote_id,
+						Some(vec![(governance::YES_VOTE, 0), (governance::NO_VOTE, 0)])
+					))
 				}]
 			);
 

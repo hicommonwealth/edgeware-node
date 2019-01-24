@@ -46,6 +46,7 @@ use codec::Encode;
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
+pub type Tally<Balance> = Option<Vec<(VoteOutcome, Balance)>>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
@@ -102,7 +103,7 @@ pub struct VoteData<AccountId> {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct VoteRecord<AccountId, Balance> {
+pub struct VoteRecord<AccountId> {
 	// Identifier of the vote
 	pub id: u64,
 	// Vote commitments
@@ -113,10 +114,6 @@ pub struct VoteRecord<AccountId, Balance> {
 	pub data: VoteData<AccountId>,
 	// Vote outcomes
 	pub outcomes: Vec<VoteOutcome>,
-	// Winning outcome
-	pub winning_outcome: Option<VoteOutcome>,
-	// Final tally
-	pub tally: Vec<(VoteOutcome, Balance)>,
 }
 
 pub trait Trait: balances::Trait + delegation::Trait {
@@ -183,21 +180,6 @@ decl_module! {
 			ensure!(record.data.initiator == _sender, "Invalid advance attempt by non-owner");
 			return Self::advance_stage(vote_id);
 		}
-
-		pub fn tally_as_initiator(origin, vote_id: u64) -> Result {
-			let _sender = ensure_signed(origin)?;
-			let record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.data.initiator == _sender, "Invalid advance attempt by non-owner");
-			ensure!(record.data.stage == VoteStage::Completed, "Vote is not in completed stage");
-
-			if let Some(tally) = Self::tally(vote_id) {
-				<VoteRecords<T>>::insert(record.id, VoteRecord {
-					tally: tally,
-					..record
-				});
-			}
-			Ok(())
-		}
 	}
 }
 
@@ -221,8 +203,6 @@ impl<T: Trait> Module<T> {
 			commitments: vec![],
 			reveals: vec![],
 			outcomes: outcomes,
-			winning_outcome: None,
-			tally: vec![],
 			data: VoteData {
 				initiator: sender.clone(),
 				stage: VoteStage::PreVoting,
@@ -284,7 +264,7 @@ impl<T: Trait> Module<T> {
 		};
 	}
 	
-	pub fn tally(vote_id: u64) -> Option<Vec<(VoteOutcome, T::Balance)>> {
+	pub fn tally(vote_id: u64) -> Tally<T::Balance> {
 		let mut voters: Vec<(T::AccountId, VoteOutcome)> = vec![];
 		let mut reps: Vec<(T::AccountId, T::AccountId)> = vec![];
 
@@ -342,7 +322,7 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Delegation {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId, T::Balance>>;
+		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(vote_record_count): u64;
 	}

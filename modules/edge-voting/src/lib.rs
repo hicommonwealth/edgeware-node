@@ -152,10 +152,6 @@ mod tests {
 		Voting::advance_stage_as_initiator(Origin::signed(who), vote_id)
 	}
 
-	fn tally_as_initiator(who: H256, vote_id: u64) -> Result {
-		Voting::tally_as_initiator(Origin::signed(who), vote_id)
-	}
-
 	fn delegate_to(who: H256, to: H256) -> Result {
 		Delegation::delegate_to(Origin::signed(who), to)
 	}
@@ -217,14 +213,12 @@ mod tests {
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]],
 		stage: VoteStage
-	) -> VoteRecord<H256, u64> {
+	) -> VoteRecord<H256> {
 		VoteRecord {
 			id: id,
 			commitments: vec![],
 			reveals: vec![],
 			outcomes: outcomes.to_vec(),
-			winning_outcome: None,
-			tally: vec![],
 			data: VoteData {
 				initiator: author,
 				stage: stage,
@@ -600,9 +594,8 @@ mod tests {
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			assert_ok!(reveal(public, 1, vote.3[0], Some(vote.3[0])));
 			assert_ok!(advance_stage_as_initiator(public, 1));
-			assert_ok!(tally_as_initiator(public, 1));
 			assert_eq!(
-				Voting::vote_records(1).unwrap().tally,
+				Voting::tally(1).unwrap(),
 				vec![(vote.3[0], 1), (vote.3[1], 0)]
 			);
 		});
@@ -640,9 +633,8 @@ mod tests {
 			assert_ok!(reveal(users[4], 1, vote.3[1], None));
 			assert_ok!(reveal(users[5], 1, vote.3[0], None));
 			assert_ok!(advance_stage_as_initiator(creator, 1));
-			assert_ok!(tally_as_initiator(creator, 1));
 			assert_eq!(
-				Voting::vote_records(1).unwrap().tally,
+				Voting::tally(1).unwrap(),
 				vec![(vote.3[0], 3), (vote.3[1], 3)]
 			);
 		});

@@ -76,8 +76,8 @@ pub trait Trait: voting::Trait {
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
-static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
@@ -176,7 +176,6 @@ decl_module! {
 				match <ProposalOf<T>>::get(completed_hash) {
 					Some(record) => {
 						// voting -> completed
-						// TODO: where and when do we tally?
 						let vote_id = record.vote_id;
 						// TODO: handle possible errors from advance_stage?
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
@@ -185,7 +184,9 @@ decl_module! {
 							transition_block: None,
 							..record
 						});
-						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id));
+						// tally the final vote to include in completion Event
+						let final_outcome = <voting::Module<T>>::tally(vote_id);
+						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id, final_outcome));
 					},
 					None => { } // TODO: emit an error here?
 				}
@@ -197,16 +198,16 @@ decl_module! {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as system::Trait>::BlockNumber {
+							<T as system::Trait>::BlockNumber,
+							<T as balances::Trait>::Balance {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted at comment creation: (Commentor, ProposalHash)
 		NewComment(AccountId, Hash),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
 		VotingStarted(Hash, u64, BlockNumber),
-		/// Emitted when voting is completed: (ProposalHash, VoteId)
-		// TODO: should this contain the final result?
-		VotingCompleted(Hash, u64),
+		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
+		VotingCompleted(Hash, u64, voting::voting::Tally<Balance>),
 	}
 );
 
