@@ -48,8 +48,8 @@ decl_module! {
 
 		pub fn delegate_to(origin, to: T::AccountId) -> Result {
 			let _sender = ensure_signed(origin)?;
-			// Check that no delegation cycle exists
-			ensure!(!Self::has_delegation_cycle(&_sender, to.clone()), "Invalid delegation");
+			// Check that no delegation cycle exists and that the depth is valid
+			ensure!(!Self::is_invalid_delegation(&_sender, to.clone(), 1), "Invalid delegation");
 			// Update the delegate of _sender -> Some(to)
 			<DelegatesOf<T>>::insert(&_sender, &to);
 			// Update the delegates of to to include _sender
@@ -93,13 +93,17 @@ decl_module! {
 
 impl<T: Trait> Module<T> {
 	/// Implement rudimentary DFS to find if "to"'s delegation ever leads to "from"
-	pub fn has_delegation_cycle(from: &T::AccountId, to: T::AccountId) -> bool {
+	pub fn is_invalid_delegation(from: &T::AccountId, to: T::AccountId, length: u32) -> bool {
+		// If length is greater than allowed depth, reject
+		if length > Self::delegation_depth() {
+			return true;
+		}
 		// Loop over delegation path of "to" to check if "from" exists
 		if from == &to {
 			return true;
 		}
 		match Self::delegate_of(&to) {
-			Some(delegate) => Self::has_delegation_cycle(from, delegate),
+			Some(delegate) => Self::is_invalid_delegation(from, delegate, length + 1),
 			None => false,
 		}
 	}
@@ -130,6 +134,7 @@ decl_event!(
 
 decl_storage! {
 	trait Store for Module<T: Trait> as Delegation {
+		pub DelegationDepth get(delegation_depth) config(): u32;
 		/// The map of strict delegates for each account
 		pub DelegatesOf get(delegate_of): map T::AccountId => Option<T::AccountId>;
 		/// The map of accounts delegating to a specific account

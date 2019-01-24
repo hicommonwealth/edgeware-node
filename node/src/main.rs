@@ -25,7 +25,7 @@ extern crate structopt;
 extern crate node_executor;
 extern crate substrate_finality_grandpa as grandpa;
 extern crate node_primitives;
-extern crate sr_primitives as runtime_primitives;
+
 
 mod chain_spec;
 mod service;
