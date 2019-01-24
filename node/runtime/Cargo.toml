@@ -34,6 +34,7 @@ sr-version = { git = "https://github.com/paritytech/substrate" }
 node-primitives = { git = "https://github.com/paritytech/substrate" }
 substrate-consensus-aura-primitives = { git = "https://github.com/paritytech/substrate" }
 edge-delegation = { path = "../../modules/edge-delegation" }
+edge-voting = { path = "../../modules/edge-voting" }
 edge-governance = { path = "../../modules/edge-governance" }
 edge-identity = { path = "../../modules/edge-identity" }
 
@@ -67,6 +68,7 @@ std = [
 	"substrate-client",
 	"substrate-consensus-aura-primitives/std",
 	"edge-delegation/std",
+	"edge-voting/std",
 	"edge-governance/std",
 	"edge-identity/std",
 ]

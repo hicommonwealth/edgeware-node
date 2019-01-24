@@ -25,6 +25,7 @@ extern crate sr_version as version;
 extern crate edge_delegation;
 extern crate edge_governance;
 extern crate edge_identity;
+extern crate edge_voting;
 extern crate srml_aura as aura;
 extern crate srml_balances as balances;
 extern crate srml_consensus as consensus;
@@ -43,11 +44,10 @@ extern crate substrate_consensus_aura_primitives as consensus_aura;
 use edge_delegation::delegation;
 use edge_governance::governance;
 use edge_identity::identity;
+use edge_voting::voting;
 
 use client::{block_builder::api as block_builder_api, runtime_api};
 use consensus_aura::api as aura_api;
-#[cfg(feature = "std")]
-use primitives::bytes;
 use primitives::OpaqueMetadata;
 use node_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, SessionKey, Signature
@@ -196,19 +196,24 @@ impl grandpa::Trait for Runtime {
 	type Event = Event;
 }
 
-impl identity::Trait for Runtime {
-	/// The type for making a claim to an identity.
-	type Claim = Vec<u8>;
-	/// The uniquitous event type.
-	type Event = Event;
-}
-
 impl delegation::Trait for Runtime {
 	/// The uniquitous event type.
 	type Event = Event;
 }
 
+impl voting::Trait for Runtime {
+	/// The uniquitous event type.
+	type Event = Event;
+}
+
 impl governance::Trait for Runtime {
+	/// The uniquitous event type.
+	type Event = Event;
+}
+
+impl identity::Trait for Runtime {
+	/// The type for making a claim to an identity.
+	type Claim = Vec<u8>;
 	/// The uniquitous event type.
 	type Event = Event;
 }
@@ -230,9 +235,10 @@ construct_runtime!(
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Contract: contract::{Module, Call, Config<T>, Event<T>},
 		Treasury: treasury,
-		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Event<T>},
+		Voting: voting::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
+		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 

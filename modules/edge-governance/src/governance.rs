@@ -30,6 +30,7 @@ extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
+extern crate edge_voting as voting;
 
 use rstd::prelude::*;
 use system::ensure_signed;
@@ -67,12 +68,16 @@ pub struct ProposalRecord<AccountId, BlockNumber> {
 	// TODO: separate comments into different object, for storage reasons
 	pub comments: Vec<(Vec<u8>, AccountId)>,
 	// TODO: for actions, we might need more data
+	pub vote_id: u64,
 }
 
-pub trait Trait: system::Trait {
+pub trait Trait: voting::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
+
+pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
@@ -92,6 +97,15 @@ decl_module! {
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
 
+			// create a vote to go along with the proposal
+			let vote_id = <voting::Module<T>>::create_vote(
+				_sender.clone(),
+				voting::VoteType::Binary,
+				false, // not commit-reveal
+				voting::TallyType::OneCoin,
+				vec![YES_VOTE, NO_VOTE],
+			)?;
+
 			let index = <ProposalCount<T>>::get();
 			<ProposalCount<T>>::mutate(|i| *i += 1);
 			<ProposalOf<T>>::insert(hash, ProposalRecord {
@@ -102,7 +116,8 @@ decl_module! {
 				transition_block: None,
 				title: title,
 				contents: contents,
-				comments: vec![]
+				comments: vec![],
+				vote_id: vote_id,
 			});
 			<Proposals<T>>::mutate(|proposals| proposals.push(hash));
 			Self::deposit_event(RawEvent::NewProposal(_sender, hash));
@@ -135,29 +150,17 @@ decl_module! {
 			ensure!(record.author == _sender, "Proposal must be advanced by author");
 			ensure!(record.stage == ProposalStage::PreVoting, "Proposal not in pre-voting stage");
 			
+			// prevoting -> voting
+			<voting::Module<T>>::advance_stage(record.vote_id)?;
 			let transition_block = <system::Module<T>>::block_number() + Self::voting_time();
+			let vote_id = record.vote_id;
 			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
 				stage: ProposalStage::Voting,
 				transition_block: Some(transition_block),
 				..record
 			});
 			<ActiveProposals<T>>::mutate(|proposals| proposals.push((proposal_hash, transition_block)));
-			Self::deposit_event(RawEvent::VotingStarted(proposal_hash, transition_block));
-			Ok(())
-		}
-
-		/// Submit or update a vote on a proposal. The proposal must be in the
-		/// "voting" stage.
-		pub fn submit_vote(origin, proposal_hash: T::Hash, vote: bool) -> Result {
-			let _sender = ensure_signed(origin)?;
-			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
-			ensure!(record.stage == ProposalStage::Voting, "Proposal not in voting stage");
-
-			if Self::vote_of((proposal_hash, _sender.clone())).is_none() {
-				<ProposalVoters<T>>::mutate(proposal_hash, |voters| voters.push(_sender.clone()));
-			}
-			<VoteOf<T>>::insert((proposal_hash.clone(), _sender.clone()), vote);
-			Self::deposit_event(RawEvent::VoteSubmitted(proposal_hash, _sender, vote));
+			Self::deposit_event(RawEvent::VotingStarted(proposal_hash, vote_id, transition_block));
 			Ok(())
 		}
 
@@ -171,13 +174,19 @@ decl_module! {
 			<ActiveProposals<T>>::put(active);
 			finished.into_iter().for_each(move |(completed_hash, _)| {
 				match <ProposalOf<T>>::get(completed_hash) {
-					Some(proposal) => {
+					Some(record) => {
+						// voting -> completed
+						let vote_id = record.vote_id;
+						// TODO: handle possible errors from advance_stage?
+						let _ = <voting::Module<T>>::advance_stage(vote_id);
 						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
 							stage: ProposalStage::Completed,
 							transition_block: None,
-							..proposal
+							..record
 						});
-						Self::deposit_event(RawEvent::VotingCompleted(completed_hash));
+						// tally the final vote to include in completion Event
+						let final_outcome = <voting::Module<T>>::tally(vote_id);
+						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id, final_outcome));
 					},
 					None => { } // TODO: emit an error here?
 				}
@@ -189,18 +198,16 @@ decl_module! {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as system::Trait>::BlockNumber {
+							<T as system::Trait>::BlockNumber,
+							<T as balances::Trait>::Balance {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted at comment creation: (Commentor, ProposalHash)
 		NewComment(AccountId, Hash),
-		/// Emitted when voting begins: (ProposalHash, VotingEndTime)
-		VotingStarted(Hash, BlockNumber),
-		/// Emitted when a vote is submitted: (ProposalHash, Voter, Vote)
-		VoteSubmitted(Hash, AccountId, bool),
-		/// Emitted when voting is completed: (ProposalHash)
-		// TODO: also have this contain the final result
-		VotingCompleted(Hash),
+		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
+		VotingStarted(Hash, u64, BlockNumber),
+		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
+		VotingCompleted(Hash, u64, voting::voting::Tally<Balance>),
 	}
 );
 
@@ -216,9 +223,5 @@ decl_storage! {
 		pub VotingTime get(voting_time) config(): T::BlockNumber;
 		/// Map for retrieving the information about any proposal from its hash.
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
-		/// Map for retrieving the users who've voted on any particular proposal.
-		pub ProposalVoters get(proposal_voters): map T::Hash => Vec<T::AccountId>;
-		/// Map for retrieving the actual votes of users on any particular proposal.
-		pub VoteOf get(vote_of): map (T::Hash, T::AccountId) => Option<bool>;
 	}
 }

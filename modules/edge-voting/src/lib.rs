@@ -23,7 +23,6 @@ extern crate serde;
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
 #[cfg(feature = "std")]
-#[macro_use]
 extern crate serde_derive;
 #[cfg(test)]
 #[macro_use]
@@ -44,11 +43,6 @@ extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
 
-extern crate rand;
-
-use rstd::prelude::*;
-use runtime_support::dispatch::Result;
-
 pub mod voting;
 pub use voting::{Module, Trait, RawEvent, Event};
 pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData};
@@ -57,17 +51,20 @@ pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData};
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use rand::Rng;
+	use rstd::prelude::*;
+	use runtime_support::dispatch::Result;
 	use runtime_io::ed25519::Pair;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher};
+	use rstd::result;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		BuildStorage, traits::{BlakeTwo256, Hash}, testing::{Digest, DigestItem, Header}
 	};
 
+	static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
 	impl_outer_origin! {
 		pub enum Origin for Test {}
@@ -135,8 +132,8 @@ mod tests {
 		is_commit_reveal: bool,
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]]
-	) -> Result {
-		Voting::create_vote(Origin::signed(who),
+	) -> result::Result<u64, &'static str> {
+		Voting::create_vote(who,
 							vote_type,
 							is_commit_reveal,
 							tally_type,
@@ -153,10 +150,6 @@ mod tests {
 
 	fn advance_stage_as_initiator(who: H256, vote_id: u64) -> Result {
 		Voting::advance_stage_as_initiator(Origin::signed(who), vote_id)
-	}
-
-	fn tally_as_initiator(who: H256, vote_id: u64) -> Result {
-		Voting::tally_as_initiator(Origin::signed(who), vote_id)
 	}
 
 	fn delegate_to(who: H256, to: H256) -> Result {
@@ -220,14 +213,12 @@ mod tests {
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]],
 		stage: VoteStage
-	) -> VoteRecord<H256, u64> {
+	) -> VoteRecord<H256> {
 		VoteRecord {
 			id: id,
 			commitments: vec![],
 			reveals: vec![],
 			outcomes: outcomes.to_vec(),
-			winning_outcome: None,
-			tally: vec![],
 			data: VoteData {
 				initiator: author,
 				stage: stage,
@@ -244,12 +235,18 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(Voting::vote_record_count(), 1);
 			assert_eq!(
 				Voting::vote_records(1),
 				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::PreVoting))
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				}
+			]);
 		});
 	}
 
@@ -272,7 +269,7 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_multi_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(Voting::vote_record_count(), 1);
 			assert_eq!(
 				Voting::vote_records(1),
@@ -326,7 +323,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let commit_value = rand::thread_rng().gen::<[u8; 32]>();
+			let commit_value = SECRET;
 			assert_err!(commit(public, 1, commit_value), "Vote record does not exist");
 		});
 	}
@@ -337,8 +334,8 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
-			let commit_value = rand::thread_rng().gen::<[u8; 32]>();
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			let commit_value = SECRET;
 			assert_err!(commit(public, 1, commit_value), "Commitments are not configured for this vote");
 		});
 	}
@@ -348,7 +345,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let commit_value = rand::thread_rng().gen::<[u8; 32]>();
+			let commit_value = SECRET;
 			assert_err!(reveal(public, 1, commit_value, Some(commit_value)), "Vote record does not exist");
 		});
 	}
@@ -359,7 +356,7 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			let vote_outcome = vote.3[0];
 			assert_err!(reveal(public, 1, vote_outcome, Some(vote_outcome)), "Vote is not in voting stage");
 		});
@@ -372,7 +369,7 @@ mod tests {
 			let public = get_test_key();
 			let public2 = get_test_key_2();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_err!(advance_stage_as_initiator(public2, 1), "Invalid advance attempt by non-owner");
 		});
 	}
@@ -383,12 +380,22 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			assert_eq!(
 				Voting::vote_records(1),
 				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::Voting))
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+				}
+			]);
 		});
 	}
 
@@ -398,7 +405,7 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			let public2 = get_test_key_2();
 			assert_ok!(reveal(public2, 1, vote.3[0], Some(vote.3[0])));
@@ -406,6 +413,20 @@ mod tests {
 				Voting::vote_records(1).unwrap().reveals,
 				vec![(public2, vote.3[0])]
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+				}
+			]);
 		});
 	}
 
@@ -415,7 +436,7 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			let public2 = get_test_key_2();
 			assert_ok!(reveal(public2, 1, vote.3[0], Some(vote.3[0])));
@@ -424,6 +445,24 @@ mod tests {
 				Voting::vote_records(1).unwrap().data.stage,
 				VoteStage::Completed
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Voting, VoteStage::Completed))
+				}
+			]);
 		});
 	}
 
@@ -433,7 +472,7 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_commit_reveal_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(
 				Voting::vote_records(1).unwrap().data.is_commit_reveal,
 				true
@@ -443,6 +482,16 @@ mod tests {
 				Voting::vote_records(1).unwrap().data.stage,
 				VoteStage::Commit
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit))
+				}
+			]);
 		});
 	}
 
@@ -452,7 +501,7 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_commit_reveal_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_eq!(
 				Voting::vote_records(1).unwrap().data.is_commit_reveal,
 				true
@@ -468,10 +517,10 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_commit_reveal_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			let public2 = get_test_key_2();
-			let secret = rand::thread_rng().gen::<[u8; 32]>();
+			let secret = SECRET;
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&<[u8; 32]>::from(public2));
 			buf.extend_from_slice(&secret);
@@ -493,10 +542,10 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_commit_reveal_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			let public2 = get_test_key_2();
-			let secret = rand::thread_rng().gen::<[u8; 32]>();
+			let secret = SECRET;
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&<[u8; 32]>::from(public2));
 			buf.extend_from_slice(&secret);
@@ -510,6 +559,28 @@ mod tests {
 
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			assert_ok!(reveal(public2, 1, vote.3[0], Some(secret)));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCommitted(1, public2))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Commit, VoteStage::Voting))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+				}
+			]);
 		});
 	}
 
@@ -519,13 +590,12 @@ mod tests {
 			System::set_block_number(1);
 			let public = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			assert_ok!(reveal(public, 1, vote.3[0], Some(vote.3[0])));
 			assert_ok!(advance_stage_as_initiator(public, 1));
-			assert_ok!(tally_as_initiator(public, 1));
 			assert_eq!(
-				Voting::vote_records(1).unwrap().tally,
+				Voting::tally(1).unwrap(),
 				vec![(vote.3[0], 1), (vote.3[1], 0)]
 			);
 		});
@@ -555,7 +625,7 @@ mod tests {
 
 			let creator = get_test_key();
 			let vote = generate_1p1v_public_binary_vote();
-			assert_ok!(create_vote(creator, vote.0, vote.1, vote.2, &vote.3));
+			assert_eq!(Ok(1), create_vote(creator, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(creator, 1));
 
 			// perform votes
@@ -563,9 +633,8 @@ mod tests {
 			assert_ok!(reveal(users[4], 1, vote.3[1], None));
 			assert_ok!(reveal(users[5], 1, vote.3[0], None));
 			assert_ok!(advance_stage_as_initiator(creator, 1));
-			assert_ok!(tally_as_initiator(creator, 1));
 			assert_eq!(
-				Voting::vote_records(1).unwrap().tally,
+				Voting::tally(1).unwrap(),
 				vec![(vote.3[0], 3), (vote.3[1], 3)]
 			);
 		});
