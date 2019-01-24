@@ -76,8 +76,8 @@ pub trait Trait: voting::Trait {
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
-pub static YES_VOTE: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-pub static NO_VOTE: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
@@ -102,7 +102,7 @@ decl_module! {
 				_sender.clone(),
 				voting::VoteType::Binary,
 				false, // not commit-reveal
-				voting::TallyType::OnePerson, // ?
+				voting::TallyType::OneCoin,
 				vec![YES_VOTE, NO_VOTE],
 			)?;
 
@@ -164,21 +164,6 @@ decl_module! {
 			Ok(())
 		}
 
-		/// Submit or update a vote on a proposal. The proposal must be in the
-		/// "voting" stage.
-		pub fn submit_vote(origin, proposal_hash: T::Hash, vote: bool) -> Result {
-			let _sender = ensure_signed(origin)?;
-			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
-			ensure!(record.stage == ProposalStage::Voting, "Proposal not in voting stage");
-			let vote_bytes = match vote {
-				true => YES_VOTE,
-				false => NO_VOTE,
-			};
-			<voting::Module<T>>::reveal_unsigned(_sender.clone(), record.vote_id, vote_bytes, None)?;
-			Self::deposit_event(RawEvent::VoteSubmitted(proposal_hash, record.vote_id, _sender, vote));
-			Ok(())
-		}
-
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
 		fn on_finalise(n: T::BlockNumber) {
@@ -219,8 +204,6 @@ decl_event!(
 		NewComment(AccountId, Hash),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
 		VotingStarted(Hash, u64, BlockNumber),
-		/// Emitted when a vote is submitted: (ProposalHash, VoteId, Voter, Vote)
-		VoteSubmitted(Hash, u64, AccountId, bool),
 		/// Emitted when voting is completed: (ProposalHash, VoteId)
 		// TODO: should this contain the final result?
 		VotingCompleted(Hash, u64),

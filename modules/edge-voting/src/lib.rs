@@ -247,6 +247,12 @@ mod tests {
 				Voting::vote_records(1),
 				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::PreVoting))
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				}
+			]);
 		});
 	}
 
@@ -386,6 +392,16 @@ mod tests {
 				Voting::vote_records(1),
 				Some(make_record(1, public, vote.0, vote.1, vote.2, &vote.3, VoteStage::Voting))
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+				}
+			]);
 		});
 	}
 
@@ -403,6 +419,20 @@ mod tests {
 				Voting::vote_records(1).unwrap().reveals,
 				vec![(public2, vote.3[0])]
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+				}
+			]);
 		});
 	}
 
@@ -421,6 +451,24 @@ mod tests {
 				Voting::vote_records(1).unwrap().data.stage,
 				VoteStage::Completed
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Voting, VoteStage::Completed))
+				}
+			]);
 		});
 	}
 
@@ -440,6 +488,16 @@ mod tests {
 				Voting::vote_records(1).unwrap().data.stage,
 				VoteStage::Commit
 			);
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit))
+				}
+			]);
 		});
 	}
 
@@ -507,6 +565,28 @@ mod tests {
 
 			assert_ok!(advance_stage_as_initiator(public, 1));
 			assert_ok!(reveal(public2, 1, vote.3[0], Some(secret)));
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCommitted(1, public2))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Commit, VoteStage::Voting))
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+				}
+			]);
 		});
 	}
 

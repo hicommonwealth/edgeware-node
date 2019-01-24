@@ -44,6 +44,9 @@ use runtime_primitives::traits::{Zero, One};
 use runtime_primitives::traits::{CheckedAdd};
 use codec::Encode;
 
+/// A potential outcome of a vote, with 2^32 possible options
+pub type VoteOutcome = [u8; 32];
+
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
 pub enum VoteStage {
@@ -103,17 +106,17 @@ pub struct VoteRecord<AccountId, Balance> {
 	// Identifier of the vote
 	pub id: u64,
 	// Vote commitments
-	pub commitments: Vec<(AccountId, [u8; 32])>,
-	// Vote reveals with 2^32 possible options
-	pub reveals: Vec<(AccountId, [u8; 32])>,
+	pub commitments: Vec<(AccountId, VoteOutcome)>,
+	// Vote reveals
+	pub reveals: Vec<(AccountId, VoteOutcome)>,
 	// Vote data record
 	pub data: VoteData<AccountId>,
 	// Vote outcomes
-	pub outcomes: Vec<[u8; 32]>,
+	pub outcomes: Vec<VoteOutcome>,
 	// Winning outcome
-	pub winning_outcome: Option<[u8; 32]>,
+	pub winning_outcome: Option<VoteOutcome>,
 	// Final tally
-	pub tally: Vec<([u8; 32], Balance)>,
+	pub tally: Vec<(VoteOutcome, Balance)>,
 }
 
 pub trait Trait: balances::Trait + delegation::Trait {
@@ -125,7 +128,7 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
-		pub fn commit(origin, vote_id: u64, commit: [u8; 32]) -> Result {
+		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.is_commit_reveal, "Commitments are not configured for this vote");
@@ -135,13 +138,43 @@ decl_module! {
 
 			// Add commitment to record
 			record.commitments.push((_sender.clone(), commit));
-			<VoteRecords<T>>::insert(record.id, record);
+			let id = record.id;
+			<VoteRecords<T>>::insert(id, record);
+			Self::deposit_event(RawEvent::VoteCommitted(id, _sender));
 			Ok(())
 		}
 
-		pub fn reveal(origin, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
+		pub fn reveal(origin, vote_id: u64, vote: VoteOutcome, secret: Option<VoteOutcome>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			return Self::reveal_unsigned(_sender, vote_id, vote, secret);
+			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
+			// Check vote is for a valid outcome
+			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
+			// TODO: Allow changing of votes
+			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
+
+			// Ensure voter committed
+			if record.data.is_commit_reveal {
+				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender already committed");
+				let commit: (T::AccountId, VoteOutcome) = record.commitments
+					.iter()
+					.find(|c| &c.0 == &_sender)
+					.unwrap()
+					.clone();
+
+				let mut buf = Vec::new();
+				buf.extend_from_slice(&_sender.encode());
+				buf.extend_from_slice(&secret.unwrap().encode());
+				buf.extend_from_slice(&vote);
+				let hash = T::Hashing::hash_of(&buf);
+				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
+			}
+
+			let id = record.id;
+			record.reveals.push((_sender.clone(), vote));
+			<VoteRecords<T>>::insert(id, record);
+			Self::deposit_event(RawEvent::VoteRevealed(id, _sender, vote));
+			Ok(())
 		}
 
 		pub fn advance_stage_as_initiator(origin, vote_id: u64) -> Result {
@@ -174,7 +207,7 @@ impl<T: Trait> Module<T> {
 		vote_type: VoteType,
 		is_commit_reveal: bool,
 		tally_type: TallyType,
-		outcomes: Vec<[u8; 32]>
+		outcomes: Vec<VoteOutcome>
 	) -> result::Result<u64, &'static str> {
 		// TODO: Origin check? sender?
 		ensure!(vote_type == VoteType::Binary || vote_type == VoteType::MultiOption, "Unsupported vote type");
@@ -219,39 +252,9 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
-	pub fn reveal_unsigned(sender: T::AccountId, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
-		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-		ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
-		// Check vote is for a valid outcome
-		ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
-		// TODO: Allow changing of votes
-		ensure!(!record.reveals.iter().any(|c| &c.0 == &sender), "Duplicate votes are not allowed");
-
-		// Ensure voter committed
-		if record.data.is_commit_reveal {
-			ensure!(record.commitments.iter().any(|c| &c.0 == &sender), "Duplicate commits are not allowed");
-			let commit: (T::AccountId, [u8; 32]) = record.commitments
-				.iter()
-				.find(|c| &c.0 == &sender)
-				.unwrap()
-				.clone();
-
-			let mut buf = Vec::new();
-			buf.extend_from_slice(&sender.encode());
-			buf.extend_from_slice(&secret.unwrap().encode());
-			buf.extend_from_slice(&vote);
-			let hash = T::Hashing::hash_of(&buf);
-			ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
-		}
-
-		record.reveals.push((sender.clone(), vote));
-		<VoteRecords<T>>::insert(record.id, record);
-		Ok(())
-	}
-
 	// for a given account, finds the voter representing them, aka their
 	// closest voting ancestor on the delegation graph (incl self)
-	fn find_rep(voters: &Vec<(T::AccountId, [u8; 32])>, acct: T::AccountId) -> Option<T::AccountId> {
+	fn find_rep(voters: &Vec<(T::AccountId, VoteOutcome)>, acct: T::AccountId) -> Option<T::AccountId> {
 		if let Some(_) = voters.iter().find(|(voter, _)| voter == &acct) {
 			return Some(acct);
 		} else if let Some(parent) = <delegation::Module<T>>::delegate_of(acct) {
@@ -262,7 +265,7 @@ impl<T: Trait> Module<T> {
 	}
 
 	// constructs a mapping of accounts to their representatives
-	fn build_rep_map(reps: &mut Vec<(T::AccountId, T::AccountId)>, voters: &Vec<(T::AccountId, [u8; 32])>, acct: T::AccountId) {
+	fn build_rep_map(reps: &mut Vec<(T::AccountId, T::AccountId)>, voters: &Vec<(T::AccountId, VoteOutcome)>, acct: T::AccountId) {
 		// if we haven't seen this account yet, find its voting parent
 		match reps.iter().find(|(voter, _)| voter == &acct) {
 			Some(_) => return,
@@ -281,8 +284,8 @@ impl<T: Trait> Module<T> {
 		};
 	}
 	
-	pub fn tally(vote_id: u64) -> Option<Vec<([u8; 32], T::Balance)>> {
-		let mut voters: Vec<(T::AccountId, [u8; 32])> = vec![];
+	pub fn tally(vote_id: u64) -> Option<Vec<(VoteOutcome, T::Balance)>> {
+		let mut voters: Vec<(T::AccountId, VoteOutcome)> = vec![];
 		let mut reps: Vec<(T::AccountId, T::AccountId)> = vec![];
 
 		if let Some(record) = <VoteRecords<T>>::get(vote_id) {
@@ -297,7 +300,7 @@ impl<T: Trait> Module<T> {
 				.for_each(|r| Self::build_rep_map(&mut reps, &voters, r.0));
 
 			// tally up the vote
-			let mut outcomes: Vec<([u8; 32], T::Balance)> = record.outcomes
+			let mut outcomes: Vec<(VoteOutcome, T::Balance)> = record.outcomes
 				.clone()
 				.into_iter()
 				.map(|o| (o, Zero::zero()))
@@ -306,7 +309,7 @@ impl<T: Trait> Module<T> {
 			for (account, rep) in reps.iter() {
 				let weight: T::Balance = match record.data.tally_type {
 					TallyType::OnePerson => One::one(),
-					TallyType::OneCoin => <balances::Module<T>>::total_balance(account),
+					TallyType::OneCoin => <balances::Module<T>>::free_balance(account),
 				};
 
 				// use the representative's choice and the voter's weight
@@ -329,6 +332,10 @@ decl_event!(
 		VoteCreated(u64, AccountId, VoteType),
 		/// vote stage transition (id, old stage, new stage)
 		VoteAdvanced(u64, VoteStage, VoteStage),
+		/// user commits
+		VoteCommitted(u64, AccountId),
+		/// user reveals a vote
+		VoteRevealed(u64, AccountId, VoteOutcome),
 	}
 );
 

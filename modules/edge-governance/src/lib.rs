@@ -68,7 +68,6 @@ mod tests {
 		testing::{Digest, DigestItem, Header}
 	};
 	use voting::{VoteStage, VoteType};
-	use governance::{YES_VOTE};
 
 	impl_outer_origin! {
 		pub enum Origin for Test {}
@@ -147,10 +146,6 @@ mod tests {
 
 	fn advance_proposal(who: H256, proposal_hash: H256) -> Result {
 		Governance::advance_proposal(Origin::signed(who), proposal_hash)
-	}
-
-	fn submit_vote(who: H256, proposal_hash: H256, vote: bool) -> Result {
-		Governance::submit_vote(Origin::signed(who), proposal_hash, vote)
 	}
 
 	fn build_proposal_hash(who: H256, proposal: &[u8]) -> H256 {
@@ -509,7 +504,6 @@ mod tests {
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
-			assert_err!(submit_vote(public, hash, true), "Proposal not in voting stage");
 			assert_ok!(advance_proposal(public, hash));
 			
 			<Governance as OnFinalise<u64>>::on_finalise(1);
@@ -549,71 +543,6 @@ mod tests {
 				Governance::proposal_of(hash),
 				Some(make_record(public, title, proposal, category))
 			);
-		});
-	}
-
-	#[test]
-	fn submit_vote_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
-			let (title, proposal) = generate_proposal();
-			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
-			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
-			assert_eq!(vote_id, 1);
-			assert_ok!(advance_proposal(public, hash));
-			assert_ok!(submit_vote(public, hash, true));
-			assert_eq!(System::events(), vec![
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, 2))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VoteSubmitted(hash, vote_id, public, true))
-				},]
-			);
-			assert_eq!(Voting::vote_records(vote_id).unwrap().reveals, vec![(public, YES_VOTE)]);
-		});
-	}
-
-	#[test]
-	fn submit_vote_at_wrong_stage_should_fail() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
-			let (title, proposal) = generate_proposal();
-			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
-			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
-			assert_eq!(vote_id, 1);
-			assert_err!(submit_vote(public, hash, true), "Proposal not in voting stage");
-			assert_eq!(Voting::vote_records(vote_id).unwrap().reveals, vec![]);
-			assert_ok!(advance_proposal(public, hash));
-			
-			<Governance as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
-
-			<Governance as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
-
-			assert_err!(submit_vote(public, hash, true), "Proposal not in voting stage");
-			assert_eq!(Voting::vote_records(vote_id).unwrap().reveals, vec![]);
 		});
 	}
 } 
