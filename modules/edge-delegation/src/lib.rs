@@ -111,8 +111,13 @@ mod tests {
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
-		// We use default for brevity, but you can configure as desired if needed.
+		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		t.extend(
+			delegation::GenesisConfig::<Test> {
+				delegation_depth: 3,
+				_genesis_phantom_data: Default::default(),
+			}.build_storage().unwrap().0,
+		);
 		t.into()
 	}
 
@@ -240,5 +245,22 @@ mod tests {
 		});
 	}
 
-	// TODO: write undelegate tests that should fail
+	#[test]
+	fn undelegate_from_oneself_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			assert_err!(undelegate_from(H256::from(1), H256::from(1)), "Invalid undelegation");
+		});
+	}
+
+	#[test]
+	fn delegate_too_deep_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			assert_ok!(delegate_to(H256::from(1), H256::from(2)));
+			assert_ok!(delegate_to(H256::from(3), H256::from(1)));
+			assert_ok!(delegate_to(H256::from(4), H256::from(3)));
+			assert_err!(delegate_to(H256::from(5), H256::from(4)), "Invalid delegation");
+		});
+	}
 }

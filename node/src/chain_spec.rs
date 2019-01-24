@@ -10,9 +10,6 @@ use substrate_service;
 
 type SessionKey = Ed25519AuthorityId;
 
-// Note this is the URL for the telemetry server
-const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-
 /// Specialised `ChainSpec`. This is a specialisation of the general Substrate ChainSpec type.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
@@ -39,20 +36,12 @@ impl Alternative {
 				|| {
 					testnet_genesis(
 						vec![
-							ed25519::Pair::from_seed(b"Alice                           ")
-								.public()
-								.into(),
+							ed25519::Pair::from_seed(b"Alice                           ").public().into(),
 						],
 						vec![
-							ed25519::Pair::from_seed(b"Alice                           ")
-								.public()
-								.0
-								.into(),
+							ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
 						],
-						ed25519::Pair::from_seed(b"Alice                           ")
-							.public()
-							.0
-							.into(),
+						ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
 					)
 				},
 				vec![],
@@ -67,43 +56,18 @@ impl Alternative {
 				|| {
 					testnet_genesis(
 						vec![
-							ed25519::Pair::from_seed(b"Alice                           ")
-								.public()
-								.into(),
-							ed25519::Pair::from_seed(b"Bob                             ")
-								.public()
-								.into(),
+							ed25519::Pair::from_seed(b"Alice                           ").public().into(),
+							ed25519::Pair::from_seed(b"Bob                             ").public().into(),
 						],
 						vec![
-							ed25519::Pair::from_seed(b"Alice                           ")
-								.public()
-								.0
-								.into(),
-							ed25519::Pair::from_seed(b"Bob                             ")
-								.public()
-								.0
-								.into(),
-							ed25519::Pair::from_seed(b"Charlie                         ")
-								.public()
-								.0
-								.into(),
-							ed25519::Pair::from_seed(b"Dave                            ")
-								.public()
-								.0
-								.into(),
-							ed25519::Pair::from_seed(b"Eve                             ")
-								.public()
-								.0
-								.into(),
-							ed25519::Pair::from_seed(b"Ferdie                          ")
-								.public()
-								.0
-								.into(),
+							ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
+							ed25519::Pair::from_seed(b"Bob                             ").public().0.into(),
+							ed25519::Pair::from_seed(b"Charlie                         ").public().0.into(),
+							ed25519::Pair::from_seed(b"Dave                            ").public().0.into(),
+							ed25519::Pair::from_seed(b"Eve                             ").public().0.into(),
+							ed25519::Pair::from_seed(b"Ferdie                          ").public().0.into(),
 						],
-						ed25519::Pair::from_seed(b"Alice                           ")
-							.public()
-							.0
-							.into(),
+						ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
 					)
 				},
 				vec![],
@@ -115,7 +79,7 @@ impl Alternative {
 			Alternative::Edgeware => {
 				match ChainSpec::from_json_file(std::path::PathBuf::from("edgeware_testnet.json")) {
 					Ok(spec) => spec,
-					Err(_) => panic!(),
+					Err(e) => panic!(e),
 				}
 			}
 		})
