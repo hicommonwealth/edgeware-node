@@ -108,20 +108,14 @@ mod tests {
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext(verifiers: Vec<H256>) -> sr_io::TestExternalities<Blake2Hasher> {
-		let mut t = system::GenesisConfig::<Test>::default()
-			.build_storage()
-			.unwrap()
-			.0;
+		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
 			identity::GenesisConfig::<Test> {
 				expiration_time: 1,
 				verifiers: verifiers,
 				claims_issuers: [H256::from(1), H256::from(2), H256::from(3)].to_vec(),
-			}
-			.build_storage()
-			.unwrap()
-			.0,
+			}.build_storage().unwrap().0,
 		);
 		t.into()
 	}

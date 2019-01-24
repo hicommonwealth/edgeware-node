@@ -2,7 +2,7 @@ use edgeware_runtime::{
 	Permill, Perbill,
 	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
 	TimestampConfig, TreasuryConfig, StakingConfig, UpgradeKeyConfig, GrandpaConfig,
-	IdentityConfig, GovernanceConfig
+	IdentityConfig, GovernanceConfig, DelegationConfig,
 };
 use node_primitives::AccountId;
 use primitives::{ed25519, Ed25519AuthorityId};
@@ -164,6 +164,9 @@ fn testnet_genesis(
 		}),
 		governance: Some(GovernanceConfig {
 			voting_time: 10000,
+		}),
+		delegation: Some(DelegationConfig {
+			delegation_depth: 5,
 		}),
 	}
 }
