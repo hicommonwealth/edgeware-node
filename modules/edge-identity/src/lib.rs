@@ -64,7 +64,7 @@ mod tests {
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		testing::{Digest, DigestItem, Header, UintAuthorityId},
-		traits::{BlakeTwo256, Hash},
+		traits::{BlakeTwo256, Hash, OnFinalise},
 		BuildStorage,
 	};
 
@@ -150,10 +150,6 @@ mod tests {
 
 	fn verify_identity(who: H256, identity_hash: H256, vote: bool, verifier_index: usize) -> Result {
 		Identity::verify(Origin::signed(who), identity_hash, vote, verifier_index)
-	}
-
-	fn remove_expired_identity(who: H256, identity_hash: H256) -> Result {
-		Identity::remove_expired_identity(Origin::signed(who), identity_hash)
 	}
 
 	fn add_metadata_to_account(
@@ -575,7 +571,7 @@ mod tests {
 
 			Timestamp::set_timestamp(10001);
 
-			assert_ok!(remove_expired_identity(public, identity_hash));
+			<Identity as OnFinalise<u64>>::on_finalise(1);
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_err!(
@@ -628,7 +624,7 @@ mod tests {
 
 			Timestamp::set_timestamp(10001);
 
-			assert_ok!(remove_expired_identity(public, identity_hash));
+			<Identity as OnFinalise<u64>>::on_finalise(1);
 
 			let verifier: H256 = H256::from(9);
 			assert_err!(

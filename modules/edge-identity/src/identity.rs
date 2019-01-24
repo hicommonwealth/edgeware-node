@@ -34,7 +34,7 @@ extern crate srml_timestamp as timestamp;
 use rstd::prelude::*;
 use runtime_primitives::traits::{Hash, MaybeSerializeDebug, Zero};
 use runtime_support::dispatch::Result;
-use runtime_support::{Parameter, StorageMap};
+use runtime_support::{Parameter, StorageMap, StorageValue};
 use system::ensure_signed;
 
 pub trait Trait: system::Trait + timestamp::Trait {
@@ -70,46 +70,8 @@ pub struct IdentityRecord<AccountId, Moment> {
 	pub stage: IdentityStage,
 	pub expiration_time: Moment,
 	pub proof: Option<Attestation>,
-					  // no,   yes
 	pub verifications: [u128; 2],
 	pub metadata: Option<MetadataRecord>,
-}
-
-/// An event in this module.
-decl_event!(
-	pub enum Event<T> where <T as system::Trait>::Hash,
-							<T as system::Trait>::AccountId,
-							<T as Trait>::Claim,
-							<T as timestamp::Trait>::Moment {
-		Register(Hash, AccountId, Moment),
-		Attest(Hash, AccountId, Moment),
-		Verify(Hash, AccountId, u128),
-		Failed(Hash, AccountId),
-		Expired(Hash),
-		AddedClaim(Hash, Claim, AccountId),
-		RemovedClaim(Hash, Claim, AccountId),
-	}
-);
-
-// TODO: rename "timeouts" "time limit" to ???
-decl_storage! {
-	trait Store for Module<T: Trait> as Identity {
-		/// Actual identity for a given hash, if it's current.
-		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::Moment>>;
-		// Makes sure that one validator can validate identity only once
-		pub VerifiedIdentityBy get(verified_identity_by): map (T::Hash, T::AccountId) => Option<bool>;
-		/// List of malicious identities who submit failed attestations
-		pub FrozenAccounts get(frozen_accounts): map T::AccountId => bool;
-		/// Timestamp allowed between register/attest or attest/verify.
-		pub ExpirationTime get(expiration_time) config(): T::Moment;
-		/// Accounts granted power to verify identities
-		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
-		/// The set of active claims issuers
-		pub ClaimsIssuers get(claims_issuers) config(): Vec<T::AccountId>;
-		/// The claims mapping for identity records: (claims_issuer, claim)
-		pub Claims get(claims): map T::Hash => Vec<(T::AccountId, T::Claim)>;
-
-	}
 }
 
 decl_module! {
@@ -142,6 +104,8 @@ decl_module! {
 				verifications: [0, 0],
 				metadata: None,
 			});
+
+			<PendingIdentities<T>>::mutate(|identities| identities.push(hash));
 
 			Self::deposit_event(RawEvent::Register(hash, _sender.into(), expiration));
 			Ok(())
@@ -279,13 +243,25 @@ decl_module! {
 			Ok(())
 		}
 
-		pub fn remove_expired_identity(_origin, identity_hash: T::Hash) -> Result {
-			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
-			ensure!(<timestamp::Module<T>>::get() > record.expiration_time, "Identity not expired");
-
-			<IdentityOf<T>>::remove(identity_hash);
-			Self::deposit_event(RawEvent::Expired(identity_hash));
-			Ok(())
+		fn on_finalise(_n: T::BlockNumber) {
+			let mut pending_identities = Self::pending_identities();
+			pending_identities.retain(|hash| {
+				match <IdentityOf<T>>::get(hash) {
+					Some(record) => {
+						if (<timestamp::Module<T>>::get() > record.expiration_time) && (record.expiration_time > T::Moment::zero()) {
+							<IdentityOf<T>>::remove(hash);
+							Self::deposit_event(RawEvent::Expired(*hash));
+							return false;
+						}
+						if record.stage == IdentityStage::Verified {
+							return false;
+						}
+						return true;
+					},
+					None => return false,
+				};
+			});
+			<PendingIdentities<T>>::put(pending_identities);
 		}
 	}
 }
@@ -312,5 +288,44 @@ impl<T: Trait> Module<T> {
 			Self::deposit_event(RawEvent::Failed(identity_hash, acct.into()));
 		}
 		Ok(())
+	}
+}
+
+/// An event in this module.
+decl_event!(
+	pub enum Event<T> where <T as system::Trait>::Hash,
+							<T as system::Trait>::AccountId,
+							<T as Trait>::Claim,
+							<T as timestamp::Trait>::Moment {
+		Register(Hash, AccountId, Moment),
+		Attest(Hash, AccountId, Moment),
+		Verify(Hash, AccountId, u128),
+		Failed(Hash, AccountId),
+		Expired(Hash),
+		AddedClaim(Hash, Claim, AccountId),
+		RemovedClaim(Hash, Claim, AccountId),
+	}
+);
+
+// TODO: rename "timeouts" "time limit" to ???
+decl_storage! {
+	trait Store for Module<T: Trait> as Identity {
+		/// Actual identity for a given hash, if it's current.
+		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::Moment>>;
+		/// List of identities awaiting attestation or verification and associated expirations
+		pub PendingIdentities get(pending_identities): Vec<T::Hash>;
+		// Makes sure that one validator can validate identity only once
+		pub VerifiedIdentityBy get(verified_identity_by): map (T::Hash, T::AccountId) => Option<bool>;
+		/// List of malicious identities who submit failed attestations
+		pub FrozenAccounts get(frozen_accounts): map T::AccountId => bool;
+		/// Timestamp allowed between register/attest or attest/verify.
+		pub ExpirationTime get(expiration_time) config(): T::Moment;
+		/// Accounts granted power to verify identities
+		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
+		/// The set of active claims issuers
+		pub ClaimsIssuers get(claims_issuers) config(): Vec<T::AccountId>;
+		/// The claims mapping for identity records: (claims_issuer, claim)
+		pub Claims get(claims): map T::Hash => Vec<(T::AccountId, T::Claim)>;
+
 	}
 }
