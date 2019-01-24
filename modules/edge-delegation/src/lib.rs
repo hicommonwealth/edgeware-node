@@ -105,6 +105,7 @@ mod tests {
 		t.extend(
 			delegation::GenesisConfig::<Test> {
 				delegation_depth: 3,
+				_genesis_phantom_data: Default::default(),
 			}.build_storage().unwrap().0,
 		);
 		t.into()
