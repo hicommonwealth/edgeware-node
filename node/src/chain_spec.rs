@@ -167,6 +167,7 @@ fn testnet_genesis(
 		}),
 		delegation: Some(DelegationConfig {
 			delegation_depth: 5,
+			_genesis_phantom_data: Default::default(),
 		}),
 	}
 }
