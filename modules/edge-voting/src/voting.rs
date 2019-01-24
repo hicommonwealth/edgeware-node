@@ -34,7 +34,6 @@ extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
 
-use std::collections::HashMap;
 use rstd::prelude::*;
 use rstd::result;
 use system::ensure_signed;
@@ -252,8 +251,8 @@ impl<T: Trait> Module<T> {
 
 	// for a given account, finds the voter representing them, aka their
 	// closest voting ancestor on the delegation graph (incl self)
-	fn find_rep(voters: &HashMap<T::Hash, [u8; 32]>, acct: T::AccountId) -> Option<T::AccountId> {
-		if voters.contains_key(&T::Hashing::hash_of(&acct.encode())) {
+	fn find_rep(voters: &Vec<(T::AccountId, [u8; 32])>, acct: T::AccountId) -> Option<T::AccountId> {
+		if let Some(_) = voters.iter().find(|(voter, _)| voter == &acct) {
 			return Some(acct);
 		} else if let Some(parent) = <delegation::Module<T>>::delegate_of(acct) {
 			return Self::find_rep(voters, parent);
@@ -263,14 +262,14 @@ impl<T: Trait> Module<T> {
 	}
 
 	// constructs a mapping of accounts to their representatives
-	fn build_rep_map(reps: &mut HashMap<T::Hash, (T::AccountId, T::AccountId)>, voters: &HashMap<T::Hash, [u8; 32]>, acct: T::AccountId) {
+	fn build_rep_map(reps: &mut Vec<(T::AccountId, T::AccountId)>, voters: &Vec<(T::AccountId, [u8; 32])>, acct: T::AccountId) {
 		// if we haven't seen this account yet, find its voting parent
-		let hash = T::Hashing::hash_of(&acct.encode());
-		if reps.contains_key(&hash) {
-			return;
-		} else {
-			if let Some(voter) = Self::find_rep(voters, acct.clone()) {
-				reps.insert(hash, (acct.clone(), voter));
+		match reps.iter().find(|(voter, _)| voter == &acct) {
+			Some(_) => return,
+			None => {
+				if let Some(voter) = Self::find_rep(voters, acct.clone()) {
+					reps.push((acct.clone(), voter));
+				}
 			}
 		}
 
@@ -283,14 +282,14 @@ impl<T: Trait> Module<T> {
 	}
 	
 	pub fn tally(vote_id: u64) -> Option<Vec<([u8; 32], T::Balance)>> {
-		let mut voters: HashMap<T::Hash, [u8; 32]> = HashMap::new();
-		let mut reps: HashMap<T::Hash, (T::AccountId, T::AccountId)> = HashMap::new();
+		let mut voters: Vec<(T::AccountId, [u8; 32])> = vec![];
+		let mut reps: Vec<(T::AccountId, T::AccountId)> = vec![];
 
 		if let Some(record) = <VoteRecords<T>>::get(vote_id) {
 			// build mapping of voters to their votes
 			record.reveals.clone().into_iter().for_each(|(acct, choice)| {
 				// build a mapping of voters to their votes
-				voters.insert(T::Hashing::hash_of(&acct.encode()), choice);
+				voters.push((acct, choice));
 			});
 
 			// populate the map
@@ -304,14 +303,14 @@ impl<T: Trait> Module<T> {
 				.map(|o| (o, Zero::zero()))
 				.collect();
 
-			for (_, (account, rep)) in reps.iter() {
+			for (account, rep) in reps.iter() {
 				let weight: T::Balance = match record.data.tally_type {
 					TallyType::OnePerson => One::one(),
 					TallyType::OneCoin => <balances::Module<T>>::total_balance(account),
 				};
 
 				// use the representative's choice and the voter's weight
-				let selection = voters.get(&T::Hashing::hash_of(&rep.encode())).unwrap();
+				let (_, selection) = voters.iter().find(|(v, _)| &v == &rep).unwrap();
 				let index: usize = outcomes.iter().position(|&o| &o.0 == selection).unwrap();
 				outcomes[index].1 = outcomes[index].1.checked_add(&weight).unwrap();
 			}

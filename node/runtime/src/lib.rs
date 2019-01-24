@@ -196,23 +196,24 @@ impl grandpa::Trait for Runtime {
 	type Event = Event;
 }
 
-impl identity::Trait for Runtime {
-	/// The type for making a claim to an identity.
-	type Claim = Vec<u8>;
-	/// The uniquitous event type.
-	type Event = Event;
-}
-
 impl delegation::Trait for Runtime {
 	/// The uniquitous event type.
 	type Event = Event;
 }
 
 impl voting::Trait for Runtime {
+	/// The uniquitous event type.
 	type Event = Event;
 }
 
 impl governance::Trait for Runtime {
+	/// The uniquitous event type.
+	type Event = Event;
+}
+
+impl identity::Trait for Runtime {
+	/// The type for making a claim to an identity.
+	type Claim = Vec<u8>;
 	/// The uniquitous event type.
 	type Event = Event;
 }
@@ -234,9 +235,10 @@ construct_runtime!(
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Contract: contract::{Module, Call, Config<T>, Event<T>},
 		Treasury: treasury,
-		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Event<T>},
+		Voting: voting::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
+		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 
