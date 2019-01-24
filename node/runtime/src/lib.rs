@@ -235,7 +235,7 @@ construct_runtime!(
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Contract: contract::{Module, Call, Config<T>, Event<T>},
 		Treasury: treasury,
-		Delegation: delegation::{Module, Call, Storage, Event<T>},
+		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
