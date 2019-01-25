@@ -78,9 +78,6 @@ pub trait Trait: voting::Trait {
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
-pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
@@ -105,7 +102,7 @@ decl_module! {
 				voting::VoteType::Binary,
 				false, // not commit-reveal
 				voting::TallyType::OneCoin,
-				vec![YES_VOTE, NO_VOTE],
+				vec![voting::YES_VOTE, voting::NO_VOTE],
 			)?;
 
 			let index = <ProposalCount<T>>::get();
