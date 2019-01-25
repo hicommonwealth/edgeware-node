@@ -17,6 +17,9 @@ sr-io = { git = "https://github.com/paritytech/substrate", default-features = fa
 sr-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-support = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
+edge-voting = { path = "../edge-voting", default-features = false }
+edge-delegation = { path = "../edge-delegation", default-features = false }
 
 [features]
 default = ["std"]
@@ -32,4 +35,6 @@ std = [
     "srml-support/std",
     "sr-primitives/std",
     "srml-system/std",
+    "edge-voting/std",
+    "edge-delegation/std",
 ]

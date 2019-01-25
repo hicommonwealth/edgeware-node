@@ -590,6 +590,8 @@ dependencies = [
 name = "edge-identity"
 version = "0.1.0"
 dependencies = [
+ "edge-delegation 0.1.0",
+ "edge-voting 0.1.0",
  "hex-literal 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec-derive 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -599,6 +601,7 @@ dependencies = [
  "sr-io 0.1.0 (git+https://github.com/paritytech/substrate)",
  "sr-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
  "sr-std 0.1.0 (git+https://github.com/paritytech/substrate)",
+ "srml-balances 0.1.0 (git+https://github.com/paritytech/substrate)",
  "srml-support 0.1.0 (git+https://github.com/paritytech/substrate)",
  "srml-system 0.1.0 (git+https://github.com/paritytech/substrate)",
  "substrate-keyring 0.1.0 (git+https://github.com/paritytech/substrate)",

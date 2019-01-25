@@ -45,7 +45,10 @@ extern crate edge_delegation as delegation;
 
 pub mod voting;
 pub use voting::{Module, Trait, RawEvent, Event};
-pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData};
+pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData, VoteOutcome};
+
+pub static YES_VOTE: VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+pub static NO_VOTE: VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 // Tests for Delegation Module
 #[cfg(test)]
