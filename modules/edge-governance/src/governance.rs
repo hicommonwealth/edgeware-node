@@ -39,6 +39,8 @@ use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
 use codec::Encode;
 
+pub use voting::voting::Tally;
+
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
 pub enum ProposalStage {
@@ -207,7 +209,7 @@ decl_event!(
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
 		VotingStarted(Hash, u64, BlockNumber),
 		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
-		VotingCompleted(Hash, u64, voting::voting::Tally<Balance>),
+		VotingCompleted(Hash, u64, Tally<Balance>),
 	}
 );
 
