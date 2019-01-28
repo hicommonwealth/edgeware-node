@@ -320,7 +320,7 @@ decl_event!(
 );
 
 decl_storage! {
-	trait Store for Module<T: Trait> as Delegation {
+	trait Store for Module<T: Trait> as Voting {
 		/// The map of all vote records indexed by id
 		pub VoteRecords get(vote_records): map u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
