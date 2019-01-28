@@ -191,7 +191,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
+			let category = governance::ProposalCategory::Funding(123);
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -347,7 +347,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
+			let category = governance::ProposalCategory::Funding(123);
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -389,7 +389,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
+			let category = governance::ProposalCategory::Funding(123);
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -413,7 +413,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
+			let category = governance::ProposalCategory::Funding(123);
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -504,7 +504,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
+			let category = governance::ProposalCategory::Funding(123);
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -534,7 +534,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding;
+			let category = governance::ProposalCategory::Funding(123);
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 

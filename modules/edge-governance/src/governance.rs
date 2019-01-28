@@ -53,7 +53,7 @@ pub enum ProposalStage {
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
 pub enum ProposalCategory {
 	Signaling,
-	Funding,
+	Funding(u32),
 	Upgrade,
 }
 
