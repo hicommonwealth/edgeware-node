@@ -34,22 +34,16 @@ use rstd::prelude::*;
 use runtime_primitives::traits::Hash;
 use runtime_support::dispatch::Result;
 use runtime_support::{StorageMap, StorageValue};
-use runtime_primitives::traits::EnsureOrigin;
 use system::ensure_signed;
 use codec::Encode;
 
 pub trait Trait: system::Trait {
-	/// Origin from which approvals must come.
-	type ApproveOrigin: EnsureOrigin<Self::Origin>;
-
-	/// Origin from which rejections must come.
-	type RejectOrigin: EnsureOrigin<Self::Origin>;
-
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
 pub type Attestation = Vec<u8>;
+pub type IdentityType = Vec<u8>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
@@ -71,6 +65,7 @@ pub enum IdentityStage {
 #[derive(Encode, Decode, PartialEq)]
 pub struct IdentityRecord<AccountId, BlockNumber> {
 	pub account: AccountId,
+	pub identity_type: IdentityType,
 	pub identity: Vec<u8>,
 	pub stage: IdentityStage,
 	pub expiration_time: Option<BlockNumber>,
@@ -82,18 +77,16 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
-		pub fn register(origin, identity_type: Vec<u8>, identity: Vec<u8>) -> Result {
+		pub fn register(origin, identity_type: IdentityType, identity: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
-			// Check that the sender hasn't used this identity type before
-			let mut buf = Vec::new();
-			buf.extend_from_slice(&_sender.encode());
-			buf.extend_from_slice(&identity_type.encode());
-			let type_hash = T::Hashing::hash(&buf[..]);
-			ensure!(!<UsedType<T>>::exists(type_hash), "Identity type already used");
-			<UsedType<T>>::insert(type_hash, true);
+			ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
+			let mut types = <UsedTypes<T>>::get(_sender.clone());
+			types.push(identity_type.clone());
+			<UsedTypes<T>>::insert(_sender.clone(), types);
+
 			// Hash the identity type with the identity to use as a key for the mapping
-			buf = Vec::new();
+			let mut buf = Vec::new();
 			buf.extend_from_slice(&identity_type.encode());
 			buf.extend_from_slice(&identity.encode());
 			let hash = T::Hashing::hash(&buf[..]);
@@ -104,6 +97,7 @@ decl_module! {
 			<Identities<T>>::mutate(|idents| idents.push(hash.clone()));
 			<IdentityOf<T>>::insert(hash, IdentityRecord {
 				account: _sender.clone(),
+				identity_type: identity_type,
 				identity: identity,
 				stage: IdentityStage::Registered,
 				expiration_time: Some(expiration),
@@ -126,14 +120,12 @@ decl_module! {
 			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
 			// Grab record
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+			// Ensure the record is not verified
+			ensure!(record.stage != IdentityStage::Verified, "Already verified");
 			// Ensure the record isn't expired if it still exists
 			if let Some(time) = record.expiration_time {
 				ensure!(time >= <system::Module<T>>::block_number(), "Identity has reached expiration");
 			}
-			if record.stage == IdentityStage::Verified {
-				return Err("Already verified");
-			}
-
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender, "Stored identity does not match sender");
 
@@ -261,7 +253,7 @@ decl_storage! {
 		/// Number of blocks allowed between register/attest or attest/verify.
 		pub ExpirationTime get(expiration_time) config(): T::BlockNumber;
 		/// Identity types of users
-		pub UsedType get(used_type): map T::Hash => bool;
+		pub UsedTypes get(used_types): map T::AccountId => Vec<IdentityType>;
 		/// Verifier set
 		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
 	}

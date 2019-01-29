@@ -99,8 +99,6 @@ mod tests {
 		type Log = DigestItem;
 	}
 	impl Trait for Test {
-		type ApproveOrigin = system::EnsureRoot<H256>;
-		type RejectOrigin = system::EnsureRoot<H256>;
 		type Event = Event;
 	}
 
@@ -149,9 +147,10 @@ mod tests {
 		)
 	}
 
-	fn default_identity_record(public: H256, identity: &[u8]) -> IdentityRecord<H256, u64> {
+	fn default_identity_record(public: H256, identity_type: &[u8], identity: &[u8]) -> IdentityRecord<H256, u64> {
 		IdentityRecord {
 			account: public,
+			identity_type: identity_type.to_vec(),
 			identity: identity.to_vec(),
 			stage: IdentityStage::Registered,
 			expiration_time: Some(2),
@@ -193,7 +192,7 @@ mod tests {
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
+				Some(default_identity_record(public, identity_type, identity))
 			);
 		});
 	}
@@ -220,7 +219,7 @@ mod tests {
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
+				Some(default_identity_record(public, identity_type, identity))
 			);
 		});
 	}
@@ -252,7 +251,7 @@ mod tests {
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
+				Some(default_identity_record(public, identity_type, identity))
 			);
 		});
 	}
@@ -281,7 +280,7 @@ mod tests {
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
+				Some(default_identity_record(public, identity_type, identity))
 			);
 		});
 	}
@@ -324,7 +323,7 @@ mod tests {
 				Some(IdentityRecord {
 					stage: IdentityStage::Attested,
 					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity)
+					..default_identity_record(public, identity_type, identity)
 				})
 			);
 		});
@@ -381,7 +380,7 @@ mod tests {
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
+				Some(default_identity_record(public, identity_type, identity))
 			);
 		});
 	}
@@ -433,7 +432,7 @@ mod tests {
 					stage: IdentityStage::Verified,
 					expiration_time: None,
 					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity)
+					..default_identity_record(public, identity_type, identity)
 				})
 			);
 		});
@@ -472,7 +471,7 @@ mod tests {
 					stage: IdentityStage::Verified,
 					expiration_time: None,
 					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity)
+					..default_identity_record(public, identity_type, identity)
 				})
 			);
 		});
@@ -508,7 +507,7 @@ mod tests {
 				Some(IdentityRecord {
 					stage: IdentityStage::Attested,
 					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity)
+					..default_identity_record(public, identity_type, identity)
 				})
 			);
 		});
@@ -544,7 +543,7 @@ mod tests {
 				Some(IdentityRecord {
 					stage: IdentityStage::Attested,
 					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity)
+					..default_identity_record(public, identity_type, identity)
 				})
 			);
 		});
@@ -625,7 +624,7 @@ mod tests {
 			));
 			assert_eq!(Identity::identities(), vec![identity_hash]);
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
-			let default_record = default_identity_record(public, identity);
+			let default_record = default_identity_record(public, identity_type, identity);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(IdentityRecord {
@@ -696,7 +695,7 @@ mod tests {
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
 			assert_eq!(
 				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity))
+				Some(default_identity_record(public, identity_type, identity))
 			);
 		});
 	}
