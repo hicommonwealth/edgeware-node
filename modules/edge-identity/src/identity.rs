@@ -91,6 +91,7 @@ decl_module! {
 			buf.extend_from_slice(&identity_type.encode());
 			let type_hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<UsedType<T>>::exists(type_hash), "Identity type already used");
+			<UsedType<T>>::insert(type_hash, true);
 			// Hash the identity type with the identity to use as a key for the mapping
 			buf = Vec::new();
 			buf.extend_from_slice(&identity_type.encode());

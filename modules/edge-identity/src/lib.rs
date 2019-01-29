@@ -214,7 +214,68 @@ mod tests {
 			assert_ok!(register_identity(public, identity_type, identity));
 			assert_err!(
 				register_identity(public, identity_type, identity),
+				"Identity type already used"
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
+			);
+		});
+	}
+
+	#[test]
+	fn register_existing_identity_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+
+			let pair2: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
+			));
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public: H256 = pair.public().0.into();
+			let public2: H256 = pair2.public().0.into();
+
+			assert_ok!(register_identity(public, identity_type, identity));
+			assert_err!(
+				register_identity(public2, identity_type, identity),
 				"Identity already exists"
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity))
+			);
+		});
+	}
+
+	#[test]
+	fn register_same_type_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public: H256 = pair.public().0.into();
+
+			assert_ok!(register_identity(public, identity_type, identity));
+
+			let new_github: &[u8] = b"drstone";
+			assert_err!(
+				register_identity(public, identity_type, new_github),
+				"Identity type already used"
 			);
 			assert_eq!(Identity::identities(), vec![identity_hash]);
 			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 2)]);
