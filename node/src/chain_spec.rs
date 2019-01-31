@@ -160,7 +160,6 @@ fn testnet_genesis(
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),
 			expiration_time: 10000,
-			claims_issuers: initial_authorities.iter().cloned().map(Into::into).collect(),
 		}),
 		governance: Some(GovernanceConfig {
 			voting_time: 10000,
