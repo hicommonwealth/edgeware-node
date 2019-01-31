@@ -30,13 +30,14 @@ extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
+extern crate srml_timestamp as timestamp;
 extern crate edge_voting as voting;
 
 use rstd::prelude::*;
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::Hash;
+use runtime_primitives::traits::{Zero, Hash};
 use codec::Encode;
 
 pub use voting::voting::Tally;
@@ -59,11 +60,11 @@ pub enum ProposalCategory {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct ProposalRecord<AccountId, BlockNumber> {
+pub struct ProposalRecord<AccountId, Moment> {
 	pub index: u32,
 	pub author: AccountId,
 	pub stage: ProposalStage,
-	pub transition_block: Option<BlockNumber>,
+	pub transition_time: Moment,
 	pub category: ProposalCategory,
 	pub title: Vec<u8>,
 	pub contents: Vec<u8>,
@@ -73,7 +74,7 @@ pub struct ProposalRecord<AccountId, BlockNumber> {
 	pub vote_id: u64,
 }
 
-pub trait Trait: voting::Trait {
+pub trait Trait: voting::Trait + timestamp::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
@@ -115,7 +116,7 @@ decl_module! {
 				author: _sender.clone(),
 				stage: ProposalStage::PreVoting,
 				category: category,
-				transition_block: None,
+				transition_time: T::Moment::zero(),
 				title: title,
 				contents: contents,
 				comments: vec![],
@@ -154,24 +155,24 @@ decl_module! {
 			
 			// prevoting -> voting
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
-			let transition_block = <system::Module<T>>::block_number() + Self::voting_time();
+			let transition_time = <timestamp::Module<T>>::get() + Self::voting_time();
 			let vote_id = record.vote_id;
 			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
 				stage: ProposalStage::Voting,
-				transition_block: Some(transition_block),
+				transition_time: transition_time.clone(),
 				..record
 			});
-			<ActiveProposals<T>>::mutate(|proposals| proposals.push((proposal_hash, transition_block)));
-			Self::deposit_event(RawEvent::VotingStarted(proposal_hash, vote_id, transition_block));
+			<ActiveProposals<T>>::mutate(|proposals| proposals.push((proposal_hash, transition_time.clone())));
+			Self::deposit_event(RawEvent::VotingStarted(proposal_hash, vote_id, transition_time));
 			Ok(())
 		}
 
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
-		fn on_finalise(n: T::BlockNumber) {
+		fn on_finalise(_n: T::BlockNumber) {
 			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
-				.partition(|(_, completion)| n >= *completion);
+				.partition(|(_, exp)| <timestamp::Module<T>>::get() > *exp);
 			
 			<ActiveProposals<T>>::put(active);
 			finished.into_iter().for_each(move |(completed_hash, _)| {
@@ -183,7 +184,7 @@ decl_module! {
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
 						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
 							stage: ProposalStage::Completed,
-							transition_block: None,
+							transition_time: T::Moment::zero(),
 							..record
 						});
 						// tally the final vote to include in completion Event
@@ -200,14 +201,14 @@ decl_module! {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as system::Trait>::BlockNumber,
+							<T as timestamp::Trait>::Moment,
 							<T as balances::Trait>::Balance {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted at comment creation: (Commentor, ProposalHash)
 		NewComment(AccountId, Hash),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
-		VotingStarted(Hash, u64, BlockNumber),
+		VotingStarted(Hash, u64, Moment),
 		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
 		VotingCompleted(Hash, u64, Tally<Balance>),
 	}
@@ -219,11 +220,11 @@ decl_storage! {
 		pub ProposalCount get(proposal_count) : u32;
 		/// A list of all extant proposals.
 		pub Proposals get(proposals): Vec<T::Hash>;
-		/// A list of active proposals along with the block at which they complete.
-		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::BlockNumber)>;
-		/// Amount of time a proposal remains in "Voting" stage, in blocks.
-		pub VotingTime get(voting_time) config(): T::BlockNumber;
+		/// A list of active proposals along with the time at which they complete.
+		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::Moment)>;
+		/// Amount of time a proposal remains in "Voting" stage.
+		pub VotingTime get(voting_time) config(): T::Moment;
 		/// Map for retrieving the information about any proposal from its hash.
-		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::Moment>>;
 	}
 }
