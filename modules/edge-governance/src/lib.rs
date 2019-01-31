@@ -41,6 +41,8 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
+extern crate srml_timestamp as timestamp;
+extern crate srml_consensus as consensus;
 extern crate edge_delegation as delegation;
 extern crate edge_voting as voting;
 
@@ -65,7 +67,7 @@ mod tests {
 	use runtime_primitives::{
 		BuildStorage,
 		traits::{BlakeTwo256, OnFinalise},
-		testing::{Digest, DigestItem, Header}
+		testing::{Digest, DigestItem, Header, UintAuthorityId}
 	};
 	use voting::{VoteStage, VoteType};
 
@@ -101,6 +103,17 @@ mod tests {
 		type Log = DigestItem;
 	}
 
+	impl consensus::Trait for Test {
+		const NOTE_OFFLINE_POSITION: u32 = 1;
+		type Log = DigestItem;
+		type SessionKey = UintAuthorityId;
+		type InherentOfflineReport = ();
+	}
+	impl timestamp::Trait for Test {
+		const TIMESTAMP_SET_POSITION: u32 = 0;
+		type Moment = u64;
+		type OnTimestampSet = ();
+	}
 	impl balances::Trait for Test {
 		type Balance = u64;
 		type AccountIndex = u64;
@@ -122,6 +135,7 @@ mod tests {
 	}
 
 	pub type System = system::Module<Test>;
+ 	pub type Timestamp = timestamp::Module<Test>;
 	pub type Voting = voting::Module<Test>;
 	pub type Governance = Module<Test>;
 
@@ -130,7 +144,7 @@ mod tests {
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
 			governance::GenesisConfig::<Test> {
-				voting_time: 1,
+				voting_time: 10000,
 			}.build_storage().unwrap().0,
 		);
 		t.into()
@@ -178,7 +192,7 @@ mod tests {
 				author: author,
 				stage: ProposalStage::PreVoting,
 				category: category,
-				transition_block: None,
+				transition_time: 0,
 				title: title.to_vec(),
 				contents: contents.to_vec(),
 				comments: vec![],
@@ -354,6 +368,11 @@ mod tests {
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
+
+ 			let vote_time = Governance::voting_time();
+			let now = Timestamp::get();
+			let vote_ends_at = now + vote_time;
+
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
@@ -369,15 +388,15 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, 2))
+					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
 				},]
 			);
-			assert_eq!(Governance::active_proposals(), vec![(hash, 2)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_block: Some(2),
+					transition_time: 10000,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -396,12 +415,12 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
 									"Proposal not in pre-voting stage");
-			assert_eq!(Governance::active_proposals(), vec![(hash, 2)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_block: Some(2),
+					transition_time: 10000,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -421,12 +440,16 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
-			assert_eq!(Governance::active_proposals(), vec![(hash, 2)]);
+ 			let vote_time = Governance::voting_time();
+			let now = Timestamp::get();
+			let vote_ends_at = now + vote_time;
+
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_block: Some(2),
+					transition_time: 10000,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -449,9 +472,11 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, 2))
+					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
 				},]
 			);
+
+			Timestamp::set_timestamp(10001);
 
 			<Governance as OnFinalise<u64>>::on_finalise(2);
 			System::set_block_number(3);
@@ -471,7 +496,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, 2))
+					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
@@ -492,7 +517,7 @@ mod tests {
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Completed,
-					transition_block: None,
+					transition_time: 0,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -510,11 +535,10 @@ mod tests {
 			assert_ok!(propose(public, title, proposal, category));
 			assert_ok!(advance_proposal(public, hash));
 			
+			Timestamp::set_timestamp(10001);
+			
 			<Governance as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);
-
-			<Governance as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
 
 			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
 			assert_eq!(Governance::active_proposals(), vec![]);
@@ -522,7 +546,7 @@ mod tests {
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Completed,
-					transition_block: None,
+					transition_time: 0,
 					..make_record(public, title, proposal, category)
 				})
 			);

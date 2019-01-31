@@ -159,11 +159,10 @@ fn testnet_genesis(
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),
-			expiration_time: 10000,
-			claims_issuers: initial_authorities.iter().cloned().map(Into::into).collect(),
+			expiration_time: 604800, // 7 days
 		}),
 		governance: Some(GovernanceConfig {
-			voting_time: 10000,
+			voting_time: 604800, // 7 days
 		}),
 		delegation: Some(DelegationConfig {
 			delegation_depth: 5,

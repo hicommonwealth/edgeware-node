@@ -212,8 +212,6 @@ impl governance::Trait for Runtime {
 }
 
 impl identity::Trait for Runtime {
-	/// The type for making a claim to an identity.
-	type Claim = Vec<u8>;
 	/// The uniquitous event type.
 	type Event = Event;
 }
