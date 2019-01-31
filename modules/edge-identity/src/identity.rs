@@ -79,7 +79,6 @@ decl_module! {
 
 		pub fn register(origin, identity_type: IdentityType, identity: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
 			ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
 			let mut types = <UsedTypes<T>>::get(_sender.clone());
 			types.push(identity_type.clone());
@@ -117,7 +116,6 @@ decl_module! {
 		/// pass.
 		pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!Self::frozen_accounts().iter().any(|i| i == &_sender.clone()), "Sender account is frozen");
 			// Grab record
 			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 			// Ensure the record is not verified
@@ -221,7 +219,6 @@ decl_module! {
 impl<T: Trait> Module<T> {
 	/// Removes all data about a pending identity given the hash of the record
 	pub fn remove_pending_identity(identity_hash: &T::Hash) {
-		// If triggered by a malicious party's actions, delete all data
 		<Identities<T>>::mutate(|idents| idents.retain(|hash| hash != identity_hash));
 		<IdentityOf<T>>::remove(identity_hash);
 		<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
@@ -231,10 +228,13 @@ impl<T: Trait> Module<T> {
 /// An event in this module.
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash, <T as system::Trait>::AccountId {
+		/// (record_hash, creator) when an account is registered
 		Register(Hash, AccountId),
+		/// (record_hash, creator) when an account creator submits an attestation
 		Attest(Hash, AccountId),
+		/// (record_hash, verifier) when a verifier approves an account
 		Verify(Hash, AccountId),
-		Failed(Hash, AccountId),
+		/// (record_hash) when an account is expired and deleted
 		Expired(Hash),
 	}
 );
@@ -248,8 +248,6 @@ decl_storage! {
 		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::BlockNumber>>;
 		/// List of identities awaiting attestation or verification and associated expirations
 		pub IdentitiesPending get(identities_pending): Vec<(T::Hash, T::BlockNumber)>;
-		/// List of malicious identities who submit failed attestations
-		pub FrozenAccounts get(frozen_accounts): Vec<T::AccountId>;
 		/// Number of blocks allowed between register/attest or attest/verify.
 		pub ExpirationTime get(expiration_time) config(): T::BlockNumber;
 		/// Identity types of users
