@@ -18,7 +18,7 @@ exit-future = "0.1"
 parking_lot = "0.4"
 hex-literal = "0.1"
 slog = "^2"
-parity-codec = { version = "2.1" }
+parity-codec = { version = "3.0" }
 trie-root = { git = "https://github.com/paritytech/trie" }
 sr-io = { git = "https://github.com/paritytech/substrate" }
 sr-primitives = { git = "https://github.com/paritytech/substrate" }
@@ -33,7 +33,7 @@ substrate-telemetry = { git = "https://github.com/paritytech/substrate" }
 substrate-client = { git = "https://github.com/paritytech/substrate", default-features = false }
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate" }
 substrate-basic-authorship = { git = "https://github.com/paritytech/substrate" }
-structopt = "0.2.13"
+structopt = "0.2"
 node-executor = { git = "https://github.com/paritytech/substrate" }
 node-primitives = { git = "https://github.com/paritytech/substrate" }
 edgeware-runtime = { path = "node/runtime" }
