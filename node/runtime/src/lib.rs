@@ -12,8 +12,6 @@ extern crate srml_support;
 #[macro_use]
 extern crate sr_primitives as runtime_primitives;
 #[cfg(feature = "std")]
-#[macro_use]
-extern crate serde_derive;
 extern crate parity_codec;
 extern crate substrate_primitives as primitives;
 #[macro_use]
