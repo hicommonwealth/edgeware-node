@@ -65,7 +65,7 @@ mod tests {
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		testing::{Digest, DigestItem, Header, UintAuthorityId},
-		traits::{BlakeTwo256, OnFinalise},
+		traits::{BlakeTwo256, OnFinalise, IdentityLookup},
 		BuildStorage,
 	};
 
@@ -96,18 +96,17 @@ mod tests {
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
 		type AccountId = H256;
+		type Lookup = IdentityLookup<H256>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
 	}
 	impl consensus::Trait for Test {
-		const NOTE_OFFLINE_POSITION: u32 = 1;
 		type Log = DigestItem;
 		type SessionKey = UintAuthorityId;
 		type InherentOfflineReport = ();
 	}
 	impl timestamp::Trait for Test {
-		const TIMESTAMP_SET_POSITION: u32 = 0;
 		type Moment = u64;
 		type OnTimestampSet = ();
 	}
@@ -127,7 +126,7 @@ mod tests {
 		t.extend(
 			identity::GenesisConfig::<Test> {
 				expiration_time: 10000,
-				verifiers: [H256::from(1)].to_vec(),
+				verifiers: [H256::from_low_u64_be(1)].to_vec(),
 			}.build_storage().unwrap().0,
 		);
 		t.into()
@@ -439,7 +438,7 @@ mod tests {
 			now = Timestamp::get();
 			let attest_expires_at = now + expiration_time;
 
-			let verifier = H256::from(1);
+			let verifier = H256::from_low_u64_be(1);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
 
 			assert_eq!(
@@ -492,7 +491,7 @@ mod tests {
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
-			let verifier = H256::from(1);
+			let verifier = H256::from_low_u64_be(1);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
 			assert_err!(
 				attest_to_identity(public, identity_hash, attestation),

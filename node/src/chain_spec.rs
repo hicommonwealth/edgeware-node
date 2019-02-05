@@ -2,7 +2,7 @@ use edgeware_runtime::{
 	Permill, Perbill,
 	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
 	TimestampConfig, TreasuryConfig, StakingConfig, UpgradeKeyConfig, GrandpaConfig,
-	//IdentityConfig, GovernanceConfig, DelegationConfig,
+	IdentityConfig, //GovernanceConfig, DelegationConfig,
 	CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig, IndicesConfig,
 };
 use node_primitives::AccountId;
@@ -194,11 +194,11 @@ fn testnet_genesis(
 			proposal_bond_minimum: 1_000_000,
 			spend_period: 12 * 60 * 24,
 			burn: Permill::from_percent(50),
-		}),/*
+		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().cloned().map(Into::into).collect(),
 			expiration_time: 604800, // 7 days
-		}),
+		}),/*
 		governance: Some(GovernanceConfig {
 			voting_time: 604800, // 7 days
 		}),

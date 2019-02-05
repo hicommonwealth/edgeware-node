@@ -34,6 +34,7 @@ substrate-client = { git = "https://github.com/paritytech/substrate", default-fe
 sr-version = { git = "https://github.com/paritytech/substrate", default-features = false }
 node-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 substrate-consensus-aura-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
+edge-identity = { path = "../../modules/edge-identity", default-features = false }
 
 [features]
 default = ["std"]
@@ -64,4 +65,5 @@ std = [
 	"serde/std",
 	"safe-mix/std",
 	"substrate-consensus-aura-primitives/std",
+	"edge-identity/std",
 ]

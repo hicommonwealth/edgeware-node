@@ -657,8 +657,8 @@ name = "edge-identity"
 version = "0.1.0"
 dependencies = [
  "hex-literal 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-codec 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-codec-derive 2.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-codec-derive 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.87 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.87 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -735,6 +735,7 @@ dependencies = [
 name = "edgeware-runtime"
 version = "0.1.0"
 dependencies = [
+ "edge-identity 0.1.0",
  "hex-literal 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "node-primitives 0.1.0 (git+https://github.com/paritytech/substrate)",
  "parity-codec 3.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
