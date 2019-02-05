@@ -61,7 +61,8 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage, traits::{BlakeTwo256, Hash}, testing::{Digest, DigestItem, Header}
+		BuildStorage, traits::{BlakeTwo256, Hash, IdentityLookup},
+		testing::{Digest, DigestItem, Header}
 	};
 
 	static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
@@ -93,6 +94,7 @@ mod tests {
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
 		type AccountId = H256;
+		type Lookup = IdentityLookup<H256>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
@@ -100,8 +102,8 @@ mod tests {
 
 	impl balances::Trait for Test {
 		type Balance = u64;
-		type AccountIndex = u64;
 		type OnFreeBalanceZero = ();
+		type OnNewAccount = ();
 		type EnsureAccountLiquid = ();
 		type Event = Event;
 	}
@@ -121,7 +123,13 @@ mod tests {
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		t.extend(
+			delegation::delegation::GenesisConfig::<Test> {
+				delegation_depth: 5,
+				_genesis_phantom_data: Default::default(),
+			}.build_storage().unwrap().0,
+		);
 		// We use default for brevity, but you can configure as desired if needed.
 		t.into()
 	}
@@ -616,7 +624,7 @@ mod tests {
 			 */
 			System::set_block_number(1);
 			// set up delegations
-			let users : Vec<H256> = (0..7).map(|v| H256::from(v)).collect();
+			let users : Vec<H256> = (0..7).map(|v| H256::from_low_u64_be(v)).collect();
 			assert_ok!(delegate_to(users[1], users[2]));
 			assert_ok!(delegate_to(users[2], users[3]));
 			assert_ok!(delegate_to(users[3], users[4]));

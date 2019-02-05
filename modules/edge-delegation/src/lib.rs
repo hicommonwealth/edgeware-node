@@ -55,7 +55,8 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage, traits::{BlakeTwo256}, testing::{Digest, DigestItem, Header}
+		BuildStorage, traits::{BlakeTwo256, IdentityLookup},
+		testing::{Digest, DigestItem, Header}
 	};
 
 
@@ -86,6 +87,7 @@ mod tests {
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
 		type AccountId = H256;
+		type Lookup = IdentityLookup<H256>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
@@ -123,7 +125,7 @@ mod tests {
 	fn unit_delegate_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a : Vec<H256> = (1..3).map(|v| H256::from(v)).collect();
+			let a : Vec<H256> = (1..3).map(|v| H256::from_low_u64_be(v)).collect();
 
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -143,7 +145,7 @@ mod tests {
 	fn multistep_delegate_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a : Vec<H256> = (1..5).map(|v| H256::from(v)).collect();
+			let a : Vec<H256> = (1..5).map(|v| H256::from_low_u64_be(v)).collect();
 			
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -177,7 +179,7 @@ mod tests {
 	fn self_delegate_should_fail() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a = H256::from(1);
+			let a = H256::from_low_u64_be(1);
 			assert_eq!(delegate_to(a, a), Err("Invalid delegation"));
 			assert_eq!(System::events(), vec![]);
 			assert_eq!(Delegation::delegate_of(a), None);
@@ -189,7 +191,7 @@ mod tests {
 	fn cycle_delegate_should_fail() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a : Vec<H256> = (1..3).map(|v| H256::from(v)).collect();
+			let a : Vec<H256> = (1..3).map(|v| H256::from_low_u64_be(v)).collect();
 			
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -219,19 +221,19 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 
-			assert_ok!(delegate_to(H256::from(1), H256::from(2)));
-			assert_ok!(undelegate_from(H256::from(1), H256::from(2)));
+			assert_ok!(delegate_to(H256::from_low_u64_be(1), H256::from_low_u64_be(2)));
+			assert_ok!(undelegate_from(H256::from_low_u64_be(1), H256::from_low_u64_be(2)));
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::delegation(RawEvent::Delegated(H256::from(1), H256::from(2)))
+					event: Event::delegation(RawEvent::Delegated(H256::from_low_u64_be(1), H256::from_low_u64_be(2)))
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::delegation(RawEvent::Undelegated(H256::from(1), H256::from(2)))
+					event: Event::delegation(RawEvent::Undelegated(H256::from_low_u64_be(1), H256::from_low_u64_be(2)))
 				}]
 			);
-			assert_eq!(Delegation::delegate_of(H256::from(1)), None);
+			assert_eq!(Delegation::delegate_of(H256::from_low_u64_be(1)), None);
 		});
 	}
 
@@ -239,7 +241,7 @@ mod tests {
 	fn undelegate_from_oneself_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			assert_err!(undelegate_from(H256::from(1), H256::from(1)), "Invalid undelegation");
+			assert_err!(undelegate_from(H256::from_low_u64_be(1), H256::from_low_u64_be(1)), "Invalid undelegation");
 		});
 	}
 
@@ -247,10 +249,10 @@ mod tests {
 	fn delegate_too_deep_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			assert_ok!(delegate_to(H256::from(1), H256::from(2)));
-			assert_ok!(delegate_to(H256::from(3), H256::from(1)));
-			assert_ok!(delegate_to(H256::from(4), H256::from(3)));
-			assert_err!(delegate_to(H256::from(5), H256::from(4)), "Invalid delegation");
+			assert_ok!(delegate_to(H256::from_low_u64_be(1), H256::from_low_u64_be(2)));
+			assert_ok!(delegate_to(H256::from_low_u64_be(3), H256::from_low_u64_be(1)));
+			assert_ok!(delegate_to(H256::from_low_u64_be(4), H256::from_low_u64_be(3)));
+			assert_err!(delegate_to(H256::from_low_u64_be(5), H256::from_low_u64_be(4)), "Invalid delegation");
 		});
 	}
 }

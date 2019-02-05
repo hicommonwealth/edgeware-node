@@ -2,7 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
-#![recursion_limit = "256"]
+#![recursion_limit = "512"]
 
 extern crate sr_std as rstd;
 #[macro_use]
@@ -18,10 +18,10 @@ extern crate substrate_primitives as primitives;
 extern crate parity_codec_derive;
 #[macro_use]
 extern crate sr_version as version;
-//extern crate edge_delegation;
-//extern crate edge_governance;
+extern crate edge_delegation;
+extern crate edge_governance;
 extern crate edge_identity;
-//extern crate edge_voting;
+extern crate edge_voting;
 extern crate srml_aura as aura;
 extern crate srml_balances as balances;
 extern crate srml_consensus as consensus;
@@ -40,10 +40,10 @@ extern crate srml_upgrade_key as upgrade_key;
 extern crate node_primitives;
 extern crate substrate_consensus_aura_primitives as consensus_aura;
 
-//use edge_delegation::delegation;
-//use edge_governance::governance;
+use edge_delegation::delegation;
+use edge_governance::governance;
 use edge_identity::identity;
-//use edge_voting::voting;
+use edge_voting::voting;
 
 use client::{
 	block_builder::api::{self as block_builder_api, InherentData, CheckInherentsResult},
@@ -208,7 +208,6 @@ impl upgrade_key::Trait for Runtime {
 	type Event = Event;
 }
 
-/*
 impl delegation::Trait for Runtime {
 	/// The uniquitous event type.
 	type Event = Event;
@@ -222,7 +221,7 @@ impl voting::Trait for Runtime {
 impl governance::Trait for Runtime {
 	/// The uniquitous event type.
 	type Event = Event;
-}*/
+}
 
 impl identity::Trait for Runtime {
 	/// The uniquitous event type.
@@ -253,6 +252,9 @@ construct_runtime!(
 		Contract: contract::{Module, Call, Storage, Config<T>, Event<T>},
 		UpgradeKey: upgrade_key,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
+		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
+		Voting: voting::{Module, Call, Storage, Event<T>},
+		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 

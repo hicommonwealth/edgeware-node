@@ -66,7 +66,7 @@ mod tests {
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		BuildStorage,
-		traits::{BlakeTwo256, OnFinalise},
+		traits::{BlakeTwo256, OnFinalise, IdentityLookup},
 		testing::{Digest, DigestItem, Header, UintAuthorityId}
 	};
 	use voting::{VoteStage, VoteType};
@@ -98,26 +98,25 @@ mod tests {
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
 		type AccountId = H256;
+		type Lookup = IdentityLookup<H256>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
 	}
 
 	impl consensus::Trait for Test {
-		const NOTE_OFFLINE_POSITION: u32 = 1;
 		type Log = DigestItem;
 		type SessionKey = UintAuthorityId;
 		type InherentOfflineReport = ();
 	}
 	impl timestamp::Trait for Test {
-		const TIMESTAMP_SET_POSITION: u32 = 0;
 		type Moment = u64;
 		type OnTimestampSet = ();
 	}
 	impl balances::Trait for Test {
 		type Balance = u64;
-		type AccountIndex = u64;
 		type OnFreeBalanceZero = ();
+		type OnNewAccount = ();
 		type EnsureAccountLiquid = ();
 		type Event = Event;
 	}

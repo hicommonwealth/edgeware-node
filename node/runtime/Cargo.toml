@@ -35,6 +35,9 @@ sr-version = { git = "https://github.com/paritytech/substrate", default-features
 node-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 substrate-consensus-aura-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 edge-identity = { path = "../../modules/edge-identity", default-features = false }
+edge-delegation = { path = "../../modules/edge-delegation", default-features = false }
+edge-voting = { path = "../../modules/edge-voting", default-features = false }
+edge-governance = { path = "../../modules/edge-governance", default-features = false }
 
 [features]
 default = ["std"]
@@ -66,4 +69,7 @@ std = [
 	"safe-mix/std",
 	"substrate-consensus-aura-primitives/std",
 	"edge-identity/std",
+	"edge-delegation/std",
+	"edge-voting/std",
+	"edge-governance/std",
 ]
