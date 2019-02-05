@@ -3,12 +3,13 @@ use edgeware_runtime::{
 	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
 	TimestampConfig, TreasuryConfig, StakingConfig, UpgradeKeyConfig, GrandpaConfig,
 	IdentityConfig, GovernanceConfig, DelegationConfig,
+	CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig, IndicesConfig,
 };
 use node_primitives::AccountId;
 use primitives::{ed25519, Ed25519AuthorityId};
 use substrate_service;
 
-type SessionKey = Ed25519AuthorityId;
+use substrate_keystore::pad_seed;
 
 /// Specialised `ChainSpec`. This is a specialisation of the general Substrate ChainSpec type.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
@@ -26,6 +27,14 @@ pub enum Alternative {
 	Edgeware,
 }
 
+/// Helper function to generate AuthorityID from seed
+pub fn get_authority_id_from_seed(seed: &str) -> Ed25519AuthorityId {
+	let padded_seed = pad_seed(seed);
+	// NOTE from ed25519 impl:
+	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
+	ed25519::Pair::from_seed(&padded_seed).public().0.into()
+}
+
 impl Alternative {
 	/// Get an actual chain config from one of the alternatives.
 	pub(crate) fn load(self) -> Result<ChainSpec, String> {
@@ -36,12 +45,10 @@ impl Alternative {
 				|| {
 					testnet_genesis(
 						vec![
-							ed25519::Pair::from_seed(b"Alice                           ").public().into(),
+							get_authority_id_from_seed("Alice"),
 						],
-						vec![
-							ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
-						],
-						ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
+						get_authority_id_from_seed("Alice").into(),
+						None,
 					)
 				},
 				vec![],
@@ -56,18 +63,11 @@ impl Alternative {
 				|| {
 					testnet_genesis(
 						vec![
-							ed25519::Pair::from_seed(b"Alice                           ").public().into(),
-							ed25519::Pair::from_seed(b"Bob                             ").public().into(),
+							get_authority_id_from_seed("Alice"),
+							get_authority_id_from_seed("Bob"),
 						],
-						vec![
-							ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
-							ed25519::Pair::from_seed(b"Bob                             ").public().0.into(),
-							ed25519::Pair::from_seed(b"Charlie                         ").public().0.into(),
-							ed25519::Pair::from_seed(b"Dave                            ").public().0.into(),
-							ed25519::Pair::from_seed(b"Eve                             ").public().0.into(),
-							ed25519::Pair::from_seed(b"Ferdie                          ").public().0.into(),
-						],
-						ed25519::Pair::from_seed(b"Alice                           ").public().0.into(),
+						get_authority_id_from_seed("Alice").into(),
+						None,
 					)
 				},
 				vec![],
@@ -96,18 +96,57 @@ impl Alternative {
 }
 
 fn testnet_genesis(
-	initial_authorities: Vec<SessionKey>,
-	endowed_accounts: Vec<AccountId>,
-	upgrade_key: AccountId,
+	initial_authorities: Vec<Ed25519AuthorityId>,
+	root_key: AccountId,
+	endowed_accounts: Option<Vec<Ed25519AuthorityId>>,
 ) -> GenesisConfig {
+	let endowed_accounts = endowed_accounts.unwrap_or_else(|| {
+		vec![
+			get_authority_id_from_seed("Alice"),
+			get_authority_id_from_seed("Bob"),
+			get_authority_id_from_seed("Charlie"),
+			get_authority_id_from_seed("Dave"),
+			get_authority_id_from_seed("Eve"),
+			get_authority_id_from_seed("Ferdie"),
+		]
+	});
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
 			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),
 			authorities: initial_authorities.clone(),
 		}),
 		system: None,
+		indices: Some(IndicesConfig {
+			ids: endowed_accounts.iter().map(|x| x.0.into()).collect(),
+		}),
 		timestamp: Some(TimestampConfig {
 			period: 5,					// 5 second block time.
+		}),
+		democracy: Some(DemocracyConfig {
+			launch_period: 9,
+			voting_period: 18,
+			minimum_deposit: 10,
+			public_delay: 0,
+			max_lock_periods: 6,
+		}),
+		council_seats: Some(CouncilSeatsConfig {
+			active_council: endowed_accounts.iter()
+			.filter(|a| initial_authorities.iter().find(|&b| a.0 == b.0).is_none())
+				.map(|a| (a.clone().into(), 1000000)).collect(),
+			candidacy_bond: 10,
+			voter_bond: 2,
+			present_slash_per_voter: 1,
+			carry_count: 4,
+			presentation_duration: 10,
+			approval_voting_period: 20,
+			term_duration: 1000000,
+			desired_seats: (endowed_accounts.len() - initial_authorities.len()) as u32,
+			inactive_grace_period: 1,
+		}),
+		council_voting: Some(CouncilVotingConfig {
+			cooloff_period: 75,
+			voting_period: 20,
+			enact_delay_period: 0,
 		}),
 		balances: Some(BalancesConfig {
 			transaction_base_fee: 1,
@@ -115,8 +154,7 @@ fn testnet_genesis(
 			existential_deposit: 500,
 			transfer_fee: 0,
 			creation_fee: 0,
-			reclaim_rebate: 0,
-			balances: endowed_accounts.iter().map(|&k|(k, (1 << 60))).collect(),
+			balances: endowed_accounts.iter().map(|&k| (k.into(), (1 << 60))).collect(),
 		}),
 		session: Some(SessionConfig {
 			validators: initial_authorities.iter().cloned().map(Into::into).collect(),
@@ -137,7 +175,7 @@ fn testnet_genesis(
 			invulnerables: initial_authorities.iter().cloned().map(Into::into).collect(),
 		}),
 		upgrade_key: Some(UpgradeKeyConfig {
-			key: upgrade_key,
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.clone().into_iter().map(|k| (k, 1)).collect(),
