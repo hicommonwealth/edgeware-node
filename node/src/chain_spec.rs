@@ -155,6 +155,7 @@ fn testnet_genesis(
 			transfer_fee: 0,
 			creation_fee: 0,
 			balances: endowed_accounts.iter().map(|&k| (k.into(), (1 << 60))).collect(),
+			vesting: vec![],
 		}),
 		session: Some(SessionConfig {
 			validators: initial_authorities.iter().cloned().map(Into::into).collect(),
