@@ -37,9 +37,15 @@ extern crate bellman;
 extern crate ff;
 extern crate num_bigint;
 extern crate num_traits;
+extern crate sapling_crypto;
 
+use sapling_crypto::{
+    babyjubjub::{
+        JubjubBn256,
+    },
+};
 use num_traits::Num;
-use ff::{PrimeField, Field};
+use ff::{BitIterator, PrimeField};
 use pairing::{bn256::{Bn256, Fr}};
 use rstd::prelude::*;
 use system::ensure_signed;
@@ -54,12 +60,15 @@ use num_bigint::BigInt;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct MTree<Hash, Balance> {
-	pub root: Hash,
-    pub leaves: Option<Vec<Hash>>,
+pub struct MTree<Balance> {
+	pub root: Vec<u8>,
+    pub leaves: Option<Vec<Vec<u8>>>,
     pub fee: Balance,
+    pub depth: u32,
+    pub upper_pow: u32,
 }
 
+const DEFAULT_TREE_DEPTH: u32 = 32;
 
 pub trait Trait: balances::Trait + delegation::Trait {
 	/// The overarching event type.
@@ -75,23 +84,35 @@ decl_module! {
             let ctr = Self::number_of_trees();
             <NumberOfTrees<T>>::put(ctr + 1);
             <MerkleTrees<T>>::insert(ctr, MTree {
-                root: T::Hashing::hash_of(b"0"),
+                root: T::Hashing::hash_of(b"0").encode(),
                 leaves: None,
                 fee: Zero::zero(),
+                depth: DEFAULT_TREE_DEPTH,
+                upper_pow: 1,
             });
             Ok(())
         }
 
         pub fn add_leaf(origin, tree_id: u32, leaf_value: T::Hash) -> Result {
             let _sender = ensure_signed(origin)?;
-            let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
+            let mut tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             ensure!(<balances::Module<T>>::free_balance(_sender.clone()) > tree.fee, "Insufficient balance from sender");    
-            
+            ensure!(tree.upper_pow <= tree.depth, "Tree has insufficient capacity");
+
             if let Some(mut leaves) = tree.leaves {
-                leaves.push(leaf_value);
-                let new_root = Self::compute_new_root(leaves.clone(), None);
+                if leaves.len() == 2_i32.pow(tree.upper_pow) as usize {
+                    tree.upper_pow += 1;
+                }
+                leaves.push(leaf_value.encode());
+                let mut aux_leaves = leaves.clone();
+                for _ in aux_leaves.len()..(2_i32.pow(tree.upper_pow) as usize) {
+                    aux_leaves.push("0".as_bytes().to_vec());
+                }
+
+                // TODO: Optimize recomputing hash without recomputing entire tree?
+                let new_root = Self::compute_new_root(aux_leaves.clone());
                 <MerkleTrees<T>>::insert(tree_id, MTree {
-                    root: new_root,
+                    root: new_root.encode(),
                     leaves: Some(leaves),
                     ..tree
                 });
@@ -101,32 +122,11 @@ decl_module! {
             Ok(())
         }
 
-        pub fn prove_membership(origin, tree_id: u32, leaf_value: T::Hash, path: Vec<(T::Hash, bool)>) -> Result {
-			let _sender = ensure_signed(origin)?;
-            let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
-
-            let mut hash = leaf_value.clone();
-            for (elt, side) in path.into_iter() {
-            	let mut buf = Vec::new();
-            	if side {
-	            	buf.extend_from_slice(&hash.encode());
-	            	buf.extend_from_slice(&elt.encode());            		
-            	} else {
-	            	buf.extend_from_slice(&elt.encode());
-	            	buf.extend_from_slice(&hash.encode());
-            	}
-            	hash = T::Hashing::hash_of(&buf);
-            }
-
-            ensure!(hash == tree.root, "Invalid merkle path proof");
-            Ok(())
-        }
-
-        pub fn verify_proof(origin, tree_id: u32, _params: Vec<u8>, _proof: Vec<u8>, _nullifier_hex: Vec<u8>, _root_hex: Vec<u8>) -> Result {
+        pub fn verify_zkproof(origin, tree_id: u32, _params: Vec<u8>, _proof: Vec<u8>, _nullifier_hex: Vec<u8>, _root_hex: Vec<u8>) -> Result {
             let _sender = ensure_signed(origin)?;
             let params = String::from_utf8(_params).expect("Found invalid UTF-8");
             let proof = String::from_utf8(_proof).expect("Found invalid UTF-8");
-            let nullifier_hex = String::from_utf8(_nullifier_hex).expect("Found invalid UTF-8");
+            let nullifier_hex = String::from_utf8(_nullifier_hex.clone()).expect("Found invalid UTF-8");
             // let root_hex = String::from_utf8(_root_hex).expect("Found invalid UTF-8");
             let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             let tree_root = tree.root.encode();
@@ -146,69 +146,65 @@ decl_module! {
             let root_big = BigInt::from_str_radix(&root_hex, 16).expect("Root decode failed");
             let root_raw = &root_big.to_str_radix(10);
             let root = Fr::from_str(root_raw).ok_or("couldn't parse Fr")?;
-            let result = verify_proof(
+            let _result = verify_proof(
                 &pvk,
                 &Proof::read(&hex::decode(proof).expect("Proof hex decode failed")[..]).expect("Proof decode failed"),
                 &[
                     nullifier,
                     root
                 ]).expect("Verify proof failed");
+
+            if _result {
+                <UsedNullifiers<T>>::insert(_nullifier_hex, true);    
+            }
+            
             Ok(())
         }
 	}
 }
 
 impl<T: Trait> Module<T> {
-    fn compute_new_root(leaves: Vec<T::Hash>, length: Option<usize>) -> T::Hash {
-        let mut limit = 0;
-        if let Some(len) = length {
-            if len == 2 {
-                let mut buf = Vec::new();
-                buf.extend_from_slice(&leaves[0].encode());
-                buf.extend_from_slice(&leaves[1].encode());
-                return T::Hashing::hash_of(&buf);
-            }
+    pub fn hash_from_halves(left_bytes: Vec<u8>, right_bytes: Vec<u8>) -> Vec<u8> {
+        let params = &JubjubBn256::new();
+        let left_pt_str = String::from_utf8(left_bytes.encode()).expect("Found invalid UTF-8");
+        let left_big = BigInt::from_str_radix(&left_pt_str, 16).expect("Nullfier decode failed");
+        let left_raw = &left_big.to_str_radix(10);
+        let left = Fr::from_str(left_raw).ok_or("couldn't parse Fr").unwrap();
 
-            limit = len;
-        }
+        let right_pt_str = String::from_utf8(right_bytes.encode()).expect("Found invalid UTF-8");
+        let right_big = BigInt::from_str_radix(&right_pt_str, 16).expect("Nullfier decode failed");
+        let right_raw = &right_big.to_str_radix(10);
+        let right = Fr::from_str(right_raw).ok_or("couldn't parse Fr").unwrap();
 
-        let zero_hash = T::Hashing::hash_of(b"0");
-        let mut result: Vec<T::Hash> = Vec::new();
-        let mut lf_len = 0;
-        if length.is_none() {
-            lf_len = leaves.len();
-            limit = Self::get_upper_count(lf_len);
-        }
-
-        let mut ctr = 0;
-        while ctr < limit {
-            // Pull elements from array, check for even or odd
-            let mut fst = zero_hash;
-            let mut snd = zero_hash;
-
-            if ctr < lf_len {
-                fst = leaves[ctr];
-                if ctr + 1 < lf_len { snd = leaves[ctr + 1] }
-            }
-
-            let mut buf = Vec::new();
-            buf.extend_from_slice(&fst.encode());
-            buf.extend_from_slice(&snd.encode());
-            result.push(T::Hashing::hash_of(&buf));
-            ctr += 2;
-        }
-
-        return Self::compute_new_root(result, Some(limit / 2));
+        let mut lhs: Vec<bool> = BitIterator::new(left.into_repr()).collect();
+        let mut rhs: Vec<bool> = BitIterator::new(right.into_repr()).collect();
+        lhs.reverse();
+        rhs.reverse();
+        let hash = sapling_crypto::baby_pedersen_hash::pedersen_hash::<Bn256, _>(
+            sapling_crypto::baby_pedersen_hash::Personalization::NoteCommitment,
+            lhs.into_iter()
+               .take(Fr::NUM_BITS as usize)
+               .chain(rhs.into_iter().take(Fr::NUM_BITS as usize)),
+            params
+        ).into_xy().0;
+        
+        return hash.to_string().as_bytes().to_vec();
     }
 
-    fn get_upper_count(length: usize) -> usize {
-        let mut ctr = 1;
-        while (1 << ctr) < length {
-            ctr += 1
+    fn compute_new_root(mut nodes: Vec<Vec<u8>>) -> Vec<u8> {
+        if nodes.len() == 2 {
+            let l = nodes.remove(0);
+            let r = nodes.remove(0);
+            return Self::hash_from_halves(l, r);
+        } else {
+            let left_nodes = nodes[..(nodes.len() / 2)].to_vec();
+            let right_nodes = nodes[(nodes.len() / 2)..].to_vec();
+            return Self::hash_from_halves(
+                Self::compute_new_root(left_nodes),
+                Self::compute_new_root(right_nodes),
+            );
         }
-
-        (1 << ctr)
-    }    
+    }   
 }
 
 /// An event in this module.
@@ -222,6 +218,7 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as MerkleTree {
 		pub NumberOfTrees get(number_of_trees): u32;
-		pub MerkleTrees get(merkle_trees): map u32 => Option<MTree<T::Hash, T::Balance>>;
+		pub MerkleTrees get(merkle_trees): map u32 => Option<MTree<T::Balance>>;
+        pub UsedNullifiers get(used_nullifiers): map Vec<u8> => bool;
 	}
 }
