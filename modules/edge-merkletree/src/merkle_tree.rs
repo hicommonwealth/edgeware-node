@@ -33,7 +33,14 @@ extern crate sr_io as runtime_io;
 extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
+extern crate bellman;
+extern crate ff;
+extern crate num_bigint;
+extern crate num_traits;
 
+use num_traits::Num;
+use ff::{PrimeField, Field};
+use pairing::{bn256::{Bn256, Fr}};
 use rstd::prelude::*;
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
@@ -41,6 +48,9 @@ use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
 use runtime_primitives::traits::{Zero};
 use codec::Encode;
+
+use bellman::groth16::{Proof, Parameters, verify_proof, prepare_verifying_key};
+use num_bigint::BigInt;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
@@ -112,8 +122,38 @@ decl_module! {
             Ok(())
         }
 
-        pub fn prove_with_zk(origin, tree_id: u32, nullifier: T::Hash, proof: Vec<u8>) -> Result {
-        	Ok(())
+        pub fn verify_proof(origin, tree_id: u32, _params: Vec<u8>, _proof: Vec<u8>, _nullifier_hex: Vec<u8>, _root_hex: Vec<u8>) -> Result {
+            let _sender = ensure_signed(origin)?;
+            let params = String::from_utf8(_params).expect("Found invalid UTF-8");
+            let proof = String::from_utf8(_proof).expect("Found invalid UTF-8");
+            let nullifier_hex = String::from_utf8(_nullifier_hex).expect("Found invalid UTF-8");
+            // let root_hex = String::from_utf8(_root_hex).expect("Found invalid UTF-8");
+            let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
+            let tree_root = tree.root.encode();
+            let root_hex = String::from_utf8(tree_root).expect("Invalid root");
+
+            let params_hex = hex::decode(params).expect("Decoding params failed");
+            let de_params = Parameters::read(&params_hex[..], true).expect("Param bellman decode failed");
+
+
+            let pvk = prepare_verifying_key::<Bn256>(&de_params.vk);
+            // Nullifier
+            let nullifier_big = BigInt::from_str_radix(&nullifier_hex, 16).expect("Nullfier decode failed");
+            let nullifier_raw = &nullifier_big.to_str_radix(10);
+            let nullifier = Fr::from_str(nullifier_raw).ok_or("couldn't parse Fr")?;
+            // Root hash
+
+            let root_big = BigInt::from_str_radix(&root_hex, 16).expect("Root decode failed");
+            let root_raw = &root_big.to_str_radix(10);
+            let root = Fr::from_str(root_raw).ok_or("couldn't parse Fr")?;
+            let result = verify_proof(
+                &pvk,
+                &Proof::read(&hex::decode(proof).expect("Proof hex decode failed")[..]).expect("Proof decode failed"),
+                &[
+                    nullifier,
+                    root
+                ]).expect("Verify proof failed");
+            Ok(())
         }
 	}
 }
