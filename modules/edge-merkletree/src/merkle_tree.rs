@@ -79,15 +79,31 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
-        pub fn create_tree(origin) -> Result {
+        pub fn create_tree(origin, _fee: Option<T::Balance>, _depth: Option<u32>, _leaves: Option<Vec<Vec<u8>>>) -> Result {
             let _sender = ensure_signed(origin)?;
+
+            let fee = match _fee {
+                Some(f) => f,
+                None => Zero::zero(),
+            };
+
+            let depth = match _depth {
+                Some(d) => d,
+                None => DEFAULT_TREE_DEPTH,
+            };
+
+            let root_hash = match _leaves.clone() {
+                Some(ls) => Self::compute_new_root(ls),
+                None => T::Hashing::hash_of(b"0").encode(),
+            };
+
             let ctr = Self::number_of_trees();
             <NumberOfTrees<T>>::put(ctr + 1);
             <MerkleTrees<T>>::insert(ctr, MTree {
-                root: T::Hashing::hash_of(b"0").encode(),
-                leaves: None,
-                fee: Zero::zero(),
-                depth: DEFAULT_TREE_DEPTH,
+                root: root_hash,
+                leaves: _leaves,
+                fee: fee,
+                depth: depth,
                 upper_pow: 1,
             });
             Ok(())
@@ -96,7 +112,7 @@ decl_module! {
         pub fn add_leaf(origin, tree_id: u32, leaf_value: T::Hash) -> Result {
             let _sender = ensure_signed(origin)?;
             let mut tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
-            ensure!(<balances::Module<T>>::free_balance(_sender.clone()) > tree.fee, "Insufficient balance from sender");    
+            ensure!(<balances::Module<T>>::free_balance(_sender.clone()) >= tree.fee, "Insufficient balance from sender");    
             ensure!(tree.upper_pow <= tree.depth, "Tree has insufficient capacity");
 
             if let Some(mut leaves) = tree.leaves {

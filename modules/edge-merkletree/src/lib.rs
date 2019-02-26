@@ -55,8 +55,9 @@ mod tests {
 	use runtime_io::ed25519::Pair;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
-	use primitives::{H256, Blake2Hasher};
+	use primitives::{H256, Blake2Hasher, Hasher};
 	use rstd::result;
+	use codec::Encode;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
@@ -133,15 +134,43 @@ mod tests {
 		t.into()
 	}
 
+	fn create_tree(who: H256, fee: Option<u64>, depth: Option<u32>, leaves: Option<Vec<Vec<u8>>>) -> Result {
+		MerkleTree::create_tree(Origin::signed(who), fee, depth, leaves)
+	}
+
+	fn add_leaf(who: H256, tree_id: u32, leaf_hash: H256) -> Result {
+		MerkleTree::add_leaf(Origin::signed(who), tree_id, leaf_hash)
+	}
+
+	fn verify_zk_snark(who: H256, tree_id: u32, params: Vec<u8>, proof: Vec<u8>, nullifier_hex: Vec<u8>, root_hex: Vec<u8>) -> Result {
+		MerkleTree::verify_zkproof(Origin::signed(who), tree_id, params, proof, nullifier_hex, root_hex)
+	}
+
 	#[test]
-	fn add_item_should_work() {
+	fn create_tree_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
+			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 			let public: H256 = pair.public().0.into();
+			assert_ok!(create_tree(public, None, None, None));
+			let default_root_hash = Blake2Hasher::hash(&"0".as_bytes());
+			let tree = MerkleTree::merkle_trees(0).unwrap();
+			assert_eq!(tree.root, default_root_hash.encode());
+			assert_eq!(tree.fee, 0);
+			assert_eq!(tree.upper_pow, 1);
+			assert_eq!(tree.depth, 32);
+		});
+	}
+
+	#[test]
+	fn add_leaf_to_tree_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
+			let public: H256 = pair.public().0.into();
+			assert_ok!(create_tree(public, None, None, None));
+			let leaf_hash = Blake2Hasher::hash(&"leaf hash".as_bytes());
+			assert_ok!(add_leaf(public, 0, leaf_hash));
 		});
 	}
 }
