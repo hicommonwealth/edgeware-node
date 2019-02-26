@@ -97,9 +97,7 @@ decl_module! {
 
             let mut tree = vec![];
             for i in 0..depth {
-                let precompute = Self::get_precomputes(i as usize);
-                let precompute_bytes = Self::convert_point_to_bytes(precompute);
-                tree.push(vec![precompute_bytes; 2_i32.pow(i) as usize]);
+                tree.push(vec![vec![]; 2_i32.pow(i) as usize]);
             }
 
             let mtree = MTree {
