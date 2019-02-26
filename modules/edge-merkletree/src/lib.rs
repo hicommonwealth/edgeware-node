@@ -152,12 +152,11 @@ mod tests {
 			System::set_block_number(1);
 			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 			let public: H256 = pair.public().0.into();
+			let default_root_hash = MerkleTree::get_precomputes(0);
 			assert_ok!(create_tree(public, None, None, None));
-			let default_root_hash = Blake2Hasher::hash(&"0".as_bytes());
 			let tree = MerkleTree::merkle_trees(0).unwrap();
-			assert_eq!(tree.root, default_root_hash.encode());
+			assert_eq!(tree.tree[0][0], default_root_hash.to_hex().as_bytes().to_vec());
 			assert_eq!(tree.fee, 0);
-			assert_eq!(tree.upper_pow, 1);
 			assert_eq!(tree.depth, 32);
 		});
 	}

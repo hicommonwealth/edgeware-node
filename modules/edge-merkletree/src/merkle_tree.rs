@@ -45,7 +45,7 @@ use sapling_crypto::{
     },
 };
 use num_traits::Num;
-use ff::{BitIterator, PrimeField};
+use ff::{BitIterator, PrimeField, Field};
 use pairing::{bn256::{Bn256, Fr}};
 use rstd::prelude::*;
 use system::ensure_signed;
@@ -55,20 +55,22 @@ use runtime_primitives::traits::Hash;
 use runtime_primitives::traits::{Zero};
 use codec::Encode;
 
+
 use bellman::groth16::{Proof, Parameters, verify_proof, prepare_verifying_key};
 use num_bigint::BigInt;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
 pub struct MTree<Balance> {
-	pub root: Vec<u8>,
-    pub leaves: Option<Vec<Vec<u8>>>,
+	pub tree: Vec<Vec<Vec<u8>>>,
     pub fee: Balance,
     pub depth: u32,
-    pub upper_pow: u32,
+    pub leaf_count: u64
 }
 
 const DEFAULT_TREE_DEPTH: u32 = 32;
+// TODO: Better estimates/decisions
+const MAX_DEPTH: u32 = 256;
 
 pub trait Trait: balances::Trait + delegation::Trait {
 	/// The overarching event type.
@@ -91,21 +93,34 @@ decl_module! {
                 Some(d) => d,
                 None => DEFAULT_TREE_DEPTH,
             };
+            ensure!(depth < MAX_DEPTH, "Fee is too large");
 
-            let root_hash = match _leaves.clone() {
-                Some(ls) => Self::compute_new_root(ls),
-                None => T::Hashing::hash_of(b"0").encode(),
+            let _root_hash = match _leaves.clone() {
+                Some(ls) => {
+                    let leaves: Vec<Fr> = vec![];
+                    for i in 0..ls.len() {
+                        let l = Self::convert_bytes_to_point(ls[i]);
+                        leaves.push(l);
+                    }
+                    Self::compute_new_root(leaves, depth as usize)
+                },
+                None => Self::get_precomputes(0),
             };
+
+            let mut tree = vec![];
+            for i in 0..depth {
+                tree.push(vec![Self::get_precomputes(i as usize); 2_i32.pow(i) as usize]);
+            }
 
             let ctr = Self::number_of_trees();
             <NumberOfTrees<T>>::put(ctr + 1);
             <MerkleTrees<T>>::insert(ctr, MTree {
-                root: root_hash,
-                leaves: _leaves,
+                tree: tree,
                 fee: fee,
                 depth: depth,
-                upper_pow: 1,
+                leaf_count: 0,
             });
+
             Ok(())
         }
 
@@ -113,28 +128,10 @@ decl_module! {
             let _sender = ensure_signed(origin)?;
             let mut tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             ensure!(<balances::Module<T>>::free_balance(_sender.clone()) >= tree.fee, "Insufficient balance from sender");    
-            ensure!(tree.upper_pow <= tree.depth, "Tree has insufficient capacity");
+            ensure!(tree.leaf_count < 2_i32.pow(tree.depth) as u64, "Insufficient capacity in tree");
 
-            if let Some(mut leaves) = tree.leaves {
-                if leaves.len() == 2_i32.pow(tree.upper_pow) as usize {
-                    tree.upper_pow += 1;
-                }
-                leaves.push(leaf_value.encode());
-                let mut aux_leaves = leaves.clone();
-                for _ in aux_leaves.len()..(2_i32.pow(tree.upper_pow) as usize) {
-                    aux_leaves.push("0".as_bytes().to_vec());
-                }
-
-                // TODO: Optimize recomputing hash without recomputing entire tree?
-                let new_root = Self::compute_new_root(aux_leaves.clone());
-                <MerkleTrees<T>>::insert(tree_id, MTree {
-                    root: new_root.encode(),
-                    leaves: Some(leaves),
-                    ..tree
-                });
-            }
-
-            
+            let leaf_index = tree.leaf_count;
+            tree.tree[tree.depth as usize][leaf_index as usize] = leaf_value.encode();
             Ok(())
         }
 
@@ -145,8 +142,8 @@ decl_module! {
             let nullifier_hex = String::from_utf8(_nullifier_hex.clone()).expect("Found invalid UTF-8");
             // let root_hex = String::from_utf8(_root_hex).expect("Found invalid UTF-8");
             let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
-            let tree_root = tree.root.encode();
-            let root_hex = String::from_utf8(tree_root).expect("Invalid root");
+            let tree_root = &tree.tree[0][0];
+            let root_hex = String::from_utf8(tree_root.to_vec()).expect("Invalid root");
 
             let params_hex = hex::decode(params).expect("Decoding params failed");
             let de_params = Parameters::read(&params_hex[..], true).expect("Param bellman decode failed");
@@ -158,7 +155,6 @@ decl_module! {
             let nullifier_raw = &nullifier_big.to_str_radix(10);
             let nullifier = Fr::from_str(nullifier_raw).ok_or("couldn't parse Fr")?;
             // Root hash
-
             let root_big = BigInt::from_str_radix(&root_hex, 16).expect("Root decode failed");
             let root_raw = &root_big.to_str_radix(10);
             let root = Fr::from_str(root_raw).ok_or("couldn't parse Fr")?;
@@ -180,47 +176,66 @@ decl_module! {
 }
 
 impl<T: Trait> Module<T> {
-    pub fn hash_from_halves(left_bytes: Vec<u8>, right_bytes: Vec<u8>) -> Vec<u8> {
+    fn convert_bytes_to_point(bytes: Vec<u8>) -> Fr {
+        let big = BigInt::from_str_radix(&hex::encode(bytes), 16).unwrap();
+        let raw = &big.to_str_radix(10);
+        let pt = Fr::from_str(raw).ok_or("couldn't parse Fr").unwrap();
+        return pt;
+    }
+
+    fn convert_point_to_bytes(pt: Fr) -> Vec<u8> {
+        return pt.to_hex().as_bytes().to_vec();
+    }
+
+    fn hash_from_halves(left: Fr, right: Fr, index: Option<usize>) -> Fr {
         let params = &JubjubBn256::new();
-        let left_pt_str = String::from_utf8(left_bytes.encode()).expect("Found invalid UTF-8");
-        let left_big = BigInt::from_str_radix(&left_pt_str, 16).expect("Nullfier decode failed");
-        let left_raw = &left_big.to_str_radix(10);
-        let left = Fr::from_str(left_raw).ok_or("couldn't parse Fr").unwrap();
-
-        let right_pt_str = String::from_utf8(right_bytes.encode()).expect("Found invalid UTF-8");
-        let right_big = BigInt::from_str_radix(&right_pt_str, 16).expect("Nullfier decode failed");
-        let right_raw = &right_big.to_str_radix(10);
-        let right = Fr::from_str(right_raw).ok_or("couldn't parse Fr").unwrap();
-
         let mut lhs: Vec<bool> = BitIterator::new(left.into_repr()).collect();
         let mut rhs: Vec<bool> = BitIterator::new(right.into_repr()).collect();
         lhs.reverse();
         rhs.reverse();
+
+        let personalization = if index.is_none() {
+            sapling_crypto::baby_pedersen_hash::Personalization::NoteCommitment
+        } else {
+            sapling_crypto::baby_pedersen_hash::Personalization::MerkleTree(index.unwrap())
+        };
+
         let hash = sapling_crypto::baby_pedersen_hash::pedersen_hash::<Bn256, _>(
-            sapling_crypto::baby_pedersen_hash::Personalization::NoteCommitment,
+            personalization,
             lhs.into_iter()
                .take(Fr::NUM_BITS as usize)
                .chain(rhs.into_iter().take(Fr::NUM_BITS as usize)),
             params
         ).into_xy().0;
         
-        return hash.to_string().as_bytes().to_vec();
+        return hash;
     }
 
-    fn compute_new_root(mut nodes: Vec<Vec<u8>>) -> Vec<u8> {
+    fn compute_new_root(mut nodes: Vec<Fr>, depth: usize) -> Fr {
         if nodes.len() == 2 {
             let l = nodes.remove(0);
             let r = nodes.remove(0);
-            return Self::hash_from_halves(l, r);
+            return Self::hash_from_halves(l, r, Some(depth - 1));
         } else {
             let left_nodes = nodes[..(nodes.len() / 2)].to_vec();
             let right_nodes = nodes[(nodes.len() / 2)..].to_vec();
             return Self::hash_from_halves(
-                Self::compute_new_root(left_nodes),
-                Self::compute_new_root(right_nodes),
+                Self::compute_new_root(left_nodes, depth - 1),
+                Self::compute_new_root(right_nodes, depth - 1),
+                Some(depth),
             );
         }
-    }   
+    }
+
+    pub fn get_precomputes(index: usize) -> Fr {
+        let mut pt = pairing::bn256::Fr::zero();
+
+        for _ in 0..index {
+            pt = Self::hash_from_halves(pt.clone(), pt.clone(), Some(index));
+        }
+
+        return pt;
+    }
 }
 
 /// An event in this module.
