@@ -139,7 +139,7 @@ mod tests {
 	}
 
 	fn add_leaf(who: H256, tree_id: u32, leaf_hash: H256) -> Result {
-		MerkleTree::add_leaf(Origin::signed(who), tree_id, leaf_hash)
+		MerkleTree::add_leaf(Origin::signed(who), tree_id, leaf_hash.encode())
 	}
 
 	fn verify_zk_snark(who: H256, tree_id: u32, params: Vec<u8>, proof: Vec<u8>, nullifier_hex: Vec<u8>, root_hex: Vec<u8>) -> Result {

@@ -95,43 +95,40 @@ decl_module! {
             };
             ensure!(depth < MAX_DEPTH, "Fee is too large");
 
-            let _root_hash = match _leaves.clone() {
-                Some(ls) => {
-                    let leaves: Vec<Fr> = vec![];
-                    for i in 0..ls.len() {
-                        let l = Self::convert_bytes_to_point(ls[i]);
-                        leaves.push(l);
-                    }
-                    Self::compute_new_root(leaves, depth as usize)
-                },
-                None => Self::get_precomputes(0),
-            };
-
             let mut tree = vec![];
             for i in 0..depth {
-                tree.push(vec![Self::get_precomputes(i as usize); 2_i32.pow(i) as usize]);
+                let precompute = Self::get_precomputes(i as usize);
+                let precompute_bytes = Self::convert_point_to_bytes(precompute);
+                tree.push(vec![precompute_bytes; 2_i32.pow(i) as usize]);
             }
 
-            let ctr = Self::number_of_trees();
-            <NumberOfTrees<T>>::put(ctr + 1);
-            <MerkleTrees<T>>::insert(ctr, MTree {
+            let mtree = MTree {
                 tree: tree,
                 fee: fee,
                 depth: depth,
                 leaf_count: 0,
-            });
+            };
+
+            let ctr = Self::number_of_trees();
+            <MerkleTrees<T>>::insert(ctr, mtree);
+            <NumberOfTrees<T>>::put(ctr + 1);
+
+            if let Some(leaves) = _leaves {
+                for i in 0..leaves.len() {
+                    Self::add_leaf_element(ctr, leaves[i].clone());
+                }
+            }
 
             Ok(())
         }
 
-        pub fn add_leaf(origin, tree_id: u32, leaf_value: T::Hash) -> Result {
+        pub fn add_leaf(origin, tree_id: u32, leaf_value: Vec<u8>) -> Result {
             let _sender = ensure_signed(origin)?;
-            let mut tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
+            let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             ensure!(<balances::Module<T>>::free_balance(_sender.clone()) >= tree.fee, "Insufficient balance from sender");    
             ensure!(tree.leaf_count < 2_i32.pow(tree.depth) as u64, "Insufficient capacity in tree");
 
-            let leaf_index = tree.leaf_count;
-            tree.tree[tree.depth as usize][leaf_index as usize] = leaf_value.encode();
+            Self::add_leaf_element(tree_id, leaf_value);
             Ok(())
         }
 
@@ -176,6 +173,40 @@ decl_module! {
 }
 
 impl<T: Trait> Module<T> {
+    fn add_leaf_element(key: u32, leaf: Vec<u8>) {
+        let mut tree = <MerkleTrees<T>>::get(key).ok_or("Tree doesn't exist").unwrap();
+        // Add element
+        let leaf_index = tree.leaf_count;
+        tree.tree[tree.depth as usize][leaf_index as usize] = leaf;
+
+        let mut curr_index = tree.leaf_count as usize;
+        let mut leaf1: Vec<u8>;
+        let mut leaf2: Vec<u8>;
+        // Update the tree
+        for i in 0..tree.depth {
+            let next_index = curr_index / 2;
+            let inx = i as usize;
+            if curr_index % 2 == 0 {
+                leaf1 = tree.tree[inx][curr_index].clone();
+                leaf2 = Self::get_unique_leaf(tree.tree[inx][curr_index + 2].clone(), inx);
+            } else {
+                leaf1 = Self::get_unique_leaf(tree.tree[inx][curr_index - 2].clone(), inx);
+                leaf2 = tree.tree[inx][curr_index].clone();
+            }
+
+            tree.tree[inx + 1][next_index] = Self::convert_point_to_bytes(
+                Self::hash_from_halves(
+                    Self::convert_bytes_to_point(leaf1),
+                    Self::convert_bytes_to_point(leaf2),
+                    Some(inx)
+                )
+            );
+            curr_index = next_index;
+        }
+
+        <MerkleTrees<T>>::insert(key, tree);
+    }
+
     fn convert_bytes_to_point(bytes: Vec<u8>) -> Fr {
         let big = BigInt::from_str_radix(&hex::encode(bytes), 16).unwrap();
         let raw = &big.to_str_radix(10);
@@ -225,6 +256,15 @@ impl<T: Trait> Module<T> {
                 Some(depth),
             );
         }
+    }
+
+    pub fn get_unique_leaf(leaf: Vec<u8>, index: usize) -> Vec<u8> {
+        if leaf != vec![] {
+            return leaf;
+        } else {
+            return Self::convert_point_to_bytes(Self::get_precomputes(index));
+        }
+
     }
 
     pub fn get_precomputes(index: usize) -> Fr {
