@@ -154,8 +154,7 @@ mod tests {
 			let public: H256 = pair.public().0.into();
 			let default_root_hash = MerkleTree::get_precomputes(0);
 			assert_ok!(create_tree(public, None, None, None));
-			let tree = MerkleTree::merkle_trees(0).unwrap();
-			assert_eq!(tree.tree[0][0], default_root_hash.to_hex().as_bytes().to_vec());
+			let tree = MerkleTree::merkle_tree_metadata(0).unwrap();
 			assert_eq!(tree.fee, 0);
 			assert_eq!(tree.depth, 32);
 		});

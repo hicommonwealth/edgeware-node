@@ -62,7 +62,6 @@ use num_bigint::BigInt;
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
 pub struct MTree<Balance> {
-	pub tree: Vec<Vec<Vec<u8>>>,
     pub fee: Balance,
     pub depth: u32,
     pub leaf_count: u64
@@ -95,20 +94,19 @@ decl_module! {
             };
             ensure!(depth < MAX_DEPTH, "Fee is too large");
 
-            let mut tree = vec![];
+            let ctr = Self::number_of_trees();
             for i in 0..depth {
-                tree.push(vec![vec![]; 2_i32.pow(i) as usize]);
+                let empty_level = vec![vec![]; 2_i32.pow(i) as usize];
+                <MerkleTreeLevels<T>>::insert((ctr, i), empty_level);
             }
 
             let mtree = MTree {
-                tree: tree,
                 fee: fee,
                 depth: depth,
                 leaf_count: 0,
             };
-
-            let ctr = Self::number_of_trees();
-            <MerkleTrees<T>>::insert(ctr, mtree);
+            
+            <MerkleTreeMetadata<T>>::insert(ctr, mtree);
             <NumberOfTrees<T>>::put(ctr + 1);
 
             if let Some(leaves) = _leaves {
@@ -122,7 +120,7 @@ decl_module! {
 
         pub fn add_leaf(origin, tree_id: u32, leaf_value: Vec<u8>) -> Result {
             let _sender = ensure_signed(origin)?;
-            let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
+            let tree = <MerkleTreeMetadata<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             ensure!(<balances::Module<T>>::free_balance(_sender.clone()) >= tree.fee, "Insufficient balance from sender");    
             ensure!(tree.leaf_count < 2_i32.pow(tree.depth) as u64, "Insufficient capacity in tree");
 
@@ -135,9 +133,8 @@ decl_module! {
             let params = String::from_utf8(_params).expect("Found invalid UTF-8");
             let proof = String::from_utf8(_proof).expect("Found invalid UTF-8");
             let nullifier_hex = String::from_utf8(_nullifier_hex.clone()).expect("Found invalid UTF-8");
-            // let root_hex = String::from_utf8(_root_hex).expect("Found invalid UTF-8");
-            let tree = <MerkleTrees<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
-            let tree_root = &tree.tree[0][0];
+
+            let tree_root = &<MerkleTreeLevels<T>>::get((tree_id, 0)).unwrap()[0];
             let root_hex = String::from_utf8(tree_root.to_vec()).expect("Invalid root");
 
             let params_hex = hex::decode(params).expect("Decoding params failed");
@@ -172,12 +169,17 @@ decl_module! {
 
 impl<T: Trait> Module<T> {
     fn add_leaf_element(key: u32, leaf: Vec<u8>) {
-        let mut tree = <MerkleTrees<T>>::get(key).ok_or("Tree doesn't exist").unwrap();
+        let mut tree = <MerkleTreeMetadata<T>>::get(key).ok_or("Tree doesn't exist").unwrap();
         // Add element
         let leaf_index = tree.leaf_count;
-        tree.tree[tree.depth as usize][leaf_index as usize] = leaf;
+        tree.leaf_count += 1;
+        if let Some(mut mt_level) = <MerkleTreeLevels<T>>::get((key, tree.depth)) {
+            mt_level.push(leaf);
+            <MerkleTreeLevels<T>>::insert((key, tree.depth), mt_level);
+        }
+        
 
-        let mut curr_index = tree.leaf_count as usize;
+        let mut curr_index = leaf_index as usize;
         let mut leaf1: Vec<u8>;
         let mut leaf2: Vec<u8>;
         // Update the tree
@@ -185,24 +187,31 @@ impl<T: Trait> Module<T> {
             let next_index = curr_index / 2;
             let inx = i as usize;
             if curr_index % 2 == 0 {
-                leaf1 = tree.tree[inx][curr_index].clone();
-                leaf2 = Self::get_unique_leaf(tree.tree[inx][curr_index + 2].clone(), inx);
+                let leaf1_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index];
+                leaf1 = leaf1_val.to_vec();
+                let leaf2_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index + 1];
+                leaf2 = Self::get_unique_leaf(leaf2_val.to_vec(), inx);
             } else {
-                leaf1 = Self::get_unique_leaf(tree.tree[inx][curr_index - 2].clone(), inx);
-                leaf2 = tree.tree[inx][curr_index].clone();
+                let leaf1_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index - 1];
+                leaf1 = Self::get_unique_leaf(leaf1_val.to_vec(), inx);
+                let leaf2_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index];
+                leaf2 = leaf2_val.to_vec();
             }
 
-            tree.tree[inx + 1][next_index] = Self::convert_point_to_bytes(
-                Self::hash_from_halves(
-                    Self::convert_bytes_to_point(leaf1),
-                    Self::convert_bytes_to_point(leaf2),
-                    Some(inx)
-                )
-            );
+            if let Some(mut level) = <MerkleTreeLevels<T>>::get((key, tree.depth - i + 1)) {
+                level[next_index] = Self::convert_point_to_bytes(
+                    Self::hash_from_halves(
+                        Self::convert_bytes_to_point(leaf1),
+                        Self::convert_bytes_to_point(leaf2),
+                        Some(inx)
+                    )
+                );
+            }
+
             curr_index = next_index;
         }
 
-        <MerkleTrees<T>>::insert(key, tree);
+        <MerkleTreeMetadata<T>>::insert(key, tree);
     }
 
     fn convert_bytes_to_point(bytes: Vec<u8>) -> Fr {
@@ -287,7 +296,8 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as MerkleTree {
 		pub NumberOfTrees get(number_of_trees): u32;
-		pub MerkleTrees get(merkle_trees): map u32 => Option<MTree<T::Balance>>;
+		pub MerkleTreeMetadata get(merkle_tree_metadata): map u32 => Option<MTree<T::Balance>>;
+        pub MerkleTreeLevels get(merkle_tree_level): map (u32, u32) => Option<Vec<Vec<u8>>>;
         pub UsedNullifiers get(used_nullifiers): map Vec<u8> => bool;
 	}
 }
