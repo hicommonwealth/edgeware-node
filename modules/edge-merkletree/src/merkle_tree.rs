@@ -206,6 +206,8 @@ impl<T: Trait> Module<T> {
                         Some(inx)
                     )
                 );
+
+                <MerkleTreeLevels<T>>::insert((key, tree.depth - i + 1), level);
             }
 
             curr_index = next_index;
