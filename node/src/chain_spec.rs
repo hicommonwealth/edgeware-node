@@ -35,6 +35,18 @@ pub fn get_authority_id_from_seed(seed: &str) -> Ed25519AuthorityId {
 	ed25519::Pair::from_seed(&padded_seed).public().0.into()
 }
 
+pub fn get_testnet_pubkeys() -> Vec<Ed25519AuthorityId> {
+	let pubkeys = vec![
+		ed25519::Public::from_raw(hex!("df291854c27a22c50322344604076e8b2dc3ffe11dbdcd886adba9e0d6c9f950") as [u8; 32]).into(),
+		ed25519::Public::from_raw(hex!("3bd15363a31eac0e5ecd067731d8a4561185347fc804c50b507025abc29c2ba1") as [u8; 32]).into(),
+		ed25519::Public::from_raw(hex!("65b118b4ae7fe642a59316fc5f0ad9b75cdb9f5ab52733165004f7602755bcfd") as [u8; 32]).into(),
+		ed25519::Public::from_raw(hex!("68128017e34fe40f4ed40f79c24dc7f5a531afc82fc6b71e8092c903627a9133") as [u8; 32]).into(),
+		ed25519::Public::from_raw(hex!("dc746491a214053440d8b9df6774587da105661cc58ed703dc36965359c666a6") as [u8; 32]).into()
+	];
+
+	return pubkeys;
+}
+
 impl Alternative {
 	/// Get an actual chain config from one of the alternatives.
 	pub(crate) fn load(self) -> Result<ChainSpec, String> {
@@ -76,12 +88,22 @@ impl Alternative {
 				None,
 				None,
 			),
-			Alternative::Edgeware => {
-				match ChainSpec::from_json_file(std::path::PathBuf::from("edgeware_testnet.json")) {
-					Ok(spec) => spec,
-					Err(e) => panic!(e),
-				}
-			}
+			Alternative::Edgeware => ChainSpec::from_genesis(
+				"Edgeware",
+				"edgeware-testnet",
+				|| {
+					testnet_genesis(
+						get_testnet_pubkeys(),
+						get_testnet_pubkeys()[0].into(),
+						Some(get_testnet_pubkeys()),
+					)
+				},
+				vec![],
+				None,
+				None,
+				None,
+				None,
+			),
 		})
 	}
 
@@ -110,6 +132,7 @@ fn testnet_genesis(
 			get_authority_id_from_seed("Ferdie"),
 		]
 	});
+
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
 			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.wasm").to_vec(),

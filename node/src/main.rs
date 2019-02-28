@@ -26,6 +26,8 @@ extern crate edgeware_runtime;
 extern crate node_executor;
 extern crate substrate_finality_grandpa as grandpa;
 extern crate node_primitives;
+#[macro_use]
+extern crate hex_literal;
 
 use futures::sync::oneshot;
 use futures::{future, Future};
