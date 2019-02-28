@@ -112,7 +112,7 @@ fn testnet_genesis(
 	});
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
-			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),
+			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.wasm").to_vec(),
 			authorities: initial_authorities.clone(),
 		}),
 		system: None,
