@@ -25,6 +25,7 @@ pub enum Alternative {
 	LocalTestnet,
 	/// Whatever the current runtime is, with all lock droppers and valid authorities
 	Edgeware,
+	EdgewareTestnet,
 }
 
 /// Helper function to generate AuthorityID from seed
@@ -104,6 +105,12 @@ impl Alternative {
 				None,
 				None,
 			),
+			Alternative::EdgewareTestnet => {
+				match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.3/edgeware.json")) {
+					Ok(spec) => spec,
+					Err(e) => panic!(e),
+				}
+			}
 		})
 	}
 
@@ -111,7 +118,8 @@ impl Alternative {
 		match s {
 			"dev" => Some(Alternative::Development),
 			"local" => Some(Alternative::LocalTestnet),
-			"edgeware" => Some(Alternative::Edgeware),
+			"edgewaresetup" => Some(Alternative::Edgeware),
+			"edgeware" => Some(Alternative::EdgewareTestnet),
 			_ => None,
 		}
 	}
