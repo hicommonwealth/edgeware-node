@@ -1,6 +1,6 @@
 {
   "name": "Edgeware V0.1.4",
-  "id": "edgeware",
+  "id": "edgeware-testnet",
   "bootNodes": [
     "/ip4/18.222.29.148/tcp/30333/p2p/QmTsrFBJMXUcZrKAT2a2HXQZ2ZopzAEVeFxKfoGzg1x29x",
     "/ip4/18.221.47.154/tcp/30333/p2p/QmXC8pmWU6pbWT1JsvaewXqZyyERX8Kk5AYXjRYjMcm2Qj",
