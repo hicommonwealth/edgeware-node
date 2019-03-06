@@ -2,14 +2,14 @@
   "name": "Edgeware V0.1.4",
   "id": "edgeware",
   "bootNodes": [
-    "/ip4/18.222.29.148/tcp/30333/p2p/Qmdsw8KesZsn6sNi1GqaZZyB7FR58Q3HuW2qVgMtenZjuY",
-    "/ip4/18.221.47.154/tcp/30333/p2p/QmchnXiKkq55j2ZwGvqdf6PKCzmJaQYQMWQuuBJvucuu3e",
+    "/ip4/18.222.29.148/tcp/30333/p2p/QmTsrFBJMXUcZrKAT2a2HXQZ2ZopzAEVeFxKfoGzg1x29x",
+    "/ip4/18.221.47.154/tcp/30333/p2p/QmXC8pmWU6pbWT1JsvaewXqZyyERX8Kk5AYXjRYjMcm2Qj",
     "/ip4/18.224.5.129/tcp/30333/p2p/QmeWoex13D4vbuJJXw6aBkLhziMfM2Lv92Tx4jXhwXupPf"
   ],
   "telemetryEndpoints": [
     ["wss://telemetry.polkadot.io/submit/", 0]
   ],
-  "protocolId": "Lechayim",
+  "protocolId": null,
   "consensusEngine": null,
   "properties": null,
   "genesis": {
