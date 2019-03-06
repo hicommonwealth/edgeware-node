@@ -262,11 +262,53 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, Author
 
 /// Helper function to create GenesisConfig for testing
 pub fn testnet_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, AuthorityId)>,
+	mut init_authorities: Vec<(AccountId, AccountId, AuthorityId)>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> GenesisConfig {
-	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+	// stash, controller, session-key
+	let mut initial_authorities: Vec<(AccountId, AccountId, AuthorityId)> = vec![(
+		hex!["d52793d9a0c5c7c82275f6d20cb314045e3ec4b93d73d828d9219f6b21ccdd51"].into(),
+		hex!["dcb34453b417badcef2fb93efb855380a783289319389952622e4cea7d743145"].into(),
+		hex!["6b72796524ee3fe2b7b4a3e65dde1e9057eeb0026e899fbecfee92ef9a8280ac"].into(),
+	), (
+		hex!["148cac52642973fc4a61bb434e6421681e67b64974d04a172e7c2514d26d5366"].into(),
+		hex!["afcc85986335783a13907a12f273335b270a05bd99444a618ef3a1c4c4d92186"].into(),
+		hex!["bdf3930a4e93e29200e1b1f81f1de011d2a9e02f774e54f67e6e52dfaeda9f23"].into(),
+	), (
+		hex!["7e0837ed15ea8198b099502570f356f9ec0b49fa2b961ec35e8ebd5498647335"].into(),
+		hex!["faa71637adec464e2217464cdfa6e3a891257a814c222fd4360480bf0b36855c"].into(),
+		hex!["b0278d6f62876202aa70e8133b21f49daa303ee8818b98988630d05235f7b798"].into(),
+	), (
+		hex!["eb708c619cdd7634c0ba7238c1f13a9c5cb4816d5af02c3fdde717f1966d05ad"].into(),
+		hex!["db34823044cf58c96df8dec73896d4014ba03328c1fef29e8f447c003625d2ac"].into(),
+		hex!["c0d496cc1c37fdc276e005960199e22c051a94bb611f93c537c463ff4b7dd61f"].into(),
+	), (
+		hex!["df291854c27a22c50322344604076e8b2dc3ffe11dbdcd886adba9e0d6c9f950"].into(),
+		hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
+		hex!["be3e3264a06a61d9c5c8055807bce41a71e2497257ee72f8745d251429014a2b"].into(),
+	), (
+		hex!["3bd15363a31eac0e5ecd067731d8a4561185347fc804c50b507025abc29c2ba1"].into(),
+		hex!["619473a7bd9f608bfdfa93582b53cc8867245e91c9fe5026fee379d47c94dd09"].into(),
+		hex!["ab66295ab4f3015a6108e391181f8ac13e40b437cedfa87983688c7e5065bb70"].into(),
+	), (
+		hex!["65b118b4ae7fe642a59316fc5f0ad9b75cdb9f5ab52733165004f7602755bcfd"].into(),
+		hex!["01489c5e4c7d0cc8af9fba72c72b95785357e2db50fd8c5ae907ac799a66d9dd"].into(),
+		hex!["e48e7a2b1c381a7a0821d61791daaa695bfd070815dd9fe02b51f60f81f0e034"].into(),
+	), (
+		hex!["68128017e34fe40f4ed40f79c24dc7f5a531afc82fc6b71e8092c903627a9133"].into(),
+		hex!["8510ba4363ac9a70b34fd586a5a6a1335e3484ec4767617f49db060865e899c4"].into(),
+		hex!["83191772bc526b7625ee6ca197a63f984ca10afc2231ad87865d71a6fda0b84d"].into(),
+	), (
+		hex!["dc746491a214053440d8b9df6774587da105661cc58ed703dc36965359c666a6"].into(),
+		hex!["d04fa941c18fef1461da631b36766e410ef0017817a06f5c8728e3b23d87f660"].into(),
+		hex!["b30d0b164273c00050d4c2e1eb1cc8be6ade9ac9078abbb692c649c81b4c21b4"].into(),
+	)];
+
+	initial_authorities.append(&mut init_authorities);
+
+
+	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed("Alice"),
 			get_account_id_from_seed("Bob"),
@@ -276,6 +318,17 @@ pub fn testnet_genesis(
 			get_account_id_from_seed("Ferdie"),
 		]
 	});
+
+	endowed_accounts.append(&mut vec![
+		hex!["d52793d9a0c5c7c82275f6d20cb314045e3ec4b93d73d828d9219f6b21ccdd51"].into(),
+		hex!["148cac52642973fc4a61bb434e6421681e67b64974d04a172e7c2514d26d5366"].into(),
+		hex!["7e0837ed15ea8198b099502570f356f9ec0b49fa2b961ec35e8ebd5498647335"].into(),
+		hex!["eb708c619cdd7634c0ba7238c1f13a9c5cb4816d5af02c3fdde717f1966d05ad"].into(),
+		hex!["df291854c27a22c50322344604076e8b2dc3ffe11dbdcd886adba9e0d6c9f950"].into(),
+		hex!["3bd15363a31eac0e5ecd067731d8a4561185347fc804c50b507025abc29c2ba1"].into(),
+		hex!["65b118b4ae7fe642a59316fc5f0ad9b75cdb9f5ab52733165004f7602755bcfd"].into(),
+		hex!["68128017e34fe40f4ed40f79c24dc7f5a531afc82fc6b71e8092c903627a9133"].into(),
+	]);
 
 	const STASH: u128 = 1 << 20;
 	const ENDOWMENT: u128 = 1 << 20;
