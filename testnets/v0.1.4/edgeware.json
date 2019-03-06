@@ -9,7 +9,7 @@
   "telemetryEndpoints": [
     ["wss://telemetry.polkadot.io/submit/", 0]
   ],
-  "protocolId": null,
+  "protocolId": "Lechayim",
   "consensusEngine": null,
   "properties": null,
   "genesis": {
