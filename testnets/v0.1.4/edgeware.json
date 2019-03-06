@@ -2,9 +2,9 @@
   "name": "Edgeware V0.1.4",
   "id": "edgeware-testnet",
   "bootNodes": [
-    "/ip4/18.222.29.148/tcp/30333/p2p/QmTsrFBJMXUcZrKAT2a2HXQZ2ZopzAEVeFxKfoGzg1x29x",
-    "/ip4/18.221.47.154/tcp/30333/p2p/QmXC8pmWU6pbWT1JsvaewXqZyyERX8Kk5AYXjRYjMcm2Qj",
-    "/ip4/18.224.5.129/tcp/30333/p2p/QmeWoex13D4vbuJJXw6aBkLhziMfM2Lv92Tx4jXhwXupPf"
+    "/ip4/18.222.29.148/tcp/30333/p2p/QmRiZmzPoUZsGyGLtmU1KLWmmoyn3ZpyeEDVy9GqLctzjT",
+    "/ip4/18.221.47.154/tcp/30333/p2p/QmeRs6k2qav8vabqL15MpaiN4GGDFg7LcsMqLt3iGU1vnU",
+    // "/ip4/18.224.5.129/tcp/30333/p2p/QmeWoex13D4vbuJJXw6aBkLhziMfM2Lv92Tx4jXhwXupPf"
   ],
   "telemetryEndpoints": [
     ["wss://telemetry.polkadot.io/submit/", 0]
