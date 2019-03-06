@@ -34,7 +34,7 @@ pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 /// Edgeware testnet generator
 pub fn edgeware_config() -> Result<ChainSpec, String> {
-	ChainSpec::from_embedded(include_bytes!("../../testnets/v0.1.3/edgeware.json"))
+	ChainSpec::from_embedded(include_bytes!("../../testnets/v0.1.4/edgeware.json"))
 }
 
 /// Helper function to generate AuthorityID from seed
