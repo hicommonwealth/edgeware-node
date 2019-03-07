@@ -34,8 +34,6 @@ pub enum ChainSpec {
 	LocalTestnet,
 	/// Edgeware testnet.
 	Edgeware,
-	/// Whatever the current runtime is with the "global testnet" defaults.
-	StagingTestnet,
 }
 
 /// Get a chain config from a spec setting.
@@ -45,16 +43,15 @@ impl ChainSpec {
 			ChainSpec::Edgeware => chain_spec::edgeware_config()?,
 			ChainSpec::Development => chain_spec::development_config(),
 			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
-			ChainSpec::StagingTestnet => chain_spec::staging_testnet_config(),
 		})
 	}
 
 	pub(crate) fn from(s: &str) -> Option<Self> {
+		println!("{:?} hello", s);
 		match s {
 			"dev" => Some(ChainSpec::Development),
 			"local" => Some(ChainSpec::LocalTestnet),
 			"" | "edge" | "edgeware" => Some(ChainSpec::Edgeware),
-			"staging" => Some(ChainSpec::StagingTestnet),
 			_ => None,
 		}
 	}

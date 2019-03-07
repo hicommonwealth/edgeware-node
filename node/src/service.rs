@@ -42,7 +42,7 @@ native_executor_instance!(
 	pub Executor,
 	edgeware_runtime::api::dispatch,
 	edgeware_runtime::native_version,
-	include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.wasm")
+	include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm")
 );
 
 construct_simple_protocol! {
