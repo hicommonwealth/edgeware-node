@@ -34,6 +34,7 @@ pub enum ChainSpec {
 	LocalTestnet,
 	/// Edgeware testnet.
 	Edgeware,
+	EdgewareTestnet,
 }
 
 /// Get a chain config from a spec setting.
@@ -41,17 +42,19 @@ impl ChainSpec {
 	pub(crate) fn load(self) -> Result<chain_spec::ChainSpec, String> {
 		Ok(match self {
 			ChainSpec::Edgeware => chain_spec::edgeware_config()?,
+			ChainSpec::EdgewareTestnet => chain_spec::edgeware_testnet_config(),
 			ChainSpec::Development => chain_spec::development_config(),
 			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
 		})
 	}
 
 	pub(crate) fn from(s: &str) -> Option<Self> {
-		println!("{:?} hello", s);
+		println!("Network {:?}", s);
 		match s {
 			"dev" => Some(ChainSpec::Development),
 			"local" => Some(ChainSpec::LocalTestnet),
-			"" | "edge" | "edgeware" => Some(ChainSpec::Edgeware),
+			"" | "edge" => Some(ChainSpec::Edgeware),
+			"edgeware" => Some(ChainSpec::EdgewareTestnet),
 			_ => None,
 		}
 	}

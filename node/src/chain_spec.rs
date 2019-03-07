@@ -32,52 +32,46 @@ const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
+pub fn edgeware_testnet_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.4/edgeware.json")) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
+	}
+}
+
 pub fn edgeware_config_gensis() -> GenesisConfig {
 	testnet_genesis(
-		vec![
-			get_authority_keys_from_seed("Alice"),
-			get_authority_keys_from_seed("Bob"),
-			get_authority_keys_from_seed("Charlie"),
-			get_authority_keys_from_seed("Dave"),
-			get_authority_keys_from_seed("Eve"),
-			get_authority_keys_from_seed("Ferdie"),
-			get_authority_keys_from_seed("A"),
-			get_authority_keys_from_seed("B"),
-			get_authority_keys_from_seed("C"),
-			get_authority_keys_from_seed("D"),
-			get_authority_keys_from_seed("E"),
-			get_authority_keys_from_seed("F"),
-			get_authority_keys_from_seed("G"),
-			get_authority_keys_from_seed("H"),
-			get_authority_keys_from_seed("I"),
-			get_authority_keys_from_seed("J"),
-			get_authority_keys_from_seed("K"),
-			get_authority_keys_from_seed("L"),
-			get_authority_keys_from_seed("M"),
-			get_authority_keys_from_seed("N"),
-		],
-		get_account_id_from_seed("Alice").into(),
+		vec![(
+			hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
+			hex!["be3e3264a06a61d9c5c8055807bce41a71e2497257ee72f8745d251429014a2b"].into(),
+			hex!["619473a7bd9f608bfdfa93582b53cc8867245e91c9fe5026fee379d47c94dd09"].into(),
+		), (
+			hex!["ab66295ab4f3015a6108e391181f8ac13e40b437cedfa87983688c7e5065bb70"].into(),
+			hex!["01489c5e4c7d0cc8af9fba72c72b95785357e2db50fd8c5ae907ac799a66d9dd"].into(),
+			hex!["e48e7a2b1c381a7a0821d61791daaa695bfd070815dd9fe02b51f60f81f0e034"].into(),
+		), (
+			hex!["8510ba4363ac9a70b34fd586a5a6a1335e3484ec4767617f49db060865e899c4"].into(),
+			hex!["83191772bc526b7625ee6ca197a63f984ca10afc2231ad87865d71a6fda0b84d"].into(),
+			hex!["d04fa941c18fef1461da631b36766e410ef0017817a06f5c8728e3b23d87f660"].into(),
+		), (
+			hex!["b30d0b164273c00050d4c2e1eb1cc8be6ade9ac9078abbb692c649c81b4c21b4"].into(),
+			hex!["d3739f9e24a0644f34b1301bb490745a1afdfa45bd1c699fbcba0a6723ecc87c"].into(),
+			hex!["cf77ff32f8728fd08e9bbd70b0161ba979c55e166de193c17c35a328ecf5cdc2"].into(),
+		)],
+		hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
 		Some(vec![
-			get_authority_id_from_seed("Alice").into(),
-			get_authority_id_from_seed("Bob").into(),
-			get_authority_id_from_seed("Charlie").into(),
-			get_authority_id_from_seed("Dave").into(),
-			get_authority_id_from_seed("Eve").into(),
-			get_authority_id_from_seed("Ferdie").into(),
-			get_authority_id_from_seed("A").into(),
-			get_authority_id_from_seed("B").into(),
-			get_authority_id_from_seed("C").into(),
-			get_authority_id_from_seed("D").into(),
-			get_authority_id_from_seed("E").into(),
-			get_authority_id_from_seed("F").into(),
-			get_authority_id_from_seed("G").into(),
-			get_authority_id_from_seed("H").into(),
-			get_authority_id_from_seed("I").into(),
-			get_authority_id_from_seed("J").into(),
-			get_authority_id_from_seed("K").into(),
-			get_authority_id_from_seed("L").into(),
-			get_authority_id_from_seed("M").into(),
-			get_authority_id_from_seed("N").into(),
+			hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
+			hex!["be3e3264a06a61d9c5c8055807bce41a71e2497257ee72f8745d251429014a2b"].into(),
+			hex!["619473a7bd9f608bfdfa93582b53cc8867245e91c9fe5026fee379d47c94dd09"].into(),
+			hex!["ab66295ab4f3015a6108e391181f8ac13e40b437cedfa87983688c7e5065bb70"].into(),
+			hex!["01489c5e4c7d0cc8af9fba72c72b95785357e2db50fd8c5ae907ac799a66d9dd"].into(),
+			hex!["e48e7a2b1c381a7a0821d61791daaa695bfd070815dd9fe02b51f60f81f0e034"].into(),
+			hex!["8510ba4363ac9a70b34fd586a5a6a1335e3484ec4767617f49db060865e899c4"].into(),
+			hex!["83191772bc526b7625ee6ca197a63f984ca10afc2231ad87865d71a6fda0b84d"].into(),
+			hex!["d04fa941c18fef1461da631b36766e410ef0017817a06f5c8728e3b23d87f660"].into(),
+			hex!["b30d0b164273c00050d4c2e1eb1cc8be6ade9ac9078abbb692c649c81b4c21b4"].into(),
+			hex!["d3739f9e24a0644f34b1301bb490745a1afdfa45bd1c699fbcba0a6723ecc87c"].into(),
+			hex!["cf77ff32f8728fd08e9bbd70b0161ba979c55e166de193c17c35a328ecf5cdc2"].into(),
 		])
 	)
 }
@@ -87,7 +81,7 @@ pub fn edgeware_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![];
 	Ok(ChainSpec::from_genesis(
 		"Edgeware",
-		"edge",
+		"edgeware",
 		edgeware_config_gensis,
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
@@ -141,11 +135,11 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, Author
 
 /// Helper function to create GenesisConfig for testing
 pub fn testnet_genesis(
-	mut initial_authorities: Vec<(AccountId, AccountId, AuthorityId)>,
+	initial_authorities: Vec<(AccountId, AccountId, AuthorityId)>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 ) -> GenesisConfig {
-	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed("Alice"),
 			get_account_id_from_seed("Bob"),
@@ -155,17 +149,6 @@ pub fn testnet_genesis(
 			get_account_id_from_seed("Ferdie"),
 		]
 	});
-
-	endowed_accounts.append(&mut vec![
-		hex!["d52793d9a0c5c7c82275f6d20cb314045e3ec4b93d73d828d9219f6b21ccdd51"].into(),
-		hex!["148cac52642973fc4a61bb434e6421681e67b64974d04a172e7c2514d26d5366"].into(),
-		hex!["7e0837ed15ea8198b099502570f356f9ec0b49fa2b961ec35e8ebd5498647335"].into(),
-		hex!["eb708c619cdd7634c0ba7238c1f13a9c5cb4816d5af02c3fdde717f1966d05ad"].into(),
-		hex!["df291854c27a22c50322344604076e8b2dc3ffe11dbdcd886adba9e0d6c9f950"].into(),
-		hex!["3bd15363a31eac0e5ecd067731d8a4561185347fc804c50b507025abc29c2ba1"].into(),
-		hex!["65b118b4ae7fe642a59316fc5f0ad9b75cdb9f5ab52733165004f7602755bcfd"].into(),
-		hex!["68128017e34fe40f4ed40f79c24dc7f5a531afc82fc6b71e8092c903627a9133"].into(),
-	]);
 
 	const STASH: u128 = 1 << 20;
 	const ENDOWMENT: u128 = 1 << 20;
