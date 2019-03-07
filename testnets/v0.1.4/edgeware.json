@@ -2,7 +2,8 @@
   "name": "Edgeware V0.1.4",
   "id": "edgeware",
   "bootNodes": [
-    "/ip4/127.0.0.1/tcp/30333/p2p/QmPjWChzbRq3atxwkv2mUFK5pD4jQ8wD6j4Yh5UtZ5Gn5j"
+    "/ip4/18.222.29.148/tcp/30333/p2p/QmR55crQd55hvNr2i4oHpEEWAM4eJd3xskjcQzycq1Larq",
+    "/ip4/18.221.47.154/tcp/30333/p2p/QmNTaWsiKXCMwFabqFJfuY4zh8WW4o1iXtt8dN6LWDgkdv"
   ],
   "telemetryEndpoints": [
     [
