@@ -3,7 +3,8 @@
   "id": "edgeware",
   "bootNodes": [
     "/ip4/18.222.29.148/tcp/30333/p2p/QmR55crQd55hvNr2i4oHpEEWAM4eJd3xskjcQzycq1Larq",
-    "/ip4/18.221.47.154/tcp/30333/p2p/QmNTaWsiKXCMwFabqFJfuY4zh8WW4o1iXtt8dN6LWDgkdv"
+    "/ip4/18.221.47.154/tcp/30333/p2p/QmNTaWsiKXCMwFabqFJfuY4zh8WW4o1iXtt8dN6LWDgkdv",
+    "/ip4/18.223.143.102/tcp/30333/p2p/QmRHGbxdxWgi8CttEsegzDVY38prr4yMngRfUqVkhqoXho"
   ],
   "telemetryEndpoints": [
     [
