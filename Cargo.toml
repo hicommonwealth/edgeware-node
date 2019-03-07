@@ -1,6 +1,6 @@
 [package]
 name = "edgeware"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 build = "build.rs"
 
