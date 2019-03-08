@@ -1,3 +1,19 @@
+// Copyright 2018 Commonwealth Labs, Inc.
+// This file is part of Edgeware.
+
+// Edgeware is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Edgeware is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
+
 //! Service and ServiceFactory implementation. Specialized wrapper over Substrate service.
 
 #![warn(unused_extern_crates)]
@@ -103,6 +119,7 @@ construct_service_factory! {
 					},
 					link_half,
 					grandpa::NetworkBridge::new(service.network()),
+					service.config.custom.inherent_data_providers.clone(),
 					service.on_exit(),
 				)?);
 
@@ -111,12 +128,8 @@ construct_service_factory! {
 		},
 		LightService = LightComponents<Self>
 			{ |config, executor| <LightComponents<Factory>>::new(config, executor) },
-		FullImportQueue = AuraImportQueue<
-			Self::Block,
-			FullClient<Self>,
-			NothingExtra,
-		>
-			{ |config: &mut FactoryFullConfiguration<Self>, client: Arc<FullClient<Self>>| {
+		FullImportQueue = AuraImportQueue<Self::Block>
+			{ |config: &mut FactoryFullConfiguration<Self> , client: Arc<FullClient<Self>>| {
 				let slot_duration = SlotDuration::get_or_compute(&*client)?;
 				let (block_import, link_half) =
 					grandpa::block_import::<_, _, _, RuntimeApi, FullClient<Self>>(
@@ -136,11 +149,7 @@ construct_service_factory! {
 					config.custom.inherent_data_providers.clone(),
 				).map_err(Into::into)
 			}},
-		LightImportQueue = AuraImportQueue<
-			Self::Block,
-			LightClient<Self>,
-			NothingExtra,
-		>
+		LightImportQueue = AuraImportQueue<Self::Block>
 			{ |config: &FactoryFullConfiguration<Self>, client: Arc<LightClient<Self>>| {
 					import_queue(
 						SlotDuration::get_or_compute(&*client)?,

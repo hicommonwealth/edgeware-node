@@ -1,3 +1,19 @@
+// Copyright 2018 Commonwealth Labs, Inc.
+// This file is part of Edgeware.
+
+// Edgeware is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Edgeware is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
+
 //! Substrate Node Template CLI library.
 
 #![warn(missing_docs)]
@@ -17,6 +33,7 @@ extern crate substrate_client as client;
 extern crate substrate_network as network;
 #[macro_use]
 extern crate substrate_executor;
+extern crate substrate_telemetry;
 extern crate substrate_transaction_pool as transaction_pool;
 #[macro_use]
 extern crate substrate_service;
@@ -26,6 +43,8 @@ extern crate edgeware_runtime;
 extern crate node_executor;
 extern crate substrate_finality_grandpa as grandpa;
 extern crate node_primitives;
+#[macro_use]
+extern crate hex_literal;
 
 use futures::sync::oneshot;
 use futures::{future, Future};

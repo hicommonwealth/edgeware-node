@@ -1,6 +1,6 @@
 [package]
 name = "edgeware"
-version = "0.1.3"
+version = "0.1.5"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 build = "build.rs"
 
@@ -51,6 +51,7 @@ members = [
 	"modules/edge-identity",
 	"modules/edge-voting",
 	"modules/edge-merkletree",
+    "subkey",
 ]
 exclude = [ "node/runtime/wasm" ]
 
