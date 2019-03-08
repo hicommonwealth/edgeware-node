@@ -33,25 +33,25 @@ extern crate sr_io as runtime_io;
 extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
-extern crate bellman;
-extern crate ff;
 extern crate num_bigint;
 extern crate num_traits;
+extern crate bellman;
 extern crate sapling_crypto;
 
+use bellman::pairing::bn256::Bn256;
+use bellman::pairing::bn256::Fr;
+use bellman::pairing::ff::{BitIterator, PrimeField, Field};
 use sapling_crypto::{
     babyjubjub::{
         JubjubBn256,
     },
 };
 use num_traits::Num;
-use ff::{BitIterator, PrimeField, Field};
-use pairing::{bn256::{Bn256, Fr}};
 use rstd::prelude::*;
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::Hash;
+
 use runtime_primitives::traits::{Zero};
 use codec::Encode;
 
@@ -277,7 +277,7 @@ impl<T: Trait> Module<T> {
     }
 
     pub fn get_precomputes(index: usize) -> Fr {
-        let mut pt = pairing::bn256::Fr::zero();
+        let mut pt = Fr::zero();
 
         for _ in 0..index {
             pt = Self::hash_from_halves(pt.clone(), pt.clone(), Some(index));

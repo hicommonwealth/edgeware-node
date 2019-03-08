@@ -53,10 +53,10 @@ mod tests {
 	use rstd::prelude::*;
 	use runtime_support::dispatch::Result;
 	use runtime_io::ed25519::Pair;
-	use system::{EventRecord, Phase};
+	
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher, Hasher};
-	use rstd::result;
+	
 	use codec::Encode;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
@@ -104,7 +104,6 @@ mod tests {
 		type Balance = u64;
 		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
-		type EnsureAccountLiquid = ();
 		type Event = Event;
 	}
 
@@ -140,10 +139,6 @@ mod tests {
 
 	fn add_leaf(who: H256, tree_id: u32, leaf_hash: H256) -> Result {
 		MerkleTree::add_leaf(Origin::signed(who), tree_id, leaf_hash.encode())
-	}
-
-	fn verify_zk_snark(who: H256, tree_id: u32, params: Vec<u8>, proof: Vec<u8>, nullifier_hex: Vec<u8>, root_hex: Vec<u8>) -> Result {
-		MerkleTree::verify_zkproof(Origin::signed(who), tree_id, params, proof, nullifier_hex, root_hex)
 	}
 
 	#[test]
