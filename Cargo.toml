@@ -51,7 +51,7 @@ members = [
 	"modules/edge-identity",
 	"modules/edge-voting",
 	"modules/edge-merkletree",
-    "subkey",
+    "subkey"
 ]
 exclude = [ "node/runtime/wasm" ]
 
