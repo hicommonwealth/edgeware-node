@@ -1,3 +1,19 @@
+// Copyright 2018 Commonwealth Labs, Inc.
+// This file is part of Edgeware.
+
+// Edgeware is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Edgeware is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
+
 //! The Edgeware runtime. This can be compiled with `#[no_std]`, ready for Wasm.
 
 #![cfg_attr(not(feature = "std"), no_std)]
@@ -36,7 +52,10 @@ extern crate srml_staking as staking;
 extern crate srml_system as system;
 extern crate srml_timestamp as timestamp;
 extern crate srml_treasury as treasury;
+extern crate srml_fees as fees;
+extern crate srml_finality_tracker as finality_tracker;
 extern crate srml_upgrade_key as upgrade_key;
+
 extern crate node_primitives;
 extern crate substrate_consensus_aura_primitives as consensus_aura;
 
@@ -82,10 +101,10 @@ pub use timestamp::BlockPeriod;
 /// This runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
-	impl_name: create_runtime_str!("edgeware"),
+	impl_name: create_runtime_str!("edgeware node"),
 	authoring_version: 1,
-	spec_version: 1,
-	impl_version: 0,
+	spec_version: 2,
+	impl_version: 2,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -123,19 +142,30 @@ impl indices::Trait for Runtime {
 	type Event = Event;
 }
 
+// impl balances::Trait for Runtime {
+// 	type Balance = Balance;
+// 	type OnFreeBalanceZero = ((Staking, Contract), Democracy);
+// 	type OnNewAccount = Indices;
+// 	type EnsureAccountLiquid = (Staking, Democracy);
+// 	type Event = Event;
+// }
 impl balances::Trait for Runtime {
 	type Balance = Balance;
-	type OnFreeBalanceZero = ((Staking, Contract), Democracy);
+	type OnFreeBalanceZero = ((Staking, Contract), Session);
 	type OnNewAccount = Indices;
-	type EnsureAccountLiquid = (Staking, Democracy);
 	type Event = Event;
+}
+
+impl fees::Trait for Runtime {
+	type Event = Event;
+	type TransferAsset = Balances;
 }
 
 impl consensus::Trait for Runtime {
 	type Log = Log;
 	type SessionKey = SessionKey;
 
-	// the aura module handles offline-reports internally
+	// The Aura module handles offline-reports internally
 	// rather than using an explicit report system.
 	type InherentOfflineReport = ();
 }
@@ -206,6 +236,10 @@ impl grandpa::Trait for Runtime {
 	type Event = Event;
 }
 
+impl finality_tracker::Trait for Runtime {
+	type OnFinalizationStalled = grandpa::SyncedAuthorities<Runtime>;
+}
+
 impl upgrade_key::Trait for Runtime {
 	/// The uniquitous event type.
 	type Event = Event;
@@ -244,15 +278,17 @@ construct_runtime!(
 		Indices: indices,
 		Balances: balances,
 		Session: session,
-		Staking: staking,
+		Staking: staking::{default, OfflineWorker},
 		Democracy: democracy,
 		Council: council::{Module, Call, Storage, Event<T>},
 		CouncilVoting: council_voting,
 		CouncilMotions: council_motions::{Module, Call, Storage, Event<T>, Origin},
 		CouncilSeats: council_seats::{Config<T>},
+		FinalityTracker: finality_tracker::{Module, Call, Inherent},
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Treasury: treasury,
 		Contract: contract::{Module, Call, Storage, Config<T>, Event<T>},
+		Fees: fees::{Module, Storage, Config<T>, Event<T>},
 		UpgradeKey: upgrade_key,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
@@ -276,7 +312,7 @@ pub type UncheckedExtrinsic = generic::UncheckedMortalCompactExtrinsic<Address, 
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Index, Call>;
 /// Executive: handles dispatch to the various modules.
-pub type Executive = executive::Executive<Runtime, Block, system::ChainContext<Runtime>, Balances, AllModules>;
+pub type Executive = executive::Executive<Runtime, Block, system::ChainContext<Runtime>, Fees, AllModules>;
 
 impl_runtime_apis! {
 	impl client_api::Core<Block> for Runtime {
@@ -337,9 +373,23 @@ impl_runtime_apis! {
 		{
 			for log in digest.logs.iter().filter_map(|l| match l {
 				Log(InternalLog::grandpa(grandpa_signal)) => Some(grandpa_signal),
-				_=> None
+				_ => None
 			}) {
 				if let Some(change) = Grandpa::scrape_digest_change(log) {
+					return Some(change);
+				}
+			}
+			None
+		}
+
+		fn grandpa_forced_change(digest: &DigestFor<Block>)
+			-> Option<(NumberFor<Block>, ScheduledChange<NumberFor<Block>>)>
+		{
+			for log in digest.logs.iter().filter_map(|l| match l {
+				Log(InternalLog::grandpa(grandpa_signal)) => Some(grandpa_signal),
+				_ => None
+			}) {
+				if let Some(change) = Grandpa::scrape_digest_forced_change(log) {
 					return Some(change);
 				}
 			}

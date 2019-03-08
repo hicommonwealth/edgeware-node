@@ -104,7 +104,6 @@ mod tests {
 		type Balance = u64;
 		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
-		type EnsureAccountLiquid = ();
 		type Event = Event;
 	}
 

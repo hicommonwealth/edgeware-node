@@ -1,3 +1,19 @@
+// Copyright 2018 Commonwealth Labs, Inc.
+// This file is part of Edgeware.
+
+// Edgeware is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Edgeware is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
+
 extern crate substrate_cli as cli;
 
 use service;
@@ -8,6 +24,48 @@ use substrate_service::{ServiceFactory, Roles as ServiceRoles};
 use chain_spec;
 use std::ops::Deref;
 pub use substrate_cli::error;
+
+/// The chain specification option.
+#[derive(Clone, Debug)]
+pub enum ChainSpec {
+	/// Whatever the current runtime is, with just Alice as an auth.
+	Development,
+	/// Whatever the current runtime is, with simple Alice/Bob auths.
+	LocalTestnet,
+	/// Edgeware testnet.
+	Edgeware,
+	EdgewareTestnet,
+}
+
+/// Get a chain config from a spec setting.
+impl ChainSpec {
+	pub(crate) fn load(self) -> Result<chain_spec::ChainSpec, String> {
+		Ok(match self {
+			ChainSpec::Edgeware => chain_spec::edgeware_config()?,
+			ChainSpec::EdgewareTestnet => chain_spec::edgeware_testnet_config(),
+			ChainSpec::Development => chain_spec::development_config(),
+			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
+		})
+	}
+
+	pub(crate) fn from(s: &str) -> Option<Self> {
+		println!("Network {:?}", s);
+		match s {
+			"dev" => Some(ChainSpec::Development),
+			"local" => Some(ChainSpec::LocalTestnet),
+			"" | "edge" => Some(ChainSpec::Edgeware),
+			"edgeware" => Some(ChainSpec::EdgewareTestnet),
+			_ => None,
+		}
+	}
+}
+
+fn load_spec(id: &str) -> Result<Option<chain_spec::ChainSpec>, String> {
+	Ok(match ChainSpec::from(id) {
+		Some(spec) => Some(spec.load()?),
+		None => None,
+	})
+}
 
 /// Parse command line arguments into service configuration.
 pub fn run<I, T, E>(args: I, exit: E, version: cli::VersionInfo) -> error::Result<()> where
@@ -42,12 +100,6 @@ pub fn run<I, T, E>(args: I, exit: E, version: cli::VersionInfo) -> error::Resul
 	).map_err(Into::into).map(|_| ())
 }
 
-fn load_spec(id: &str) -> Result<Option<chain_spec::ChainSpec>, String> {
-	Ok(match chain_spec::Alternative::from(id) {
-		Some(spec) => Some(spec.load()?),
-		None => None,
-	})
-}
 fn run_until_exit<T, C, E>(
 	mut runtime: Runtime,
 	service: T,
