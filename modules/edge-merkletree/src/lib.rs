@@ -52,6 +52,25 @@ extern crate sapling_crypto;
 pub mod merkle_tree;
 pub use merkle_tree::{Module, Trait, RawEvent, Event};
 
+#[cfg(not(target_arch = "wasm32"))]
+use std::time::{Instant};
+
+pub struct Stopwatch {
+    start: Instant,
+}
+
+impl Stopwatch {
+    pub fn start() -> Self {
+        Stopwatch {
+            start: Instant::now(),
+        }
+    }
+
+    pub fn finish(self) -> u128 {
+        return self.start.elapsed().as_millis();
+    }
+}
+
 // Tests for Delegation Module
 #[cfg(test)]
 mod tests {
@@ -65,7 +84,7 @@ mod tests {
 	use bellman::pairing::bn256::Fr;
 	use rand::Rand;
 	
-	use codec::Encode;
+	
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
@@ -73,7 +92,7 @@ mod tests {
 		testing::{Digest, DigestItem, Header}
 	};
 
-	static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
+	// static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
 	impl_outer_origin! {
 		pub enum Origin for Test {}
@@ -159,6 +178,29 @@ mod tests {
 			let tree = MerkleTree::merkle_tree_metadata(0).unwrap();
 			assert_eq!(tree.fee, 0);
 			assert_eq!(tree.depth, 31);
+		});
+	}
+
+	#[test]
+	fn time_functions() {
+		with_externalities(&mut new_test_ext(), || {
+			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
+			let public: H256 = pair.public().0.into();
+
+			let mut stopwatch = Stopwatch::start();
+			
+			assert_ok!(create_tree(public, None, None, None));
+			let mut millis = stopwatch.finish();
+			println!("create tree time elapsed: {}", millis);
+
+			
+			for i in 0..32 {
+				stopwatch = Stopwatch::start();
+				let precompute_i = MerkleTree::get_precomputes(i);
+				println!("{:?}", precompute_i);
+				millis = stopwatch.finish();
+				println!("generating precompute of depth {} time elapsed: {}", i, millis);
+			}
 		});
 	}
 

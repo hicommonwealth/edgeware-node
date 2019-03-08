@@ -96,7 +96,6 @@ decl_module! {
 
             let ctr = Self::number_of_trees();
             for i in 0..depth {
-                println!("Add empty level at level {:?}", i);
                 <MerkleTreeLevels<T>>::insert((ctr, i), vec![]);
             }
 
@@ -172,7 +171,6 @@ impl<T: Trait> Module<T> {
         let mut tree = <MerkleTreeMetadata<T>>::get(key).ok_or("Tree doesn't exist").unwrap();
         // Add element
         let leaf_index = tree.leaf_count;
-        println!("Leaf index {:?}", leaf_index);
         tree.leaf_count += 1;
         if let Some(mut mt_level) = <MerkleTreeLevels<T>>::get((key, tree.depth - 1)) {
             mt_level.push(leaf);
@@ -182,13 +180,11 @@ impl<T: Trait> Module<T> {
         let mut curr_index = leaf_index as usize;
         // Update the tree
         for i in 0..(tree.depth - 1) {
-            println!("{:?}", tree.depth - i - 1);
             let mut left: Vec<u8>;
             let mut right: Vec<u8>;
             let next_index = curr_index / 2;
             let inx = i as usize;
             let level = <MerkleTreeLevels<T>>::get((key, tree.depth - i - 1));
-            println!("{:?}", level);
             if curr_index % 2 == 0 {
                 let left_val = &level.clone().unwrap()[curr_index].clone();
                 left = left_val.to_vec();
@@ -268,22 +264,6 @@ impl<T: Trait> Module<T> {
         ).into_xy().0;
         
         return hash;
-    }
-
-    fn compute_new_root(mut nodes: Vec<Fr>, depth: usize) -> Fr {
-        if nodes.len() == 2 {
-            let l = nodes.remove(0);
-            let r = nodes.remove(0);
-            return Self::hash_from_halves(l, r, Some(depth - 1));
-        } else {
-            let left_nodes = nodes[..(nodes.len() / 2)].to_vec();
-            let right_nodes = nodes[(nodes.len() / 2)..].to_vec();
-            return Self::hash_from_halves(
-                Self::compute_new_root(left_nodes, depth - 1),
-                Self::compute_new_root(right_nodes, depth - 1),
-                Some(depth),
-            );
-        }
     }
 
     pub fn get_unique_node(leaf: Vec<u8>, index: usize) -> Vec<u8> {
