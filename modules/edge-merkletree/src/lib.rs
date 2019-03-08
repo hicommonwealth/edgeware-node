@@ -43,6 +43,12 @@ extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_delegation as delegation;
 
+extern crate rand;
+extern crate num_bigint;
+extern crate num_traits;
+extern crate bellman;
+extern crate sapling_crypto;
+
 pub mod merkle_tree;
 pub use merkle_tree::{Module, Trait, RawEvent, Event};
 
@@ -55,13 +61,15 @@ mod tests {
 	use runtime_io::ed25519::Pair;
 	
 	use runtime_io::with_externalities;
-	use primitives::{H256, Blake2Hasher, Hasher};
+	use primitives::{H256, Blake2Hasher};
+	use bellman::pairing::bn256::Fr;
+	use rand::Rand;
 	
 	use codec::Encode;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage, traits::{BlakeTwo256, Hash, IdentityLookup},
+		BuildStorage, traits::{BlakeTwo256, IdentityLookup},
 		testing::{Digest, DigestItem, Header}
 	};
 
@@ -137,8 +145,8 @@ mod tests {
 		MerkleTree::create_tree(Origin::signed(who), fee, depth, leaves)
 	}
 
-	fn add_leaf(who: H256, tree_id: u32, leaf_hash: H256) -> Result {
-		MerkleTree::add_leaf(Origin::signed(who), tree_id, leaf_hash.encode())
+	fn add_leaf(who: H256, tree_id: u32, leaf_hash: Vec<u8>) -> Result {
+		MerkleTree::add_leaf(Origin::signed(who), tree_id, leaf_hash)
 	}
 
 	#[test]
@@ -147,11 +155,10 @@ mod tests {
 			System::set_block_number(1);
 			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 			let public: H256 = pair.public().0.into();
-			let default_root_hash = MerkleTree::get_precomputes(0);
 			assert_ok!(create_tree(public, None, None, None));
 			let tree = MerkleTree::merkle_tree_metadata(0).unwrap();
 			assert_eq!(tree.fee, 0);
-			assert_eq!(tree.depth, 32);
+			assert_eq!(tree.depth, 31);
 		});
 	}
 
@@ -162,8 +169,13 @@ mod tests {
 			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
 			let public: H256 = pair.public().0.into();
 			assert_ok!(create_tree(public, None, None, None));
-			let leaf_hash = Blake2Hasher::hash(&"leaf hash".as_bytes());
-			assert_ok!(add_leaf(public, 0, leaf_hash));
+
+			let mut rng = rand::thread_rng();
+			let left_pt = Fr::rand(&mut rng);
+			let right_pt = Fr::rand(&mut rng);
+			let leaf_hash = MerkleTree::hash_from_halves(left_pt, right_pt, None);
+			let leaf_bytes = MerkleTree::convert_point_to_bytes(leaf_hash);
+			assert_ok!(add_leaf(public, 0, leaf_bytes));
 		});
 	}
 }

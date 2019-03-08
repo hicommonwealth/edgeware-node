@@ -64,12 +64,12 @@ use num_bigint::BigInt;
 pub struct MTree<Balance> {
     pub fee: Balance,
     pub depth: u32,
-    pub leaf_count: u64
+    pub leaf_count: u32
 }
 
-const DEFAULT_TREE_DEPTH: u32 = 32;
+const DEFAULT_TREE_DEPTH: u32 = 31;
 // TODO: Better estimates/decisions
-const MAX_DEPTH: u32 = 256;
+const MAX_DEPTH: u32 = 31;
 
 pub trait Trait: balances::Trait + delegation::Trait {
 	/// The overarching event type.
@@ -92,12 +92,12 @@ decl_module! {
                 Some(d) => d,
                 None => DEFAULT_TREE_DEPTH,
             };
-            ensure!(depth < MAX_DEPTH, "Fee is too large");
+            ensure!(depth <= MAX_DEPTH, "Fee is too large");
 
             let ctr = Self::number_of_trees();
             for i in 0..depth {
-                let empty_level = vec![vec![]; 2_i32.pow(i) as usize];
-                <MerkleTreeLevels<T>>::insert((ctr, i), empty_level);
+                println!("Add empty level at level {:?}", i);
+                <MerkleTreeLevels<T>>::insert((ctr, i), vec![]);
             }
 
             let mtree = MTree {
@@ -122,8 +122,8 @@ decl_module! {
             let _sender = ensure_signed(origin)?;
             let tree = <MerkleTreeMetadata<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             ensure!(<balances::Module<T>>::free_balance(_sender.clone()) >= tree.fee, "Insufficient balance from sender");    
-            ensure!(tree.leaf_count < 2_i32.pow(tree.depth) as u64, "Insufficient capacity in tree");
-
+            ensure!(tree.leaf_count < (1 << 31), "Insufficient capacity in tree");
+            println!("Hello");
             Self::add_leaf_element(tree_id, leaf_value);
             Ok(())
         }
@@ -172,42 +172,60 @@ impl<T: Trait> Module<T> {
         let mut tree = <MerkleTreeMetadata<T>>::get(key).ok_or("Tree doesn't exist").unwrap();
         // Add element
         let leaf_index = tree.leaf_count;
+        println!("Leaf index {:?}", leaf_index);
         tree.leaf_count += 1;
-        if let Some(mut mt_level) = <MerkleTreeLevels<T>>::get((key, tree.depth)) {
+        if let Some(mut mt_level) = <MerkleTreeLevels<T>>::get((key, tree.depth - 1)) {
             mt_level.push(leaf);
-            <MerkleTreeLevels<T>>::insert((key, tree.depth), mt_level);
+            <MerkleTreeLevels<T>>::insert((key, tree.depth - 1), mt_level);
         }
-        
 
         let mut curr_index = leaf_index as usize;
-        let mut leaf1: Vec<u8>;
-        let mut leaf2: Vec<u8>;
         // Update the tree
-        for i in 0..tree.depth {
+        for i in 0..(tree.depth - 1) {
+            println!("{:?}", tree.depth - i - 1);
+            let mut left: Vec<u8>;
+            let mut right: Vec<u8>;
             let next_index = curr_index / 2;
             let inx = i as usize;
+            let level = <MerkleTreeLevels<T>>::get((key, tree.depth - i - 1));
+            println!("{:?}", level);
             if curr_index % 2 == 0 {
-                let leaf1_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index];
-                leaf1 = leaf1_val.to_vec();
-                let leaf2_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index + 1];
-                leaf2 = Self::get_unique_leaf(leaf2_val.to_vec(), inx);
+                let left_val = &level.clone().unwrap()[curr_index].clone();
+                left = left_val.to_vec();
+                // Get leaf if exists or use precomputed hash
+                let right_val = {
+                    let mut temp = vec![];
+                    if level.clone().unwrap().len() >= curr_index + 2 {
+                        temp = level.clone().unwrap()[curr_index + 1].to_vec()
+                    }
+                    // returns precompute for an index or the node
+                    Self::get_unique_node(temp, inx)
+                };
+
+                right = right_val.to_vec();
             } else {
-                let leaf1_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index - 1];
-                leaf1 = Self::get_unique_leaf(leaf1_val.to_vec(), inx);
-                let leaf2_val = &<MerkleTreeLevels<T>>::get((key, tree.depth - i)).unwrap()[curr_index];
-                leaf2 = leaf2_val.to_vec();
+                let left_val = &level.clone().unwrap()[curr_index - 1];
+                left = Self::get_unique_node(left_val.to_vec(), inx);
+                let right_val = &level.clone().unwrap()[curr_index];
+                right = right_val.to_vec();
             }
 
-            if let Some(mut level) = <MerkleTreeLevels<T>>::get((key, tree.depth - i + 1)) {
-                level[next_index] = Self::convert_point_to_bytes(
-                    Self::hash_from_halves(
-                        Self::convert_bytes_to_point(leaf1),
-                        Self::convert_bytes_to_point(leaf2),
-                        Some(inx)
-                    )
+            if let Some(mut next_level) = <MerkleTreeLevels<T>>::get((key, tree.depth - i - 2)) {
+                println!("Next level {:?}", tree.depth - i - 2);
+                let new_node = Self::hash_from_halves(
+                    Self::convert_bytes_to_point(left),
+                    Self::convert_bytes_to_point(right),
+                    Some(inx)
                 );
+                println!("{:?}", new_node);
+                if next_level.len() >= next_index + 1 {
+                    next_level[next_index] = Self::convert_point_to_bytes(new_node);
+                } else {
+                    next_level.push(Self::convert_point_to_bytes(new_node));
+                }
+                println!("{:?}", next_level);
 
-                <MerkleTreeLevels<T>>::insert((key, tree.depth - i + 1), level);
+                <MerkleTreeLevels<T>>::insert((key, tree.depth - i - 2), next_level);
             }
 
             curr_index = next_index;
@@ -216,24 +234,25 @@ impl<T: Trait> Module<T> {
         <MerkleTreeMetadata<T>>::insert(key, tree);
     }
 
-    fn convert_bytes_to_point(bytes: Vec<u8>) -> Fr {
+    pub fn convert_bytes_to_point(bytes: Vec<u8>) -> Fr {
         let big = BigInt::from_str_radix(&hex::encode(bytes), 16).unwrap();
         let raw = &big.to_str_radix(10);
         let pt = Fr::from_str(raw).ok_or("couldn't parse Fr").unwrap();
         return pt;
     }
 
-    fn convert_point_to_bytes(pt: Fr) -> Vec<u8> {
+    pub fn convert_point_to_bytes(pt: Fr) -> Vec<u8> {
         return pt.to_hex().as_bytes().to_vec();
     }
 
-    fn hash_from_halves(left: Fr, right: Fr, index: Option<usize>) -> Fr {
+    pub fn hash_from_halves(left: Fr, right: Fr, index: Option<usize>) -> Fr {
         let params = &JubjubBn256::new();
         let mut lhs: Vec<bool> = BitIterator::new(left.into_repr()).collect();
         let mut rhs: Vec<bool> = BitIterator::new(right.into_repr()).collect();
         lhs.reverse();
         rhs.reverse();
 
+        // Split on whether it is leaf node hash or intermediate node hash
         let personalization = if index.is_none() {
             sapling_crypto::baby_pedersen_hash::Personalization::NoteCommitment
         } else {
@@ -267,7 +286,7 @@ impl<T: Trait> Module<T> {
         }
     }
 
-    pub fn get_unique_leaf(leaf: Vec<u8>, index: usize) -> Vec<u8> {
+    pub fn get_unique_node(leaf: Vec<u8>, index: usize) -> Vec<u8> {
         if leaf != vec![] {
             return leaf;
         } else {
