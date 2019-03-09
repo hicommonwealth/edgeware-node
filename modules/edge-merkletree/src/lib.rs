@@ -197,7 +197,7 @@ mod tests {
 			for i in 0..32 {
 				stopwatch = Stopwatch::start();
 				let precompute_i = MerkleTree::get_precomputes(i);
-				println!("{:?}", precompute_i);
+				println!("{:?}, {:?}", precompute_i, MerkleTree::convert_point_to_bytes(precompute_i));
 				millis = stopwatch.finish();
 				println!("generating precompute of depth {} time elapsed: {}", i, millis);
 			}
