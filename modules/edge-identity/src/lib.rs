@@ -327,7 +327,7 @@ mod tests {
 
  			expiration_time = Identity::expiration_time();
 			now = Timestamp::get();
-			let attest_expires_at = now + expiration_time;
+			let _attest_expires_at = now + expiration_time;
 
 			assert_eq!(
 				System::events(),
@@ -338,7 +338,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
 					}
 				]
 			);
@@ -436,7 +436,7 @@ mod tests {
 
  			expiration_time = Identity::expiration_time();
 			now = Timestamp::get();
-			let attest_expires_at = now + expiration_time;
+			let _attest_expires_at = now + expiration_time;
 
 			let verifier = H256::from_low_u64_be(1);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
@@ -450,7 +450,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),

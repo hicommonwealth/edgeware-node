@@ -134,7 +134,7 @@ decl_module! {
 			// currently this implements no check against updating
 			// proof links
 			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-				proof: Some(attestation),
+				proof: Some(attestation.clone()),
 				stage: IdentityStage::Attested,
 				expiration_time: expiration.clone(),
 				..record
@@ -145,7 +145,7 @@ decl_module! {
 				idents.push((identity_hash, expiration.clone()))
 			});
 
-			Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into(), id_type, identity));
+			Self::deposit_event(RawEvent::Attest(attestation, identity_hash, _sender.into(), id_type, identity));
 			Ok(())
 		}
 
@@ -250,7 +250,7 @@ decl_event!(
 		/// (record_hash, creator, expiration) when an account is registered
 		Register(Hash, AccountId, Moment),
 		/// (record_hash, creator, identity_type, identity) when an account creator submits an attestation
-		Attest(Hash, AccountId, Vec<u8>, Vec<u8>),
+		Attest(Vec<u8>, Hash, AccountId, Vec<u8>, Vec<u8>),
 		/// (record_hash, verifier) when a verifier approves an account
 		Verify(Hash, AccountId),
 		/// (record_hash) when an account is expired and deleted
