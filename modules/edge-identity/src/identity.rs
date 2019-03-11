@@ -188,6 +188,7 @@ decl_module! {
 				Self::remove_pending_identity(&identity_hashes[i]);
 			}
 
+			Self::deposit_event(RawEvent::Denied(identity_hashes, _sender));
 			Ok(())
 		}
 
@@ -255,6 +256,8 @@ decl_event!(
 		Verify(Hash, AccountId),
 		/// (record_hash) when an account is expired and deleted
 		Expired(Hash),
+		/// {identity_hashes} when a valid verifier denies a batch of registration/attestations
+		Denied(Vec<Hash>, AccountId),
 	}
 );
 

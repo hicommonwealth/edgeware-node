@@ -507,7 +507,15 @@ mod tests {
 			}
 
 			let verifier = H256::from_low_u64_be(1);
-			assert_ok!(batch_deny(verifier, &id_hashes, 0))
+			assert_ok!(batch_deny(verifier, &id_hashes, 0));
+			let events = System::events();
+			assert_eq!(
+				events[events.len() - 1],
+				EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Denied(id_hashes, verifier))
+				}
+			);
 		});
 	}
 
