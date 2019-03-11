@@ -144,6 +144,10 @@ mod tests {
 		Identity::verify_or_deny(Origin::signed(who), identity_hash, approve, verifier_index)
 	}
 
+	fn batch_deny(who: H256, identity_hashes: &[H256], verifier_index: usize) -> Result {
+		Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
+	}
+
 	fn add_metadata_to_account(
 		who: H256,
 		identity_hash: H256,
@@ -469,6 +473,41 @@ mod tests {
 					..default_identity_record(public, identity_type, identity)
 				})
 			);
+		});
+	}
+
+	#[test]
+	fn deny_many_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let mut pairs = vec![
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f62")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f63")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f64")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f65")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f66")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f67")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f68")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f69")),
+			];
+
+			let mut id_hashes = vec![];
+			for i in 0..10 {
+				let identity_type: &[u8] = b"github";
+				let identity: Vec<u8> = format!("drewstone {}", i).as_bytes().to_vec();
+				let identity_hash = build_identity_hash(identity_type, &identity);	
+				let pair: Pair = pairs.remove(0);
+				let public: H256 = pair.public().0.into();
+				assert_ok!(register_identity(public, identity_type, &identity));
+				let attestation: &[u8] = b"09283049820394820938402938234sdfsfsd";
+				assert_ok!(attest_to_identity(public, identity_hash, attestation));
+				id_hashes.push(identity_hash);
+			}
+
+			let verifier = H256::from_low_u64_be(1);
+			assert_ok!(batch_deny(verifier, &id_hashes, 0))
 		});
 	}
 
