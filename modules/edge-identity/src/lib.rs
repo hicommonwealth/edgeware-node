@@ -338,7 +338,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
+						event: Event::identity(RawEvent::Attest(identity_hash, public, identity_type.to_vec(), identity.to_vec()))
 					}
 				]
 			);
@@ -450,7 +450,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
+						event: Event::identity(RawEvent::Attest(identity_hash, public, identity_type.to_vec(), identity.to_vec()))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),

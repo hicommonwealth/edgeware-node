@@ -126,6 +126,8 @@ decl_module! {
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender, "Stored identity does not match sender");
 
+			let id_type = record.identity_type.clone();
+			let identity = record.identity.clone();
 			let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
 
 			// TODO: Decide how we want to process proof updates
@@ -143,7 +145,7 @@ decl_module! {
 				idents.push((identity_hash, expiration.clone()))
 			});
 
-			Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into(), expiration));
+			Self::deposit_event(RawEvent::Attest(identity_hash, _sender.into(), id_type, identity));
 			Ok(())
 		}
 
@@ -171,6 +173,19 @@ decl_module! {
 			} else {
 				Self::remove_pending_identity(&identity_hash);
 				Self::deposit_event(RawEvent::Expired(identity_hash))
+			}
+
+			Ok(())
+		}
+
+		/// Deny many verification requests
+		pub fn deny_many(origin, identity_hashes: Vec<T::Hash>, verifier_index: usize) -> Result {
+			let _sender = ensure_signed(origin)?;
+			ensure!(verifier_index < Self::verifiers().len(), "Verifier index out of bounds");
+			ensure!(Self::verifiers()[verifier_index] == _sender.clone(), "Sender is not a verifier");
+			
+			for i in 0..identity_hashes.len() {
+				Self::remove_pending_identity(&identity_hashes[i]);
 			}
 
 			Ok(())
@@ -234,8 +249,8 @@ decl_event!(
 		<T as timestamp::Trait>::Moment {
 		/// (record_hash, creator, expiration) when an account is registered
 		Register(Hash, AccountId, Moment),
-		/// (record_hash, creator, expiration) when an account creator submits an attestation
-		Attest(Hash, AccountId, Moment),
+		/// (record_hash, creator, identity_type, identity) when an account creator submits an attestation
+		Attest(Hash, AccountId, Vec<u8>, Vec<u8>),
 		/// (record_hash, verifier) when a verifier approves an account
 		Verify(Hash, AccountId),
 		/// (record_hash) when an account is expired and deleted
