@@ -154,41 +154,19 @@ decl_module! {
 			let _sender = ensure_signed(origin)?;
 			ensure!(verifier_index < Self::verifiers().len(), "Verifier index out of bounds");
 			ensure!(Self::verifiers()[verifier_index] == _sender.clone(), "Sender is not a verifier");
-			let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
-			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
-			match record.stage {
-				IdentityStage::Registered => return Err("No attestation to verify"),
-				IdentityStage::Verified => return Err("Already verified"),
-				IdentityStage::Attested => ()
-			}
-
-			if approve {
-				<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-					stage: IdentityStage::Verified,
-					expiration_time: T::Moment::zero(),
-					..record
-				});
-				<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != &identity_hash));
-				Self::deposit_event(RawEvent::Verify(identity_hash, _sender))
-			} else {
-				Self::remove_pending_identity(&identity_hash);
-				Self::deposit_event(RawEvent::Expired(identity_hash))
-			}
-
-			Ok(())
+			return Self::verify_or_deny_identity(_sender, &identity_hash, approve);
 		}
 
 		/// Deny many verification requests
-		pub fn deny_many(origin, identity_hashes: Vec<T::Hash>, verifier_index: usize) -> Result {
+		pub fn verify_or_deny_many(origin, identity_hashes: Vec<T::Hash>, approvals: Vec<bool>, verifier_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(verifier_index < Self::verifiers().len(), "Verifier index out of bounds");
 			ensure!(Self::verifiers()[verifier_index] == _sender.clone(), "Sender is not a verifier");
 			
 			for i in 0..identity_hashes.len() {
-				Self::remove_pending_identity(&identity_hashes[i]);
+				Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], approvals[i]).unwrap();
 			}
 
-			Self::deposit_event(RawEvent::Denied(identity_hashes, _sender));
 			Ok(())
 		}
 
@@ -240,6 +218,33 @@ impl<T: Trait> Module<T> {
 		<IdentityOf<T>>::remove(identity_hash);
 		<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
 	}
+
+	fn verify_or_deny_identity(sender: T::AccountId, identity_hash: &T::Hash, approve: bool) -> Result {
+		let record = <IdentityOf<T>>::get(identity_hash).ok_or("Identity does not exist")?;
+		ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
+		match record.stage {
+			IdentityStage::Registered => return Err("No attestation to verify"),
+			IdentityStage::Verified => return Err("Already verified"),
+			IdentityStage::Attested => ()
+		}
+
+		let id_type = record.identity_type.encode().clone();
+		let id = record.identity.encode().clone();
+		if approve {
+			<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
+			Self::deposit_event(RawEvent::Verify(*identity_hash, sender, id_type, id));
+			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+				stage: IdentityStage::Verified,
+				expiration_time: T::Moment::zero(),
+				..record
+			});
+		} else {
+			Self::remove_pending_identity(&identity_hash);
+			Self::deposit_event(RawEvent::Denied(*identity_hash, sender, id_type, id));
+		}
+
+		Ok(())
+	}
 }
 
 /// An event in this module.
@@ -253,11 +258,11 @@ decl_event!(
 		/// (record_hash, creator, identity_type, identity) when an account creator submits an attestation
 		Attest(Vec<u8>, Hash, AccountId, Vec<u8>, Vec<u8>),
 		/// (record_hash, verifier) when a verifier approves an account
-		Verify(Hash, AccountId),
+		Verify(Hash, AccountId, Vec<u8>, Vec<u8>),
 		/// (record_hash) when an account is expired and deleted
 		Expired(Hash),
 		/// {identity_hashes} when a valid verifier denies a batch of registration/attestations
-		Denied(Vec<Hash>, AccountId),
+		Denied(Hash, AccountId, Vec<u8>, Vec<u8>),
 	}
 );
 

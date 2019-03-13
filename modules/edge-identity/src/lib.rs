@@ -144,8 +144,8 @@ mod tests {
 		Identity::verify_or_deny(Origin::signed(who), identity_hash, approve, verifier_index)
 	}
 
-	fn batch_deny(who: H256, identity_hashes: &[H256], verifier_index: usize) -> Result {
-		Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
+	fn verify_or_deny_many(who: H256, identity_hashes: &[H256], approvals: Vec<bool>, verifier_index: usize) -> Result {
+		Identity::verify_or_deny_many(Origin::signed(who), identity_hashes.to_vec(), approvals, verifier_index)
 	}
 
 	fn add_metadata_to_account(
@@ -458,7 +458,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, verifier))
+						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec()))
 					}
 				]
 			);
@@ -477,7 +477,7 @@ mod tests {
 	}
 
 	#[test]
-	fn deny_many_should_work() {
+	fn verify_or_deny_many_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let mut pairs = vec![
@@ -494,7 +494,11 @@ mod tests {
 			];
 
 			let mut id_hashes = vec![];
+			let test_id_type: &[u8] = b"github";
+			let test_id: Vec<u8> = "drewstone 9".as_bytes().to_vec();
+			let mut approvals = vec![];
 			for i in 0..10 {
+				approvals.push(false);
 				let identity_type: &[u8] = b"github";
 				let identity: Vec<u8> = format!("drewstone {}", i).as_bytes().to_vec();
 				let identity_hash = build_identity_hash(identity_type, &identity);	
@@ -507,13 +511,13 @@ mod tests {
 			}
 
 			let verifier = H256::from_low_u64_be(1);
-			assert_ok!(batch_deny(verifier, &id_hashes, 0));
+			assert_ok!(verify_or_deny_many(verifier, &id_hashes, approvals, 0));
 			let events = System::events();
 			assert_eq!(
 				events[events.len() - 1],
 				EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Denied(id_hashes, verifier))
+						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode()))
 				}
 			);
 		});
