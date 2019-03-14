@@ -144,6 +144,10 @@ mod tests {
 		Identity::verify_or_deny(Origin::signed(who), identity_hash, approve, verifier_index)
 	}
 
+	fn verify_or_deny_many(who: H256, identity_hashes: &[H256], approvals: Vec<bool>, verifier_index: usize) -> Result {
+		Identity::verify_or_deny_many(Origin::signed(who), identity_hashes.to_vec(), approvals, verifier_index)
+	}
+
 	fn add_metadata_to_account(
 		who: H256,
 		identity_hash: H256,
@@ -327,7 +331,7 @@ mod tests {
 
  			expiration_time = Identity::expiration_time();
 			now = Timestamp::get();
-			let attest_expires_at = now + expiration_time;
+			let _attest_expires_at = now + expiration_time;
 
 			assert_eq!(
 				System::events(),
@@ -338,7 +342,7 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
 					}
 				]
 			);
@@ -436,7 +440,7 @@ mod tests {
 
  			expiration_time = Identity::expiration_time();
 			now = Timestamp::get();
-			let attest_expires_at = now + expiration_time;
+			let _attest_expires_at = now + expiration_time;
 
 			let verifier = H256::from_low_u64_be(1);
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
@@ -450,11 +454,11 @@ mod tests {
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(identity_hash, public, attest_expires_at))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, verifier))
+						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec()))
 					}
 				]
 			);
@@ -468,6 +472,53 @@ mod tests {
 					proof: Some(attestation.to_vec()),
 					..default_identity_record(public, identity_type, identity)
 				})
+			);
+		});
+	}
+
+	#[test]
+	fn verify_or_deny_many_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let mut pairs = vec![
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f62")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f63")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f64")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f65")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f66")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f67")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f68")),
+				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f69")),
+			];
+
+			let mut id_hashes = vec![];
+			let test_id_type: &[u8] = b"github";
+			let test_id: Vec<u8> = "drewstone 9".as_bytes().to_vec();
+			let mut approvals = vec![];
+			for i in 0..10 {
+				approvals.push(false);
+				let identity_type: &[u8] = b"github";
+				let identity: Vec<u8> = format!("drewstone {}", i).as_bytes().to_vec();
+				let identity_hash = build_identity_hash(identity_type, &identity);	
+				let pair: Pair = pairs.remove(0);
+				let public: H256 = pair.public().0.into();
+				assert_ok!(register_identity(public, identity_type, &identity));
+				let attestation: &[u8] = b"09283049820394820938402938234sdfsfsd";
+				assert_ok!(attest_to_identity(public, identity_hash, attestation));
+				id_hashes.push(identity_hash);
+			}
+
+			let verifier = H256::from_low_u64_be(1);
+			assert_ok!(verify_or_deny_many(verifier, &id_hashes, approvals, 0));
+			let events = System::events();
+			assert_eq!(
+				events[events.len() - 1],
+				EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode()))
+				}
 			);
 		});
 	}
