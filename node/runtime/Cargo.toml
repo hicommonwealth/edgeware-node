@@ -40,6 +40,7 @@ edge-identity = { path = "../../modules/edge-identity", default-features = false
 edge-delegation = { path = "../../modules/edge-delegation", default-features = false }
 edge-voting = { path = "../../modules/edge-voting", default-features = false }
 edge-governance = { path = "../../modules/edge-governance", default-features = false }
+edge-merkletree = { path = "../../modules/edge-merkletree", default-features = false }
 
 [features]
 default = ["std"]
@@ -76,4 +77,5 @@ std = [
 	"edge-delegation/std",
 	"edge-voting/std",
 	"edge-governance/std",
+	"edge-merkletree/std",
 ]

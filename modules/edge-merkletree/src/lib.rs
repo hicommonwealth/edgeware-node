@@ -143,7 +143,6 @@ mod tests {
 	}
 
 	pub type System = system::Module<Test>;
-	pub type Delegation = delegation::Module<Test>;
 	pub type MerkleTree = Module<Test>;
 
 	// This function basically just builds a genesis storage key/value store according to
@@ -217,7 +216,10 @@ mod tests {
 			let right_pt = Fr::rand(&mut rng);
 			let leaf_hash = MerkleTree::hash_from_halves(left_pt, right_pt, None);
 			let leaf_bytes = MerkleTree::convert_point_to_bytes(leaf_hash);
+			let stopwatch = Stopwatch::start();
 			assert_ok!(add_leaf(public, 0, leaf_bytes));
+			let millis = stopwatch.finish();
+			println!("adding new element of depth time elapsed: {}", millis);
 		});
 	}
 }

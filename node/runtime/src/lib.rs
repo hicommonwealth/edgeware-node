@@ -38,6 +38,7 @@ extern crate edge_delegation;
 extern crate edge_governance;
 extern crate edge_identity;
 extern crate edge_voting;
+extern crate edge_merkletree;
 extern crate srml_aura as aura;
 extern crate srml_balances as balances;
 extern crate srml_consensus as consensus;
@@ -59,6 +60,7 @@ extern crate srml_upgrade_key as upgrade_key;
 extern crate node_primitives;
 extern crate substrate_consensus_aura_primitives as consensus_aura;
 
+use edge_merkletree::merkle_tree;
 use edge_delegation::delegation;
 use edge_governance::governance;
 use edge_identity::identity;
@@ -265,6 +267,11 @@ impl identity::Trait for Runtime {
 	type Event = Event;
 }
 
+impl merkle_tree::Trait for Runtime {
+	/// The uniquitous event type.
+	type Event = Event;
+}
+
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, SessionKey>) where
 		Block = Block,
@@ -294,6 +301,7 @@ construct_runtime!(
 		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
+		MerkleTree: merkle_tree::{Module, Call, Storage, Event<T>},
 	}
 );
 
