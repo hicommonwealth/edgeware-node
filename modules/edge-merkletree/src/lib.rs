@@ -41,9 +41,8 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate edge_delegation as delegation;
 
-extern crate rand;
+// extern crate rand;
 extern crate num_bigint;
 extern crate num_traits;
 extern crate bellman;
@@ -82,7 +81,7 @@ mod tests {
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher};
 	use bellman::pairing::bn256::Fr;
-	use rand::Rand;
+	// use rand::Rand;
 	
 	
 	// The testing primitives are very useful for avoiding having to work with signatures
@@ -203,23 +202,23 @@ mod tests {
 		});
 	}
 
-	#[test]
-	fn add_leaf_to_tree_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
-			let public: H256 = pair.public().0.into();
-			assert_ok!(create_tree(public, None, None, None));
+	// #[test]
+	// fn add_leaf_to_tree_should_work() {
+	// 	with_externalities(&mut new_test_ext(), || {
+	// 		System::set_block_number(1);
+	// 		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
+	// 		let public: H256 = pair.public().0.into();
+	// 		assert_ok!(create_tree(public, None, None, None));
 
-			let mut rng = rand::thread_rng();
-			let left_pt = Fr::rand(&mut rng);
-			let right_pt = Fr::rand(&mut rng);
-			let leaf_hash = MerkleTree::hash_from_halves(left_pt, right_pt, None);
-			let leaf_bytes = MerkleTree::convert_point_to_bytes(leaf_hash);
-			let stopwatch = Stopwatch::start();
-			assert_ok!(add_leaf(public, 0, leaf_bytes));
-			let millis = stopwatch.finish();
-			println!("adding new element of depth time elapsed: {}", millis);
-		});
-	}
+	// 		// let mut rng = rand::thread_rng();
+	// 		// let left_pt = Fr::rand(&mut rng);
+	// 		// let right_pt = Fr::rand(&mut rng);
+	// 		let leaf_hash = MerkleTree::hash_from_halves(left_pt, right_pt, None);
+	// 		let leaf_bytes = MerkleTree::convert_point_to_bytes(leaf_hash);
+	// 		let stopwatch = Stopwatch::start();
+	// 		assert_ok!(add_leaf(public, 0, leaf_bytes));
+	// 		let millis = stopwatch.finish();
+	// 		println!("adding new element of depth time elapsed: {}", millis);
+	// 	});
+	// }
 }

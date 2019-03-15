@@ -5,7 +5,7 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 
 [lib]
 name = "edgeware_runtime"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib", "staticlib"]
 
 [dependencies]
 edgeware-runtime = { path = "..", default-features = false }

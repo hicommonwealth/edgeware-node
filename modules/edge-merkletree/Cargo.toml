@@ -19,13 +19,10 @@ sr-primitives = { git = "https://github.com/paritytech/substrate", default-featu
 srml-support = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
-edge-delegation = { path = "../edge-delegation", default-features = false }
 
 hex = "0.3.2"
 num-bigint = "0.2.2"
 num-traits = "0.2"
-
-rand = "0.4"
 
 sapling-crypto = { git = "https://github.com/matterinc/sapling-crypto" }
 bellman = { git = 'https://github.com/matterinc/bellman', tag = "0.2.0"}
@@ -45,5 +42,4 @@ std = [
     "sr-primitives/std",
     "srml-system/std",
     "srml-balances/std",
-    "edge-delegation/std",
 ]

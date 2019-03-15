@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+#![no_std]
 #![cfg_attr(not(feature = "std"), no_std)]
-
 #[cfg(feature = "std")]
 extern crate serde;
 
@@ -32,7 +32,6 @@ extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate edge_delegation as delegation;
 extern crate num_bigint;
 extern crate num_traits;
 extern crate bellman;
@@ -71,7 +70,7 @@ const DEFAULT_TREE_DEPTH: u32 = 31;
 // TODO: Better estimates/decisions
 const MAX_DEPTH: u32 = 31;
 
-pub trait Trait: balances::Trait + delegation::Trait {
+pub trait Trait: balances::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }

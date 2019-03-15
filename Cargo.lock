@@ -734,14 +734,12 @@ name = "edge-merkletree"
 version = "0.1.0"
 dependencies = [
  "bellman 0.2.0 (git+https://github.com/matterinc/bellman?tag=0.2.0)",
- "edge-delegation 0.1.0",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex-literal 0.1.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-bigint 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "num-traits 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec 3.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-codec-derive 3.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "rand 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "sapling-crypto 0.0.4 (git+https://github.com/matterinc/sapling-crypto)",
  "serde 1.0.89 (registry+https://github.com/rust-lang/crates.io-index)",
