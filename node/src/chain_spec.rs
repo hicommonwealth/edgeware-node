@@ -42,6 +42,7 @@ pub fn edgeware_testnet_config() -> ChainSpec {
 pub fn edgeware_config_gensis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
+			get_authority_keys_from_seed("Alice"),
 			get_authority_keys_from_seed("A"),
 			get_authority_keys_from_seed("B"),
 			get_authority_keys_from_seed("C"),

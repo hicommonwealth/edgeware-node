@@ -81,33 +81,12 @@ decl_module! {
 		pub fn register(origin, identity_type: IdentityType, identity: Vec<u8>) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
-			let mut types = <UsedTypes<T>>::get(_sender.clone());
-			types.push(identity_type.clone());
-			<UsedTypes<T>>::insert(_sender.clone(), types);
-
-			// Hash the identity type with the identity to use as a key for the mapping
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&identity_type.encode());
 			buf.extend_from_slice(&identity.encode());
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
-			// Set expiration time of identity
-			let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
-			// Add identity record
-			<Identities<T>>::mutate(|idents| idents.push(hash.clone()));
-			<IdentityOf<T>>::insert(hash, IdentityRecord {
-				account: _sender.clone(),
-				identity_type: identity_type,
-				identity: identity,
-				stage: IdentityStage::Registered,
-				expiration_time: expiration.clone(),
-				proof: None,
-				metadata: None,
-			});
-			<IdentitiesPending<T>>::mutate(|idents| idents.push((hash, expiration.clone())));
-			// Fire register event
-			Self::deposit_event(RawEvent::Register(hash, _sender.into(), expiration));
-			Ok(())
+			return Self::register_identity(_sender, identity_type, identity, hash);
 		}
 
 		/// Attest that the sender is the original publisher of said identity
@@ -126,27 +105,29 @@ decl_module! {
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender, "Stored identity does not match sender");
 
-			let id_type = record.identity_type.clone();
-			let identity = record.identity.clone();
-			let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
 
-			// TODO: Decide how we want to process proof updates
-			// currently this implements no check against updating
-			// proof links
-			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
-				proof: Some(attestation.clone()),
-				stage: IdentityStage::Attested,
-				expiration_time: expiration.clone(),
-				..record
-			});
+			return Self::attest_for(_sender, identity_hash, attestation);
+		}
 
-			<IdentitiesPending<T>>::mutate(|idents| {
-				idents.retain(|(hash, _)| hash != &identity_hash);
-				idents.push((identity_hash, expiration.clone()))
-			});
-
-			Self::deposit_event(RawEvent::Attest(attestation, identity_hash, _sender.into(), id_type, identity));
-			Ok(())
+		pub fn register_and_attest(origin, identity_type: IdentityType, identity: Vec<u8>, attestation: Attestation) -> Result {
+			let _sender = ensure_signed(origin)?;
+			// Check hash
+			let mut buf = Vec::new();
+			buf.extend_from_slice(&identity_type.encode());
+			buf.extend_from_slice(&identity.encode());
+			let hash = T::Hashing::hash(&buf[..]);
+			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
+			// Register identity
+			Self::register_identity(_sender.clone(), identity_type, identity, hash).unwrap();
+			// Grab record
+			let record = <IdentityOf<T>>::get(&hash).ok_or("Identity does not exist")?;
+			// Ensure the record is not verified
+			ensure!(record.stage != IdentityStage::Verified, "Already verified");
+			// Ensure the record isn't expired if it still exists
+			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
+			// Check that original sender and current sender match
+			ensure!(record.account == _sender.clone(), "Stored identity does not match sender");
+			return Self::attest_for(_sender, hash, attestation);
 		}
 
 		/// Propose verification to be voted upon by the council
@@ -243,6 +224,57 @@ impl<T: Trait> Module<T> {
 			Self::deposit_event(RawEvent::Denied(*identity_hash, sender, id_type, id));
 		}
 
+		Ok(())
+	}
+
+	fn register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Vec<u8>, identity_hash: T::Hash) -> Result {
+		// Hash the identity type with the identity to use as a key for the mapping
+		let mut types = <UsedTypes<T>>::get(sender.clone());
+		types.push(identity_type.clone());
+		<UsedTypes<T>>::insert(sender.clone(), types);
+
+		// Set expiration time of identity
+		let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
+		// Add identity record
+		<Identities<T>>::mutate(|idents| idents.push(identity_hash.clone()));
+		<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+			account: sender.clone(),
+			identity_type: identity_type,
+			identity: identity,
+			stage: IdentityStage::Registered,
+			expiration_time: expiration.clone(),
+			proof: None,
+			metadata: None,
+		});
+		<IdentitiesPending<T>>::mutate(|idents| idents.push((identity_hash, expiration.clone())));
+		// Fire register event
+		Self::deposit_event(RawEvent::Register(identity_hash, sender.into(), expiration));
+		Ok(())
+	}
+
+	fn attest_for(sender: T::AccountId, identity_hash: T::Hash, attestation: Attestation) -> Result {
+		// Grab record
+		let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+		let id_type = record.identity_type.clone();
+		let identity = record.identity.clone();
+		let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
+
+		// TODO: Decide how we want to process proof updates
+		// currently this implements no check against updating
+		// proof links
+		<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+			proof: Some(attestation.clone()),
+			stage: IdentityStage::Attested,
+			expiration_time: expiration.clone(),
+			..record
+		});
+
+		<IdentitiesPending<T>>::mutate(|idents| {
+			idents.retain(|(hash, _)| hash != &identity_hash);
+			idents.push((identity_hash, expiration.clone()))
+		});
+
+		Self::deposit_event(RawEvent::Attest(attestation, identity_hash, sender.into(), id_type, identity));
 		Ok(())
 	}
 }
