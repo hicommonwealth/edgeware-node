@@ -14,36 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-//! Service and ServiceFactory implementation. Specialized wrapper over Substrate service.
-
 #![warn(unused_extern_crates)]
+
+//! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
 use std::sync::Arc;
 use std::time::Duration;
 
-use transaction_pool::{self, txpool::{Pool as TransactionPool}};
-use substrate_inherents::InherentDataProviders;
-use node_primitives::{Block};
-use edgeware_runtime::{self, GenesisConfig, RuntimeApi};
+use client;
+use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
+use grandpa;
+use node_executor;
+use primitives::{Pair as _Pair, ed25519::Pair};
+use node_primitives::Block;
+use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use substrate_service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
-	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor,
-	TaskExecutor,
+	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor, TaskExecutor,
 };
-use node_executor;
-use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
-use client;
-use grandpa;
-use primitives::ed25519::Pair;
-
-pub use substrate_executor::NativeExecutor;
-// Our native executor instance.
-native_executor_instance!(
-	pub Executor,
-	edgeware_runtime::api::dispatch,
-	edgeware_runtime::native_version,
-	include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm")
-);
+use transaction_pool::{self, txpool::{Pool as TransactionPool}};
+use substrate_inherents::InherentDataProviders;
+use network::construct_simple_protocol;
+use substrate_service::construct_service_factory;
+use log::info;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -162,4 +155,56 @@ construct_service_factory! {
 				}
 			},
 	}
+}
+
+
+#[cfg(test)]
+mod tests {
+	#[cfg(feature = "rhd")]
+	fn test_sync() {
+		use {service_test, Factory};
+		use client::{ImportBlock, BlockOrigin};
+
+		let alice: Arc<ed25519::Pair> = Arc::new(Keyring::Alice.into());
+		let bob: Arc<ed25519::Pair> = Arc::new(Keyring::Bob.into());
+		let validators = vec![alice.public().0.into(), bob.public().0.into()];
+		let keys: Vec<&ed25519::Pair> = vec![&*alice, &*bob];
+		let dummy_runtime = ::tokio::runtime::Runtime::new().unwrap();
+		let block_factory = |service: &<Factory as service::ServiceFactory>::FullService| {
+			let block_id = BlockId::number(service.client().info().unwrap().chain.best_number);
+			let parent_header = service.client().header(&block_id).unwrap().unwrap();
+			let consensus_net = ConsensusNetwork::new(service.network(), service.client().clone());
+			let proposer_factory = consensus::ProposerFactory {
+				client: service.client().clone(),
+				transaction_pool: service.transaction_pool().clone(),
+				network: consensus_net,
+				force_delay: 0,
+				handle: dummy_runtime.executor(),
+			};
+			let (proposer, _, _) = proposer_factory.init(&parent_header, &validators, alice.clone()).unwrap();
+			let block = proposer.propose().expect("Error making test block");
+			ImportBlock {
+				origin: BlockOrigin::File,
+				justification: Vec::new(),
+				internal_justification: Vec::new(),
+				finalized: true,
+				body: Some(block.extrinsics),
+				header: block.header,
+				auxiliary: Vec::new(),
+			}
+		};
+		let extrinsic_factory = |service: &<Factory as service::ServiceFactory>::FullService| {
+			let payload = (0, Call::Balances(BalancesCall::transfer(RawAddress::Id(bob.public().0.into()), 69.into())), Era::immortal(), service.client().genesis_hash());
+			let signature = alice.sign(&payload.encode()).into();
+			let id = alice.public().0.into();
+			let xt = UncheckedExtrinsic {
+				signature: Some((RawAddress::Id(id), signature, payload.0, Era::immortal())),
+				function: payload.1,
+			}.encode();
+			let v: Vec<u8> = Decode::decode(&mut xt.as_slice()).unwrap();
+			OpaqueExtrinsic(v)
+		};
+		service_test::sync::<Factory, _, _>(chain_spec::integration_test_config(), block_factory, extrinsic_factory);
+	}
+
 }
