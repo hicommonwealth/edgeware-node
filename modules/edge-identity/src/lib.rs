@@ -140,6 +140,10 @@ mod tests {
 		Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
 	}
 
+	fn register_and_attest(who: H256, identity_type: &[u8], identity: &[u8], attestation: &[u8]) -> Result {
+		Identity::register_and_attest(Origin::signed(who), identity_type.to_vec(), identity.to_vec(), attestation.to_vec())
+	}
+
 	fn verify_identity(who: H256, identity_hash: H256, approve: bool, verifier_index: usize) -> Result {
 		Identity::verify_or_deny(Origin::signed(who), identity_hash, approve, verifier_index)
 	}
@@ -328,6 +332,58 @@ mod tests {
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+ 			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let _attest_expires_at = now + expiration_time;
+
+			assert_eq!(
+				System::events(),
+				vec![
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+					},
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+					}
+				]
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10000)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Attested,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity_type, identity)
+				})
+			);
+		});
+	}
+
+
+	#[test]
+	fn register_and_attest_as_one_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+
+			let pair: Pair = Pair::from_seed(&hex!(
+				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+			));
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+
+			let public: H256 = pair.public().0.into();
+
+ 			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let register_expires_at = now + expiration_time;
+
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(register_and_attest(public, identity_type, identity, attestation));
 
  			expiration_time = Identity::expiration_time();
 			now = Timestamp::get();
