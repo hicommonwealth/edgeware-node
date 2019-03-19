@@ -6,21 +6,30 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ### Edge
 
-* [Delegation](modules/edge-delegation)
-* [Governance](modules/edge-governance)
 * [Identity](modules/edge-identity)
+* [Governance](modules/edge-governance)
+* [Voting](modules/edge-voting)
+* [Delegation](modules/edge-delegation)
 
 ### SRML
 
-* [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
-* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
-* [Consensus](https://github.com/paritytech/substrate/tree/master/srml/consensus)
-* [Contract](https://github.com/paritytech/substrate/tree/master/srml/contract)
-* [Executive](https://github.com/paritytech/substrate/tree/master/srml/executive)
-* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
-* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
-* [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
-* [UpgradeKey](https://github.com/paritytech/substrate/tree/master/srml/upgrade-key)
+* [Aura](https://github/com/paritytech/substrate/tree/master/srml/aura)
+* [Balances](https://github/com/paritytech/substrate/tree/master/srml/balances)
+* [Consensus](https://github/com/paritytech/substrate/tree/master/srml/consensus)
+* [Contract](https://github/com/paritytech/substrate/tree/master/srml/contract)
+* [Council](https://github/com/paritytech/substrate/tree/master/srml/council)
+* [Democracy](https://github/com/paritytech/substrate/tree/master/srml/democracy)
+* [Executive](https://github/com/paritytech/substrate/tree/master/srml/executive)
+* [Fees](https://github/com/paritytech/substrate/tree/master/srml/fees)
+* [Finality_tracker](https://github/com/paritytech/substrate/tree/master/srml/finality-tracker)
+* [Grandpa](https://github/com/paritytech/substrate/tree/master/srml/grandpa)
+* [Indices](https://github/com/paritytech/substrate/tree/master/srml/indices)
+* [Session](https://github/com/paritytech/substrate/tree/master/srml/session)
+* [Staking](https://github/com/paritytech/substrate/tree/master/srml/staking)
+* [System](https://github/com/paritytech/substrate/tree/master/srml/system)
+* [Timestamp](https://github/com/paritytech/substrate/tree/master/srml/timestamp)
+* [Treasury](https://github/com/paritytech/substrate/tree/master/srml/treasury)
+* [Upgrade_key](https://github/com/paritytech/substrate/tree/master/srml/upgrade-key)
 
 ## Adding A Module
 

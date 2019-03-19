@@ -45,6 +45,7 @@ pub trait Trait: timestamp::Trait {
 
 pub type Attestation = Vec<u8>;
 pub type IdentityType = Vec<u8>;
+pub type Identity = Vec<u8>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
@@ -67,7 +68,7 @@ pub enum IdentityStage {
 pub struct IdentityRecord<AccountId, Moment> {
 	pub account: AccountId,
 	pub identity_type: IdentityType,
-	pub identity: Vec<u8>,
+	pub identity: Identity,
 	pub stage: IdentityStage,
 	pub expiration_time: Moment,
 	pub proof: Option<Attestation>,
@@ -78,7 +79,7 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
-		pub fn register(origin, identity_type: IdentityType, identity: Vec<u8>) -> Result {
+		pub fn register(origin, identity_type: IdentityType, identity: Identity) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
 			let mut buf = Vec::new();
@@ -109,7 +110,7 @@ decl_module! {
 			return Self::attest_for(_sender, identity_hash, attestation);
 		}
 
-		pub fn register_and_attest(origin, identity_type: IdentityType, identity: Vec<u8>, attestation: Attestation) -> Result {
+		pub fn register_and_attest(origin, identity_type: IdentityType, identity: Identity, attestation: Attestation) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Check hash
 			let mut buf = Vec::new();
@@ -227,7 +228,7 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
-	fn register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Vec<u8>, identity_hash: T::Hash) -> Result {
+	fn register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Identity, identity_hash: T::Hash) -> Result {
 		// Hash the identity type with the identity to use as a key for the mapping
 		let mut types = <UsedTypes<T>>::get(sender.clone());
 		types.push(identity_type.clone());
@@ -281,10 +282,9 @@ impl<T: Trait> Module<T> {
 
 /// An event in this module.
 decl_event!(
-	pub enum Event<T>
-	where <T as system::Trait>::Hash,
-		<T as system::Trait>::AccountId,
-		<T as timestamp::Trait>::Moment {
+	pub enum Event<T> where <T as system::Trait>::Hash,
+							<T as system::Trait>::AccountId,
+							<T as timestamp::Trait>::Moment {
 		/// (record_hash, creator, expiration) when an account is registered
 		Register(Hash, AccountId, Moment),
 		/// (record_hash, creator, identity_type, identity) when an account creator submits an attestation
@@ -293,7 +293,7 @@ decl_event!(
 		Verify(Hash, AccountId, Vec<u8>, Vec<u8>),
 		/// (record_hash) when an account is expired and deleted
 		Expired(Hash),
-		/// {identity_hashes} when a valid verifier denies a batch of registration/attestations
+		/// (identity_hashes) when a valid verifier denies a batch of registration/attestations
 		Denied(Hash, AccountId, Vec<u8>, Vec<u8>),
 	}
 );
