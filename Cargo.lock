@@ -701,7 +701,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "ctrlc 3.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "edgeware-runtime 0.1.0",
