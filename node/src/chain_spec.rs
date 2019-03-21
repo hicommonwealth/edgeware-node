@@ -32,7 +32,7 @@ const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_testnet_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.6/edgeware.json")) {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.7/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
