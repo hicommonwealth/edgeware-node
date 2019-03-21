@@ -14,18 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
+use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair};
 use node_primitives::AccountId;
-use primitives::{Ed25519AuthorityId as AuthorityId, ed25519};
 use edgeware_runtime::{
 	Permill, Perbill,
 	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
-	TimestampConfig, TreasuryConfig, StakingConfig, UpgradeKeyConfig, GrandpaConfig,
+	TimestampConfig, TreasuryConfig, StakingConfig, StakerStatus, SudoConfig, GrandpaConfig,
 	IdentityConfig, GovernanceConfig, DelegationConfig, FeesConfig,
 	CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig, IndicesConfig,
 };
 use substrate_service;
 use substrate_telemetry::TelemetryEndpoints;
-use substrate_keystore::pad_seed;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
@@ -33,7 +32,7 @@ const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_testnet_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.6/edgeware.json")) {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.7/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
@@ -42,6 +41,7 @@ pub fn edgeware_testnet_config() -> ChainSpec {
 pub fn edgeware_config_gensis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
+			get_authority_keys_from_seed("Alice"),
 			get_authority_keys_from_seed("A"),
 			get_authority_keys_from_seed("B"),
 			get_authority_keys_from_seed("C"),
@@ -90,45 +90,26 @@ pub fn edgeware_config() -> Result<ChainSpec, String> {
 	))
 }
 
-/// Helper function to generate AuthorityID from seed
-pub fn get_authority_id_from_seed(seed: &str) -> AuthorityId {
-	let padded_seed = pad_seed(seed);
-	// NOTE from ed25519 impl:
-	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
-	ed25519::Pair::from_seed(&padded_seed).public().0.into()
+/// Helper function to generate AccountId from seed
+pub fn get_account_id_from_seed(seed: &str) -> AccountId {
+	sr25519::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
 }
-
-pub fn get_testnet_pubkeys() -> Vec<AuthorityId> {
-	let pubkeys = vec![
-		ed25519::Public::from_raw(hex!("df291854c27a22c50322344604076e8b2dc3ffe11dbdcd886adba9e0d6c9f950") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("3bd15363a31eac0e5ecd067731d8a4561185347fc804c50b507025abc29c2ba1") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("65b118b4ae7fe642a59316fc5f0ad9b75cdb9f5ab52733165004f7602755bcfd") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("68128017e34fe40f4ed40f79c24dc7f5a531afc82fc6b71e8092c903627a9133") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("dc746491a214053440d8b9df6774587da105661cc58ed703dc36965359c666a6") as [u8; 32]).into()
-	];
-
-	return pubkeys;
-}
-
-
 
 /// Helper function to generate AuthorityId from seed
-pub fn get_account_id_from_seed(seed: &str) -> AccountId {
-	let padded_seed = pad_seed(seed);
-	// NOTE from ed25519 impl:
-	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
-	ed25519::Pair::from_seed(&padded_seed).public().0.into()
+pub fn get_session_key_from_seed(seed: &str) -> AuthorityId {
+	ed25519::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
 }
 
 /// Helper function to generate stash, controller and session key from seed
 pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, AuthorityId) {
-	let padded_seed = pad_seed(seed);
-	// NOTE from ed25519 impl:
-	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
 	(
-		get_account_id_from_seed(&format!("{}-stash", seed)),
+		get_account_id_from_seed(&format!("{}//stash", seed)),
 		get_account_id_from_seed(seed),
-		ed25519::Pair::from_seed(&padded_seed).public().0.into()
+		get_session_key_from_seed(seed)
 	)
 }
 
@@ -146,6 +127,12 @@ pub fn testnet_genesis(
 			get_account_id_from_seed("Dave"),
 			get_account_id_from_seed("Eve"),
 			get_account_id_from_seed("Ferdie"),
+			get_account_id_from_seed("Alice//stash"),
+			get_account_id_from_seed("Bob//stash"),
+			get_account_id_from_seed("Charlie//stash"),
+			get_account_id_from_seed("Dave//stash"),
+			get_account_id_from_seed("Eve//stash"),
+			get_account_id_from_seed("Ferdie//stash"),
 		]
 	});
 
@@ -165,11 +152,11 @@ pub fn testnet_genesis(
 			existential_deposit: 500,
 			transfer_fee: 0,
 			creation_fee: 0,
-			balances: endowed_accounts.iter().map(|&k| (k.into(), ENDOWMENT)).collect(),
+			balances: endowed_accounts.iter().map(|k| (k.clone(), ENDOWMENT)).collect(),
 			vesting: vec![],
 		}),
 		session: Some(SessionConfig {
-			validators: initial_authorities.iter().map(|x| x.1.into()).collect(),
+			validators: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 			session_length: 10,
 			keys: initial_authorities.iter().map(|x| (x.1.clone(), x.2.clone())).collect::<Vec<_>>(),
 		}),
@@ -184,8 +171,8 @@ pub fn testnet_genesis(
 			current_offline_slash: 0,
 			current_session_reward: 0,
 			offline_slash_grace: 0,
-			stakers: initial_authorities.iter().map(|x| (x.0.into(), x.1.into(), STASH)).collect(),
-			invulnerables: initial_authorities.iter().map(|x| x.1.into()).collect(),
+			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
+			invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 		}),
 		democracy: Some(DemocracyConfig {
 			launch_period: 9,
@@ -197,7 +184,7 @@ pub fn testnet_genesis(
 		council_seats: Some(CouncilSeatsConfig {
 			active_council: endowed_accounts.iter()
 				.filter(|&endowed| initial_authorities.iter().find(|&(_, controller, _)| controller == endowed).is_none())
-				.map(|a| (a.clone().into(), 1000000)).collect(),
+				.map(|a| (a.clone(), 1000000)).collect(),
 			candidacy_bond: 10,
 			voter_bond: 2,
 			present_slash_per_voter: 1,
@@ -205,7 +192,7 @@ pub fn testnet_genesis(
 			presentation_duration: 10,
 			approval_voting_period: 20,
 			term_duration: 1000000,
-			desired_seats: (endowed_accounts.len() - initial_authorities.len()) as u32,
+			desired_seats: (endowed_accounts.len() / 2 - initial_authorities.len()) as u32,
 			inactive_grace_period: 1,
 		}),
 		council_voting: Some(CouncilVotingConfig {
@@ -231,6 +218,9 @@ pub fn testnet_genesis(
 			block_gas_limit: 10_000_000,
 			current_schedule: Default::default(),
 		}),
+		sudo: Some(SudoConfig {
+			key: root_key,
+		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
 		}),
@@ -238,11 +228,8 @@ pub fn testnet_genesis(
 			transaction_base_fee: 1,
 			transaction_byte_fee: 0,
 		}),
-		upgrade_key: Some(UpgradeKeyConfig {
-			key: root_key,
-		}),
 		identity: Some(IdentityConfig {
-			verifiers: get_testnet_pubkeys().iter().map(|x| x.0.into()).collect(),
+			verifiers: initial_authorities.iter().map(|x| x.0.clone()).collect(),
 			expiration_time: 604800, // 7 days
 		}),
 		governance: Some(GovernanceConfig {
@@ -260,31 +247,8 @@ fn development_config_genesis() -> GenesisConfig {
 		vec![
 			get_authority_keys_from_seed("Alice"),
 		],
-		get_account_id_from_seed("Alice").into(),
-		Some(vec![
-			get_account_id_from_seed("Alice"),
-			get_account_id_from_seed("Bob"),
-			get_account_id_from_seed("Charlie"),
-			get_account_id_from_seed("Dave"),
-			get_account_id_from_seed("Eve"),
-			get_account_id_from_seed("A"),
-			get_account_id_from_seed("B"),
-			get_account_id_from_seed("C"),
-			get_account_id_from_seed("D"),
-			get_account_id_from_seed("E"),
-			get_account_id_from_seed("F"),
-			get_account_id_from_seed("G"),
-			get_account_id_from_seed("H"),
-			get_account_id_from_seed("I"),
-			get_account_id_from_seed("J"),
-			get_account_id_from_seed("K"),
-			get_account_id_from_seed("L"),
-			get_account_id_from_seed("M"),
-			get_account_id_from_seed("N"),
-			get_account_id_from_seed("O"),
-			get_account_id_from_seed("P"),
-			get_account_id_from_seed("Q"),
-		]),
+		get_account_id_from_seed("Alice"),
+		None,
 	)
 }
 
@@ -299,7 +263,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 			get_authority_keys_from_seed("Alice"),
 			get_authority_keys_from_seed("Bob"),
 		],
-		get_account_id_from_seed("Alice").into(),
+		get_account_id_from_seed("Alice"),
 		None,
 	)
 }

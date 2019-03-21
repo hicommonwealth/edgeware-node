@@ -32,4 +32,17 @@ Mac:
 brew install cmake pkg-config openssl git
 ```
 
-Once done with setup, run `cargo build` to compile the module and `cargo test` to run our unit tests.
+# Signalling Lifecycle
+This module enables one to create signalling proposals and vote on them. This is useful for engaging parts of the community and understanding how the community reacts to a given idea before putting it forth in a state-changing proposal through the main governance mechanism.
+
+The lifecycle for using this module is:
+1. Create proposals
+2. Vote on proposals
+3. Engage in off-chain discussion
+
+
+## Proposal Lifecycle
+Proposals go through the lifecycle that votes go through from the [edge-voting](modules/edge-voting) module. These specific stages are described there.
+1. PreVoting
+2. Voting
+3. Completed

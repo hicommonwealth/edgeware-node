@@ -20,83 +20,77 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "512"]
 
-extern crate sr_std as rstd;
-#[macro_use]
-extern crate substrate_client as client;
-#[macro_use]
-extern crate srml_support;
-#[macro_use]
-extern crate sr_primitives as runtime_primitives;
+extern crate rstd;
+extern crate client;
+extern crate support;
+extern crate runtime_primitives;
 #[cfg(feature = "std")]
 extern crate parity_codec;
 extern crate substrate_primitives as primitives;
-#[macro_use]
-extern crate parity_codec_derive;
-#[macro_use]
-extern crate sr_version as version;
+
+extern crate version;
 extern crate edge_delegation;
 extern crate edge_governance;
 extern crate edge_identity;
 extern crate edge_voting;
-extern crate srml_aura as aura;
-extern crate srml_balances as balances;
-extern crate srml_consensus as consensus;
-extern crate srml_contract as contract;
-extern crate srml_council as council;
-extern crate srml_democracy as democracy;
-extern crate srml_executive as executive;
-extern crate srml_grandpa as grandpa;
-extern crate srml_indices as indices;
-extern crate srml_session as session;
-extern crate srml_staking as staking;
-extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
-extern crate srml_treasury as treasury;
-extern crate srml_fees as fees;
-extern crate srml_finality_tracker as finality_tracker;
-extern crate srml_upgrade_key as upgrade_key;
+extern crate aura;
+extern crate balances;
+extern crate consensus;
+extern crate contract;
+extern crate council;
+extern crate democracy;
+extern crate executive;
+extern crate grandpa;
+extern crate indices;
+extern crate session;
+extern crate staking;
+extern crate system;
+extern crate timestamp;
+extern crate treasury;
+extern crate fees;
+extern crate finality_tracker;
+extern crate sudo;
 
 extern crate node_primitives;
-extern crate substrate_consensus_aura_primitives as consensus_aura;
+extern crate consensus_aura;
 
 use edge_delegation::delegation;
 use edge_governance::governance;
 use edge_identity::identity;
 use edge_voting::voting;
 
-use client::{
-	block_builder::api::{self as block_builder_api, InherentData, CheckInherentsResult},
-	runtime_api as client_api,
-};
-use primitives::OpaqueMetadata;
+use rstd::prelude::*;
+use support::construct_runtime;
 use primitives::u32_trait::{_2, _4};
 use node_primitives::{
-	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, SessionKey, Signature
-};
-use rstd::prelude::*;
-use runtime_primitives::ApplyResult;
-use runtime_primitives::transaction_validity::TransactionValidity;
-use runtime_primitives::generic;
-use runtime_primitives::traits::{
-	Convert, BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup,
+	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, AuthorityId, Signature, AuthoritySignature
 };
 use grandpa::fg_primitives::{self, ScheduledChange};
+use client::{
+	block_builder::api::{self as block_builder_api, InherentData, CheckInherentsResult},
+	runtime_api as client_api, impl_runtime_apis
+};
+use runtime_primitives::{ApplyResult, generic, create_runtime_str};
+use runtime_primitives::transaction_validity::TransactionValidity;
+use runtime_primitives::traits::{
+	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup,
+};
 use version::RuntimeVersion;
 use council::{motions as council_motions, voting as council_voting};
 #[cfg(feature = "std")]
 use council::seats as council_seats;
 #[cfg(any(feature = "std", test))]
 use version::NativeVersion;
+use primitives::OpaqueMetadata;
 
-// A few exports that help ease life for downstream crates.
-pub use balances::Call as BalancesCall;
-pub use consensus::Call as ConsensusCall;
-pub use timestamp::Call as TimestampCall;
 #[cfg(any(feature = "std", test))]
 pub use runtime_primitives::BuildStorage;
-pub use runtime_primitives::{Perbill, Permill};
-pub use srml_support::StorageValue;
-pub use timestamp::BlockPeriod;
+pub use consensus::Call as ConsensusCall;
+pub use timestamp::Call as TimestampCall;
+pub use balances::Call as BalancesCall;
+pub use runtime_primitives::{Permill, Perbill};
+pub use support::StorageValue;
+pub use staking::StakerStatus;
 
 /// This runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
@@ -142,13 +136,6 @@ impl indices::Trait for Runtime {
 	type Event = Event;
 }
 
-// impl balances::Trait for Runtime {
-// 	type Balance = Balance;
-// 	type OnFreeBalanceZero = ((Staking, Contract), Democracy);
-// 	type OnNewAccount = Indices;
-// 	type EnsureAccountLiquid = (Staking, Democracy);
-// 	type Event = Event;
-// }
 impl balances::Trait for Runtime {
 	type Balance = Balance;
 	type OnFreeBalanceZero = ((Staking, Contract), Session);
@@ -163,7 +150,7 @@ impl fees::Trait for Runtime {
 
 impl consensus::Trait for Runtime {
 	type Log = Log;
-	type SessionKey = SessionKey;
+	type SessionKey = AuthorityId;
 
 	// The Aura module handles offline-reports internally
 	// rather than using an explicit report system.
@@ -175,16 +162,8 @@ impl timestamp::Trait for Runtime {
 	type OnTimestampSet = Aura;
 }
 
-/// Session key conversion.
-pub struct SessionKeyConversion;
-impl Convert<AccountId, SessionKey> for SessionKeyConversion {
-	fn convert(a: AccountId) -> SessionKey {
-		a.to_fixed_bytes().into()
-	}
-}
-
 impl session::Trait for Runtime {
-	type ConvertAccountIdToSessionKey = SessionKeyConversion;
+	type ConvertAccountIdToSessionKey = ();
 	type OnSessionChange = (Staking, grandpa::SyncedAuthorities<Runtime>);
 	type Event = Event;
 }
@@ -230,19 +209,19 @@ impl contract::Trait for Runtime {
 	type ComputeDispatchFee = contract::DefaultDispatchFeeComputor<Runtime>;
 }
 
+impl sudo::Trait for Runtime {
+	type Event = Event;
+	type Proposal = Call;
+}
+
 impl grandpa::Trait for Runtime {
-	type SessionKey = SessionKey;
+	type SessionKey = AuthorityId;
 	type Log = Log;
 	type Event = Event;
 }
 
 impl finality_tracker::Trait for Runtime {
 	type OnFinalizationStalled = grandpa::SyncedAuthorities<Runtime>;
-}
-
-impl upgrade_key::Trait for Runtime {
-	/// The uniquitous event type.
-	type Event = Event;
 }
 
 impl delegation::Trait for Runtime {
@@ -266,7 +245,7 @@ impl identity::Trait for Runtime {
 }
 
 construct_runtime!(
-	pub enum Runtime with Log(InternalLog: DigestItem<Hash, SessionKey>) where
+	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId, AuthoritySignature>) where
 		Block = Block,
 		NodeBlock = node_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
@@ -288,8 +267,8 @@ construct_runtime!(
 		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Log(), Event<T>},
 		Treasury: treasury,
 		Contract: contract::{Module, Call, Storage, Config<T>, Event<T>},
+		Sudo: sudo,
 		Fees: fees::{Module, Storage, Config<T>, Event<T>},
-		UpgradeKey: upgrade_key,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
@@ -320,7 +299,7 @@ impl_runtime_apis! {
 			VERSION
 		}
 
-		fn authorities() -> Vec<SessionKey> {
+		fn authorities() -> Vec<AuthorityId> {
 			Consensus::authorities()
 		}
 
@@ -396,7 +375,7 @@ impl_runtime_apis! {
 			None
 		}
 
-		fn grandpa_authorities() -> Vec<(SessionKey, u64)> {
+		fn grandpa_authorities() -> Vec<(AuthorityId, u64)> {
 			Grandpa::grandpa_authorities()
 		}
 	}

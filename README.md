@@ -6,21 +6,30 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ### Edge
 
-* [Delegation](modules/edge-delegation)
-* [Governance](modules/edge-governance)
 * [Identity](modules/edge-identity)
+* [Governance](modules/edge-governance)
+* [Voting](modules/edge-voting)
+* [Delegation](modules/edge-delegation)
 
 ### SRML
 
-* [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
-* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
-* [Consensus](https://github.com/paritytech/substrate/tree/master/srml/consensus)
-* [Contract](https://github.com/paritytech/substrate/tree/master/srml/contract)
-* [Executive](https://github.com/paritytech/substrate/tree/master/srml/executive)
-* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
-* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
-* [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
-* [UpgradeKey](https://github.com/paritytech/substrate/tree/master/srml/upgrade-key)
+* [Aura](https://github/com/paritytech/substrate/tree/master/srml/aura)
+* [Balances](https://github/com/paritytech/substrate/tree/master/srml/balances)
+* [Consensus](https://github/com/paritytech/substrate/tree/master/srml/consensus)
+* [Contract](https://github/com/paritytech/substrate/tree/master/srml/contract)
+* [Council](https://github/com/paritytech/substrate/tree/master/srml/council)
+* [Democracy](https://github/com/paritytech/substrate/tree/master/srml/democracy)
+* [Executive](https://github/com/paritytech/substrate/tree/master/srml/executive)
+* [Fees](https://github/com/paritytech/substrate/tree/master/srml/fees)
+* [Finality_tracker](https://github/com/paritytech/substrate/tree/master/srml/finality-tracker)
+* [Grandpa](https://github/com/paritytech/substrate/tree/master/srml/grandpa)
+* [Indices](https://github/com/paritytech/substrate/tree/master/srml/indices)
+* [Session](https://github/com/paritytech/substrate/tree/master/srml/session)
+* [Staking](https://github/com/paritytech/substrate/tree/master/srml/staking)
+* [System](https://github/com/paritytech/substrate/tree/master/srml/system)
+* [Timestamp](https://github/com/paritytech/substrate/tree/master/srml/timestamp)
+* [Treasury](https://github/com/paritytech/substrate/tree/master/srml/treasury)
+* [Sudo](https://github/com/paritytech/substrate/tree/master/srml/sudo)
 
 ## Adding A Module
 
@@ -47,7 +56,6 @@ rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
 rustup update stable
 cargo install --git https://github.com/alexcrichton/wasm-gc
-sudo apt install cmake pkg-config libssl-dev git clang libclang-dev
 ```
 
 You will also need to install the following packages:
@@ -71,8 +79,15 @@ cargo build --release
 
 ### Running
 
-If you've rebuilt the runtime and are using the default development chain storage location (`~/.local/share/Substrate/chains/development/`), run the `./purge-chain.sh` script to clear your old chain's history.
+Ensure you have a fresh start if updating from another version:
+```
+./purge-chain.sh
+```
+To start up the Edgeware node and connect to the latest testnet, run:
+```
+./target/release/edgeware --chain=edgeware --name <INSERT_NAME --key <(OPTIONAL) INSERT_KEY>
+```
 
-```
-./target/release/edgeware --chain edgeware
-```
+### Visualization
+
+To ensure you followed the steps correct, check https://telemetry.polkadot.io/#/Edgeware%20V0.1.7. If done correctly, you should see your node with the inserted name.

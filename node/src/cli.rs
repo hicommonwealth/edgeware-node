@@ -17,8 +17,8 @@
 extern crate substrate_cli as cli;
 
 use service;
-use futures::{Future};
-use tokio::runtime::Runtime;
+use tokio::prelude::Future;
+use tokio::runtime::{Builder as RuntimeBuilder, Runtime};
 pub use substrate_cli::{VersionInfo, IntoExit, NoCustom};
 use substrate_service::{ServiceFactory, Roles as ServiceRoles};
 use chain_spec;
@@ -77,11 +77,12 @@ pub fn run<I, T, E>(args: I, exit: E, version: cli::VersionInfo) -> error::Resul
 		|exit, _custom_args, config| {
 			info!("{}", version.name);
 			info!("  version {}", config.full_version());
-			info!("  by Commonwealth Labs, 2018-2019");
+			info!("  by Parity Technologies, 2017-2019");
 			info!("Chain specification: {}", config.chain_spec.name());
 			info!("Node name: {}", config.name);
 			info!("Roles: {:?}", config.roles);
-			let runtime = Runtime::new().map_err(|e| format!("{:?}", e))?;
+			let runtime = RuntimeBuilder::new().name_prefix("main-tokio-").build()
+				.map_err(|e| format!("{:?}", e))?;
 			let executor = runtime.executor();
 			match config.roles {
 				ServiceRoles::LIGHT => run_until_exit(
