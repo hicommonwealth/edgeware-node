@@ -85,7 +85,12 @@ Ensure you have a fresh start if updating from another version:
 ```
 To start up the Edgeware node and connect to the latest testnet, run:
 ```
-./target/release/edgeware --chain=edgeware --name <INSERT_NAME --key <(OPTIONAL) INSERT_KEY>
+./target/release/edgeware --chain=edgeware --name <INSERT_NAME>
+```
+
+If you use the `--key` flag, ensure that either it is a 32-byte hex string or prefixed with `//` like so:
+```
+./target/release/edgeware --chain=edgeware --name <INSERT_NAME> --key //testkey
 ```
 
 ### Visualization
