@@ -29,7 +29,7 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 * [System](https://github/com/paritytech/substrate/tree/master/srml/system)
 * [Timestamp](https://github/com/paritytech/substrate/tree/master/srml/timestamp)
 * [Treasury](https://github/com/paritytech/substrate/tree/master/srml/treasury)
-* [Upgrade_key](https://github/com/paritytech/substrate/tree/master/srml/upgrade-key)
+* [Sudo](https://github/com/paritytech/substrate/tree/master/srml/sudo)
 
 ## Adding A Module
 
@@ -56,7 +56,6 @@ rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
 rustup update stable
 cargo install --git https://github.com/alexcrichton/wasm-gc
-sudo apt install cmake pkg-config libssl-dev git clang libclang-dev
 ```
 
 You will also need to install the following packages:
@@ -80,8 +79,15 @@ cargo build --release
 
 ### Running
 
-If you've rebuilt the runtime and are using the default development chain storage location (`~/.local/share/Substrate/chains/development/`), run the `./purge-chain.sh` script to clear your old chain's history.
+Ensure you have a fresh start if updating from another version:
+```
+./purge-chain.sh
+```
+To start up the Edgeware node and connect to the latest testnet, run:
+```
+./target/release/edgeware --chain=edgeware --name <INSERT_NAME --key <(OPTIONAL) INSERT_KEY>
+```
 
-```
-./target/release/edgeware --chain edgeware
-```
+### Visualization
+
+To ensure you followed the steps correct, check https://telemetry.polkadot.io/#/Edgeware%20V0.1.7. If done correctly, you should see your node with the inserted name.
