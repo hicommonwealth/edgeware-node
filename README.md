@@ -47,6 +47,11 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 4. Build and run the chain.
 
 ## Usage
+The fastest setup is to run the following script. It will build the release version using the pre-compiled binary:
+```
+./setup.sh
+```
+Then proceed to the *Running* instructions or follow the instructions below for the manual setup.
 
 ### Initial Setup
 
