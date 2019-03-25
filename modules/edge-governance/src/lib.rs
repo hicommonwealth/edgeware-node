@@ -69,6 +69,7 @@ mod tests {
 		testing::{Digest, DigestItem, Header, UintAuthorityId}
 	};
 	use voting::{VoteStage, VoteType};
+	use voting::voting::{VoteOutcome, TallyType};
 
 	impl_outer_origin! {
 		pub enum Origin for Test {}
@@ -146,8 +147,23 @@ mod tests {
 		t.into()
 	}
 
-	fn propose(who: u64, title: &[u8], proposal: &[u8], category: governance::ProposalCategory) -> Result {
-		Governance::create_proposal(Origin::signed(who), title.to_vec(), proposal.to_vec(), category)
+	fn propose(
+		who: u64,
+		title: &[u8],
+		proposal: &[u8],
+		category: governance::ProposalCategory,
+		outcomes: Vec<VoteOutcome>,
+		vote_type: VoteType,
+		tally_type: TallyType
+	) -> Result {
+		Governance::create_proposal(
+			Origin::signed(who),
+			title.to_vec(),
+			proposal.to_vec(),
+			category,
+			outcomes,
+			vote_type,
+			tally_type)
 	}
 
 	fn advance_proposal(who: u64, proposal_hash: H256) -> Result {
@@ -198,7 +214,8 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(System::events(), vec![
 				EventRecord {
@@ -214,7 +231,8 @@ mod tests {
 			let title2: &[u8] = b"Proposal 2";
 			let proposal2: &[u8] = b"Proposal 2";
 			let hash2 = build_proposal_hash(public, &proposal2);
-			assert_ok!(propose(public, title2, proposal2, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title2, proposal2, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id2 = Governance::proposal_of(hash2).unwrap().vote_id;
 			assert_eq!(System::events(), vec![
 				EventRecord {
@@ -260,8 +278,9 @@ mod tests {
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let category = governance::ProposalCategory::Signaling;
-			assert_ok!(propose(public, title, proposal, category));
-			assert_eq!(propose(public, title, proposal, category), Err("Proposal already exists"));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes.clone(), VoteType::Binary, TallyType::OneCoin));
+			assert_eq!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal already exists"));
 			assert_eq!(Governance::proposal_count(), 1);
 			assert_eq!(Governance::proposals(), vec![hash]);
 			assert_eq!(
@@ -280,7 +299,8 @@ mod tests {
 			let proposal = vec![];
 			let hash = build_proposal_hash(public, &proposal);
 			let category = governance::ProposalCategory::Signaling;
-			assert_eq!(propose(public, title, &proposal, category), Err("Proposal must not be empty"));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_eq!(propose(public, title, &proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must not be empty"));
 			assert_eq!(Governance::proposal_count(), 0);
 			assert_eq!(Governance::proposals(), vec![]);
 			assert_eq!(Governance::proposal_of(hash), None);
@@ -296,7 +316,8 @@ mod tests {
 			let hash = build_proposal_hash(public, &proposal);
 			let title = vec![];
 			let category = governance::ProposalCategory::Signaling;
-			assert_eq!(propose(public, &title, proposal, category), Err("Proposal must have title"));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_eq!(propose(public, &title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must have title"));
 			assert_eq!(Governance::proposal_count(), 0);
 			assert_eq!(Governance::proposals(), vec![]);
 			assert_eq!(Governance::proposal_of(hash), None);
@@ -311,7 +332,8 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
@@ -358,7 +380,8 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
 									"Proposal not in pre-voting stage");
@@ -382,7 +405,8 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
@@ -479,7 +503,8 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			assert_ok!(propose(public, title, proposal, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			
 			Timestamp::set_timestamp(10001);
@@ -510,7 +535,8 @@ mod tests {
 			let hash = build_proposal_hash(public, &proposal);
 
 			let other_public = 2_u64;
-			assert_ok!(propose(public, title, proposal, category));
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
 			assert_eq!(Governance::active_proposals(), vec![]);
 			assert_eq!(

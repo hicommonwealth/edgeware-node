@@ -40,7 +40,7 @@ use runtime_support::dispatch::Result;
 use runtime_primitives::traits::{Zero, Hash};
 use codec::Encode;
 
-pub use voting::voting::Tally;
+pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
@@ -75,6 +75,8 @@ pub trait Trait: voting::Trait + timestamp::Trait {
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
+pub type ProposalTitle = Vec<u8>;
+pub type ProposalContents = Vec<u8>;
 pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
@@ -83,7 +85,15 @@ decl_module! {
 		fn deposit_event<T>() = default;
 
 		/// Creates a new governance proposal in the chosen category.
-		pub fn create_proposal(origin, title: Vec<u8>, contents: Vec<u8>, category: ProposalCategory) -> Result {
+		pub fn create_proposal(
+			origin,
+			title: ProposalTitle,
+			contents: ProposalContents,
+			category: ProposalCategory,
+			outcomes: Vec<VoteOutcome>,
+			vote_type: voting::VoteType,
+			tally_type: voting::TallyType
+		) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!title.is_empty(), "Proposal must have title");
 			ensure!(!contents.is_empty(), "Proposal must not be empty");
@@ -99,10 +109,10 @@ decl_module! {
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
-				voting::VoteType::Binary,
+				vote_type,
 				false, // not commit-reveal
-				voting::TallyType::OneCoin,
-				vec![YES_VOTE, NO_VOTE],
+				tally_type,
+				outcomes,
 			)?;
 
 			let index = <ProposalCount<T>>::get();
