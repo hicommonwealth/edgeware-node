@@ -79,6 +79,10 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
+		/// A function that registers an identity_type and identity for a user
+		///
+		/// Checks whether the (identity_type, identity) pair exists and creates
+		/// the record if now. The record is indexed by the hash of the pair.
 		pub fn register(origin, identity_type: IdentityType, identity: Identity) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
@@ -90,11 +94,11 @@ decl_module! {
 			return Self::register_identity(_sender, identity_type, identity, hash);
 		}
 
-		/// Attest that the sender is the original publisher of said identity
-		/// by linking to an external proof.
+		/// A function that creates an identity attestation
 		///
-		/// Current implementation overwrites all proofs if safety checks
-		/// pass.
+		/// Attestation is only valid if the identity is in the attestation phase
+		/// and is verified off-chain using an off-chain worker node. Current
+		/// implementation overwrites all proofs if safety checks pass.
 		pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Grab record
@@ -110,6 +114,10 @@ decl_module! {
 			return Self::attest_for(_sender, identity_hash, attestation);
 		}
 
+		/// A function that registers and attests to an identity simultaneously.
+		///
+		/// Allows more efficient registration and attestation processing since it
+		/// requires only 1 transaction.
 		pub fn register_and_attest(origin, identity_type: IdentityType, identity: Identity, attestation: Attestation) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Check hash
@@ -131,7 +139,10 @@ decl_module! {
 			return Self::attest_for(_sender, hash, attestation);
 		}
 
-		/// Propose verification to be voted upon by the council
+		/// A function that verifies or denies an identity attestation.
+		/// 
+		/// The verification is handled by a set of seeded verifiers who run
+		/// the off-chain worker node to verify attestations.
 		pub fn verify_or_deny(origin, identity_hash: T::Hash, approve: bool, verifier_index: usize) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(verifier_index < Self::verifiers().len(), "Verifier index out of bounds");
@@ -201,6 +212,7 @@ impl<T: Trait> Module<T> {
 		<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
 	}
 
+	/// Helper function for executing the verification of identities
 	fn verify_or_deny_identity(sender: T::AccountId, identity_hash: &T::Hash, approve: bool) -> Result {
 		let record = <IdentityOf<T>>::get(identity_hash).ok_or("Identity does not exist")?;
 		ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
@@ -228,6 +240,7 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
+	/// Helper function for executing the registration of identities
 	fn register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Identity, identity_hash: T::Hash) -> Result {
 		// Hash the identity type with the identity to use as a key for the mapping
 		let mut types = <UsedTypes<T>>::get(sender.clone());
@@ -253,6 +266,7 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
+	/// Helper function for executing the attestation of identities
 	fn attest_for(sender: T::AccountId, identity_hash: T::Hash, attestation: Attestation) -> Result {
 		// Grab record
 		let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
@@ -280,25 +294,23 @@ impl<T: Trait> Module<T> {
 	}
 }
 
-/// An event in this module.
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
 							<T as timestamp::Trait>::Moment {
 		/// (record_hash, creator, expiration) when an account is registered
 		Register(Hash, AccountId, Moment),
-		/// (record_hash, creator, identity_type, identity) when an account creator submits an attestation
-		Attest(Vec<u8>, Hash, AccountId, Vec<u8>, Vec<u8>),
-		/// (record_hash, verifier) when a verifier approves an account
-		Verify(Hash, AccountId, Vec<u8>, Vec<u8>),
+		/// (attestation, record_hash, creator, identity_type, identity) when an account creator submits an attestation
+		Attest(Attestation, Hash, AccountId, IdentityType, Identity),
+		/// (record_hash, verifier, id_type, identity) when a verifier approves an account
+		Verify(Hash, AccountId, IdentityType, Identity),
 		/// (record_hash) when an account is expired and deleted
 		Expired(Hash),
-		/// (identity_hashes) when a valid verifier denies a batch of registration/attestations
-		Denied(Hash, AccountId, Vec<u8>, Vec<u8>),
+		/// (identity_hash, verifier, id_type, identity) when a valid verifier denies a batch of registration/attestations
+		Denied(Hash, AccountId, IdentityType, Identity),
 	}
 );
 
-// TODO: rename "timeouts" "time limit" to ???
 decl_storage! {
 	trait Store for Module<T: Trait> as Identity {
 		/// The hashed identities.

@@ -44,6 +44,9 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
+		/// A function which delegates the sender's vote to a target account.
+		///
+		/// Delegates the vote for all coin-weighted or individual identity based votes.
 		pub fn delegate_to(origin, to: T::AccountId) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Check that no delegation cycle exists and that the depth is valid
@@ -64,13 +67,16 @@ decl_module! {
 			Ok(())
 		}
 
+		/// A function which undelegates a sender's vote from an account
+		///
+		/// Undelegates a sender's vote and removes the backlink from the delegation graph.
 		pub fn undelegate_from(origin, from: T::AccountId) -> Result {
 			let _sender = ensure_signed(origin)?;
 			// Check sender is not delegating to itself
 			ensure!(_sender != from, "Invalid undelegation");
 			// Update the delegate to the sender, None type throws an error due to missing Trait bound
 			<DelegatesOf<T>>::remove(&_sender);
-			// Update the delegates of to remove _sender
+			// Update the delegates to remove _sender (i.e. remove backlink)
 			if let Some(mut delegates) = <DelegatesTo<T>>::get(from.clone()) {
 				let index = delegates.iter().position(|d| d == &_sender.clone()).unwrap();
 				delegates.remove(index);
@@ -122,10 +128,11 @@ impl<T: Trait> Module<T> {
 	}
 }
 
-/// An event in this module.
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::AccountId {
+		/// (delegator, target) when a delegator delegates to a target
 		Delegated(AccountId, AccountId),
+		/// (delegator, target) when an account undelegates from a target
 		Undelegated(AccountId, AccountId),
 	}
 );

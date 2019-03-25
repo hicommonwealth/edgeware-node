@@ -40,7 +40,7 @@ use runtime_support::dispatch::Result;
 use runtime_primitives::traits::{Zero, Hash};
 use codec::Encode;
 
-pub use voting::voting::Tally;
+pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
@@ -54,8 +54,6 @@ pub enum ProposalStage {
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
 pub enum ProposalCategory {
 	Signaling,
-	Funding(u32),
-	Upgrade,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -68,8 +66,6 @@ pub struct ProposalRecord<AccountId, Moment> {
 	pub category: ProposalCategory,
 	pub title: Vec<u8>,
 	pub contents: Vec<u8>,
-	// TODO: separate comments into different object, for storage reasons
-	pub comments: Vec<(Vec<u8>, AccountId)>,
 	// TODO: for actions, we might need more data
 	pub vote_id: u64,
 }
@@ -79,6 +75,8 @@ pub trait Trait: voting::Trait + timestamp::Trait {
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
 
+pub type ProposalTitle = Vec<u8>;
+pub type ProposalContents = Vec<u8>;
 pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
@@ -87,7 +85,15 @@ decl_module! {
 		fn deposit_event<T>() = default;
 
 		/// Creates a new governance proposal in the chosen category.
-		pub fn create_proposal(origin, title: Vec<u8>, contents: Vec<u8>, category: ProposalCategory) -> Result {
+		pub fn create_proposal(
+			origin,
+			title: ProposalTitle,
+			contents: ProposalContents,
+			category: ProposalCategory,
+			outcomes: Vec<VoteOutcome>,
+			vote_type: voting::VoteType,
+			tally_type: voting::TallyType
+		) -> Result {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!title.is_empty(), "Proposal must have title");
 			ensure!(!contents.is_empty(), "Proposal must not be empty");
@@ -103,10 +109,10 @@ decl_module! {
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
-				voting::VoteType::Binary,
+				vote_type,
 				false, // not commit-reveal
-				voting::TallyType::OneCoin,
-				vec![YES_VOTE, NO_VOTE],
+				tally_type,
+				outcomes,
 			)?;
 
 			let index = <ProposalCount<T>>::get();
@@ -119,27 +125,10 @@ decl_module! {
 				transition_time: T::Moment::zero(),
 				title: title,
 				contents: contents,
-				comments: vec![],
 				vote_id: vote_id,
 			});
 			<Proposals<T>>::mutate(|proposals| proposals.push(hash));
 			Self::deposit_event(RawEvent::NewProposal(_sender, hash));
-			Ok(())
-		}
-
-		/// Add a new comment to an existing governance proposal.
-		// TODO: give comments unique numbers/ids?
-		pub fn add_comment(origin, proposal_hash: T::Hash, comment: Vec<u8>) -> Result {
-			let _sender = ensure_signed(origin)?;
-			let record = <ProposalOf<T>>::get(proposal_hash).ok_or("Proposal does not exist")?;
-			// TODO: store comments separately to prevent all this cloning?
-			let mut new_comments = record.comments.clone();
-			new_comments.push((comment, _sender.clone()));
-			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
-				comments: new_comments,
-				..record
-			});
-			Self::deposit_event(RawEvent::NewComment(_sender, proposal_hash));
 			Ok(())
 		}
 
@@ -169,6 +158,8 @@ decl_module! {
 
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
+		///
+		/// TODO: Decide whether we want this. It may be the only vulnerability we have.
 		fn on_finalise(_n: T::BlockNumber) {
 			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
@@ -205,8 +196,6 @@ decl_event!(
 							<T as balances::Trait>::Balance {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
-		/// Emitted at comment creation: (Commentor, ProposalHash)
-		NewComment(AccountId, Hash),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
 		VotingStarted(Hash, u64, Moment),
 		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
