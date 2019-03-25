@@ -86,8 +86,8 @@ mod tests {
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
-		type AccountId = H256;
-		type Lookup = IdentityLookup<H256>;
+		type AccountId = u64;
+		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
@@ -113,11 +113,11 @@ mod tests {
 		t.into()
 	}
 
-	fn delegate_to(who: H256, to_account: H256) -> Result {
+	fn delegate_to(who: u64, to_account: u64) -> Result {
 		Delegation::delegate_to(Origin::signed(who), to_account)
 	}
 
-	fn undelegate_from(who: H256, from_account: H256) -> Result {
+	fn undelegate_from(who: u64, from_account: u64) -> Result {
 		Delegation::undelegate_from(Origin::signed(who), from_account)
 	}
 
@@ -125,7 +125,7 @@ mod tests {
 	fn unit_delegate_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a : Vec<H256> = (1..3).map(|v| H256::from_low_u64_be(v)).collect();
+			let a: Vec<u64> = vec![1,2,3];
 
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -145,7 +145,7 @@ mod tests {
 	fn multistep_delegate_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a : Vec<H256> = (1..5).map(|v| H256::from_low_u64_be(v)).collect();
+			let a: Vec<u64> = vec![1,2,3,4,5];
 			
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -179,7 +179,7 @@ mod tests {
 	fn self_delegate_should_fail() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a = H256::from_low_u64_be(1);
+			let a = 1_u64;
 			assert_eq!(delegate_to(a, a), Err("Invalid delegation"));
 			assert_eq!(System::events(), vec![]);
 			assert_eq!(Delegation::delegate_of(a), None);
@@ -191,7 +191,7 @@ mod tests {
 	fn cycle_delegate_should_fail() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a : Vec<H256> = (1..3).map(|v| H256::from_low_u64_be(v)).collect();
+			let a: Vec<u64> = vec![1,2,3];
 			
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -221,19 +221,19 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 
-			assert_ok!(delegate_to(H256::from_low_u64_be(1), H256::from_low_u64_be(2)));
-			assert_ok!(undelegate_from(H256::from_low_u64_be(1), H256::from_low_u64_be(2)));
+			assert_ok!(delegate_to(1_u64, 2_u64));
+			assert_ok!(undelegate_from(1_u64, 2_u64));
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::delegation(RawEvent::Delegated(H256::from_low_u64_be(1), H256::from_low_u64_be(2)))
+					event: Event::delegation(RawEvent::Delegated(1_u64, 2_u64))
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::delegation(RawEvent::Undelegated(H256::from_low_u64_be(1), H256::from_low_u64_be(2)))
+					event: Event::delegation(RawEvent::Undelegated(1_u64, 2_u64))
 				}]
 			);
-			assert_eq!(Delegation::delegate_of(H256::from_low_u64_be(1)), None);
+			assert_eq!(Delegation::delegate_of(1_u64), None);
 		});
 	}
 
@@ -241,7 +241,7 @@ mod tests {
 	fn undelegate_from_oneself_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			assert_err!(undelegate_from(H256::from_low_u64_be(1), H256::from_low_u64_be(1)), "Invalid undelegation");
+			assert_err!(undelegate_from(1_u64, 1_u64), "Invalid undelegation");
 		});
 	}
 
@@ -249,10 +249,10 @@ mod tests {
 	fn delegate_too_deep_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			assert_ok!(delegate_to(H256::from_low_u64_be(1), H256::from_low_u64_be(2)));
-			assert_ok!(delegate_to(H256::from_low_u64_be(3), H256::from_low_u64_be(1)));
-			assert_ok!(delegate_to(H256::from_low_u64_be(4), H256::from_low_u64_be(3)));
-			assert_err!(delegate_to(H256::from_low_u64_be(5), H256::from_low_u64_be(4)), "Invalid delegation");
+			assert_ok!(delegate_to(1_u64, 2_u64));
+			assert_ok!(delegate_to(3_u64, 2_u64));
+			assert_ok!(delegate_to(4_u64, 3_u64));
+			assert_err!(delegate_to(5_u64, 4_u64), "Invalid delegation");
 		});
 	}
 }

@@ -60,7 +60,6 @@ mod tests {
 	use runtime_support::dispatch::Result;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
-	use runtime_io::ed25519::Pair;
 	use primitives::{H256, Blake2Hasher, Hasher};
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
@@ -97,8 +96,8 @@ mod tests {
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
-		type AccountId = H256;
-		type Lookup = IdentityLookup<H256>;
+		type AccountId = u64;
+		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
@@ -134,7 +133,6 @@ mod tests {
 
 	pub type System = system::Module<Test>;
  	pub type Timestamp = timestamp::Module<Test>;
-	pub type Voting = voting::Module<Test>;
 	pub type Governance = Module<Test>;
 
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
@@ -148,28 +146,23 @@ mod tests {
 		t.into()
 	}
 
-	fn propose(who: H256, title: &[u8], proposal: &[u8], category: governance::ProposalCategory) -> Result {
+	fn propose(who: u64, title: &[u8], proposal: &[u8], category: governance::ProposalCategory) -> Result {
 		Governance::create_proposal(Origin::signed(who), title.to_vec(), proposal.to_vec(), category)
 	}
 
-	fn add_comment(who: H256, proposal_hash: H256, comment: &[u8]) -> Result {
-		Governance::add_comment(Origin::signed(who), proposal_hash, comment.to_vec())
-	}
-
-	fn advance_proposal(who: H256, proposal_hash: H256) -> Result {
+	fn advance_proposal(who: u64, proposal_hash: H256) -> Result {
 		Governance::advance_proposal(Origin::signed(who), proposal_hash)
 	}
 
-	fn build_proposal_hash(who: H256, proposal: &[u8]) -> H256 {
+	fn build_proposal_hash(who: u64, proposal: &[u8]) -> H256 {
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&who.encode());
 			buf.extend_from_slice(proposal.as_ref());
 			return Blake2Hasher::hash(&buf[..]);
 	}
 
-	fn get_test_key() -> H256 {
-		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
-		let public: H256 = pair.public().0.into();
+	fn get_test_key() -> u64 {
+		let public = 1_u64;
 		return public;
 	}
 
@@ -180,11 +173,11 @@ mod tests {
 	}
 
 	fn make_record(
-		author: H256,
+		author: u64,
 		title: &[u8],
 		contents: &[u8],
 		category: ProposalCategory)
-		-> ProposalRecord<H256, u64> {
+		-> ProposalRecord<u64, u64> {
 			ProposalRecord {
 				index: 0,
 				author: author,
@@ -193,7 +186,6 @@ mod tests {
 				transition_time: 0,
 				title: title.to_vec(),
 				contents: contents.to_vec(),
-				comments: vec![],
 				vote_id: 1,
 			}
 	}
@@ -203,7 +195,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(123);
+			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -287,7 +279,7 @@ mod tests {
 			let (title, _) = generate_proposal();
 			let proposal = vec![];
 			let hash = build_proposal_hash(public, &proposal);
-			let category = governance::ProposalCategory::Upgrade;
+			let category = governance::ProposalCategory::Signaling;
 			assert_eq!(propose(public, title, &proposal, category), Err("Proposal must not be empty"));
 			assert_eq!(Governance::proposal_count(), 0);
 			assert_eq!(Governance::proposals(), vec![]);
@@ -303,51 +295,8 @@ mod tests {
 			let (_, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let title = vec![];
-			let category = governance::ProposalCategory::Upgrade;
+			let category = governance::ProposalCategory::Signaling;
 			assert_eq!(propose(public, &title, proposal, category), Err("Proposal must have title"));
-			assert_eq!(Governance::proposal_count(), 0);
-			assert_eq!(Governance::proposals(), vec![]);
-			assert_eq!(Governance::proposal_of(hash), None);
-		});
-	}
-
-	#[test]
-	fn comment_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-			let (title, proposal) = generate_proposal();
-			let category = governance::ProposalCategory::Upgrade;
-			assert_ok!(propose(public, title, proposal, category));
-			let hash = build_proposal_hash(public, &proposal);
-
-			// create a comment
-			let comment: &[u8] = b"pls do not do this";
-			assert_ok!(add_comment(public, hash, comment));
-			assert_eq!(System::events()[2], EventRecord {
-				phase: Phase::ApplyExtrinsic(0),
-				event: Event::governance(RawEvent::NewComment(public, hash))
-			});
-			assert_eq!(
-				Governance::proposal_of(hash),
-				Some(ProposalRecord {
-					comments: vec![(comment.to_vec(), public)],
-					..make_record(public, title, proposal, category)
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn comment_on_invalid_proposal_should_fail() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-
-			// create a comment and an invalid hash
-			let comment: &[u8] = b"pls do not do this";
-			let hash: H256 = public.clone();
-			assert_err!(add_comment(public, hash, comment), "Proposal does not exist");
 			assert_eq!(Governance::proposal_count(), 0);
 			assert_eq!(Governance::proposals(), vec![]);
 			assert_eq!(Governance::proposal_of(hash), None);
@@ -359,7 +308,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(123);
+			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -406,7 +355,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(123);
+			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -430,7 +379,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(123);
+			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -527,7 +476,7 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(123);
+			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			assert_ok!(propose(public, title, proposal, category));
@@ -556,12 +505,11 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Funding(123);
+			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 
-			let other_pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"));
-			let other_public: H256 = other_pair.public().0.into();
+			let other_public = 2_u64;
 			assert_ok!(propose(public, title, proposal, category));
 			assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
 			assert_eq!(Governance::active_proposals(), vec![]);

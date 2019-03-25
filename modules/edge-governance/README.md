@@ -3,11 +3,9 @@ This module contains the logic that powers Edgeware's governance UI. It is prese
 
 ## Functionality
 
-The module exposes 4 public functions:
-* `create_proposal`, which allows submission of a new governance proposal, for the purpose of `Funding`, a chain `Upgrade`, or `Signaling`.
-* `add_comment`, which attaches a new comment to an existing proposal.
+The module exposes 2 public functions:
+* `create_proposal`, which allows submission of a new governance proposal for the purpose of `Signaling`.
 * `advance_proposal`, which allows the author of a proposal to shift the proposal's state, either starting or completing the voting process.
-* `submit_vote`, which allows a user to place their vote.
 
 ## Setup
 

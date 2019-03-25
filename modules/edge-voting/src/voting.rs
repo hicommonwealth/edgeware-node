@@ -125,6 +125,11 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
+		/// A function for commit-reveal voting schemes that adds a vote commitment.
+		///
+		/// A vote commitment is formatted using the native hash function. There
+		/// are currently no cryptoeconomic punishments against not revealing the
+		/// commitment.
 		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -141,6 +146,9 @@ decl_module! {
 			Ok(())
 		}
 
+		/// A function that reveals a vote commitment or serves as the general vote function.
+		///
+		/// There are currently no cryptoeconomic incentives for revealing commited votes.
 		pub fn reveal(origin, vote_id: u64, vote: VoteOutcome, secret: Option<VoteOutcome>) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -174,6 +182,7 @@ decl_module! {
 			Ok(())
 		}
 
+		/// A function to advance the vote stage.
 		pub fn advance_stage_as_initiator(origin, vote_id: u64) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -184,6 +193,7 @@ decl_module! {
 }
 
 impl<T: Trait> Module<T> {
+	/// A helper function for creating a new vote/ballot.
 	pub fn create_vote(
 		sender: T::AccountId,
 		vote_type: VoteType,
@@ -217,6 +227,7 @@ impl<T: Trait> Module<T> {
 		return Ok(id);
 	}
 
+	/// A helper function for advancing the stage of a vote, as a state machine
 	pub fn advance_stage(vote_id: u64) -> Result {
 		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 		let curr_stage = record.data.stage;
@@ -232,8 +243,8 @@ impl<T: Trait> Module<T> {
 		Ok(())
 	}
 
-	// for a given account, finds the voter representing them, aka their
-	// closest voting ancestor on the delegation graph (incl self)
+	/// For a given account, finds the voter representing them, aka their
+	/// closest voting ancestor on the delegation graph (incl self)
 	fn find_rep(voters: &Vec<(T::AccountId, VoteOutcome)>, acct: T::AccountId) -> Option<T::AccountId> {
 		if let Some(_) = voters.iter().find(|(voter, _)| voter == &acct) {
 			return Some(acct);
@@ -244,7 +255,7 @@ impl<T: Trait> Module<T> {
 		}
 	}
 
-	// constructs a mapping of accounts to their representatives
+	/// Constructs a mapping of accounts to their representatives
 	fn build_rep_map(reps: &mut Vec<(T::AccountId, T::AccountId)>, voters: &Vec<(T::AccountId, VoteOutcome)>, acct: T::AccountId) {
 		// if we haven't seen this account yet, find its voting parent
 		match reps.iter().find(|(voter, _)| voter == &acct) {
@@ -264,6 +275,7 @@ impl<T: Trait> Module<T> {
 		};
 	}
 	
+	/// A helper function for tallying a vote.
 	pub fn tally(vote_id: u64) -> Tally<T::Balance> {
 		let mut voters: Vec<(T::AccountId, VoteOutcome)> = vec![];
 		let mut reps: Vec<(T::AccountId, T::AccountId)> = vec![];
@@ -305,7 +317,6 @@ impl<T: Trait> Module<T> {
 	}
 }
 
-/// An event in this module.
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::AccountId {
 		/// new vote (id, creator, type of vote)
