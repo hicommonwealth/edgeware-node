@@ -125,7 +125,7 @@ mod tests {
 	fn unit_delegate_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a: Vec<u64> = vec![1,2,3];
+			let a: Vec<u64> = vec![1,2];
 
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -145,7 +145,7 @@ mod tests {
 	fn multistep_delegate_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a: Vec<u64> = vec![1,2,3,4,5];
+			let a: Vec<u64> = vec![1,2,3,4];
 			
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -191,7 +191,7 @@ mod tests {
 	fn cycle_delegate_should_fail() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let a: Vec<u64> = vec![1,2,3];
+			let a: Vec<u64> = vec![1,2];
 			
 			assert_ok!(delegate_to(a[0], a[1]));
 			assert_eq!(System::events(), vec![
@@ -249,7 +249,7 @@ mod tests {
 	fn delegate_too_deep_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			assert_ok!(delegate_to(1_u64, 2_u64));
+			assert_ok!(delegate_to(2_u64, 1_u64));
 			assert_ok!(delegate_to(3_u64, 2_u64));
 			assert_ok!(delegate_to(4_u64, 3_u64));
 			assert_err!(delegate_to(5_u64, 4_u64), "Invalid delegation");
