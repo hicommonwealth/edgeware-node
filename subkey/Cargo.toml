@@ -5,7 +5,7 @@ authors = ["Parity Technologies <admin@parity.io>"]
 edition = "2018"
 
 [dependencies]
-substrate-primitives = { version = "*", path = "../core/primitives" }
+substrate-primitives = { version = "*", git = "https://github.com/paritytech/substrate" }
 rand = "0.6"
 clap = { version = "~2.32", features = ["yaml"] }
 tiny-bip39 = "0.6.0"
