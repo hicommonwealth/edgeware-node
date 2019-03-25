@@ -67,14 +67,7 @@ pub enum VoteType {
 	// Binary decision vote, i.e. 2 outcomes
 	Binary,
 	// Multi option decision vote, i.e. > 2 possible outcomes
-	// TODO: Add support for this type
 	MultiOption,
-	// Anonymous vote using ring signatures
-	// TODO: Add support for this type
-	AnonymousRing,
-	// Anonymous vote using merkle tree accumulators
-	// TODO: Add support for this type
-	AnonymousMerkle,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -154,12 +147,13 @@ decl_module! {
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
 			// Check vote is for a valid outcome
-			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote type must be binary");
+			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote outcome is not valid");
 			// TODO: Allow changing of votes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
 			// Ensure voter committed
 			if record.data.is_commit_reveal {
+				ensure!(secret.is_some(), "Secret is invalid");
 				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender already committed");
 				let commit: (T::AccountId, VoteOutcome) = record.commitments
 					.iter()
@@ -201,9 +195,6 @@ impl<T: Trait> Module<T> {
 		tally_type: TallyType,
 		outcomes: Vec<VoteOutcome>
 	) -> result::Result<u64, &'static str> {
-		// TODO: Origin check? sender?
-		ensure!(vote_type == VoteType::Binary || vote_type == VoteType::MultiOption, "Unsupported vote type");
-
 		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
 		if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
 

@@ -309,20 +309,6 @@ mod tests {
 		});
 	}
 
-	// TODO: Ensure we fix this test when we support these types!
-	#[test]
-	fn create_vote_with_unsupported_type_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-			let vote = generate_1p1v_public_multi_vote();
-			let outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
-			assert_err!(create_vote(public, VoteType::AnonymousRing, vote.1, vote.2, &[outcome]), "Unsupported vote type");
-			assert_eq!(Voting::vote_record_count(), 0);
-			assert_eq!(Voting::vote_records(1), None);
-		});
-	}
-
 	#[test]
 	fn commit_to_nonexistent_record_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
@@ -432,6 +418,36 @@ mod tests {
 					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
 				}
 			]);
+		});
+	}
+	
+	#[test]
+	fn reveal_invalid_outcome_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			let public2 = get_test_key_2();
+			let invalid_outcome = SECRET;
+			assert_err!(reveal(public2, 1, invalid_outcome, None), "Vote outcome is not valid");
+		});
+	}
+
+	#[test]
+	fn reveal_multi_outcome_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_multi_vote();
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+
+			
+			for i in 0..vote.3.len() {
+				assert_ok!(reveal(i as u64, 1, vote.3[i], None));
+			}
 		});
 	}
 
