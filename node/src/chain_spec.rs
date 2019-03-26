@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair};
+use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair, crypto::UncheckedInto};
 use node_primitives::AccountId;
-use edgeware_runtime::{
-	Permill, Perbill,
-	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
-	TimestampConfig, TreasuryConfig, StakingConfig, StakerStatus, SudoConfig, GrandpaConfig,
-	IdentityConfig, GovernanceConfig, DelegationConfig, FeesConfig,
-	CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig, IndicesConfig,
-};
+use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig,
+	SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
+	SudoConfig, ContractConfig, GrandpaConfig, IndicesConfig, Permill, Perbill,
+	IdentityConfig, GovernanceConfig, DelegationConfig};
+pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
+use hex_literal::{hex, hex_impl};
 use substrate_telemetry::TelemetryEndpoints;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -32,52 +31,47 @@ const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_testnet_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.7/edgeware.json")) {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.8/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
 }
 
 pub fn edgeware_config_gensis() -> GenesisConfig {
+	let initial_authorities: Vec<(AccountId, AccountId, AuthorityId)> = vec![(
+		hex!["be60afbe71ab5a1ebb7d2056ccef8eefe4f0ec55626ad2c7a14f30feeb9b7553"].unchecked_into(), // 5GNKgEAakKz6kCUJCgoTEXDB575B7qnZKHpWnpfkwiMjGjVC
+		hex!["ec178706f39e97af74cc19c96c1bca88e118f17a89515e9d38b9a8d6e30b5c2e"].unchecked_into(), // 5HQG9UySSqCBBmPWGiH3jRZWcfzVhX4BjBKerkNMnbhgrvLc
+		hex!["7494745f9c3e19ab6f7944438488e0cb552c2a08b857bdb53a8f218a83718c5d"].unchecked_into(), // 5EhZWeemrGMQb6WLbqkz9zsJg1zLYuvW2jEDDsz5KuusYHJq
+	),(
+		hex!["6857d57613310e6edbdc5ef172fade5b18f550386e82f1af7d73e419579d3a57"].unchecked_into(), // 5ERWvrK1oMhA8JpAdbYtpZznP15a2CKcUnyhRzie5kCCrwTy
+		hex!["6a52b4a25de117ad12c8c03d4025e3fd0d84c3e0fd7ed9c574e10053c7722a09"].unchecked_into(), // 5EU7W3ke63HK9JFa56vkdsX638p5GE8uZPCMSbKgBCrRxTAP
+		hex!["08a97acabcdffd2432ccdf512df1e6609d7e2036d8829b49a84638ffdf228417"].unchecked_into(), // 5CG4axGeyWNKxzdLtK32E7nvpRrq4tHaxqd3pFadMMPyoG2X
+	),(
+		hex!["f2fa34cb95c8b4bcfb3d4ae1764f6ffe526265aa8d41e29e4588173c389f6576"].unchecked_into(), // 5HZHmjNvHDEqYdgKZidUwV3thKWmTAyqbBLPkJ577ArNa5fS
+		hex!["183849c09e2c2a831a6c80e31f2aac7e178f6a341064d2fdf71590aa0352a80f"].unchecked_into(), // 5CcTj9PwBvP6oRqAwuBkjpNqtTc5L6bz43fbHAtcWeCEdsjx
+		hex!["8414b24db0955f201daebda104370f5e8ecb8542f4cb61e23238fbe1e5d9704a"].unchecked_into(), // 5F3tKsCrEvJbXmHsqWqnzF5uiuLgbhgvwptUk4zFMG1UoT7d
+	),(
+		hex!["e043a6c43ad28c69b8f7d30efb9afbf0b93c514157ed1cf39a099b7f064ca973"].unchecked_into(), // 5H8kgPoDdL5wiKcyYNTpUUaR6KsTGEeRv2mUfAzRahxteF75
+		hex!["02902e56789233656efd17e0de1a65db14f5a3131b01596268a588a8c7ce5a6e"].unchecked_into(), // 5C84nQQJ4dNpJsBjN6c9GK83bK4vMFWi5aQYrxWYsF6QB8vV
+		hex!["da452333a6a811ddafcd2f41d1580c77948f7e7c9027283cd1bb6b30e152d316"].unchecked_into(), // 5GztqLMQHVtjEz4ATfhEBnsqvaHrkhGprcgQBg1bpMJjBK97
+	)];
+
 	testnet_genesis(
-		vec![
-			get_authority_keys_from_seed("Alice"),
-			get_authority_keys_from_seed("A"),
-			get_authority_keys_from_seed("B"),
-			get_authority_keys_from_seed("C"),
-			get_authority_keys_from_seed("D"),
-		],
-		get_account_id_from_seed("Alice").into(),
-		Some(vec![
-			get_account_id_from_seed("Alice"),
-			get_account_id_from_seed("Bob"),
-			get_account_id_from_seed("Charlie"),
-			get_account_id_from_seed("Dave"),
-			get_account_id_from_seed("Eve"),
-			get_account_id_from_seed("A"),
-			get_account_id_from_seed("B"),
-			get_account_id_from_seed("C"),
-			get_account_id_from_seed("D"),
-			get_account_id_from_seed("E"),
-			get_account_id_from_seed("F"),
-			get_account_id_from_seed("G"),
-			get_account_id_from_seed("H"),
-			get_account_id_from_seed("I"),
-			get_account_id_from_seed("J"),
-			get_account_id_from_seed("K"),
-			get_account_id_from_seed("L"),
-			get_account_id_from_seed("M"),
-			get_account_id_from_seed("N"),
-			get_account_id_from_seed("O"),
-			get_account_id_from_seed("P"),
-			get_account_id_from_seed("Q"),
-		]),
+		initial_authorities,
+		hex!["be60afbe71ab5a1ebb7d2056ccef8eefe4f0ec55626ad2c7a14f30feeb9b7553"].unchecked_into(),
+		None,
 	)
 }
 
 /// Edgeware testnet generator
 pub fn edgeware_config() -> Result<ChainSpec, String> {
-	let boot_nodes = vec![];
+	let boot_nodes = vec![
+	    "/ip4/157.230.218.41/tcp/30333/p2p/QmR55crQd55hvNr2i4oHpEEWAM4eJd3xskjcQzycq1Larq".to_string(),
+	    "/ip4/18.223.143.102/tcp/30333/p2p/QmNTaWsiKXCMwFabqFJfuY4zh8WW4o1iXtt8dN6LWDgkdv".to_string(),
+	    "/ip4/206.189.33.216/tcp/30333/p2p/QmRHGbxdxWgi8CttEsegzDVY38prr4yMngRfUqVkhqoXho".to_string(),
+	    "/ip4/157.230.125.18/tcp/30333/p2p/QmRgNsYHNEqT1wq5vXoHucUTE4svyQGBrwf8EY3TQJBXmM".to_string(),
+	];
+
 	Ok(ChainSpec::from_genesis(
 		"Edgeware",
 		"edgeware",
@@ -149,6 +143,8 @@ pub fn testnet_genesis(
 			ids: endowed_accounts.clone(),
 		}),
 		balances: Some(BalancesConfig {
+			transaction_base_fee: 1,
+			transaction_byte_fee: 0,
 			existential_deposit: 500,
 			transfer_fee: 0,
 			creation_fee: 0,
@@ -168,7 +164,6 @@ pub fn testnet_genesis(
 			bonding_duration: 2 * 60 * 12,
 			offline_slash: Perbill::zero(),
 			session_reward: Perbill::zero(),
-			current_offline_slash: 0,
 			current_session_reward: 0,
 			offline_slash_grace: 0,
 			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
@@ -223,10 +218,6 @@ pub fn testnet_genesis(
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
-		}),
-		fees: Some(FeesConfig {
-			transaction_base_fee: 1,
-			transaction_byte_fee: 0,
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().map(|x| x.0.clone()).collect(),
