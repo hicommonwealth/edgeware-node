@@ -18,7 +18,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
-#![recursion_limit = "512"]
+#![recursion_limit="256"]
 
 extern crate rstd;
 extern crate client;
@@ -26,7 +26,7 @@ extern crate support;
 extern crate runtime_primitives;
 #[cfg(feature = "std")]
 extern crate parity_codec;
-extern crate substrate_primitives as primitives;
+extern crate substrate_primitives;
 
 extern crate version;
 extern crate edge_delegation;
@@ -47,9 +47,9 @@ extern crate staking;
 extern crate system;
 extern crate timestamp;
 extern crate treasury;
-extern crate fees;
 extern crate finality_tracker;
 extern crate sudo;
+extern crate offchain_primitives;
 
 extern crate node_primitives;
 extern crate consensus_aura;
@@ -61,7 +61,7 @@ use edge_voting::voting;
 
 use rstd::prelude::*;
 use support::construct_runtime;
-use primitives::u32_trait::{_2, _4};
+use substrate_primitives::u32_trait::{_2, _4};
 use node_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, AuthorityId, Signature, AuthoritySignature
 };
@@ -81,7 +81,7 @@ use council::{motions as council_motions, voting as council_voting};
 use council::seats as council_seats;
 #[cfg(any(feature = "std", test))]
 use version::NativeVersion;
-use primitives::OpaqueMetadata;
+use substrate_primitives::OpaqueMetadata;
 
 #[cfg(any(feature = "std", test))]
 pub use runtime_primitives::BuildStorage;
@@ -95,10 +95,10 @@ pub use staking::StakerStatus;
 /// This runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
-	impl_name: create_runtime_str!("edgeware node"),
-	authoring_version: 1,
-	spec_version: 2,
-	impl_version: 2,
+	impl_name: create_runtime_str!("edgeware-node"),
+	authoring_version: 2,
+	spec_version: 3,
+	impl_version: 4,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -141,11 +141,9 @@ impl balances::Trait for Runtime {
 	type OnFreeBalanceZero = ((Staking, Contract), Session);
 	type OnNewAccount = Indices;
 	type Event = Event;
-}
-
-impl fees::Trait for Runtime {
-	type Event = Event;
-	type TransferAsset = Balances;
+	type TransactionPayment = ();
+	type DustRemoval = ();
+	type TransferPayment = ();
 }
 
 impl consensus::Trait for Runtime {
@@ -172,6 +170,8 @@ impl staking::Trait for Runtime {
 	type Currency = balances::Module<Self>;
 	type OnRewardMinted = Treasury;
 	type Event = Event;
+	type Slash = ();
+	type Reward = ();
 }
 
 impl democracy::Trait for Runtime {
@@ -182,6 +182,8 @@ impl democracy::Trait for Runtime {
 
 impl council::Trait for Runtime {
 	type Event = Event;
+	type BadPresentation = ();
+	type BadReaper = ();
 }
 
 impl council::voting::Trait for Runtime {
@@ -199,6 +201,8 @@ impl treasury::Trait for Runtime {
 	type ApproveOrigin = council_motions::EnsureMembers<_4>;
 	type RejectOrigin = council_motions::EnsureMembers<_2>;
 	type Event = Event;
+	type MintedForSpending = ();
+	type ProposalRejection = ();
 }
 
 impl contract::Trait for Runtime {
@@ -207,6 +211,8 @@ impl contract::Trait for Runtime {
 	type Gas = u64;
 	type DetermineContractAddress = contract::SimpleAddressDeterminator<Runtime>;
 	type ComputeDispatchFee = contract::DefaultDispatchFeeComputor<Runtime>;
+	type TrieIdGenerator = contract::TrieIdFromParentCounter<Runtime>;
+	type GasPayment = ();
 }
 
 impl sudo::Trait for Runtime {
@@ -268,7 +274,6 @@ construct_runtime!(
 		Treasury: treasury,
 		Contract: contract::{Module, Call, Storage, Config<T>, Event<T>},
 		Sudo: sudo,
-		Fees: fees::{Module, Storage, Config<T>, Event<T>},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
@@ -291,7 +296,7 @@ pub type UncheckedExtrinsic = generic::UncheckedMortalCompactExtrinsic<Address, 
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Index, Call>;
 /// Executive: handles dispatch to the various modules.
-pub type Executive = executive::Executive<Runtime, Block, system::ChainContext<Runtime>, Fees, AllModules>;
+pub type Executive = executive::Executive<Runtime, Block, system::ChainContext<Runtime>, Balances, AllModules>;
 
 impl_runtime_apis! {
 	impl client_api::Core<Block> for Runtime {
@@ -343,6 +348,12 @@ impl_runtime_apis! {
 	impl client_api::TaggedTransactionQueue<Block> for Runtime {
 		fn validate_transaction(tx: <Block as BlockT>::Extrinsic) -> TransactionValidity {
 			Executive::validate_transaction(tx)
+		}
+	}
+
+	impl offchain_primitives::OffchainWorkerApi<Block> for Runtime {
+		fn offchain_worker(number: NumberFor<Block>) {
+			Executive::offchain_worker(number)
 		}
 	}
 

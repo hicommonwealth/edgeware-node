@@ -11,6 +11,7 @@ substrate-primitives = { git = "https://github.com/paritytech/substrate", defaul
 client = { package = "substrate-client", git = "https://github.com/paritytech/substrate", default-features = false }
 rstd = { package = "sr-std", git = "https://github.com/paritytech/substrate", default-features = false }
 runtime_primitives = { package = "sr-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
+offchain-primitives = { package = "substrate-offchain-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 version = { package = "sr-version", git = "https://github.com/paritytech/substrate", default-features = false }
 support = { package = "srml-support", git = "https://github.com/paritytech/substrate", default-features = false }
 aura = { package = "srml-aura", git = "https://github.com/paritytech/substrate", default-features = false }
@@ -29,8 +30,7 @@ system = { package = "srml-system", git = "https://github.com/paritytech/substra
 timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate", default-features = false }
 treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate", default-features = false }
 sudo = { package = "srml-sudo", git = "https://github.com/paritytech/substrate", default-features = false }
-fees = { package = "srml-fees", git = "https://github.com/paritytech/substrate", default-features = false }
-node-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
+node-primitives = { package = "node-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 consensus_aura = { package = "substrate-consensus-aura-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 hex-literal = { version = "0.1.0", optional = true }
@@ -63,7 +63,6 @@ std = [
 	"timestamp/std",
 	"treasury/std",
 	"sudo/std",
-	"fees/std",
 	"version/std",
 	"node-primitives/std",
 	"serde",
