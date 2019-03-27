@@ -130,9 +130,17 @@ pub fn testnet_genesis(
 		]
 	});
 
-	const STASH: u128 = 1 << 20;
-	const ENDOWMENT: u128 = 1 << 20;
+	const MILLICENTS: u128 = 1_000_000_000;
+	const CENTS: u128 = 1_000 * MILLICENTS;    // assume this is worth about a cent.
+	const DOLLARS: u128 = 100 * CENTS;
 
+	const SECS_PER_BLOCK: u64 = 6;
+	const MINUTES: u64 = 60 / SECS_PER_BLOCK;
+	const HOURS: u64 = MINUTES * 60;
+	const DAYS: u64 = HOURS * 24;
+
+	const ENDOWMENT: u128 = 10_000_000 * DOLLARS;
+	const STASH: u128 = 100 * DOLLARS;
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
 			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),
@@ -140,81 +148,84 @@ pub fn testnet_genesis(
 		}),
 		system: None,
 		indices: Some(IndicesConfig {
-			ids: endowed_accounts.clone(),
+			ids: endowed_accounts.iter().cloned()
+				.chain(initial_authorities.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
 		}),
 		balances: Some(BalancesConfig {
-			transaction_base_fee: 1,
-			transaction_byte_fee: 0,
-			existential_deposit: 500,
-			transfer_fee: 0,
-			creation_fee: 0,
-			balances: endowed_accounts.iter().map(|k| (k.clone(), ENDOWMENT)).collect(),
+			transaction_base_fee: 1 * CENTS,
+			transaction_byte_fee: 10 * MILLICENTS,
+			balances: endowed_accounts.iter().cloned()
+				.map(|k| (k, ENDOWMENT))
+				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
+				.collect(),
+			existential_deposit: 1 * DOLLARS,
+			transfer_fee: 1 * CENTS,
+			creation_fee: 1 * CENTS,
 			vesting: vec![],
 		}),
 		session: Some(SessionConfig {
 			validators: initial_authorities.iter().map(|x| x.1.clone()).collect(),
-			session_length: 10,
+			session_length: 5 * MINUTES,
 			keys: initial_authorities.iter().map(|x| (x.1.clone(), x.2.clone())).collect::<Vec<_>>(),
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			minimum_validator_count: 1,
-			validator_count: 2,
-			sessions_per_era: 5,
-			bonding_duration: 2 * 60 * 12,
-			offline_slash: Perbill::zero(),
-			session_reward: Perbill::zero(),
+			offline_slash: Perbill::from_billionths(1_000_000),
+			session_reward: Perbill::from_billionths(2_065),
 			current_session_reward: 0,
-			offline_slash_grace: 0,
+			validator_count: 7,
+			sessions_per_era: 12,
+			bonding_duration: 60 * MINUTES,
+			offline_slash_grace: 4,
+			minimum_validator_count: 4,
 			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
 			invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 		}),
 		democracy: Some(DemocracyConfig {
-			launch_period: 9,
-			voting_period: 18,
-			minimum_deposit: 10,
-			public_delay: 0,
+			launch_period: 10 * MINUTES,    // 1 day per public referendum
+			voting_period: 10 * MINUTES,    // 3 days to discuss & vote on an active referendum
+			minimum_deposit: 50 * DOLLARS,    // 12000 as the minimum deposit for a referendum
+			public_delay: 10 * MINUTES,
 			max_lock_periods: 6,
 		}),
 		council_seats: Some(CouncilSeatsConfig {
-			active_council: endowed_accounts.iter()
-				.filter(|&endowed| initial_authorities.iter().find(|&(_, controller, _)| controller == endowed).is_none())
-				.map(|a| (a.clone(), 1000000)).collect(),
-			candidacy_bond: 10,
-			voter_bond: 2,
-			present_slash_per_voter: 1,
-			carry_count: 4,
-			presentation_duration: 10,
-			approval_voting_period: 20,
-			term_duration: 1000000,
-			desired_seats: (endowed_accounts.len() / 2 - initial_authorities.len()) as u32,
-			inactive_grace_period: 1,
+			active_council: vec![],
+			candidacy_bond: 10 * DOLLARS,
+			voter_bond: 1 * DOLLARS,
+			present_slash_per_voter: 1 * CENTS,
+			carry_count: 6,
+			presentation_duration: 1 * DAYS,
+			approval_voting_period: 2 * DAYS,
+			term_duration: 28 * DAYS,
+			desired_seats: 0,
+			inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
 		}),
 		council_voting: Some(CouncilVotingConfig {
-			cooloff_period: 75,
-			voting_period: 20,
+			cooloff_period: 4 * DAYS,
+			voting_period: 1 * DAYS,
 			enact_delay_period: 0,
 		}),
 		timestamp: Some(TimestampConfig {
-			period: 2,                    // 2*2=4 second block time.
+			period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
 		}),
 		treasury: Some(TreasuryConfig {
 			proposal_bond: Permill::from_percent(5),
-			proposal_bond_minimum: 1_000_000,
-			spend_period: 12 * 60 * 24,
+			proposal_bond_minimum: 1 * DOLLARS,
+			spend_period: 1 * DAYS,
 			burn: Permill::from_percent(50),
 		}),
 		contract: Some(ContractConfig {
-			contract_fee: 21,
-			call_base_fee: 135,
-			create_base_fee: 175,
-			gas_price: 1,
+			contract_fee: 1 * CENTS,
+			call_base_fee: 1000,
+			create_base_fee: 1000,
+			gas_price: 1 * MILLICENTS,
 			max_depth: 1024,
 			block_gas_limit: 10_000_000,
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: root_key,
+			key: endowed_accounts[0].clone(),
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
