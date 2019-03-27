@@ -39,26 +39,26 @@ pub fn edgeware_testnet_config() -> ChainSpec {
 
 pub fn edgeware_config_gensis() -> GenesisConfig {
 	let initial_authorities: Vec<(AccountId, AccountId, AuthorityId)> = vec![(
-		hex!["be60afbe71ab5a1ebb7d2056ccef8eefe4f0ec55626ad2c7a14f30feeb9b7553"].unchecked_into(), // 5GNKgEAakKz6kCUJCgoTEXDB575B7qnZKHpWnpfkwiMjGjVC
-		hex!["ec178706f39e97af74cc19c96c1bca88e118f17a89515e9d38b9a8d6e30b5c2e"].unchecked_into(), // 5HQG9UySSqCBBmPWGiH3jRZWcfzVhX4BjBKerkNMnbhgrvLc
-		hex!["7494745f9c3e19ab6f7944438488e0cb552c2a08b857bdb53a8f218a83718c5d"].unchecked_into(), // 5EhZWeemrGMQb6WLbqkz9zsJg1zLYuvW2jEDDsz5KuusYHJq
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(), // 5HnNyuEyvLfTarQ4LLTSK4PpacMi2BTzmEYg4iKbVtSEU53C
+		hex!["78ca2addb982a4a39262d68ed63fb4a8b0dfd73b7a38e0190f77b0cf155f94e0"].unchecked_into(), // 5Eo5fD9gBaMrLoLTeABXY4KoDL7mb4QtrzSQBMzFDJhhw57q
+		hex!["e320e0bec84e02f4789170ad0126175d89f64257c504c599249df7b1fe90d688"].unchecked_into(), // 5HCWVbHiXgkHKgm2rqqbMx4UCDUz3BBWAY8oTRKDkahAaMEu
 	),(
-		hex!["6857d57613310e6edbdc5ef172fade5b18f550386e82f1af7d73e419579d3a57"].unchecked_into(), // 5ERWvrK1oMhA8JpAdbYtpZznP15a2CKcUnyhRzie5kCCrwTy
-		hex!["6a52b4a25de117ad12c8c03d4025e3fd0d84c3e0fd7ed9c574e10053c7722a09"].unchecked_into(), // 5EU7W3ke63HK9JFa56vkdsX638p5GE8uZPCMSbKgBCrRxTAP
-		hex!["08a97acabcdffd2432ccdf512df1e6609d7e2036d8829b49a84638ffdf228417"].unchecked_into(), // 5CG4axGeyWNKxzdLtK32E7nvpRrq4tHaxqd3pFadMMPyoG2X
+		hex!["5049a5a4f220aad7edc78bf3311710e05070b622cdd55bec8adf506a1d90ef73"].unchecked_into(), // 5DsyZmCaTGmKaiaFChifPRB4X4jcP1vWHuEbjxsF3NerzDgd
+		hex!["4f8f200b881db35caaa041356f5ff454162cb930693983d09bafdc4abbc3f879"].unchecked_into(), // 5Ds2A4mjhSQSG7fFrZhhgj4fCDpdUEpm1L9bKzEzmrzRYNXX
+		hex!["ada6a4726da7c73108cdf2686e6735dd3740dce19f2be7eee9460152cfb4a691"].unchecked_into(), // 5FzPeKoqxxKDbKT9QmNLeFP1CVSBqKpvV1P4maubvyyQSLqU
 	),(
-		hex!["f2fa34cb95c8b4bcfb3d4ae1764f6ffe526265aa8d41e29e4588173c389f6576"].unchecked_into(), // 5HZHmjNvHDEqYdgKZidUwV3thKWmTAyqbBLPkJ577ArNa5fS
-		hex!["183849c09e2c2a831a6c80e31f2aac7e178f6a341064d2fdf71590aa0352a80f"].unchecked_into(), // 5CcTj9PwBvP6oRqAwuBkjpNqtTc5L6bz43fbHAtcWeCEdsjx
-		hex!["8414b24db0955f201daebda104370f5e8ecb8542f4cb61e23238fbe1e5d9704a"].unchecked_into(), // 5F3tKsCrEvJbXmHsqWqnzF5uiuLgbhgvwptUk4zFMG1UoT7d
+		hex!["efffffdcc35e2bb8eb1b274b19aa0e84db49e519083e9bdd5d06ee9b62b80c56"].unchecked_into(), // 5HVPMDQ5wzhKBnZtVSc1YGH8HvNYqzFfk4yFxdSCYuq3iTgK
+		hex!["d2d25e48253d9b16f81323de36eb1c51d2fc07d9b89dafdcef4cb61bff52800c"].unchecked_into(), // 5Gq8QTxo9Kedv33bTCdWFz6DSrB46Ben5saEWEYrpkpBF5rF
+		hex!["f07586a2147e4f63dd416b0b8363ed56f08f9cacf0dd35fcb6b5574f3b465d6c"].unchecked_into(), // 5HVzG9Yb7nCPRpLY7ypWJGKx5mJVtLkUFCDCtR9rQnVEm5ej
 	),(
-		hex!["e043a6c43ad28c69b8f7d30efb9afbf0b93c514157ed1cf39a099b7f064ca973"].unchecked_into(), // 5H8kgPoDdL5wiKcyYNTpUUaR6KsTGEeRv2mUfAzRahxteF75
-		hex!["02902e56789233656efd17e0de1a65db14f5a3131b01596268a588a8c7ce5a6e"].unchecked_into(), // 5C84nQQJ4dNpJsBjN6c9GK83bK4vMFWi5aQYrxWYsF6QB8vV
-		hex!["da452333a6a811ddafcd2f41d1580c77948f7e7c9027283cd1bb6b30e152d316"].unchecked_into(), // 5GztqLMQHVtjEz4ATfhEBnsqvaHrkhGprcgQBg1bpMJjBK97
+		hex!["d857fce59cca864637d5bc879eef6b23acc166ff4e01b6fc602bdf9c3f33fc18"].unchecked_into(), // 5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mPJo
+		hex!["b68ea4881c12b90205de5037283252b1a2dce85c819950a460d0d89945cad5a0"].unchecked_into(), // 5GC4wpJ3pQFfp1pDu6bXMvduZq3c6rRkYbgvQthT7M1TRBWb
+		hex!["c39aabb19d05e62b7f743d737e53c6b5f892808a10224ccf8921a146b805c57a"].unchecked_into(), // 5GVB9A9W8q7aPBTxVMw5bmD8jgtu4kT93nVVK2wRU8eHP3QG
 	)];
 
 	testnet_genesis(
 		initial_authorities,
-		hex!["be60afbe71ab5a1ebb7d2056ccef8eefe4f0ec55626ad2c7a14f30feeb9b7553"].unchecked_into(),
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(),
 		None,
 	)
 }
@@ -225,7 +225,7 @@ pub fn testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
