@@ -56,7 +56,7 @@ If you use the `--key` flag, ensure that either it is a 32-byte hex string or pr
 
 ### Visualization
 
-To ensure you followed the steps correct, check https://telemetry.polkadot.io/#/Edgeware%20V0.1.7. If done correctly, you should see your node with the inserted name.
+To ensure you followed the steps correctly, check https://telemetry.polkadot.io/#/Edgeware%20V0.1.8. If done correctly, you should see your node with the inserted name.
 
 ## Implemented Modules
 
@@ -87,7 +87,13 @@ To ensure you followed the steps correct, check https://telemetry.polkadot.io/#/
 * [Treasury](https://github/com/paritytech/substrate/tree/master/srml/treasury)
 * [Sudo](https://github/com/paritytech/substrate/tree/master/srml/sudo)
 
-## Adding A Module
+## Developing on Edgeware
+
+### Running A Local Chain
+
+To run a chain locally for development purposes: `./target/release/edgeware --chain=local --alice --validator`
+
+### Adding A Module
 
 1. Add its github repo to:
   - [Cargo.toml](Cargo.toml)
