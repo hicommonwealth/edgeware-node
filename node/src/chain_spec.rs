@@ -195,7 +195,7 @@ pub fn testnet_genesis(
 			launch_period: 10 * MINUTES,    // 1 day per public referendum
 			voting_period: 10 * MINUTES,    // 3 days to discuss & vote on an active referendum
 			minimum_deposit: 50 * DOLLARS,    // 12000 as the minimum deposit for a referendum
-			public_delay: 10 * MINUTES,
+			public_delay: 0,
 			max_lock_periods: 6,
 		}),
 		council_seats: Some(CouncilSeatsConfig {
@@ -204,15 +204,15 @@ pub fn testnet_genesis(
 			voter_bond: 1 * DOLLARS,
 			present_slash_per_voter: 1 * CENTS,
 			carry_count: 6,
-			presentation_duration: 1 * DAYS,
-			approval_voting_period: 2 * DAYS,
-			term_duration: 28 * DAYS,
+			presentation_duration: 10 * MINUTES,
+			approval_voting_period: 10 * MINUTES,
+			term_duration: 20 * MINUTES,
 			desired_seats: 0,
 			inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
 		}),
 		council_voting: Some(CouncilVotingConfig {
-			cooloff_period: 4 * DAYS,
-			voting_period: 1 * DAYS,
+			cooloff_period: 5 * MINUTES,
+			voting_period: 10 * MINUTES,
 			enact_delay_period: 0,
 		}),
 		timestamp: Some(TimestampConfig {
