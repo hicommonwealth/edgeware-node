@@ -80,7 +80,7 @@ mod tests {
 	
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher};
-	use bellman::pairing::bn256::Fr;
+	
 	// use rand::Rand;
 	
 	
@@ -99,7 +99,7 @@ mod tests {
 
 	impl_outer_event! {
 		pub enum Event for Test {
-			merkle_tree<T>, delegation<T>, balances<T>,
+			merkle_tree<T>, balances<T>,
 		}
 	}
 
@@ -133,10 +133,6 @@ mod tests {
 		type Event = Event;
 	}
 
-	impl delegation::Trait for Test {
-		type Event = Event;
-	}
-
 	impl Trait for Test {
 		type Event = Event;
 	}
@@ -148,12 +144,6 @@ mod tests {
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
 		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
-		t.extend(
-			delegation::delegation::GenesisConfig::<Test> {
-				delegation_depth: 5,
-				_genesis_phantom_data: Default::default(),
-			}.build_storage().unwrap().0,
-		);
 		// We use default for brevity, but you can configure as desired if needed.
 		t.into()
 	}

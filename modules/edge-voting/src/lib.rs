@@ -53,7 +53,7 @@ mod tests {
 	use super::*;
 	use rstd::prelude::*;
 	use runtime_support::dispatch::Result;
-	use runtime_io::ed25519::Pair;
+	use codec::Encode;
 	use system::{EventRecord, Phase};
 	use runtime_io::with_externalities;
 	use primitives::{H256, Blake2Hasher};
@@ -93,8 +93,8 @@ mod tests {
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
-		type AccountId = H256;
-		type Lookup = IdentityLookup<H256>;
+		type AccountId = u64;
+		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
@@ -134,7 +134,7 @@ mod tests {
 	}
 
 	fn create_vote(
-		who: H256,
+		who: u64,
 		vote_type: voting::VoteType,
 		is_commit_reveal: bool,
 		tally_type: voting::TallyType,
@@ -147,31 +147,29 @@ mod tests {
 							outcomes.to_vec())
 	}
 
-	fn commit(who: H256, vote_id: u64, commit: [u8; 32]) -> Result {
+	fn commit(who: u64, vote_id: u64, commit: [u8; 32]) -> Result {
 		Voting::commit(Origin::signed(who), vote_id, commit)
 	}
 
-	fn reveal(who: H256, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
+	fn reveal(who: u64, vote_id: u64, vote: [u8; 32], secret: Option<[u8; 32]>) -> Result {
 		Voting::reveal(Origin::signed(who), vote_id, vote, secret)
 	}
 
-	fn advance_stage_as_initiator(who: H256, vote_id: u64) -> Result {
+	fn advance_stage_as_initiator(who: u64, vote_id: u64) -> Result {
 		Voting::advance_stage_as_initiator(Origin::signed(who), vote_id)
 	}
 
-	fn delegate_to(who: H256, to: H256) -> Result {
+	fn delegate_to(who: u64, to: u64) -> Result {
 		Delegation::delegate_to(Origin::signed(who), to)
 	}
 
-	fn get_test_key() -> H256 {
-		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"));
-		let public: H256 = pair.public().0.into();
+	fn get_test_key() -> u64 {
+		let public = 1_u64;
 		return public;
 	}
 
-	fn get_test_key_2() -> H256 {
-		let pair: Pair = Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"));
-		let public: H256 = pair.public().0.into();
+	fn get_test_key_2() -> u64 {
+		let public = 2_u64;
 		return public;		
 	}
 
@@ -214,13 +212,13 @@ mod tests {
 
 	fn make_record(
 		id: u64,
-		author: H256,
+		author: u64,
 		vote_type: voting::VoteType,
 		is_commit_reveal: bool,
 		tally_type: voting::TallyType,
 		outcomes: &[[u8; 32]],
 		stage: VoteStage
-	) -> VoteRecord<H256> {
+	) -> VoteRecord<u64> {
 		VoteRecord {
 			id: id,
 			commitments: vec![],
@@ -306,20 +304,6 @@ mod tests {
 			let vote = generate_1p1v_public_multi_vote();
 			let outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 			assert_err!(create_vote(public, vote.0, vote.1, vote.2, &[outcome]), "Invalid multi option outcomes");
-			assert_eq!(Voting::vote_record_count(), 0);
-			assert_eq!(Voting::vote_records(1), None);
-		});
-	}
-
-	// TODO: Ensure we fix this test when we support these types!
-	#[test]
-	fn create_vote_with_unsupported_type_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-			let vote = generate_1p1v_public_multi_vote();
-			let outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
-			assert_err!(create_vote(public, VoteType::AnonymousRing, vote.1, vote.2, &[outcome]), "Unsupported vote type");
 			assert_eq!(Voting::vote_record_count(), 0);
 			assert_eq!(Voting::vote_records(1), None);
 		});
@@ -436,6 +420,36 @@ mod tests {
 			]);
 		});
 	}
+	
+	#[test]
+	fn reveal_invalid_outcome_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_binary_vote();
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+			let public2 = get_test_key_2();
+			let invalid_outcome = SECRET;
+			assert_err!(reveal(public2, 1, invalid_outcome, None), "Vote outcome is not valid");
+		});
+	}
+
+	#[test]
+	fn reveal_multi_outcome_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let vote = generate_1p1v_public_multi_vote();
+			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+			assert_ok!(advance_stage_as_initiator(public, 1));
+
+			
+			for i in 0..vote.3.len() {
+				assert_ok!(reveal(i as u64, 1, vote.3[i], None));
+			}
+		});
+	}
 
 	#[test]
 	fn complete_after_reveal_should_work() {
@@ -529,7 +543,7 @@ mod tests {
 			let public2 = get_test_key_2();
 			let secret = SECRET;
 			let mut buf = Vec::new();
-			buf.extend_from_slice(&<[u8; 32]>::from(public2));
+			buf.extend_from_slice(&public2.encode());
 			buf.extend_from_slice(&secret);
 			buf.extend_from_slice(&vote.3[0]);
 			let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
@@ -554,7 +568,7 @@ mod tests {
 			let public2 = get_test_key_2();
 			let secret = SECRET;
 			let mut buf = Vec::new();
-			buf.extend_from_slice(&<[u8; 32]>::from(public2));
+			buf.extend_from_slice(&public2.encode());
 			buf.extend_from_slice(&secret);
 			buf.extend_from_slice(&vote.3[0]);
 			let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
@@ -623,7 +637,7 @@ mod tests {
 			 */
 			System::set_block_number(1);
 			// set up delegations
-			let users : Vec<H256> = (0..7).map(|v| H256::from_low_u64_be(v)).collect();
+			let users = vec![1,2,3,4,5,6,7];
 			assert_ok!(delegate_to(users[1], users[2]));
 			assert_ok!(delegate_to(users[2], users[3]));
 			assert_ok!(delegate_to(users[3], users[4]));

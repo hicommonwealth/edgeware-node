@@ -34,7 +34,7 @@ Identities on Edgeware go through a simple state machine:
 
 ## Registration
 
-An external identity on Edgeware first starts at the registration process. A user must possess a valid Edgeware public key and be able to sign and submit a transaction to an eligible Edgeware node. To register an identity, we only require submitting the identity formatted as a byte array `Vec<u8>` to the `register` function. Once the transaction is included in the Edgeware chain, this identity becomes `Registered`.
+An external identity on Edgeware first starts at the registration process. A user must possess a valid Edgeware public key and be able to sign and submit a transaction to an eligible Edgeware node. To register an identity, we only require submitting the type of identity and identity formatted as a byte arrays `Vec<u8>` to the `register` function. Once the transaction is included in the Edgeware chain, this identity becomes `Registered`.
 
 ## Attested
 

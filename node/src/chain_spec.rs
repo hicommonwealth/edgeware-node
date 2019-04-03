@@ -14,18 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
+use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair, crypto::UncheckedInto};
 use node_primitives::AccountId;
-use primitives::{Ed25519AuthorityId as AuthorityId, ed25519};
-use edgeware_runtime::{
-	Permill, Perbill,
-	BalancesConfig, ConsensusConfig, GenesisConfig, ContractConfig, SessionConfig,
-	TimestampConfig, TreasuryConfig, StakingConfig, UpgradeKeyConfig, GrandpaConfig,
-	IdentityConfig, GovernanceConfig, DelegationConfig, FeesConfig,
-	CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig, IndicesConfig,
-};
+use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig,
+	SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
+	SudoConfig, ContractConfig, GrandpaConfig, IndicesConfig, Permill, Perbill,
+	IdentityConfig, GovernanceConfig, DelegationConfig};
+pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
+use hex_literal::{hex, hex_impl};
 use substrate_telemetry::TelemetryEndpoints;
-use substrate_keystore::pad_seed;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 
@@ -33,52 +31,47 @@ const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_testnet_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.5/edgeware.json")) {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.8/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
 }
 
 pub fn edgeware_config_gensis() -> GenesisConfig {
+	let initial_authorities: Vec<(AccountId, AccountId, AuthorityId)> = vec![(
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(), // 5HnNyuEyvLfTarQ4LLTSK4PpacMi2BTzmEYg4iKbVtSEU53C
+		hex!["78ca2addb982a4a39262d68ed63fb4a8b0dfd73b7a38e0190f77b0cf155f94e0"].unchecked_into(), // 5Eo5fD9gBaMrLoLTeABXY4KoDL7mb4QtrzSQBMzFDJhhw57q
+		hex!["e320e0bec84e02f4789170ad0126175d89f64257c504c599249df7b1fe90d688"].unchecked_into(), // 5HCWVbHiXgkHKgm2rqqbMx4UCDUz3BBWAY8oTRKDkahAaMEu
+	),(
+		hex!["5049a5a4f220aad7edc78bf3311710e05070b622cdd55bec8adf506a1d90ef73"].unchecked_into(), // 5DsyZmCaTGmKaiaFChifPRB4X4jcP1vWHuEbjxsF3NerzDgd
+		hex!["4f8f200b881db35caaa041356f5ff454162cb930693983d09bafdc4abbc3f879"].unchecked_into(), // 5Ds2A4mjhSQSG7fFrZhhgj4fCDpdUEpm1L9bKzEzmrzRYNXX
+		hex!["ada6a4726da7c73108cdf2686e6735dd3740dce19f2be7eee9460152cfb4a691"].unchecked_into(), // 5FzPeKoqxxKDbKT9QmNLeFP1CVSBqKpvV1P4maubvyyQSLqU
+	),(
+		hex!["efffffdcc35e2bb8eb1b274b19aa0e84db49e519083e9bdd5d06ee9b62b80c56"].unchecked_into(), // 5HVPMDQ5wzhKBnZtVSc1YGH8HvNYqzFfk4yFxdSCYuq3iTgK
+		hex!["d2d25e48253d9b16f81323de36eb1c51d2fc07d9b89dafdcef4cb61bff52800c"].unchecked_into(), // 5Gq8QTxo9Kedv33bTCdWFz6DSrB46Ben5saEWEYrpkpBF5rF
+		hex!["f07586a2147e4f63dd416b0b8363ed56f08f9cacf0dd35fcb6b5574f3b465d6c"].unchecked_into(), // 5HVzG9Yb7nCPRpLY7ypWJGKx5mJVtLkUFCDCtR9rQnVEm5ej
+	),(
+		hex!["d857fce59cca864637d5bc879eef6b23acc166ff4e01b6fc602bdf9c3f33fc18"].unchecked_into(), // 5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mPJo
+		hex!["b68ea4881c12b90205de5037283252b1a2dce85c819950a460d0d89945cad5a0"].unchecked_into(), // 5GC4wpJ3pQFfp1pDu6bXMvduZq3c6rRkYbgvQthT7M1TRBWb
+		hex!["c39aabb19d05e62b7f743d737e53c6b5f892808a10224ccf8921a146b805c57a"].unchecked_into(), // 5GVB9A9W8q7aPBTxVMw5bmD8jgtu4kT93nVVK2wRU8eHP3QG
+	)];
+
 	testnet_genesis(
-		vec![(
-			hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
-			hex!["be3e3264a06a61d9c5c8055807bce41a71e2497257ee72f8745d251429014a2b"].into(),
-			hex!["619473a7bd9f608bfdfa93582b53cc8867245e91c9fe5026fee379d47c94dd09"].into(),
-		), (
-			hex!["ab66295ab4f3015a6108e391181f8ac13e40b437cedfa87983688c7e5065bb70"].into(),
-			hex!["01489c5e4c7d0cc8af9fba72c72b95785357e2db50fd8c5ae907ac799a66d9dd"].into(),
-			hex!["e48e7a2b1c381a7a0821d61791daaa695bfd070815dd9fe02b51f60f81f0e034"].into(),
-		), (
-			hex!["8510ba4363ac9a70b34fd586a5a6a1335e3484ec4767617f49db060865e899c4"].into(),
-			hex!["83191772bc526b7625ee6ca197a63f984ca10afc2231ad87865d71a6fda0b84d"].into(),
-			hex!["d04fa941c18fef1461da631b36766e410ef0017817a06f5c8728e3b23d87f660"].into(),
-		), (
-			hex!["b30d0b164273c00050d4c2e1eb1cc8be6ade9ac9078abbb692c649c81b4c21b4"].into(),
-			hex!["d3739f9e24a0644f34b1301bb490745a1afdfa45bd1c699fbcba0a6723ecc87c"].into(),
-			hex!["cf77ff32f8728fd08e9bbd70b0161ba979c55e166de193c17c35a328ecf5cdc2"].into(),
-		)],
-		hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
-		Some(vec![
-			hex!["7ef7449d0d0224e0d9cabc66fe29aeff73dc923e10c8e199cb5aab0afb69d0e5"].into(),
-			hex!["be3e3264a06a61d9c5c8055807bce41a71e2497257ee72f8745d251429014a2b"].into(),
-			hex!["619473a7bd9f608bfdfa93582b53cc8867245e91c9fe5026fee379d47c94dd09"].into(),
-			hex!["ab66295ab4f3015a6108e391181f8ac13e40b437cedfa87983688c7e5065bb70"].into(),
-			hex!["01489c5e4c7d0cc8af9fba72c72b95785357e2db50fd8c5ae907ac799a66d9dd"].into(),
-			hex!["e48e7a2b1c381a7a0821d61791daaa695bfd070815dd9fe02b51f60f81f0e034"].into(),
-			hex!["8510ba4363ac9a70b34fd586a5a6a1335e3484ec4767617f49db060865e899c4"].into(),
-			hex!["83191772bc526b7625ee6ca197a63f984ca10afc2231ad87865d71a6fda0b84d"].into(),
-			hex!["d04fa941c18fef1461da631b36766e410ef0017817a06f5c8728e3b23d87f660"].into(),
-			hex!["b30d0b164273c00050d4c2e1eb1cc8be6ade9ac9078abbb692c649c81b4c21b4"].into(),
-			hex!["d3739f9e24a0644f34b1301bb490745a1afdfa45bd1c699fbcba0a6723ecc87c"].into(),
-			hex!["cf77ff32f8728fd08e9bbd70b0161ba979c55e166de193c17c35a328ecf5cdc2"].into(),
-		])
+		initial_authorities,
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(),
+		None,
 	)
 }
 
 /// Edgeware testnet generator
 pub fn edgeware_config() -> Result<ChainSpec, String> {
-	let boot_nodes = vec![];
+	let boot_nodes = vec![
+	    "/ip4/157.230.218.41/tcp/30333/p2p/QmR55crQd55hvNr2i4oHpEEWAM4eJd3xskjcQzycq1Larq".to_string(),
+	    "/ip4/18.223.143.102/tcp/30333/p2p/QmNTaWsiKXCMwFabqFJfuY4zh8WW4o1iXtt8dN6LWDgkdv".to_string(),
+	    "/ip4/206.189.33.216/tcp/30333/p2p/QmRHGbxdxWgi8CttEsegzDVY38prr4yMngRfUqVkhqoXho".to_string(),
+	    "/ip4/157.230.125.18/tcp/30333/p2p/QmRgNsYHNEqT1wq5vXoHucUTE4svyQGBrwf8EY3TQJBXmM".to_string(),
+	];
+
 	Ok(ChainSpec::from_genesis(
 		"Edgeware",
 		"edgeware",
@@ -91,45 +84,26 @@ pub fn edgeware_config() -> Result<ChainSpec, String> {
 	))
 }
 
-/// Helper function to generate AuthorityID from seed
-pub fn get_authority_id_from_seed(seed: &str) -> AuthorityId {
-	let padded_seed = pad_seed(seed);
-	// NOTE from ed25519 impl:
-	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
-	ed25519::Pair::from_seed(&padded_seed).public().0.into()
+/// Helper function to generate AccountId from seed
+pub fn get_account_id_from_seed(seed: &str) -> AccountId {
+	sr25519::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
 }
-
-pub fn get_testnet_pubkeys() -> Vec<AuthorityId> {
-	let pubkeys = vec![
-		ed25519::Public::from_raw(hex!("df291854c27a22c50322344604076e8b2dc3ffe11dbdcd886adba9e0d6c9f950") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("3bd15363a31eac0e5ecd067731d8a4561185347fc804c50b507025abc29c2ba1") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("65b118b4ae7fe642a59316fc5f0ad9b75cdb9f5ab52733165004f7602755bcfd") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("68128017e34fe40f4ed40f79c24dc7f5a531afc82fc6b71e8092c903627a9133") as [u8; 32]).into(),
-		ed25519::Public::from_raw(hex!("dc746491a214053440d8b9df6774587da105661cc58ed703dc36965359c666a6") as [u8; 32]).into()
-	];
-
-	return pubkeys;
-}
-
-
 
 /// Helper function to generate AuthorityId from seed
-pub fn get_account_id_from_seed(seed: &str) -> AccountId {
-	let padded_seed = pad_seed(seed);
-	// NOTE from ed25519 impl:
-	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
-	ed25519::Pair::from_seed(&padded_seed).public().0.into()
+pub fn get_session_key_from_seed(seed: &str) -> AuthorityId {
+	ed25519::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
 }
 
 /// Helper function to generate stash, controller and session key from seed
 pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, AuthorityId) {
-	let padded_seed = pad_seed(seed);
-	// NOTE from ed25519 impl:
-	// prefer pkcs#8 unless security doesn't matter -- this is used primarily for tests.
 	(
-		get_account_id_from_seed(&format!("{}-stash", seed)),
+		get_account_id_from_seed(&format!("{}//stash", seed)),
 		get_account_id_from_seed(seed),
-		ed25519::Pair::from_seed(&padded_seed).public().0.into()
+		get_session_key_from_seed(seed)
 	)
 }
 
@@ -147,12 +121,26 @@ pub fn testnet_genesis(
 			get_account_id_from_seed("Dave"),
 			get_account_id_from_seed("Eve"),
 			get_account_id_from_seed("Ferdie"),
+			get_account_id_from_seed("Alice//stash"),
+			get_account_id_from_seed("Bob//stash"),
+			get_account_id_from_seed("Charlie//stash"),
+			get_account_id_from_seed("Dave//stash"),
+			get_account_id_from_seed("Eve//stash"),
+			get_account_id_from_seed("Ferdie//stash"),
 		]
 	});
 
-	const STASH: u128 = 1 << 20;
-	const ENDOWMENT: u128 = 1 << 20;
+	const MILLICENTS: u128 = 1_000_000_000;
+	const CENTS: u128 = 1_000 * MILLICENTS;    // assume this is worth about a cent.
+	const DOLLARS: u128 = 100 * CENTS;
 
+	const SECS_PER_BLOCK: u64 = 6;
+	const MINUTES: u64 = 60 / SECS_PER_BLOCK;
+	const HOURS: u64 = MINUTES * 60;
+	const DAYS: u64 = HOURS * 24;
+
+	const ENDOWMENT: u128 = 10_000_000 * DOLLARS;
+	const STASH: u128 = 100 * DOLLARS;
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
 			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),
@@ -160,90 +148,90 @@ pub fn testnet_genesis(
 		}),
 		system: None,
 		indices: Some(IndicesConfig {
-			ids: endowed_accounts.clone(),
+			ids: endowed_accounts.iter().cloned()
+				.chain(initial_authorities.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
 		}),
 		balances: Some(BalancesConfig {
-			existential_deposit: 500,
-			transfer_fee: 0,
-			creation_fee: 0,
-			balances: endowed_accounts.iter().map(|&k| (k.into(), ENDOWMENT)).collect(),
+			transaction_base_fee: 1 * CENTS,
+			transaction_byte_fee: 10 * MILLICENTS,
+			balances: endowed_accounts.iter().cloned()
+				.map(|k| (k, ENDOWMENT))
+				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
+				.collect(),
+			existential_deposit: 1 * DOLLARS,
+			transfer_fee: 1 * CENTS,
+			creation_fee: 1 * CENTS,
 			vesting: vec![],
 		}),
 		session: Some(SessionConfig {
-			validators: initial_authorities.iter().map(|x| x.1.into()).collect(),
-			session_length: 10,
+			validators: initial_authorities.iter().map(|x| x.1.clone()).collect(),
+			session_length: 5 * MINUTES,
 			keys: initial_authorities.iter().map(|x| (x.1.clone(), x.2.clone())).collect::<Vec<_>>(),
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			minimum_validator_count: 1,
-			validator_count: 2,
-			sessions_per_era: 5,
-			bonding_duration: 2 * 60 * 12,
-			offline_slash: Perbill::zero(),
-			session_reward: Perbill::zero(),
-			current_offline_slash: 0,
+			offline_slash: Perbill::from_billionths(1_000_000),
+			session_reward: Perbill::from_billionths(2_065),
 			current_session_reward: 0,
-			offline_slash_grace: 0,
-			stakers: initial_authorities.iter().map(|x| (x.0.into(), x.1.into(), STASH)).collect(),
-			invulnerables: initial_authorities.iter().map(|x| x.1.into()).collect(),
+			validator_count: 7,
+			sessions_per_era: 12,
+			bonding_duration: 60 * MINUTES,
+			offline_slash_grace: 4,
+			minimum_validator_count: 4,
+			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
+			invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 		}),
 		democracy: Some(DemocracyConfig {
-			launch_period: 9,
-			voting_period: 18,
-			minimum_deposit: 10,
-			public_delay: 0,
+			launch_period: 10 * MINUTES,    // 1 day per public referendum
+			voting_period: 10 * MINUTES,    // 3 days to discuss & vote on an active referendum
+			minimum_deposit: 50 * DOLLARS,    // 12000 as the minimum deposit for a referendum
+			public_delay: 10 * MINUTES,
 			max_lock_periods: 6,
 		}),
 		council_seats: Some(CouncilSeatsConfig {
-			active_council: endowed_accounts.iter()
-				.filter(|&endowed| initial_authorities.iter().find(|&(_, controller, _)| controller == endowed).is_none())
-				.map(|a| (a.clone().into(), 1000000)).collect(),
-			candidacy_bond: 10,
-			voter_bond: 2,
-			present_slash_per_voter: 1,
-			carry_count: 4,
-			presentation_duration: 10,
-			approval_voting_period: 20,
-			term_duration: 1000000,
-			desired_seats: (endowed_accounts.len() - initial_authorities.len()) as u32,
-			inactive_grace_period: 1,
+			active_council: vec![],
+			candidacy_bond: 10 * DOLLARS,
+			voter_bond: 1 * DOLLARS,
+			present_slash_per_voter: 1 * CENTS,
+			carry_count: 6,
+			presentation_duration: 1 * DAYS,
+			approval_voting_period: 2 * DAYS,
+			term_duration: 28 * DAYS,
+			desired_seats: 0,
+			inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
 		}),
 		council_voting: Some(CouncilVotingConfig {
-			cooloff_period: 75,
-			voting_period: 20,
+			cooloff_period: 4 * DAYS,
+			voting_period: 1 * DAYS,
 			enact_delay_period: 0,
 		}),
 		timestamp: Some(TimestampConfig {
-			period: 2,                    // 2*2=4 second block time.
+			period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
 		}),
 		treasury: Some(TreasuryConfig {
 			proposal_bond: Permill::from_percent(5),
-			proposal_bond_minimum: 1_000_000,
-			spend_period: 12 * 60 * 24,
+			proposal_bond_minimum: 1 * DOLLARS,
+			spend_period: 1 * DAYS,
 			burn: Permill::from_percent(50),
 		}),
 		contract: Some(ContractConfig {
-			contract_fee: 21,
-			call_base_fee: 135,
-			create_base_fee: 175,
-			gas_price: 1,
+			contract_fee: 1 * CENTS,
+			call_base_fee: 1000,
+			create_base_fee: 1000,
+			gas_price: 1 * MILLICENTS,
 			max_depth: 1024,
 			block_gas_limit: 10_000_000,
 			current_schedule: Default::default(),
 		}),
+		sudo: Some(SudoConfig {
+			key: root_key,
+		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
 		}),
-		fees: Some(FeesConfig {
-			transaction_base_fee: 1,
-			transaction_byte_fee: 0,
-		}),
-		upgrade_key: Some(UpgradeKeyConfig {
-			key: root_key,
-		}),
 		identity: Some(IdentityConfig {
-			verifiers: get_testnet_pubkeys().iter().map(|x| x.0.into()).collect(),
+			verifiers: initial_authorities.iter().map(|x| x.0.clone()).collect(),
 			expiration_time: 604800, // 7 days
 		}),
 		governance: Some(GovernanceConfig {
@@ -261,31 +249,8 @@ fn development_config_genesis() -> GenesisConfig {
 		vec![
 			get_authority_keys_from_seed("Alice"),
 		],
-		get_account_id_from_seed("Alice").into(),
-		Some(vec![
-			get_account_id_from_seed("Alice"),
-			get_account_id_from_seed("Bob"),
-			get_account_id_from_seed("Charlie"),
-			get_account_id_from_seed("Dave"),
-			get_account_id_from_seed("Eve"),
-			get_account_id_from_seed("A"),
-			get_account_id_from_seed("B"),
-			get_account_id_from_seed("C"),
-			get_account_id_from_seed("D"),
-			get_account_id_from_seed("E"),
-			get_account_id_from_seed("F"),
-			get_account_id_from_seed("G"),
-			get_account_id_from_seed("H"),
-			get_account_id_from_seed("I"),
-			get_account_id_from_seed("J"),
-			get_account_id_from_seed("K"),
-			get_account_id_from_seed("L"),
-			get_account_id_from_seed("M"),
-			get_account_id_from_seed("N"),
-			get_account_id_from_seed("O"),
-			get_account_id_from_seed("P"),
-			get_account_id_from_seed("Q"),
-		]),
+		get_account_id_from_seed("Alice"),
+		None,
 	)
 }
 
@@ -300,7 +265,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 			get_authority_keys_from_seed("Alice"),
 			get_authority_keys_from_seed("Bob"),
 		],
-		get_account_id_from_seed("Alice").into(),
+		get_account_id_from_seed("Alice"),
 		None,
 	)
 }

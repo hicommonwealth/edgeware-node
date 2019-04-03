@@ -2,7 +2,7 @@
 
 set -e
 
-PROJECT_ROOT=`git rev-parse --show-toplevel`
+PROJECT_ROOT=`echo $(pwd)`
 
 export CARGO_INCREMENTAL=0
 

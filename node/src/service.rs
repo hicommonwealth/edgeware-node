@@ -14,36 +14,29 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-//! Service and ServiceFactory implementation. Specialized wrapper over Substrate service.
-
 #![warn(unused_extern_crates)]
+
+//! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
 use std::sync::Arc;
 use std::time::Duration;
 
-use transaction_pool::{self, txpool::{Pool as TransactionPool}};
-use substrate_inherents::InherentDataProviders;
-use node_primitives::{Block};
-use edgeware_runtime::{self, GenesisConfig, RuntimeApi};
+use client;
+use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
+use grandpa;
+use node_executor;
+use primitives::{Pair as PairT, ed25519};
+use node_primitives::Block;
+use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use substrate_service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
-	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor,
-	TaskExecutor,
+	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor, TaskExecutor,
 };
-use node_executor;
-use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
-use client;
-use grandpa;
-use primitives::ed25519::Pair;
-
-pub use substrate_executor::NativeExecutor;
-// Our native executor instance.
-native_executor_instance!(
-	pub Executor,
-	edgeware_runtime::api::dispatch,
-	edgeware_runtime::native_version,
-	include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm")
-);
+use transaction_pool::{self, txpool::{Pool as TransactionPool}};
+use substrate_inherents::InherentDataProviders;
+use network::construct_simple_protocol;
+use substrate_service::construct_service_factory;
+use log::info;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -83,7 +76,7 @@ construct_service_factory! {
 			{ |config: FactoryFullConfiguration<Self>, executor: TaskExecutor|
 				FullComponents::<Factory>::new(config, executor) },
 		AuthoritySetup = {
-			|mut service: Self::FullService, executor: TaskExecutor, local_key: Option<Arc<Pair>>| {
+			|mut service: Self::FullService, executor: TaskExecutor, local_key: Option<Arc<ed25519::Pair>>| {
 				let (block_import, link_half) = service.config.custom.grandpa_import_setup.take()
 					.expect("Link Half and Block Import are present for Full Services or setup failed before. qed");
 
@@ -92,6 +85,7 @@ construct_service_factory! {
 					let proposer = Arc::new(substrate_basic_authorship::ProposerFactory {
 						client: service.client(),
 						transaction_pool: service.transaction_pool(),
+						inherents_pool: service.inherents_pool(),
 					});
 
 					let client = service.client();
@@ -104,16 +98,23 @@ construct_service_factory! {
 						service.network(),
 						service.on_exit(),
 						service.config.custom.inherent_data_providers.clone(),
+						service.config.force_authoring,
 					)?);
 
 					info!("Running Grandpa session as Authority {}", key.public());
 				}
 
+				let local_key = if service.config.disable_grandpa {
+					None
+				} else {
+					local_key
+				};
+
 				executor.spawn(grandpa::run_grandpa(
 					grandpa::Config {
 						local_key,
 						// FIXME #1578 make this available through chainspec
-						gossip_duration: Duration::new(4, 0),
+						gossip_duration: Duration::from_millis(333),
 						justification_period: 4096,
 						name: Some(service.config.name.clone())
 					},
@@ -140,7 +141,7 @@ construct_service_factory! {
 
 				config.custom.grandpa_import_setup = Some((block_import.clone(), link_half));
 
-				import_queue(
+				import_queue::<_, _, _, ed25519::Pair>(
 					slot_duration,
 					block_import,
 					Some(justification_import),
@@ -151,15 +152,67 @@ construct_service_factory! {
 			}},
 		LightImportQueue = AuraImportQueue<Self::Block>
 			{ |config: &FactoryFullConfiguration<Self>, client: Arc<LightClient<Self>>| {
-					import_queue(
-						SlotDuration::get_or_compute(&*client)?,
-						client.clone(),
-						None,
-						client,
-						NothingExtra,
-						config.custom.inherent_data_providers.clone(),
-					).map_err(Into::into)
-				}
-			},
+				import_queue::<_, _, _, ed25519::Pair>(
+					SlotDuration::get_or_compute(&*client)?,
+					client.clone(),
+					None,
+					client,
+					NothingExtra,
+					config.custom.inherent_data_providers.clone(),
+				).map_err(Into::into)
+			}
+		},
 	}
+}
+
+
+#[cfg(test)]
+mod tests {
+	#[cfg(feature = "rhd")]
+	fn test_sync() {
+		use {service_test, Factory};
+		use client::{ImportBlock, BlockOrigin};
+
+		let alice: Arc<ed25519::Pair> = Arc::new(Keyring::Alice.into());
+		let bob: Arc<ed25519::Pair> = Arc::new(Keyring::Bob.into());
+		let validators = vec![alice.public().0.into(), bob.public().0.into()];
+		let keys: Vec<&ed25519::Pair> = vec![&*alice, &*bob];
+		let dummy_runtime = ::tokio::runtime::Runtime::new().unwrap();
+		let block_factory = |service: &<Factory as service::ServiceFactory>::FullService| {
+			let block_id = BlockId::number(service.client().info().unwrap().chain.best_number);
+			let parent_header = service.client().header(&block_id).unwrap().unwrap();
+			let consensus_net = ConsensusNetwork::new(service.network(), service.client().clone());
+			let proposer_factory = consensus::ProposerFactory {
+				client: service.client().clone(),
+				transaction_pool: service.transaction_pool().clone(),
+				network: consensus_net,
+				force_delay: 0,
+				handle: dummy_runtime.executor(),
+			};
+			let (proposer, _, _) = proposer_factory.init(&parent_header, &validators, alice.clone()).unwrap();
+			let block = proposer.propose().expect("Error making test block");
+			ImportBlock {
+				origin: BlockOrigin::File,
+				justification: Vec::new(),
+				internal_justification: Vec::new(),
+				finalized: true,
+				body: Some(block.extrinsics),
+				header: block.header,
+				auxiliary: Vec::new(),
+			}
+		};
+		let extrinsic_factory = |service: &<Factory as service::ServiceFactory>::FullService| {
+			let payload = (0, Call::Balances(BalancesCall::transfer(RawAddress::Id(bob.public().0.into()), 69.into())), Era::immortal(), service.client().genesis_hash());
+			let signature = alice.sign(&payload.encode()).into();
+			let id = alice.public().0.into();
+			let xt = UncheckedExtrinsic {
+				signature: Some((RawAddress::Id(id), signature, payload.0, Era::immortal())),
+				function: payload.1,
+			}.encode();
+			let v: Vec<u8> = Decode::decode(&mut xt.as_slice()).unwrap();
+			OpaqueExtrinsic(v)
+		};
+		service_test::sync::<Factory, _, _>(chain_spec::integration_test_config(), block_factory, extrinsic_factory);
+	}
+
 }

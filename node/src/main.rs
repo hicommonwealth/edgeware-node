@@ -38,7 +38,7 @@ extern crate substrate_transaction_pool as transaction_pool;
 #[macro_use]
 extern crate substrate_service;
 extern crate substrate_inherents;
-extern crate substrate_keystore;
+
 extern crate edgeware_runtime;
 extern crate node_executor;
 extern crate substrate_finality_grandpa as grandpa;

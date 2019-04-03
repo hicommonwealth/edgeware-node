@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.11 AS builder
-LABEL maintainer="chevdor@gmail.com"
+LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the build stage. Here we create the binary."
 
 RUN install_clean build-essential \
@@ -32,7 +32,7 @@ RUN cd /edgeware && RUSTUP_TOOLCHAIN=stable cargo build --$PROFILE
 # ===== SECOND STAGE ======
 
 FROM phusion/baseimage:0.11
-LABEL maintainer="chevdor@gmail.com"
+LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
 COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin

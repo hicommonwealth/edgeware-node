@@ -57,7 +57,6 @@ mod tests {
 	use codec::Encode;
 	use primitives::{Blake2Hasher, H256, Hasher};
 	use rstd::prelude::*;
-	use runtime_io::ed25519::Pair;
 	use runtime_io::with_externalities;
 	use runtime_support::dispatch::Result;
 	use system::{EventRecord, Phase};
@@ -95,8 +94,8 @@ mod tests {
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
 		type Digest = Digest;
-		type AccountId = H256;
-		type Lookup = IdentityLookup<H256>;
+		type AccountId = u64;
+		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
 		type Log = DigestItem;
@@ -126,30 +125,34 @@ mod tests {
 		t.extend(
 			identity::GenesisConfig::<Test> {
 				expiration_time: 10000,
-				verifiers: [H256::from_low_u64_be(1)].to_vec(),
+				verifiers: vec![1_u64],
 			}.build_storage().unwrap().0,
 		);
 		t.into()
 	}
 
-	fn register_identity(who: H256, identity_type: &[u8], identity: &[u8]) -> Result {
+	fn register_identity(who: u64, identity_type: &[u8], identity: &[u8]) -> Result {
 		Identity::register(Origin::signed(who), identity_type.to_vec(), identity.to_vec())
 	}
 
-	fn attest_to_identity(who: H256, identity_hash: H256, attestation: &[u8]) -> Result {
+	fn attest_to_identity(who: u64, identity_hash: H256, attestation: &[u8]) -> Result {
 		Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
 	}
 
-	fn verify_identity(who: H256, identity_hash: H256, approve: bool, verifier_index: usize) -> Result {
+	fn register_and_attest(who: u64, identity_type: &[u8], identity: &[u8], attestation: &[u8]) -> Result {
+		Identity::register_and_attest(Origin::signed(who), identity_type.to_vec(), identity.to_vec(), attestation.to_vec())
+	}
+
+	fn verify_identity(who: u64, identity_hash: H256, approve: bool, verifier_index: usize) -> Result {
 		Identity::verify_or_deny(Origin::signed(who), identity_hash, approve, verifier_index)
 	}
 
-	fn verify_or_deny_many(who: H256, identity_hashes: &[H256], approvals: Vec<bool>, verifier_index: usize) -> Result {
+	fn verify_or_deny_many(who: u64, identity_hashes: &[H256], approvals: Vec<bool>, verifier_index: usize) -> Result {
 		Identity::verify_or_deny_many(Origin::signed(who), identity_hashes.to_vec(), approvals, verifier_index)
 	}
 
 	fn add_metadata_to_account(
-		who: H256,
+		who: u64,
 		identity_hash: H256,
 		avatar: &[u8],
 		display_name: &[u8],
@@ -164,7 +167,7 @@ mod tests {
 		)
 	}
 
-	fn default_identity_record(public: H256, identity_type: &[u8], identity: &[u8]) -> IdentityRecord<H256, u64> {
+	fn default_identity_record(public: u64, identity_type: &[u8], identity: &[u8]) -> IdentityRecord<u64, u64> {
 		IdentityRecord {
 			account: public,
 			identity_type: identity_type.to_vec(),
@@ -187,15 +190,11 @@ mod tests {
 	fn register_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
  			let expiration_time = Identity::expiration_time();
 			let now = Timestamp::get();
@@ -222,14 +221,10 @@ mod tests {
 	fn register_twice_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 			assert_err!(
@@ -249,19 +244,11 @@ mod tests {
 	fn register_existing_identity_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
-
-			let pair2: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
-			let public2: H256 = pair2.public().0.into();
+			let public = 1_u64;
+			let public2 = 2_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 			assert_err!(
@@ -281,14 +268,10 @@ mod tests {
 	fn register_same_type_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
@@ -310,15 +293,11 @@ mod tests {
 	fn register_and_attest_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
@@ -359,18 +338,62 @@ mod tests {
 		});
 	}
 
+
+	#[test]
+	fn register_and_attest_as_one_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+
+			let public = 1_u64;
+
+ 			let mut expiration_time = Identity::expiration_time();
+			let mut now = Timestamp::get();
+			let register_expires_at = now + expiration_time;
+
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(register_and_attest(public, identity_type, identity, attestation));
+
+ 			expiration_time = Identity::expiration_time();
+			now = Timestamp::get();
+			let _attest_expires_at = now + expiration_time;
+
+			assert_eq!(
+				System::events(),
+				vec![
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+					},
+					EventRecord {
+						phase: Phase::ApplyExtrinsic(0),
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+					}
+				]
+			);
+			assert_eq!(Identity::identities(), vec![identity_hash]);
+			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10000)]);
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Attested,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity_type, identity)
+				})
+			);
+		});
+	}
+
 	#[test]
 	fn attest_without_register_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_err!(
@@ -388,17 +411,11 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
-			let other: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
-			let other_pub: H256 = other.public().0.into();
+			let public = 1_u64;
+			let other_pub = 2_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
@@ -419,15 +436,11 @@ mod tests {
 	fn register_attest_and_verify_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
@@ -442,7 +455,7 @@ mod tests {
 			now = Timestamp::get();
 			let _attest_expires_at = now + expiration_time;
 
-			let verifier = H256::from_low_u64_be(1);
+			let verifier = 1_u64;
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
 
 			assert_eq!(
@@ -480,19 +493,6 @@ mod tests {
 	fn verify_or_deny_many_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-			let mut pairs = vec![
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f62")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f63")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f64")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f65")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f66")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f67")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f68")),
-				Pair::from_seed(&hex!("9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f69")),
-			];
-
 			let mut id_hashes = vec![];
 			let test_id_type: &[u8] = b"github";
 			let test_id: Vec<u8> = "drewstone 9".as_bytes().to_vec();
@@ -502,15 +502,13 @@ mod tests {
 				let identity_type: &[u8] = b"github";
 				let identity: Vec<u8> = format!("drewstone {}", i).as_bytes().to_vec();
 				let identity_hash = build_identity_hash(identity_type, &identity);	
-				let pair: Pair = pairs.remove(0);
-				let public: H256 = pair.public().0.into();
-				assert_ok!(register_identity(public, identity_type, &identity));
+				assert_ok!(register_identity(i as u64, identity_type, &identity));
 				let attestation: &[u8] = b"09283049820394820938402938234sdfsfsd";
-				assert_ok!(attest_to_identity(public, identity_hash, attestation));
+				assert_ok!(attest_to_identity(i as u64, identity_hash, attestation));
 				id_hashes.push(identity_hash);
 			}
 
-			let verifier = H256::from_low_u64_be(1);
+			let verifier = 1_u64;
 			assert_ok!(verify_or_deny_many(verifier, &id_hashes, approvals, 0));
 			let events = System::events();
 			assert_eq!(
@@ -527,22 +525,18 @@ mod tests {
 	fn attest_after_verify_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
-			let verifier = H256::from_low_u64_be(1);
+			let verifier = 1_u64;
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
 			assert_err!(
 				attest_to_identity(public, identity_hash, attestation),
@@ -566,15 +560,11 @@ mod tests {
 	fn verify_from_nonverifier_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 2_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
@@ -602,15 +592,11 @@ mod tests {
 	fn verify_from_wrong_index_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
@@ -638,15 +624,11 @@ mod tests {
 	fn register_should_expire() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
@@ -688,15 +670,11 @@ mod tests {
 	fn add_metadata_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
 
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
 			let display_name: &[u8] = b"drewstone";
@@ -731,14 +709,10 @@ mod tests {
 	fn add_metadata_without_register_should_not_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
+			let public = 1_u64;
 
 			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
 			let display_name: &[u8] = b"drewstone";
@@ -758,17 +732,11 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 
-			let pair: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
-			));
-			let other: Pair = Pair::from_seed(&hex!(
-				"9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f61"
-			));
 			let identity_type: &[u8] = b"github";
 			let identity: &[u8] = b"drewstone";
 			let identity_hash = build_identity_hash(identity_type, identity);
-			let public: H256 = pair.public().0.into();
-			let other_pub: H256 = other.public().0.into();
+			let public = 1_u64;
+			let other_pub = 2_u64;
 
 			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
 			let display_name: &[u8] = b"drewstone";

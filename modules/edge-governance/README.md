@@ -3,11 +3,9 @@ This module contains the logic that powers Edgeware's governance UI. It is prese
 
 ## Functionality
 
-The module exposes 4 public functions:
-* `create_proposal`, which allows submission of a new governance proposal, for the purpose of `Funding`, a chain `Upgrade`, or `Signaling`.
-* `add_comment`, which attaches a new comment to an existing proposal.
+The module exposes 2 public functions:
+* `create_proposal`, which allows submission of a new governance proposal for the purpose of `Signaling`.
 * `advance_proposal`, which allows the author of a proposal to shift the proposal's state, either starting or completing the voting process.
-* `submit_vote`, which allows a user to place their vote.
 
 ## Setup
 
@@ -32,4 +30,17 @@ Mac:
 brew install cmake pkg-config openssl git
 ```
 
-Once done with setup, run `cargo build` to compile the module and `cargo test` to run our unit tests.
+# Signalling Lifecycle
+This module enables one to create signalling proposals and vote on them. This is useful for engaging parts of the community and understanding how the community reacts to a given idea before putting it forth in a state-changing proposal through the main governance mechanism.
+
+The lifecycle for using this module is:
+1. Create proposals
+2. Vote on proposals
+3. Engage in off-chain discussion
+
+
+## Proposal Lifecycle
+Proposals go through the lifecycle that votes go through from the [edge-voting](modules/edge-voting) module. These specific stages are described there.
+1. PreVoting
+2. Voting
+3. Completed
