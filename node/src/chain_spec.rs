@@ -192,8 +192,8 @@ pub fn testnet_genesis(
 			invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 		}),
 		democracy: Some(DemocracyConfig {
-			launch_period: 10,    // 1 day per public referendum
-			voting_period: 10,    // 3 days to discuss & vote on an active referendum
+			launch_period: 6,    // 1 day per public referendum
+			voting_period: 6,    // 3 days to discuss & vote on an active referendum
 			minimum_deposit: 50 * DOLLARS,    // 12000 as the minimum deposit for a referendum
 			public_delay: 0,
 			max_lock_periods: 6,
@@ -212,7 +212,7 @@ pub fn testnet_genesis(
 		}),
 		council_voting: Some(CouncilVotingConfig {
 			cooloff_period: 5 * MINUTES,
-			voting_period: 10 * MINUTES,
+			voting_period: 6,
 			enact_delay_period: 0,
 		}),
 		timestamp: Some(TimestampConfig {
