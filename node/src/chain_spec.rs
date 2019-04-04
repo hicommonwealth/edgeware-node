@@ -233,9 +233,12 @@ pub fn testnet_genesis(
 		identity: Some(IdentityConfig {
 			verifiers: initial_authorities.iter().map(|x| x.0.clone()).collect(),
 			expiration_time: 604800, // 7 days
+			registration_bond: 100,
 		}),
 		governance: Some(GovernanceConfig {
 			voting_time: 604800, // 7 days
+			proposal_creation_bond: 100,
+
 		}),
 		delegation: Some(DelegationConfig {
 			delegation_depth: 5,
