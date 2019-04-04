@@ -118,6 +118,9 @@ mod tests {
 		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
 		type Event = Event;
+		type TransactionPayment = ();
+		type TransferPayment = ();
+		type DustRemoval = ();
 	}
 
 	impl delegation::Trait for Test {
@@ -130,6 +133,7 @@ mod tests {
 
 	impl Trait for Test {
 		type Event = Event;
+		type Currency = balances::Module<Self>;
 	}
 
 	pub type System = system::Module<Test>;
@@ -142,6 +146,23 @@ mod tests {
 		t.extend(
 			governance::GenesisConfig::<Test> {
 				voting_time: 10000,
+				proposal_creation_bond: 10,
+			}.build_storage().unwrap().0,
+		);
+		t.extend(
+			balances::GenesisConfig::<Test> {
+				balances: vec![
+					(1, 100),
+					(2, 100),
+					(3, 100),
+					(4, 100),
+				],
+				transaction_base_fee: 0,
+				transaction_byte_fee: 0,
+				existential_deposit: 0,
+				transfer_fee: 0,
+				creation_fee: 0,
+				vesting: vec![],
 			}.build_storage().unwrap().0,
 		);
 		t.into()
@@ -339,7 +360,7 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 
  			let vote_time = Governance::voting_time();
-			let now = Timestamp::get();
+			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
 			assert_eq!(System::events(), vec![
@@ -360,12 +381,12 @@ mod tests {
 					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
 				},]
 			);
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -385,12 +406,12 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
 									"Proposal not in pre-voting stage");
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -412,15 +433,15 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 
  			let vote_time = Governance::voting_time();
-			let now = Timestamp::get();
+			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -447,7 +468,7 @@ mod tests {
 				},]
 			);
 
-			Timestamp::set_timestamp(10001);
+			System::set_block_number(10002);
 
 			<Governance as OnFinalise<u64>>::on_finalise(2);
 			System::set_block_number(3);
@@ -507,7 +528,7 @@ mod tests {
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			
-			Timestamp::set_timestamp(10001);
+			System::set_block_number(10002);
 			
 			<Governance as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);
