@@ -19,6 +19,7 @@ srml-support = { git = "https://github.com/paritytech/substrate", default-featur
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-consensus = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
 
 [features]
 default = ["std"]
@@ -36,4 +37,5 @@ std = [
     "srml-system/std",
     "srml-timestamp/std",
     "srml-consensus/std",
+    "srml-balances/std",
 ]

@@ -30,6 +30,12 @@ extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
 extern crate srml_timestamp as timestamp;
+extern crate srml_balances as balances;
+
+
+use srml_support::traits::{
+	Currency, Imbalance,
+};
 
 use rstd::prelude::*;
 use runtime_primitives::traits::{Zero, Hash};
@@ -38,14 +44,18 @@ use runtime_support::{StorageMap, StorageValue};
 use system::ensure_signed;
 use codec::Encode;
 
-pub trait Trait: timestamp::Trait {
+pub trait Trait: balances::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	/// The account balance.
+	type Currency: Currency<Self::AccountId>;
 }
 
 pub type Attestation = Vec<u8>;
 pub type IdentityType = Vec<u8>;
 pub type Identity = Vec<u8>;
+type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
+
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
@@ -65,12 +75,12 @@ pub enum IdentityStage {
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
-pub struct IdentityRecord<AccountId, Moment> {
+pub struct IdentityRecord<AccountId, BlockNumber> {
 	pub account: AccountId,
 	pub identity_type: IdentityType,
 	pub identity: Identity,
 	pub stage: IdentityStage,
-	pub expiration_time: Moment,
+	pub expiration_length: BlockNumber,
 	pub proof: Option<Attestation>,
 	pub metadata: Option<MetadataRecord>,
 }
@@ -91,6 +101,10 @@ decl_module! {
 			buf.extend_from_slice(&identity.encode());
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
+			// Burn the registration bond amount
+			ensure!(T::Currency::can_slash(&_sender, Self::registration_bond()), "Not enough currency for slashing bond");
+			T::Currency::slash(&_sender, Self::registration_bond());
+			// Register the identity
 			return Self::register_identity(_sender, identity_type, identity, hash);
 		}
 
@@ -106,7 +120,7 @@ decl_module! {
 			// Ensure the record is not verified
 			ensure!(record.stage != IdentityStage::Verified, "Already verified");
 			// Ensure the record isn't expired if it still exists
-			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
+			ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender, "Stored identity does not match sender");
 
@@ -126,6 +140,9 @@ decl_module! {
 			buf.extend_from_slice(&identity.encode());
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
+			// Burn the registration bond amount
+			ensure!(T::Currency::can_slash(&_sender, Self::registration_bond()), "Not enough currency for slashing bond");
+			T::Currency::slash(&_sender, Self::registration_bond());
 			// Register identity
 			Self::register_identity(_sender.clone(), identity_type, identity, hash).unwrap();
 			// Grab record
@@ -133,7 +150,7 @@ decl_module! {
 			// Ensure the record is not verified
 			ensure!(record.stage != IdentityStage::Verified, "Already verified");
 			// Ensure the record isn't expired if it still exists
-			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
+			ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender.clone(), "Stored identity does not match sender");
 			return Self::attest_for(_sender, hash, attestation);
@@ -172,7 +189,7 @@ decl_module! {
 
 			// Check that original sender and current sender match
 			ensure!(record.account == _sender, "Stored identity does not match sender");
-			ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
+			ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
 
 			// TODO: Decide how to process metadata updates, for now it's all or nothing
 			let mut new_record = record;
@@ -192,7 +209,7 @@ decl_module! {
 		fn on_finalise(_n: T::BlockNumber) {
 			let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
 				.into_iter()
-				.partition(|(_, exp)| (<timestamp::Module<T>>::get() > *exp) && (*exp > T::Moment::zero()));
+				.partition(|(_, exp)| (<system::Module<T>>::block_number() > *exp) && (*exp > T::BlockNumber::zero()));
 
 			expired.into_iter().for_each(move |(exp_hash, _)| {
 				<Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
@@ -215,7 +232,7 @@ impl<T: Trait> Module<T> {
 	/// Helper function for executing the verification of identities
 	fn verify_or_deny_identity(sender: T::AccountId, identity_hash: &T::Hash, approve: bool) -> Result {
 		let record = <IdentityOf<T>>::get(identity_hash).ok_or("Identity does not exist")?;
-		ensure!(<timestamp::Module<T>>::get() <= record.expiration_time, "Identity expired");
+		ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
 		match record.stage {
 			IdentityStage::Registered => return Err("No attestation to verify"),
 			IdentityStage::Verified => return Err("Already verified"),
@@ -225,11 +242,14 @@ impl<T: Trait> Module<T> {
 		let id_type = record.identity_type.encode().clone();
 		let id = record.identity.encode().clone();
 		if approve {
+			// Add the registration bond amount on behalf of a successful verification
+			T::Currency::deposit_into_existing(&record.account, Self::registration_bond()).unwrap();
+			// Remove identity from list of pending identities
 			<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
 			Self::deposit_event(RawEvent::Verify(*identity_hash, sender, id_type, id));
 			<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
 				stage: IdentityStage::Verified,
-				expiration_time: T::Moment::zero(),
+				expiration_length: T::BlockNumber::zero(),
 				..record
 			});
 		} else {
@@ -248,7 +268,8 @@ impl<T: Trait> Module<T> {
 		<UsedTypes<T>>::insert(sender.clone(), types);
 
 		// Set expiration time of identity
-		let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
+		let now = <system::Module<T>>::block_number();
+		let expiration = now + Self::expiration_length();
 		// Add identity record
 		<Identities<T>>::mutate(|idents| idents.push(identity_hash.clone()));
 		<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
@@ -256,7 +277,7 @@ impl<T: Trait> Module<T> {
 			identity_type: identity_type,
 			identity: identity,
 			stage: IdentityStage::Registered,
-			expiration_time: expiration.clone(),
+			expiration_length: expiration.clone(),
 			proof: None,
 			metadata: None,
 		});
@@ -272,7 +293,8 @@ impl<T: Trait> Module<T> {
 		let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
 		let id_type = record.identity_type.clone();
 		let identity = record.identity.clone();
-		let expiration = <timestamp::Module<T>>::get() + Self::expiration_time();
+		let now = <system::Module<T>>::block_number();
+		let expiration = now + Self::expiration_length();
 
 		// TODO: Decide how we want to process proof updates
 		// currently this implements no check against updating
@@ -280,7 +302,7 @@ impl<T: Trait> Module<T> {
 		<IdentityOf<T>>::insert(identity_hash, IdentityRecord {
 			proof: Some(attestation.clone()),
 			stage: IdentityStage::Attested,
-			expiration_time: expiration.clone(),
+			expiration_length: expiration.clone(),
 			..record
 		});
 
@@ -297,9 +319,9 @@ impl<T: Trait> Module<T> {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as timestamp::Trait>::Moment {
+							<T as system::Trait>::BlockNumber {
 		/// (record_hash, creator, expiration) when an account is registered
-		Register(Hash, AccountId, Moment),
+		Register(Hash, AccountId, BlockNumber),
 		/// (attestation, record_hash, creator, identity_type, identity) when an account creator submits an attestation
 		Attest(Attestation, Hash, AccountId, IdentityType, Identity),
 		/// (record_hash, verifier, id_type, identity) when a verifier approves an account
@@ -316,14 +338,16 @@ decl_storage! {
 		/// The hashed identities.
 		pub Identities get(identities): Vec<(T::Hash)>;
 		/// Actual identity for a given hash, if it's current.
-		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::Moment>>;
+		pub IdentityOf get(identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::BlockNumber>>;
 		/// List of identities awaiting attestation or verification and associated expirations
-		pub IdentitiesPending get(identities_pending): Vec<(T::Hash, T::Moment)>;
+		pub IdentitiesPending get(identities_pending): Vec<(T::Hash, T::BlockNumber)>;
 		/// Number of blocks allowed between register/attest or attest/verify.
-		pub ExpirationTime get(expiration_time) config(): T::Moment;
+		pub ExpirationLength get(expiration_length) config(): T::BlockNumber;
 		/// Identity types of users
 		pub UsedTypes get(used_types): map T::AccountId => Vec<IdentityType>;
 		/// Verifier set
 		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
+		/// Registration bond
+		pub RegistrationBond get(registration_bond) config(): BalanceOf<T>;
 	}
 }
