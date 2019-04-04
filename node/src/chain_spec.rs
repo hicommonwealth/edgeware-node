@@ -249,7 +249,7 @@ pub fn testnet_genesis(
 			registration_bond: 100,
 		}),
 		governance: Some(GovernanceConfig {
-			voting_length: 604800, // 7 days
+			voting_length: SECS_PER_BLOCK * 3, // 7 days
 			proposal_creation_bond: 100,
 
 		}),
