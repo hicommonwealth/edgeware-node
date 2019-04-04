@@ -40,7 +40,6 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 extern crate srml_consensus as consensus;
 extern crate srml_balances as balances;
 
@@ -117,10 +116,6 @@ mod tests {
 		type SessionKey = UintAuthorityId;
 		type InherentOfflineReport = ();
 	}
-	impl timestamp::Trait for Test {
-		type Moment = u64;
-		type OnTimestampSet = ();
-	}
 	impl Trait for Test {
 		type Event = Event;
 		type Currency = balances::Module<Self>;
@@ -128,9 +123,9 @@ mod tests {
 
 	type Balances = balances::Module<Test>;
 	type System = system::Module<Test>;
- 	type Timestamp = timestamp::Module<Test>;
 	type Identity = Module<Test>;
 
+	const BOND: u64 = 10;
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
@@ -140,7 +135,7 @@ mod tests {
 			identity::GenesisConfig::<Test> {
 				expiration_length: 10000,
 				verifiers: vec![1_u64],
-				registration_bond: 10,
+				registration_bond: BOND,
 			}.build_storage().unwrap().0,
 		);
 		t.extend(
@@ -231,7 +226,11 @@ mod tests {
 			let now = System::block_number();
 			let expires_at = now + expiration_length;
 
+			let balance = Balances::free_balance(public);
 			assert_ok!(register_identity(public, identity_type, identity));
+			let after_register_balance = Balances::free_balance(public);
+			assert_eq!(balance - BOND, after_register_balance);
+
 			assert_eq!(
 				System::events(),
 				vec![EventRecord {
@@ -668,9 +667,8 @@ mod tests {
 			let expires_at = now + expiration_length;
 
 			System::set_block_number(10002);
-
-			<Identity as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
+			<Identity as OnFinalise<u64>>::on_finalise(10002);
+			System::set_block_number(10003);
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_err!(

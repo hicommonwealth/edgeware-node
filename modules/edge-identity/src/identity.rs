@@ -29,7 +29,6 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 extern crate srml_balances as balances;
 
 
@@ -205,11 +204,10 @@ decl_module! {
 
 		/// Check all pending identities for expiration when each block is
 		/// finalised. Once an identity expires, it is deleted from storage.
-		/// TODO: We may want to limit how many identities will be purged each block.
 		fn on_finalise(_n: T::BlockNumber) {
 			let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
 				.into_iter()
-				.partition(|(_, exp)| (<system::Module<T>>::block_number() > *exp) && (*exp > T::BlockNumber::zero()));
+				.partition(|(_, exp)| (_n > *exp) && (*exp > T::BlockNumber::zero()));
 
 			expired.into_iter().for_each(move |(exp_hash, _)| {
 				<Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));

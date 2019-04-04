@@ -30,7 +30,6 @@ extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 extern crate edge_voting as voting;
 
 use rstd::prelude::*;
@@ -167,12 +166,10 @@ decl_module! {
 
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
-		///
-		/// TODO: Decide whether we want this. It may be the only vulnerability we have.
 		fn on_finalise(_n: T::BlockNumber) {
 			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
-				.partition(|(_, exp)| <system::Module<T>>::block_number() > *exp);
+				.partition(|(_, exp)| _n > *exp);
 			
 			<ActiveProposals<T>>::put(active);
 			finished.into_iter().for_each(move |(completed_hash, _)| {
@@ -190,9 +187,7 @@ decl_module! {
 							transition_time: T::BlockNumber::zero(),
 							..record
 						});
-						// tally the final vote to include in completion Event
-						let final_outcome = <voting::Module<T>>::tally(vote_id);
-						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id, final_outcome));
+						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id));
 					},
 					None => { } // TODO: emit an error here?
 				}
@@ -204,14 +199,13 @@ decl_module! {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as system::Trait>::BlockNumber,
-							<T as balances::Trait>::Balance {
+							<T as system::Trait>::BlockNumber {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
 		VotingStarted(Hash, u64, BlockNumber),
 		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
-		VotingCompleted(Hash, u64, Tally<Balance>),
+		VotingCompleted(Hash, u64),
 	}
 );
 

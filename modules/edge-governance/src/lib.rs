@@ -41,7 +41,6 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 extern crate srml_consensus as consensus;
 extern crate edge_delegation as delegation;
 extern crate edge_voting as voting;
@@ -109,10 +108,6 @@ mod tests {
 		type SessionKey = UintAuthorityId;
 		type InherentOfflineReport = ();
 	}
-	impl timestamp::Trait for Test {
-		type Moment = u64;
-		type OnTimestampSet = ();
-	}
 	impl balances::Trait for Test {
 		type Balance = u64;
 		type OnFreeBalanceZero = ();
@@ -122,7 +117,6 @@ mod tests {
 		type TransferPayment = ();
 		type DustRemoval = ();
 	}
-
 	impl delegation::Trait for Test {
 		type Event = Event;
 	}
@@ -136,9 +130,11 @@ mod tests {
 		type Currency = balances::Module<Self>;
 	}
 
+	pub type Balances = balances::Module<Test>;
 	pub type System = system::Module<Test>;
- 	pub type Timestamp = timestamp::Module<Test>;
 	pub type Governance = Module<Test>;
+
+	const BOND: u64 = 10;
 
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
 		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
@@ -146,7 +142,7 @@ mod tests {
 		t.extend(
 			governance::GenesisConfig::<Test> {
 				voting_time: 10000,
-				proposal_creation_bond: 10,
+				proposal_creation_bond: BOND,
 			}.build_storage().unwrap().0,
 		);
 		t.extend(
@@ -446,8 +442,9 @@ mod tests {
 				})
 			);
 
-			<Governance as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);
+			<Governance as OnFinalise<u64>>::on_finalise(2);
+			System::set_block_number(3);
 
 			assert_eq!(System::events(), vec![
 				EventRecord {
@@ -469,9 +466,8 @@ mod tests {
 			);
 
 			System::set_block_number(10002);
-
-			<Governance as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			<Governance as OnFinalise<u64>>::on_finalise(10002);
+			System::set_block_number(10003);
 
 			assert_eq!(System::events(), vec![
 				EventRecord {
@@ -499,7 +495,6 @@ mod tests {
 					event: Event::governance(RawEvent::VotingCompleted(
 						hash,
 						vote_id,
-						Some(vec![(governance::YES_VOTE, 0), (governance::NO_VOTE, 0)])
 					))
 				}]
 			);
@@ -529,9 +524,8 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 			
 			System::set_block_number(10002);
-			
-			<Governance as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
+			<Governance as OnFinalise<u64>>::on_finalise(10002);
+			System::set_block_number(10003);
 
 			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
 			assert_eq!(Governance::active_proposals(), vec![]);
@@ -564,6 +558,45 @@ mod tests {
 				Governance::proposal_of(hash),
 				Some(make_record(public, title, proposal, category))
 			);
+		});
+	}
+
+	#[test]
+	fn creating_proposal_with_insufficient_balance_fails() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = 100_u64;
+			let category = governance::ProposalCategory::Signaling;
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+
+			assert_err!(
+				propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin),
+				"Not enough currency for slashing bond");
+		});
+	}
+
+	#[test]
+	fn completed_proposal_should_return_creation_bond() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let category = governance::ProposalCategory::Signaling;
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let hash = build_proposal_hash(public, &proposal);
+			let balance = Balances::free_balance(public);
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let after_propose_balance = Balances::free_balance(public);
+			assert_eq!(balance - BOND, after_propose_balance);
+			assert_ok!(advance_proposal(public, hash));
+
+			System::set_block_number(10002);
+			<Governance as OnFinalise<u64>>::on_finalise(10002);
+			System::set_block_number(10003);
+
+			let after_completion_balance = Balances::free_balance(public);
+			assert_eq!(balance, after_completion_balance);
 		});
 	}
 } 
