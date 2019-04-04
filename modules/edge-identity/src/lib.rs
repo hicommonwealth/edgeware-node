@@ -472,7 +472,10 @@ mod tests {
 
 			let public = 1_u64;
 
+			let balance = Balances::free_balance(public);
 			assert_ok!(register_identity(public, identity_type, identity));
+			let after_register_balance = Balances::free_balance(public);
+			assert_eq!(balance - BOND, after_register_balance);
 
  			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
@@ -487,6 +490,8 @@ mod tests {
 
 			let verifier = 1_u64;
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			let balance_after_verify = Balances::free_balance(public);
+			assert_eq!(balance, balance_after_verify);
 
 			assert_eq!(
 				System::events(),
