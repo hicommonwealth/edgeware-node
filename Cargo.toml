@@ -36,7 +36,6 @@ substrate-client = { git = "https://github.com/paritytech/substrate", default-fe
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate" }
 substrate-basic-authorship = { git = "https://github.com/paritytech/substrate" }
 structopt = "0.2"
-node-executor = { git = "https://github.com/paritytech/substrate" }
 node-primitives = { git = "https://github.com/paritytech/substrate" }
 edgeware-runtime = { path = "node/runtime" }
 

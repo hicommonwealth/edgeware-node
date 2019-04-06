@@ -64,7 +64,7 @@ mod tests {
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		BuildStorage,
-		traits::{BlakeTwo256, OnFinalise, IdentityLookup},
+		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 		testing::{Digest, DigestItem, Header, UintAuthorityId}
 	};
 	use voting::{VoteStage, VoteType};
@@ -141,7 +141,7 @@ mod tests {
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
 			governance::GenesisConfig::<Test> {
-				voting_time: 10000,
+				voting_length: 10000,
 				proposal_creation_bond: BOND,
 			}.build_storage().unwrap().0,
 		);
@@ -355,7 +355,7 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_time();
+ 			let vote_time = Governance::voting_length();
 			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
@@ -428,7 +428,7 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_time();
+ 			let vote_time = Governance::voting_length();
 			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
@@ -443,7 +443,7 @@ mod tests {
 			);
 
 			System::set_block_number(2);
-			<Governance as OnFinalise<u64>>::on_finalise(2);
+			<Governance as OnFinalize<u64>>::on_finalize(2);
 			System::set_block_number(3);
 
 			assert_eq!(System::events(), vec![
@@ -466,7 +466,7 @@ mod tests {
 			);
 
 			System::set_block_number(10002);
-			<Governance as OnFinalise<u64>>::on_finalise(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			assert_eq!(System::events(), vec![
@@ -524,7 +524,7 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 			
 			System::set_block_number(10002);
-			<Governance as OnFinalise<u64>>::on_finalise(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
@@ -592,7 +592,7 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 
 			System::set_block_number(10002);
-			<Governance as OnFinalise<u64>>::on_finalise(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			let after_completion_balance = Balances::free_balance(public);

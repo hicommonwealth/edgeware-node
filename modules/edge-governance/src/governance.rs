@@ -33,13 +33,11 @@ extern crate srml_system as system;
 extern crate edge_voting as voting;
 
 use rstd::prelude::*;
-use srml_support::traits::{
-	Currency, Imbalance,
-};
+use srml_support::traits::{Currency, ReservableCurrency};
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::{Zero, Hash, CheckedAdd};
+use runtime_primitives::traits::{Zero, Hash, As};
 use codec::Encode;
 
 pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
@@ -76,7 +74,7 @@ pub trait Trait: voting::Trait + balances::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 	/// The account balance.
-	type Currency: Currency<Self::AccountId>;
+	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 }
 
 pub type ProposalTitle = Vec<u8>;
@@ -113,7 +111,7 @@ decl_module! {
 
 			// Burn the proposal creation bond amount
 			ensure!(T::Currency::can_slash(&_sender, Self::proposal_creation_bond()), "Not enough currency for slashing bond");
-			T::Currency::slash(&_sender, Self::proposal_creation_bond());
+			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).unwrap();
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
@@ -152,7 +150,7 @@ decl_module! {
 			
 			// prevoting -> voting
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
-			let transition_time = <system::Module<T>>::block_number() + Self::voting_time();
+			let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
 			let vote_id = record.vote_id;
 			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
 				stage: ProposalStage::Voting,
@@ -166,7 +164,7 @@ decl_module! {
 
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
-		fn on_finalise(_n: T::BlockNumber) {
+		fn on_finalize(_n: T::BlockNumber) {
 			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
 				.partition(|(_, exp)| _n > *exp);
@@ -179,8 +177,8 @@ decl_module! {
 						let vote_id = record.vote_id;
 						// TODO: handle possible errors from advance_stage?
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
-						// Add the proposal creation bond amount
-						T::Currency::deposit_into_existing(&record.author, Self::proposal_creation_bond()).unwrap();
+						// Unreserve the proposal creation bond amount
+						T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
 						// Edit the proposal record to completed
 						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
 							stage: ProposalStage::Completed,
@@ -218,10 +216,10 @@ decl_storage! {
 		/// A list of active proposals along with the time at which they complete.
 		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::BlockNumber)>;
 		/// Amount of time a proposal remains in "Voting" stage.
-		pub VotingTime get(voting_time) config(): T::BlockNumber;
+		pub VotingLength get(voting_length) config(): T::BlockNumber;
 		/// Map for retrieving the information about any proposal from its hash. 
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
-		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T>;
+		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T> = BalanceOf::<T>::sa(10);
 	}
 }

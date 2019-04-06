@@ -32,12 +32,10 @@ extern crate srml_system as system;
 extern crate srml_balances as balances;
 
 
-use srml_support::traits::{
-	Currency, Imbalance,
-};
+use srml_support::traits::{Currency, ReservableCurrency};
 
 use rstd::prelude::*;
-use runtime_primitives::traits::{Zero, Hash};
+use runtime_primitives::traits::{Zero, Hash, As};
 use runtime_support::dispatch::Result;
 use runtime_support::{StorageMap, StorageValue};
 use system::ensure_signed;
@@ -47,7 +45,7 @@ pub trait Trait: balances::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 	/// The account balance.
-	type Currency: Currency<Self::AccountId>;
+	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 }
 
 pub type Attestation = Vec<u8>;
@@ -101,8 +99,7 @@ decl_module! {
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 			// Burn the registration bond amount
-			ensure!(T::Currency::can_slash(&_sender, Self::registration_bond()), "Not enough currency for slashing bond");
-			T::Currency::slash(&_sender, Self::registration_bond());
+			T::Currency::reserve(&_sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
 			// Register the identity
 			return Self::register_identity(_sender, identity_type, identity, hash);
 		}
@@ -140,8 +137,7 @@ decl_module! {
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 			// Burn the registration bond amount
-			ensure!(T::Currency::can_slash(&_sender, Self::registration_bond()), "Not enough currency for slashing bond");
-			T::Currency::slash(&_sender, Self::registration_bond());
+			T::Currency::reserve(&_sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
 			// Register identity
 			Self::register_identity(_sender.clone(), identity_type, identity, hash).unwrap();
 			// Grab record
@@ -204,7 +200,7 @@ decl_module! {
 
 		/// Check all pending identities for expiration when each block is
 		/// finalised. Once an identity expires, it is deleted from storage.
-		fn on_finalise(_n: T::BlockNumber) {
+		fn on_finalize(_n: T::BlockNumber) {
 			let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
 				.into_iter()
 				.partition(|(_, exp)| (_n > *exp) && (*exp > T::BlockNumber::zero()));
@@ -241,7 +237,7 @@ impl<T: Trait> Module<T> {
 		let id = record.identity.encode().clone();
 		if approve {
 			// Add the registration bond amount on behalf of a successful verification
-			T::Currency::deposit_into_existing(&record.account, Self::registration_bond()).unwrap();
+			T::Currency::unreserve(&record.account, Self::registration_bond());
 			// Remove identity from list of pending identities
 			<IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
 			Self::deposit_event(RawEvent::Verify(*identity_hash, sender, id_type, id));
@@ -251,6 +247,7 @@ impl<T: Trait> Module<T> {
 				..record
 			});
 		} else {
+			T::Currency::slash_reserved(&record.account, Self::registration_bond());
 			Self::remove_pending_identity(&identity_hash);
 			Self::deposit_event(RawEvent::Denied(*identity_hash, sender, id_type, id));
 		}
@@ -346,6 +343,6 @@ decl_storage! {
 		/// Verifier set
 		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
 		/// Registration bond
-		pub RegistrationBond get(registration_bond) config(): BalanceOf<T>;
+		pub RegistrationBond get(registration_bond) config(): BalanceOf<T> = BalanceOf::<T>::sa(10);
 	}
 }

@@ -24,7 +24,6 @@ use std::time::Duration;
 use client;
 use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
 use grandpa;
-use node_executor;
 use primitives::{Pair as PairT, ed25519};
 use node_primitives::Block;
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
@@ -60,12 +59,16 @@ impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
 	}
 }
 
+pub use substrate_executor::NativeExecutor;
+use substrate_executor::native_executor_instance;
+native_executor_instance!(pub Executor, edgeware_runtime::api::dispatch, edgeware_runtime::native_version, include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm"));
+
 construct_service_factory! {
 	struct Factory {
 		Block = Block,
 		RuntimeApi = RuntimeApi,
 		NetworkProtocol = NodeProtocol { |config| Ok(NodeProtocol::new()) },
-		RuntimeDispatch = node_executor::Executor,
+		RuntimeDispatch = Executor,
 		FullTransactionPoolApi = transaction_pool::ChainApi<client::Client<FullBackend<Self>, FullExecutor<Self>, Block, RuntimeApi>, Block>
 			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
 		LightTransactionPoolApi = transaction_pool::ChainApi<client::Client<LightBackend<Self>, LightExecutor<Self>, Block, RuntimeApi>, Block>
@@ -119,7 +122,7 @@ construct_service_factory! {
 						name: Some(service.config.name.clone())
 					},
 					link_half,
-					grandpa::NetworkBridge::new(service.network()),
+					service.network(),
 					service.config.custom.inherent_data_providers.clone(),
 					service.on_exit(),
 				)?);

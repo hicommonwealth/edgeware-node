@@ -64,7 +64,7 @@ mod tests {
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		testing::{Digest, DigestItem, Header, UintAuthorityId},
-		traits::{BlakeTwo256, OnFinalise, IdentityLookup},
+		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 		BuildStorage,
 	};
 
@@ -488,6 +488,7 @@ mod tests {
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
+			System::set_block_number(2);
 			let verifier = 1_u64;
 			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
 			let balance_after_verify = Balances::free_balance(public);
@@ -672,7 +673,7 @@ mod tests {
 			let expires_at = now + expiration_length;
 
 			System::set_block_number(10002);
-			<Identity as OnFinalise<u64>>::on_finalise(10002);
+			<Identity as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
