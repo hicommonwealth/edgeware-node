@@ -98,7 +98,7 @@ decl_module! {
 			buf.extend_from_slice(&identity.encode());
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
-			// Burn the registration bond amount
+			// Reserve the registration bond amount
 			T::Currency::reserve(&_sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
 			// Register the identity
 			return Self::register_identity(_sender, identity_type, identity, hash);
@@ -136,7 +136,7 @@ decl_module! {
 			buf.extend_from_slice(&identity.encode());
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
-			// Burn the registration bond amount
+			// Reserve the registration bond amount
 			T::Currency::reserve(&_sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
 			// Register identity
 			Self::register_identity(_sender.clone(), identity_type, identity, hash).unwrap();

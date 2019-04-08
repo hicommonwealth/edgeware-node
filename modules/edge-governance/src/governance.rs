@@ -109,9 +109,8 @@ decl_module! {
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
 
-			// Burn the proposal creation bond amount
-			ensure!(T::Currency::can_slash(&_sender, Self::proposal_creation_bond()), "Not enough currency for slashing bond");
-			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).unwrap();
+			// Reserve the proposal creation bond amount
+			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).map_err(|| "Not enough currency for reserve bond");
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
