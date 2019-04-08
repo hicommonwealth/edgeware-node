@@ -110,7 +110,7 @@ decl_module! {
 			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
 
 			// Reserve the proposal creation bond amount
-			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).map_err(|| "Not enough currency for reserve bond");
+			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).map_err(|_| "Not enough currency for reserve bond")?;
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
