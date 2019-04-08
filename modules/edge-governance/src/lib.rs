@@ -572,7 +572,7 @@ mod tests {
 
 			assert_err!(
 				propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin),
-				"Not enough currency for slashing bond");
+				"Not enough currency for reserve bond");
 		});
 	}
 
