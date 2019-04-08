@@ -73,7 +73,8 @@ use client::{
 use runtime_primitives::{ApplyResult, generic, create_runtime_str};
 use runtime_primitives::transaction_validity::TransactionValidity;
 use runtime_primitives::traits::{
-	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup,
+	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup, CurrencyToVoteHandler,
+	AuthorityIdFor,
 };
 use version::RuntimeVersion;
 use council::{motions as council_motions, voting as council_voting};
@@ -96,9 +97,9 @@ pub use staking::StakerStatus;
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 2,
-	spec_version: 3,
-	impl_version: 4,
+	authoring_version: 3,
+	spec_version: 5,
+	impl_version: 5,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -167,7 +168,8 @@ impl session::Trait for Runtime {
 }
 
 impl staking::Trait for Runtime {
-	type Currency = balances::Module<Self>;
+	type Currency = Balances;
+	type CurrencyToVote = CurrencyToVoteHandler;
 	type OnRewardMinted = Treasury;
 	type Event = Event;
 	type Slash = ();
@@ -175,7 +177,7 @@ impl staking::Trait for Runtime {
 }
 
 impl democracy::Trait for Runtime {
-	type Currency = balances::Module<Self>;
+	type Currency = Balances;
 	type Proposal = Call;
 	type Event = Event;
 }
@@ -197,7 +199,7 @@ impl council::motions::Trait for Runtime {
 }
 
 impl treasury::Trait for Runtime {
-	type Currency = balances::Module<Self>;
+	type Currency = Balances;
 	type ApproveOrigin = council_motions::EnsureMembers<_4>;
 	type RejectOrigin = council_motions::EnsureMembers<_2>;
 	type Event = Event;
@@ -206,6 +208,7 @@ impl treasury::Trait for Runtime {
 }
 
 impl contract::Trait for Runtime {
+	type Currency = Balances;
 	type Call = Call;
 	type Event = Event;
 	type Gas = u64;
@@ -231,23 +234,21 @@ impl finality_tracker::Trait for Runtime {
 }
 
 impl delegation::Trait for Runtime {
-	/// The uniquitous event type.
 	type Event = Event;
 }
 
 impl voting::Trait for Runtime {
-	/// The uniquitous event type.
 	type Event = Event;
 }
 
 impl governance::Trait for Runtime {
-	/// The uniquitous event type.
 	type Event = Event;
+	type Currency = Balances;
 }
 
 impl identity::Trait for Runtime {
-	/// The uniquitous event type.
 	type Event = Event;
+	type Currency = Balances;
 }
 
 construct_runtime!(
@@ -304,16 +305,16 @@ impl_runtime_apis! {
 			VERSION
 		}
 
-		fn authorities() -> Vec<AuthorityId> {
-			Consensus::authorities()
-		}
-
 		fn execute_block(block: Block) {
 			Executive::execute_block(block)
 		}
 
-		fn initialise_block(header: &<Block as BlockT>::Header) {
-			Executive::initialise_block(header)
+		fn initialize_block(header: &<Block as BlockT>::Header) {
+			Executive::initialize_block(header)
+		}
+
+		fn authorities() -> Vec<AuthorityIdFor<Block>> {
+			panic!("Deprecated, please use `AuthoritiesApi`.")
 		}
 	}
 
@@ -328,8 +329,8 @@ impl_runtime_apis! {
 			Executive::apply_extrinsic(extrinsic)
 		}
 
-		fn finalise_block() -> <Block as BlockT>::Header {
-			Executive::finalise_block()
+		fn finalize_block() -> <Block as BlockT>::Header {
+			Executive::finalize_block()
 		}
 
 		fn inherent_extrinsics(data: InherentData) -> Vec<<Block as BlockT>::Extrinsic> {
@@ -394,6 +395,12 @@ impl_runtime_apis! {
 	impl consensus_aura::AuraApi<Block> for Runtime {
 		fn slot_duration() -> u64 {
 			Aura::slot_duration()
+		}
+	}
+
+	impl consensus_authorities::AuthoritiesApi<Block> for Runtime {
+		fn authorities() -> Vec<AuthorityIdFor<Block>> {
+			Consensus::authorities()
 		}
 	}
 }

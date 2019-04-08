@@ -41,7 +41,6 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 extern crate srml_consensus as consensus;
 extern crate edge_delegation as delegation;
 extern crate edge_voting as voting;
@@ -65,7 +64,7 @@ mod tests {
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		BuildStorage,
-		traits::{BlakeTwo256, OnFinalise, IdentityLookup},
+		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 		testing::{Digest, DigestItem, Header, UintAuthorityId}
 	};
 	use voting::{VoteStage, VoteType};
@@ -109,17 +108,15 @@ mod tests {
 		type SessionKey = UintAuthorityId;
 		type InherentOfflineReport = ();
 	}
-	impl timestamp::Trait for Test {
-		type Moment = u64;
-		type OnTimestampSet = ();
-	}
 	impl balances::Trait for Test {
 		type Balance = u64;
 		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
 		type Event = Event;
+		type TransactionPayment = ();
+		type TransferPayment = ();
+		type DustRemoval = ();
 	}
-
 	impl delegation::Trait for Test {
 		type Event = Event;
 	}
@@ -130,18 +127,38 @@ mod tests {
 
 	impl Trait for Test {
 		type Event = Event;
+		type Currency = balances::Module<Self>;
 	}
 
+	pub type Balances = balances::Module<Test>;
 	pub type System = system::Module<Test>;
- 	pub type Timestamp = timestamp::Module<Test>;
 	pub type Governance = Module<Test>;
+
+	const BOND: u64 = 10;
 
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
 		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
 			governance::GenesisConfig::<Test> {
-				voting_time: 10000,
+				voting_length: 10000,
+				proposal_creation_bond: BOND,
+			}.build_storage().unwrap().0,
+		);
+		t.extend(
+			balances::GenesisConfig::<Test> {
+				balances: vec![
+					(1, 100),
+					(2, 100),
+					(3, 100),
+					(4, 100),
+				],
+				transaction_base_fee: 0,
+				transaction_byte_fee: 0,
+				existential_deposit: 0,
+				transfer_fee: 0,
+				creation_fee: 0,
+				vesting: vec![],
 			}.build_storage().unwrap().0,
 		);
 		t.into()
@@ -338,8 +355,8 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_time();
-			let now = Timestamp::get();
+ 			let vote_time = Governance::voting_length();
+			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
 			assert_eq!(System::events(), vec![
@@ -360,12 +377,12 @@ mod tests {
 					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
 				},]
 			);
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -385,12 +402,12 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
 									"Proposal not in pre-voting stage");
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -411,22 +428,23 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_time();
-			let now = Timestamp::get();
+ 			let vote_time = Governance::voting_length();
+			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
 
-			<Governance as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);
+			<Governance as OnFinalize<u64>>::on_finalize(2);
+			System::set_block_number(3);
 
 			assert_eq!(System::events(), vec![
 				EventRecord {
@@ -447,10 +465,9 @@ mod tests {
 				},]
 			);
 
-			Timestamp::set_timestamp(10001);
-
-			<Governance as OnFinalise<u64>>::on_finalise(2);
-			System::set_block_number(3);
+			System::set_block_number(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
 
 			assert_eq!(System::events(), vec![
 				EventRecord {
@@ -478,7 +495,6 @@ mod tests {
 					event: Event::governance(RawEvent::VotingCompleted(
 						hash,
 						vote_id,
-						Some(vec![(governance::YES_VOTE, 0), (governance::NO_VOTE, 0)])
 					))
 				}]
 			);
@@ -507,10 +523,9 @@ mod tests {
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			
-			Timestamp::set_timestamp(10001);
-			
-			<Governance as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
+			System::set_block_number(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
 
 			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
 			assert_eq!(Governance::active_proposals(), vec![]);
@@ -543,6 +558,45 @@ mod tests {
 				Governance::proposal_of(hash),
 				Some(make_record(public, title, proposal, category))
 			);
+		});
+	}
+
+	#[test]
+	fn creating_proposal_with_insufficient_balance_fails() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = 100_u64;
+			let category = governance::ProposalCategory::Signaling;
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+
+			assert_err!(
+				propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin),
+				"Not enough currency for slashing bond");
+		});
+	}
+
+	#[test]
+	fn completed_proposal_should_return_creation_bond() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let category = governance::ProposalCategory::Signaling;
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let hash = build_proposal_hash(public, &proposal);
+			let balance = Balances::free_balance(public);
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let after_propose_balance = Balances::free_balance(public);
+			assert_eq!(balance - BOND, after_propose_balance);
+			assert_ok!(advance_proposal(public, hash));
+
+			System::set_block_number(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
+
+			let after_completion_balance = Balances::free_balance(public);
+			assert_eq!(balance, after_completion_balance);
 		});
 	}
 } 

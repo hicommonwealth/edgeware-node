@@ -60,6 +60,7 @@ pub fn edgeware_config_gensis() -> GenesisConfig {
 		initial_authorities,
 		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(),
 		None,
+		None,
 	)
 }
 
@@ -112,7 +113,15 @@ pub fn testnet_genesis(
 	initial_authorities: Vec<(AccountId, AccountId, AuthorityId)>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
+	initial_verifiers: Option<Vec<AccountId>>,
 ) -> GenesisConfig {
+	let initial_verifiers: Vec<AccountId> = initial_verifiers.unwrap_or_else(|| {
+		vec![
+			get_account_id_from_seed("Alice"),
+			get_account_id_from_seed("Bob"),
+		]
+	});
+
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed("Alice"),
@@ -143,15 +152,10 @@ pub fn testnet_genesis(
 	const STASH: u128 = 100 * DOLLARS;
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
-			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),
+			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
 			authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
 		}),
 		system: None,
-		indices: Some(IndicesConfig {
-			ids: endowed_accounts.iter().cloned()
-				.chain(initial_authorities.iter().map(|x| x.0.clone()))
-				.collect::<Vec<_>>(),
-		}),
 		balances: Some(BalancesConfig {
 			transaction_base_fee: 1 * CENTS,
 			transaction_byte_fee: 10 * MILLICENTS,
@@ -163,6 +167,11 @@ pub fn testnet_genesis(
 			transfer_fee: 1 * CENTS,
 			creation_fee: 1 * CENTS,
 			vesting: vec![],
+		}),
+		indices: Some(IndicesConfig {
+			ids: endowed_accounts.iter().cloned()
+				.chain(initial_authorities.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
 		}),
 		session: Some(SessionConfig {
 			validators: initial_authorities.iter().map(|x| x.1.clone()).collect(),
@@ -207,7 +216,7 @@ pub fn testnet_genesis(
 			enact_delay_period: 0,
 		}),
 		timestamp: Some(TimestampConfig {
-			period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
+			minimum_period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
 		}),
 		treasury: Some(TreasuryConfig {
 			proposal_bond: Permill::from_percent(5),
@@ -216,6 +225,10 @@ pub fn testnet_genesis(
 			burn: Permill::from_percent(50),
 		}),
 		contract: Some(ContractConfig {
+			transaction_base_fee: 1 * CENTS,
+			transaction_byte_fee: 10 * MILLICENTS,
+			transfer_fee: 1 * CENTS,
+			creation_fee: 1 * CENTS,
 			contract_fee: 1 * CENTS,
 			call_base_fee: 1000,
 			create_base_fee: 1000,
@@ -225,17 +238,20 @@ pub fn testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: root_key,
+			key: endowed_accounts[0].clone(),
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
 		}),
 		identity: Some(IdentityConfig {
-			verifiers: initial_authorities.iter().map(|x| x.0.clone()).collect(),
-			expiration_time: 604800, // 7 days
+			verifiers: initial_verifiers,
+			expiration_length: 604800, // 7 days
+			registration_bond: 100,
 		}),
 		governance: Some(GovernanceConfig {
-			voting_time: 604800, // 7 days
+			voting_length: 604800, // 7 days
+			proposal_creation_bond: 100,
+
 		}),
 		delegation: Some(DelegationConfig {
 			delegation_depth: 5,
@@ -250,6 +266,7 @@ fn development_config_genesis() -> GenesisConfig {
 			get_authority_keys_from_seed("Alice"),
 		],
 		get_account_id_from_seed("Alice"),
+		None,
 		None,
 	)
 }
@@ -266,6 +283,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 			get_authority_keys_from_seed("Bob"),
 		],
 		get_account_id_from_seed("Alice"),
+		None,
 		None,
 	)
 }

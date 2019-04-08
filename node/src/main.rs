@@ -40,7 +40,6 @@ extern crate substrate_service;
 extern crate substrate_inherents;
 
 extern crate edgeware_runtime;
-extern crate node_executor;
 extern crate substrate_finality_grandpa as grandpa;
 extern crate node_primitives;
 #[macro_use]

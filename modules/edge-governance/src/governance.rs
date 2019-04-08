@@ -30,14 +30,14 @@ extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
 extern crate edge_voting as voting;
 
 use rstd::prelude::*;
+use srml_support::traits::{Currency, ReservableCurrency};
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::{Zero, Hash};
+use runtime_primitives::traits::{Zero, Hash, As};
 use codec::Encode;
 
 pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
@@ -70,15 +70,18 @@ pub struct ProposalRecord<AccountId, Moment> {
 	pub vote_id: u64,
 }
 
-pub trait Trait: voting::Trait + timestamp::Trait {
+pub trait Trait: voting::Trait + balances::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	/// The account balance.
+	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 }
 
 pub type ProposalTitle = Vec<u8>;
 pub type ProposalContents = Vec<u8>;
 pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
@@ -106,6 +109,8 @@ decl_module! {
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
 
+			// Reserve the proposal creation bond amount
+			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).map_err(|| "Not enough currency for reserve bond");
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
@@ -122,7 +127,7 @@ decl_module! {
 				author: _sender.clone(),
 				stage: ProposalStage::PreVoting,
 				category: category,
-				transition_time: T::Moment::zero(),
+				transition_time: T::BlockNumber::zero(),
 				title: title,
 				contents: contents,
 				vote_id: vote_id,
@@ -144,7 +149,7 @@ decl_module! {
 			
 			// prevoting -> voting
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
-			let transition_time = <timestamp::Module<T>>::get() + Self::voting_time();
+			let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
 			let vote_id = record.vote_id;
 			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
 				stage: ProposalStage::Voting,
@@ -158,12 +163,10 @@ decl_module! {
 
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
-		///
-		/// TODO: Decide whether we want this. It may be the only vulnerability we have.
-		fn on_finalise(_n: T::BlockNumber) {
+		fn on_finalize(_n: T::BlockNumber) {
 			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
-				.partition(|(_, exp)| <timestamp::Module<T>>::get() > *exp);
+				.partition(|(_, exp)| _n > *exp);
 			
 			<ActiveProposals<T>>::put(active);
 			finished.into_iter().for_each(move |(completed_hash, _)| {
@@ -173,14 +176,15 @@ decl_module! {
 						let vote_id = record.vote_id;
 						// TODO: handle possible errors from advance_stage?
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
+						// Unreserve the proposal creation bond amount
+						T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
+						// Edit the proposal record to completed
 						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
 							stage: ProposalStage::Completed,
-							transition_time: T::Moment::zero(),
+							transition_time: T::BlockNumber::zero(),
 							..record
 						});
-						// tally the final vote to include in completion Event
-						let final_outcome = <voting::Module<T>>::tally(vote_id);
-						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id, final_outcome));
+						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id));
 					},
 					None => { } // TODO: emit an error here?
 				}
@@ -192,14 +196,13 @@ decl_module! {
 decl_event!(
 	pub enum Event<T> where <T as system::Trait>::Hash,
 							<T as system::Trait>::AccountId,
-							<T as timestamp::Trait>::Moment,
-							<T as balances::Trait>::Balance {
+							<T as system::Trait>::BlockNumber {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
-		VotingStarted(Hash, u64, Moment),
+		VotingStarted(Hash, u64, BlockNumber),
 		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
-		VotingCompleted(Hash, u64, Tally<Balance>),
+		VotingCompleted(Hash, u64),
 	}
 );
 
@@ -210,10 +213,12 @@ decl_storage! {
 		/// A list of all extant proposals.
 		pub Proposals get(proposals): Vec<T::Hash>;
 		/// A list of active proposals along with the time at which they complete.
-		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::Moment)>;
+		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::BlockNumber)>;
 		/// Amount of time a proposal remains in "Voting" stage.
-		pub VotingTime get(voting_time) config(): T::Moment;
-		/// Map for retrieving the information about any proposal from its hash.
-		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::Moment>>;
+		pub VotingLength get(voting_length) config(): T::BlockNumber;
+		/// Map for retrieving the information about any proposal from its hash. 
+		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+		/// Registration bond
+		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T> = BalanceOf::<T>::sa(10);
 	}
 }

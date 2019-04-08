@@ -105,6 +105,9 @@ mod tests {
 		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
 		type Event = Event;
+		type TransactionPayment = ();
+		type TransferPayment = ();
+		type DustRemoval = ();
 	}
 
 	impl delegation::Trait for Test {
@@ -606,23 +609,6 @@ mod tests {
 	}
 
 	#[test]
-	fn tally_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let public = get_test_key();
-			let vote = generate_1p1v_public_binary_vote();
-			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
-			assert_ok!(advance_stage_as_initiator(public, 1));
-			assert_ok!(reveal(public, 1, vote.3[0], Some(vote.3[0])));
-			assert_ok!(advance_stage_as_initiator(public, 1));
-			assert_eq!(
-				Voting::tally(1).unwrap(),
-				vec![(vote.3[0], 1), (vote.3[1], 0)]
-			);
-		});
-	}
-
-	#[test]
 	fn delegation_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			/*  To test delegation, we'll generate a delegation graph, have some
@@ -654,10 +640,6 @@ mod tests {
 			assert_ok!(reveal(users[4], 1, vote.3[1], None));
 			assert_ok!(reveal(users[5], 1, vote.3[0], None));
 			assert_ok!(advance_stage_as_initiator(creator, 1));
-			assert_eq!(
-				Voting::tally(1).unwrap(),
-				vec![(vote.3[0], 3), (vote.3[1], 3)]
-			);
 		});
 	}
 }
