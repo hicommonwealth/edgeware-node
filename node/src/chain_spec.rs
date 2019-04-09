@@ -401,7 +401,7 @@ pub fn cwci_testnet_genesis(
 			registration_bond: 100,
 		}),
 		governance: Some(GovernanceConfig {
-			voting_length: SECS_PER_BLOCK * 3, // 7 days
+			voting_length: 4,
 			proposal_creation_bond: 100,
 
 		}),
