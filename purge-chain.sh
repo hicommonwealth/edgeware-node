@@ -9,6 +9,9 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	elif [[ "$db" == "edgeware" ]]; then
     	rm -rf ~/.local/share/edgeware/chains/edgeware/
     	rm -rf ~/.local/share/edgeware/chains/edgeware-testnet/
+	elif [[ "$db" == "cwci" ]]; then
+    	rm -rf ~/.local/share/edgeware/chains/cwci/
+    	rm -rf ~/.local/share/edgeware/chains/cwci-testnet/
 	else
 		db="all"
 	    rm -rf ~/.local/share/edgeware/chains/dev/
@@ -26,6 +29,9 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	elif [[ "$db" == "edgeware" ]]; then
 		rm -rf ~/Library/Application\ Support/edgeware/chains/edgeware/
 		rm -rf ~/Library/Application\ Support/edgeware/chains/edgeware-testnet/
+	elif [[ "$db" == "cwci" ]]; then
+		rm -rf ~/Library/Application\ Support/edgeware/chains/cwci/
+		rm -rf ~/Library/Application\ Support/edgeware/chains/cwci-testnet/
 	else
 		db="all"
 		rm -rf ~/Library/Application\ Support/edgeware/chains/dev/
@@ -43,6 +49,9 @@ else
 	elif [[ "$db" == "edgeware" ]]; then
     	rm -rf ~/.local/share/edgeware/chains/edgeware/
     	rm -rf ~/.local/share/edgeware/chains/edgeware-testnet/
+	elif [[ "$db" == "cwci" ]]; then
+    	rm -rf ~/.local/share/edgeware/chains/cwci/
+    	rm -rf ~/.local/share/edgeware/chains/cwci-testnet/
 	else
 		db="all"
 	    rm -rf ~/.local/share/edgeware/chains/dev/
