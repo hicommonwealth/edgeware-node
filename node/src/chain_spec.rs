@@ -92,6 +92,12 @@ pub fn get_account_id_from_seed(seed: &str) -> AccountId {
 		.public()
 }
 
+// pub fn get_ed25519_account_id_from_seed(seed: &str) -> AccountId {
+// 	ed25519::Pair::from_string(&format!("//{}", seed), None)
+// 		.expect("static values are valid; qed")
+// 		.public()
+// }
+
 /// Helper function to generate AuthorityId from seed
 pub fn get_session_key_from_seed(seed: &str) -> AuthorityId {
 	ed25519::Pair::from_string(&format!("//{}", seed), None)
