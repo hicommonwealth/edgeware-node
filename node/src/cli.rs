@@ -35,6 +35,8 @@ pub enum ChainSpec {
 	/// Edgeware testnet.
 	Edgeware,
 	EdgewareTestnet,
+	// Commonwealth CI testnet
+	CWCITestnet,
 }
 
 /// Get a chain config from a spec setting.
@@ -45,6 +47,7 @@ impl ChainSpec {
 			ChainSpec::EdgewareTestnet => chain_spec::edgeware_testnet_config(),
 			ChainSpec::Development => chain_spec::development_config(),
 			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
+			ChainSpec::CWCITestnet => chain_spec::cwci_testnet_config(),
 		})
 	}
 
@@ -54,6 +57,7 @@ impl ChainSpec {
 			"local" => Some(ChainSpec::LocalTestnet),
 			"" | "edge" => Some(ChainSpec::Edgeware),
 			"edgeware" => Some(ChainSpec::EdgewareTestnet),
+			"cwci" => Some(ChainSpec::CWCITestnet),
 			_ => None,
 		}
 	}

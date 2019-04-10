@@ -93,6 +93,8 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 
 To run a chain locally for development purposes: `./target/release/edgeware --chain=local --alice --validator`
 
+To force your local to create new blocks, even if offline, add the `--force-authoring` flag.
+
 ### Adding A Module
 
 1. Add its github repo to:
