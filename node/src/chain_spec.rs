@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair, crypto::{UncheckedInto, UncheckedFrom}};
+use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair, crypto::UncheckedInto};
 use node_primitives::AccountId;
 use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig,
 	SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
@@ -39,26 +39,26 @@ pub fn edgeware_testnet_config() -> ChainSpec {
 
 pub fn edgeware_config_gensis() -> GenesisConfig {
 	let initial_authorities: Vec<(AccountId, AccountId, AuthorityId)> = vec![(
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"])), // 5HnNyuEyvLfTarQ4LLTSK4PpacMi2BTzmEYg4iKbVtSEU53C
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["78ca2addb982a4a39262d68ed63fb4a8b0dfd73b7a38e0190f77b0cf155f94e0"])), // 5Eo5fD9gBaMrLoLTeABXY4KoDL7mb4QtrzSQBMzFDJhhw57q
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(), // 5HnNyuEyvLfTarQ4LLTSK4PpacMi2BTzmEYg4iKbVtSEU53C
+		hex!["78ca2addb982a4a39262d68ed63fb4a8b0dfd73b7a38e0190f77b0cf155f94e0"].unchecked_into(), // 5Eo5fD9gBaMrLoLTeABXY4KoDL7mb4QtrzSQBMzFDJhhw57q
 		hex!["e320e0bec84e02f4789170ad0126175d89f64257c504c599249df7b1fe90d688"].unchecked_into(), // 5HCWVbHiXgkHKgm2rqqbMx4UCDUz3BBWAY8oTRKDkahAaMEu
 	),(
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["5049a5a4f220aad7edc78bf3311710e05070b622cdd55bec8adf506a1d90ef73"])), // 5DsyZmCaTGmKaiaFChifPRB4X4jcP1vWHuEbjxsF3NerzDgd
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["4f8f200b881db35caaa041356f5ff454162cb930693983d09bafdc4abbc3f879"])), // 5Ds2A4mjhSQSG7fFrZhhgj4fCDpdUEpm1L9bKzEzmrzRYNXX
+		hex!["5049a5a4f220aad7edc78bf3311710e05070b622cdd55bec8adf506a1d90ef73"].unchecked_into(), // 5DsyZmCaTGmKaiaFChifPRB4X4jcP1vWHuEbjxsF3NerzDgd
+		hex!["4f8f200b881db35caaa041356f5ff454162cb930693983d09bafdc4abbc3f879"].unchecked_into(), // 5Ds2A4mjhSQSG7fFrZhhgj4fCDpdUEpm1L9bKzEzmrzRYNXX
 		hex!["ada6a4726da7c73108cdf2686e6735dd3740dce19f2be7eee9460152cfb4a691"].unchecked_into(), // 5FzPeKoqxxKDbKT9QmNLeFP1CVSBqKpvV1P4maubvyyQSLqU
 	),(
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["efffffdcc35e2bb8eb1b274b19aa0e84db49e519083e9bdd5d06ee9b62b80c56"])), // 5HVPMDQ5wzhKBnZtVSc1YGH8HvNYqzFfk4yFxdSCYuq3iTgK
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["d2d25e48253d9b16f81323de36eb1c51d2fc07d9b89dafdcef4cb61bff52800c"])), // 5Gq8QTxo9Kedv33bTCdWFz6DSrB46Ben5saEWEYrpkpBF5rF
+		hex!["efffffdcc35e2bb8eb1b274b19aa0e84db49e519083e9bdd5d06ee9b62b80c56"].unchecked_into(), // 5HVPMDQ5wzhKBnZtVSc1YGH8HvNYqzFfk4yFxdSCYuq3iTgK
+		hex!["d2d25e48253d9b16f81323de36eb1c51d2fc07d9b89dafdcef4cb61bff52800c"].unchecked_into(), // 5Gq8QTxo9Kedv33bTCdWFz6DSrB46Ben5saEWEYrpkpBF5rF
 		hex!["f07586a2147e4f63dd416b0b8363ed56f08f9cacf0dd35fcb6b5574f3b465d6c"].unchecked_into(), // 5HVzG9Yb7nCPRpLY7ypWJGKx5mJVtLkUFCDCtR9rQnVEm5ej
 	),(
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["d857fce59cca864637d5bc879eef6b23acc166ff4e01b6fc602bdf9c3f33fc18"])), // 5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mPJo
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["b68ea4881c12b90205de5037283252b1a2dce85c819950a460d0d89945cad5a0"])), // 5GC4wpJ3pQFfp1pDu6bXMvduZq3c6rRkYbgvQthT7M1TRBWb
+		hex!["d857fce59cca864637d5bc879eef6b23acc166ff4e01b6fc602bdf9c3f33fc18"].unchecked_into(), // 5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mPJo
+		hex!["b68ea4881c12b90205de5037283252b1a2dce85c819950a460d0d89945cad5a0"].unchecked_into(), // 5GC4wpJ3pQFfp1pDu6bXMvduZq3c6rRkYbgvQthT7M1TRBWb
 		hex!["c39aabb19d05e62b7f743d737e53c6b5f892808a10224ccf8921a146b805c57a"].unchecked_into(), // 5GVB9A9W8q7aPBTxVMw5bmD8jgtu4kT93nVVK2wRU8eHP3QG
 	)];
 
 	testnet_genesis(
 		initial_authorities,
-		sr_primitives::MultiSigner::Ed25519(ed25519::Public::unchecked_from(hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"])),
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(),
 		None,
 		None,
 	)
@@ -87,10 +87,16 @@ pub fn edgeware_config() -> Result<ChainSpec, String> {
 
 /// Helper function to generate AccountId from seed
 pub fn get_account_id_from_seed(seed: &str) -> AccountId {
-	sr_primitives::MultiSigner::Sr25519(sr25519::Pair::from_string(&format!("//{}", seed), None)
+	sr25519::Pair::from_string(&format!("//{}", seed), None)
 		.expect("static values are valid; qed")
-		.public())
+		.public()
 }
+
+// pub fn get_ed25519_account_id_from_seed(seed: &str) -> AccountId {
+// 	ed25519::Pair::from_string(&format!("//{}", seed), None)
+// 		.expect("static values are valid; qed")
+// 		.public()
+// }
 
 /// Helper function to generate AuthorityId from seed
 pub fn get_session_key_from_seed(seed: &str) -> AuthorityId {
@@ -238,7 +244,7 @@ pub fn testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
@@ -390,7 +396,7 @@ pub fn cwci_testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),

@@ -22,14 +22,14 @@
 #![cfg_attr(not(feature = "std"), feature(alloc))]
 
 use runtime_primitives::{
-	generic, traits::{Verify, BlakeTwo256}, OpaqueExtrinsic, MultiSignature
+	generic, traits::{Verify, BlakeTwo256}, OpaqueExtrinsic, AnySignature
 };
 
 /// An index to a block.
 pub type BlockNumber = u64;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = MultiSignature;
+pub type Signature = AnySignature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
