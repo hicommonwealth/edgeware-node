@@ -18,6 +18,7 @@
 
 #![warn(missing_docs)]
 #![warn(unused_extern_crates)]
+#![feature(type_alias_enum_variants)]
 
 extern crate futures;
 #[macro_use]

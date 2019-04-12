@@ -92,6 +92,12 @@ pub fn get_account_id_from_seed(seed: &str) -> AccountId {
 		.public()
 }
 
+// pub fn get_ed25519_account_id_from_seed(seed: &str) -> AccountId {
+// 	ed25519::Pair::from_string(&format!("//{}", seed), None)
+// 		.expect("static values are valid; qed")
+// 		.public()
+// }
+
 /// Helper function to generate AuthorityId from seed
 pub fn get_session_key_from_seed(seed: &str) -> AuthorityId {
 	ed25519::Pair::from_string(&format!("//{}", seed), None)
@@ -238,7 +244,7 @@ pub fn testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
@@ -390,7 +396,7 @@ pub fn cwci_testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),

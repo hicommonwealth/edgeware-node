@@ -151,25 +151,49 @@ decl_module! {
 			return Self::attest_for(_sender, hash, attestation);
 		}
 
-		/// A function that verifies or denies an identity attestation.
+		/// A function that verifies an identity attestation.
 		/// 
 		/// The verification is handled by a set of seeded verifiers who run
 		/// the off-chain worker node to verify attestations.
-		pub fn verify_or_deny(origin, identity_hash: T::Hash, approve: bool, verifier_index: usize) -> Result {
+		pub fn verify(origin, identity_hash: T::Hash, verifier_index: u32) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(verifier_index < Self::verifiers().len(), "Verifier index out of bounds");
-			ensure!(Self::verifiers()[verifier_index] == _sender.clone(), "Sender is not a verifier");
-			return Self::verify_or_deny_identity(_sender, &identity_hash, approve);
+			ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+			ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+			return Self::verify_or_deny_identity(_sender, &identity_hash, true);
+		}
+
+		/// A function that denies an identity attestation.
+		/// 
+		/// The verification is handled by a set of seeded verifiers who run
+		/// the off-chain worker node to verify attestations.
+		pub fn deny(origin, identity_hash: T::Hash, verifier_index: u32) -> Result {
+			let _sender = ensure_signed(origin)?;
+			ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+			ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+			return Self::verify_or_deny_identity(_sender, &identity_hash, false);
+		}
+
+		/// Verify many verification requests
+		pub fn verify_many(origin, identity_hashes: Vec<T::Hash>, verifier_index: u32) -> Result {
+			let _sender = ensure_signed(origin)?;
+			ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+			ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+			
+			for i in 0..identity_hashes.len() {
+				Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], true).unwrap();
+			}
+
+			Ok(())
 		}
 
 		/// Deny many verification requests
-		pub fn verify_or_deny_many(origin, identity_hashes: Vec<T::Hash>, approvals: Vec<bool>, verifier_index: usize) -> Result {
+		pub fn deny_many(origin, identity_hashes: Vec<T::Hash>, verifier_index: u32) -> Result {
 			let _sender = ensure_signed(origin)?;
-			ensure!(verifier_index < Self::verifiers().len(), "Verifier index out of bounds");
-			ensure!(Self::verifiers()[verifier_index] == _sender.clone(), "Sender is not a verifier");
+			ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+			ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
 			
 			for i in 0..identity_hashes.len() {
-				Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], approvals[i]).unwrap();
+				Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], false).unwrap();
 			}
 
 			Ok(())
