@@ -35,10 +35,11 @@ FROM phusion/baseimage:0.11
 LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
+COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
 
 RUN rm -rf /usr/lib/python* && \
-	mkdir -p /root/.local/share/Substrate && \
-	ln -s /root/.local/share/Substrate /data
+	mkdir -p /root/.local/share/edgeware && \
+	ln -s /root/.local/share/edgeware /data
 
 EXPOSE 30333 9933 9944
 VOLUME ["/data"]
