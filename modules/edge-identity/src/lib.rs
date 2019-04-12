@@ -169,12 +169,20 @@ mod tests {
 		Identity::register_and_attest(Origin::signed(who), identity_type.to_vec(), identity.to_vec(), attestation.to_vec())
 	}
 
-	fn verify_identity(who: u64, identity_hash: H256, approve: bool, verifier_index: usize) -> Result {
-		Identity::verify_or_deny(Origin::signed(who), identity_hash, approve, verifier_index)
+	fn verify_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
+		Identity::verify(Origin::signed(who), identity_hash, verifier_index)
 	}
 
-	fn verify_or_deny_many(who: u64, identity_hashes: &[H256], approvals: Vec<bool>, verifier_index: usize) -> Result {
-		Identity::verify_or_deny_many(Origin::signed(who), identity_hashes.to_vec(), approvals, verifier_index)
+	fn deny_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
+		Identity::deny(Origin::signed(who), identity_hash, verifier_index)
+	}
+
+	fn verify_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
+		Identity::verify_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
+	}
+
+	fn deny_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
+		Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
 	}
 
 	fn add_metadata_to_account(
@@ -490,7 +498,7 @@ mod tests {
 
 			System::set_block_number(2);
 			let verifier = 1_u64;
-			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			assert_ok!(verify_identity(verifier, identity_hash, 0));
 			let balance_after_verify = Balances::free_balance(public);
 			assert_eq!(balance, balance_after_verify);
 
@@ -526,26 +534,24 @@ mod tests {
 	}
 
 	#[test]
-	fn verify_or_deny_many_should_work() {
+	fn deny_many_should_work() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let mut id_hashes = vec![];
 			let test_id_type: &[u8] = b"github";
 			let test_id: Vec<u8> = "drewstone 4".as_bytes().to_vec();
-			let mut approvals = vec![];
 			for i in 1..5 {
-				approvals.push(false);
 				let identity_type: &[u8] = b"github";
 				let identity: Vec<u8> = format!("drewstone {}", i).as_bytes().to_vec();
 				let identity_hash = build_identity_hash(identity_type, &identity);	
 				assert_ok!(register_identity(i as u64, identity_type, &identity));
-				let attestation: &[u8] = b"09283049820394820938402938234sdfsfsd";
+				let attestation: &[u8] = b"this_is_a_fake_attestation";
 				assert_ok!(attest_to_identity(i as u64, identity_hash, attestation));
 				id_hashes.push(identity_hash);
 			}
 
 			let verifier = 1_u64;
-			assert_ok!(verify_or_deny_many(verifier, &id_hashes, approvals, 0));
+			assert_ok!(deny_many(verifier, &id_hashes, 0));
 			let events = System::events();
 			assert_eq!(
 				events[events.len() - 1],
@@ -573,7 +579,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			let verifier = 1_u64;
-			assert_ok!(verify_identity(verifier, identity_hash, true, 0));
+			assert_ok!(verify_identity(verifier, identity_hash, 0));
 			assert_err!(
 				attest_to_identity(public, identity_hash, attestation),
 				"Already verified"
@@ -608,7 +614,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			assert_err!(
-				verify_identity(public, identity_hash, true, 0),
+				verify_identity(public, identity_hash, 0),
 				"Sender is not a verifier"
 			);
 			assert_eq!(Identity::identities(), vec![identity_hash]);
@@ -640,7 +646,7 @@ mod tests {
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
 			assert_err!(
-				verify_identity(public, identity_hash, true, 1),
+				verify_identity(public, identity_hash, 1),
 				"Verifier index out of bounds"
 			);
 			assert_eq!(Identity::identities(), vec![identity_hash]);
