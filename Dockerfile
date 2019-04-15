@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.11 AS builder
-LABEL maintainer="hello@commonwealth.im"
+LABEL maintainer="jake@commonwealth.im"
 LABEL description="This is the build stage. Here we create the binary."
 
 RUN install_clean build-essential \
@@ -36,11 +36,11 @@ LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
 COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
-COPY --from=builder /edgeware/edgeware_testnet.json /usr/local/bin
+COPY --from=builder /edgeware/testnets/v0.1.8/edgeware.json /usr/local/bin/testnets/v0.1.8/edgeware.json
 
 RUN rm -rf /usr/lib/python* && \
-	mkdir -p /root/.local/share/Substrate && \
-	ln -s /root/.local/share/Substrate /data
+	mkdir -p /root/.local/share && \
+	ln -s /root/.local/share /data
 
 EXPOSE 30333 9933 9944
 VOLUME ["/data"]
