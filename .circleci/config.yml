@@ -27,4 +27,4 @@ jobs:
             - target/debug/deps
           key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       # module test cases
-      - run: cd ~/edgeware && cargo test --all
+      - run: cd ~/edgeware && source ./.cargo/env && cargo test --all
