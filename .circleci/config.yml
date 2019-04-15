@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
       - image: phusion/baseimage:0.11
+        environment:
+          DEBUG_BUILD: true
 
     working_directory: ~/edgeware
 
