@@ -1,6 +1,8 @@
+#!/bin/bash
 db=$1
 
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  echo "Clearing local data from home dir: $HOME/.local/share/edgeware"
 	if [[ "$db" == "staging" ]]; then
 		rm -rf ~/.local/share/edgeware/chains/staging_testnet/
 	elif [[ "$db" == "dev" ]]; then
@@ -21,6 +23,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     	rm -rf ~/.local/share/edgeware/chains/cwci_testnet/
 	fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
+  echo "Clearing local data from home dir: $HOME/Library/Application Support/edgeware"
 	if [[ "$db" == "staging" ]]; then
 		rm -rf ~/Library/Application\ Support/edgeware/chains/staging_testnet/
 	elif [[ "$db" == "dev" ]]; then
@@ -41,6 +44,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 		rm -rf ~/Library/Application\ Support/edgeware/chains/cwci_testnet/
 	fi
 else
+  echo "Clearing local data from home dir: $HOME/.local/share/edgeware"
 	if [[ "$db" == "staging" ]]; then
 		rm -rf ~/.local/share/edgeware/chains/staging_testnet/
 	elif [[ "$db" == "dev" ]]; then
