@@ -15,7 +15,7 @@ jobs:
             - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
 
       # initial build
-      - run: ./setup
+      - run: cd ~/edgeware && ./setup
 
       - save_cache:
           paths:
