@@ -1,5 +1,5 @@
 {
-  "name": "Edgeware V0.1.9",
+  "name": "Edgeware",
   "id": "edgeware",
   "bootNodes": [
     "/ip4/157.230.218.41/tcp/30333/p2p/QmNYiKrVuztYuL42gs5kHLTqvKsmEnE3GvJQ8ewcvwtSVF",
@@ -20,7 +20,7 @@
     "runtime": {
       "system": null,
       "timestamp": {
-        "minimumPeriod": 2
+        "minimumPeriod": 3
       },
       "consensus": {
         "authorities": [
@@ -33,23 +33,11 @@
       },
       "indices": {
         "ids": [
-          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-          "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-          "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
-          "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
-          "5HGjWAeFDfFCWPsjFQdVV2Msvz2XtMktvgocEZcCj68kUMaw",
-          "5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL",
-          "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
-          "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
-          "5Ck5SLSHYac6WFt5UZRSsdJjwmpSZq85fd5TRNAdZQVzEAPT",
-          "5HKPmK9GYtE1PSLsS1qiYU9xQ9Si1NcEhdeCq9sw5bqu4ns8",
-          "5FCfAonRZgTFrTd9HREEyeJjDpT397KMzizE6T3DvebLFE7n",
-          "5CRmqmsiNFExV6VbdmPJViVxrWmkaXXvBrSX8oqBT8R9vmWk",
+          "5E1dGeSrXkmmFrnxHBRZZutBvjF6KfDq6mWwHEdG7KPDcnkn",
           "5HnNyuEyvLfTarQ4LLTSK4PpacMi2BTzmEYg4iKbVtSETx5i",
           "5DsyZmCaTGmKaiaFChifPRB4X4jcP1vWHuEbjxsF3NerzGAF",
           "5HVPMDQ5wzhKBnZtVSc1YGH8HvNYqzFfk4yFxdSCYuq3iStb",
-          "5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mTN4",
-          "5E1dGeSrXkmmFrnxHBRZZutBvjF6KfDq6mWwHEdG7KPDcnkn"
+          "5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mTN4"
         ]
       },
       "balances": {
@@ -60,51 +48,7 @@
         "transactionByteFee": 10000000000,
         "balances": [
           [
-            "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-            1000000000000000000000
-          ],
-          [
-            "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
-            1000000000000000000000
-          ],
-          [
-            "5FLSigC9HGRKVhB9FiEo4Y3koPsNmBmLJbpXg2mp1hXcS59Y",
-            1000000000000000000000
-          ],
-          [
-            "5DAAnrj7VHTznn2AWBemMuyBwZWs6FNFjdyVXUeYum3PTXFy",
-            1000000000000000000000
-          ],
-          [
-            "5HGjWAeFDfFCWPsjFQdVV2Msvz2XtMktvgocEZcCj68kUMaw",
-            1000000000000000000000
-          ],
-          [
-            "5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL",
-            1000000000000000000000
-          ],
-          [
-            "5GNJqTPyNqANBkUVMN1LPPrxXnFouWXoe2wNSmmEoLctxiZY",
-            1000000000000000000000
-          ],
-          [
-            "5HpG9w8EBLe5XCrbczpwq5TSXvedjrBGCwqxK1iQ7qUsSWFc",
-            1000000000000000000000
-          ],
-          [
-            "5Ck5SLSHYac6WFt5UZRSsdJjwmpSZq85fd5TRNAdZQVzEAPT",
-            1000000000000000000000
-          ],
-          [
-            "5HKPmK9GYtE1PSLsS1qiYU9xQ9Si1NcEhdeCq9sw5bqu4ns8",
-            1000000000000000000000
-          ],
-          [
-            "5FCfAonRZgTFrTd9HREEyeJjDpT397KMzizE6T3DvebLFE7n",
-            1000000000000000000000
-          ],
-          [
-            "5CRmqmsiNFExV6VbdmPJViVxrWmkaXXvBrSX8oqBT8R9vmWk",
+            "5E1dGeSrXkmmFrnxHBRZZutBvjF6KfDq6mWwHEdG7KPDcnkn",
             1000000000000000000000
           ],
           [
@@ -122,10 +66,6 @@
           [
             "5GxNLZgAzKdC3MGRfZjbhFTazjfxrq4ZaMFq987rrMJ8mTN4",
             10000000000000000
-          ],
-          [
-            "5E1dGeSrXkmmFrnxHBRZZutBvjF6KfDq6mWwHEdG7KPDcnkn",
-            1000000000000000000000
           ]
         ],
         "vesting": []
@@ -282,8 +222,7 @@
       "identity": {
         "expirationLength": 604800,
         "verifiers": [
-          "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
-          "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty"
+          "5EY1YLdXHs7w6iuuGrg6SDBonAjPz8eQi5nBzJGbqeJ1FXvG"
         ],
         "registrationBond": 100
       },

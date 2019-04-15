@@ -57,20 +57,24 @@ pub fn edgeware_config_gensis() -> GenesisConfig {
 	)];
 
 	testnet_genesis(
-		initial_authorities,
-		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(),
-		None,
-		None,
+		initial_authorities, // authorities
+		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(), // root key
+		Some(vec![ // endowed accounts
+			hex!["561f4a7512b6c4a0c9708dd60ca76bb85e2f4e35ff0c5d0c5a63b4148c44e476"].unchecked_into()
+		]),
+		Some(vec![ // identity verifiers
+			hex!["6d4b9f54cc2b3f16d17a1cbe641592ef1e9ce280c5e466c21cc6bcca11b6b5eb"].unchecked_into()
+		]), 
 	)
 }
 
 /// Edgeware testnet generator
 pub fn edgeware_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![
-	    "/ip4/157.230.218.41/tcp/30333/p2p/QmR55crQd55hvNr2i4oHpEEWAM4eJd3xskjcQzycq1Larq".to_string(),
-	    "/ip4/18.223.143.102/tcp/30333/p2p/QmNTaWsiKXCMwFabqFJfuY4zh8WW4o1iXtt8dN6LWDgkdv".to_string(),
-	    "/ip4/206.189.33.216/tcp/30333/p2p/QmRHGbxdxWgi8CttEsegzDVY38prr4yMngRfUqVkhqoXho".to_string(),
-	    "/ip4/157.230.125.18/tcp/30333/p2p/QmRgNsYHNEqT1wq5vXoHucUTE4svyQGBrwf8EY3TQJBXmM".to_string(),
+	    "/ip4/157.230.218.41/tcp/30333/p2p/QmNYiKrVuztYuL42gs5kHLTqvKsmEnE3GvJQ8ewcvwtSVF".to_string(),
+	    "/ip4/18.223.143.102/tcp/30333/p2p/QmdHoon1jbjeJfTdifknGefGrJHUNYgDDpnJBLLW1Pdt13".to_string(),
+	    "/ip4/206.189.33.216/tcp/30333/p2p/QmNc7rakvWY1QL6LL9ssTfKTWUhHUfzMvygYdyMLpLQCR7".to_string(),
+	    "/ip4/157.230.125.18/tcp/30333/p2p/QmTqM3sPbeaE7R2WaveJNg1Ma86dSFPTBHXxYSNjwcii1x".to_string(),
 	];
 
 	Ok(ChainSpec::from_genesis(
@@ -91,12 +95,6 @@ pub fn get_account_id_from_seed(seed: &str) -> AccountId {
 		.expect("static values are valid; qed")
 		.public()
 }
-
-// pub fn get_ed25519_account_id_from_seed(seed: &str) -> AccountId {
-// 	ed25519::Pair::from_string(&format!("//{}", seed), None)
-// 		.expect("static values are valid; qed")
-// 		.public()
-// }
 
 /// Helper function to generate AuthorityId from seed
 pub fn get_session_key_from_seed(seed: &str) -> AuthorityId {
