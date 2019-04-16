@@ -1,5 +1,3 @@
-[![CircleCI](https://circleci.com/gh/hicommonwealth/edgeware-node/tree/master.svg?style=svg)](https://circleci.com/gh/hicommonwealth/edgeware-node/tree/master)
-
 # edgeware-node
 
 A Parity Substrate node implementing [Edgeware](https://edgewa.re).

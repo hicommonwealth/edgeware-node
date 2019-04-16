@@ -8,7 +8,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
       echo "Running apt as sudo"
       SUDO_PREFIX='sudo'
   fi
-	$SUDO_PREFIX apt install -y cmake pkg-config libssl-dev git clang libclang-dev
+	$SUDO_PREFIX apt install -y build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev
 elif [[ "$OSTYPE" == "darwin"* ]]; then
 	echo "Found macbook"
 	brew install cmake pkg-config openssl git llvm
