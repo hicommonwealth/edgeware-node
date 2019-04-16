@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-use primitives::{ed25519::Public as AuthorityId, ed25519, sr25519, Pair, crypto::UncheckedInto};
-use node_primitives::AccountId;
+use substrate_primitives::{ed25519, sr25519, Pair, crypto::UncheckedInto};
+use edgeware_primitives::{AccountId, AuthorityId};
 use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig,
 	SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
 	SudoConfig, ContractConfig, GrandpaConfig, IndicesConfig, Permill, Perbill,
@@ -26,18 +26,19 @@ use hex_literal::{hex, hex_impl};
 use substrate_telemetry::TelemetryEndpoints;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const DEFAULT_PROTOCOL_ID: &str = "edg";
 
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
-pub fn edgeware_testnet_config() -> ChainSpec {
+pub fn edgeware_config() -> ChainSpec {
 	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.9/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
 }
 
-pub fn edgeware_config_gensis() -> GenesisConfig {
+pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let initial_authorities: Vec<(AccountId, AccountId, AuthorityId)> = vec![(
 		hex!["fcf5ef308894c9686b8302a23416ff57f4f92049b58ed3711a897d4627c56c94"].unchecked_into(), // 5HnNyuEyvLfTarQ4LLTSK4PpacMi2BTzmEYg4iKbVtSEU53C
 		hex!["78ca2addb982a4a39262d68ed63fb4a8b0dfd73b7a38e0190f77b0cf155f94e0"].unchecked_into(), // 5Eo5fD9gBaMrLoLTeABXY4KoDL7mb4QtrzSQBMzFDJhhw57q
@@ -69,7 +70,7 @@ pub fn edgeware_config_gensis() -> GenesisConfig {
 }
 
 /// Edgeware testnet generator
-pub fn edgeware_config() -> Result<ChainSpec, String> {
+pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![
 	    "/ip4/157.230.218.41/tcp/30333/p2p/QmNYiKrVuztYuL42gs5kHLTqvKsmEnE3GvJQ8ewcvwtSVF".to_string(),
 	    "/ip4/18.223.143.102/tcp/30333/p2p/QmdHoon1jbjeJfTdifknGefGrJHUNYgDDpnJBLLW1Pdt13".to_string(),
@@ -78,12 +79,12 @@ pub fn edgeware_config() -> Result<ChainSpec, String> {
 	];
 
 	Ok(ChainSpec::from_genesis(
-		"Edgeware",
-		"edgeware",
-		edgeware_config_gensis,
+		"Edgeware Testnet",
+		"edgeware_testnet",
+		edgeware_testnet_config_gensis,
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
-		None,
+		Some(DEFAULT_PROTOCOL_ID),
 		None,
 		None
 	))
@@ -156,7 +157,7 @@ pub fn testnet_genesis(
 	const STASH: u128 = 100 * DOLLARS;
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
-			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
+			code: include_bytes!("../../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
 			authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
 		}),
 		system: None,
@@ -308,7 +309,7 @@ pub fn cwci_testnet_genesis(
 	const STASH: u128 = 100 * DOLLARS;
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
-			code: include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
+			code: include_bytes!("../../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
 			authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
 		}),
 		system: None,
@@ -429,7 +430,7 @@ fn development_config_genesis() -> GenesisConfig {
 
 /// Development config (single validator Alice)
 pub fn development_config() -> ChainSpec {
-	ChainSpec::from_genesis("Development", "dev", development_config_genesis, vec![], None, None, None, None)
+	ChainSpec::from_genesis("Development", "dev", development_config_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None, None)
 }
 
 fn local_testnet_genesis() -> GenesisConfig {
@@ -446,7 +447,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 
 /// Local testnet config (multivalidator Alice + Bob)
 pub fn local_testnet_config() -> ChainSpec {
-	ChainSpec::from_genesis("Local Testnet", "local_testnet", local_testnet_genesis, vec![], None, None, None, None)
+	ChainSpec::from_genesis("Local Testnet", "local_testnet", local_testnet_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None, None)
 }
 
 
@@ -464,5 +465,28 @@ fn cwci_config_genesis() -> GenesisConfig {
 
 /// Local testnet config (multivalidator Alice + Bob)
 pub fn cwci_testnet_config() -> ChainSpec {
-	ChainSpec::from_genesis("Commonwealth CI Testnet", "cwci_testnet", cwci_config_genesis, vec![], None, None, None, None)
+	ChainSpec::from_genesis("Commonwealth CI Testnet", "cwci_testnet", cwci_config_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None, None)
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use service_test;
+	use crate::service::Factory;
+
+	fn local_testnet_genesis_instant() -> GenesisConfig {
+		let mut genesis = local_testnet_genesis();
+		genesis.timestamp = Some(TimestampConfig { minimum_period: 1 });
+		genesis
+	}
+
+	/// Local testnet config (multivalidator Alice + Bob)
+	pub fn integration_test_config() -> ChainSpec {
+		ChainSpec::from_genesis("Integration Test", "test", local_testnet_genesis_instant, vec![], None, None, None, None)
+	}
+
+	#[test]
+	fn test_connectivity() {
+		service_test::connectivity::<Factory>(integration_test_config());
+	}
 }

@@ -18,21 +18,47 @@
 
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
+#[macro_use]
+extern crate log;
+#[macro_use]
+extern crate hex_literal;
+
+use edgeware_executor;
+
+use substrate_primitives as primitives;
+use substrate_client as client;
+#[macro_use]
+extern crate substrate_service as service;
+use substrate_consensus_aura as aura;
+use substrate_finality_grandpa as grandpa;
+use substrate_network as network;
+use substrate_transaction_pool as transaction_pool;
+
+
+use substrate_inherents as inherents;
+
+pub mod chain_spec;
+
 use std::sync::Arc;
 use std::time::Duration;
-
-use client;
-use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
-use grandpa;
-use primitives::{Pair as PairT, ed25519};
-use node_primitives::Block;
-use edgeware_runtime::{GenesisConfig, RuntimeApi};
-use substrate_service::{
-	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
-	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor, TaskExecutor,
+use tokio::runtime::TaskExecutor;
+use service::{FactoryFullConfiguration, FullBackend, LightBackend, FullExecutor, LightExecutor};
+use transaction_pool::txpool::{Pool as TransactionPool};
+use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
+use inherents::InherentDataProviders;
+pub use service::{
+	Roles, PruningMode, TransactionPoolOptions, ComponentClient,
+	ErrorKind, Error, ComponentBlock, LightComponents, FullComponents,
+	FullClient, LightClient, Components, Service, ServiceFactory
 };
-use transaction_pool::{self, txpool::{Pool as TransactionPool}};
-use substrate_inherents::InherentDataProviders;
+
+use primitives::{ed25519, crypto::Pair};
+use edgeware_primitives::{Block};
+use edgeware_runtime::{GenesisConfig, RuntimeApi};
+pub use client::{backend::Backend, runtime_api::Core as CoreApi, ExecutionStrategy};
+pub use primitives::{Blake2Hasher};
+pub use sr_primitives::traits::ProvideRuntimeApi;
+pub use chain_spec::ChainSpec;
 use network::construct_simple_protocol;
 use substrate_service::construct_service_factory;
 use log::info;
@@ -43,15 +69,18 @@ construct_simple_protocol! {
 }
 
 /// Node specific configuration
-pub struct NodeConfig<F: substrate_service::ServiceFactory> {
+pub struct NodeConfig {
 	/// grandpa connection to import block
 	// FIXME #1134 rather than putting this on the config, let's have an actual intermediate setup state
-	pub grandpa_import_setup: Option<(Arc<grandpa::BlockImportForService<F>>, grandpa::LinkHalfForService<F>)>,
+	pub grandpa_import_setup: Option<(
+		Arc<grandpa::BlockImportForService<Factory>>,
+		grandpa::LinkHalfForService<Factory>
+	)>,
 	inherent_data_providers: InherentDataProviders,
 }
 
-impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
-	fn default() -> NodeConfig<F> {
+impl Default for NodeConfig {
+	fn default() -> NodeConfig {
 		NodeConfig {
 			grandpa_import_setup: None,
 			inherent_data_providers: InherentDataProviders::new(),
@@ -59,22 +88,18 @@ impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
 	}
 }
 
-pub use substrate_executor::NativeExecutor;
-use substrate_executor::native_executor_instance;
-native_executor_instance!(pub Executor, edgeware_runtime::api::dispatch, edgeware_runtime::native_version, include_bytes!("../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm"));
-
 construct_service_factory! {
 	struct Factory {
 		Block = Block,
 		RuntimeApi = RuntimeApi,
 		NetworkProtocol = NodeProtocol { |config| Ok(NodeProtocol::new()) },
-		RuntimeDispatch = Executor,
+		RuntimeDispatch = edgeware_executor::Executor,
 		FullTransactionPoolApi = transaction_pool::ChainApi<client::Client<FullBackend<Self>, FullExecutor<Self>, Block, RuntimeApi>, Block>
 			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
 		LightTransactionPoolApi = transaction_pool::ChainApi<client::Client<LightBackend<Self>, LightExecutor<Self>, Block, RuntimeApi>, Block>
 			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
 		Genesis = GenesisConfig,
-		Configuration = NodeConfig<Self>,
+		Configuration = NodeConfig,
 		FullService = FullComponents<Self>
 			{ |config: FactoryFullConfiguration<Self>, executor: TaskExecutor|
 				FullComponents::<Factory>::new(config, executor) },
@@ -217,5 +242,4 @@ mod tests {
 		};
 		service_test::sync::<Factory, _, _>(chain_spec::integration_test_config(), block_factory, extrinsic_factory);
 	}
-
 }
