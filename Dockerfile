@@ -12,6 +12,7 @@ RUN install_clean build-essential \
     curl
 
 ARG PROFILE=release
+ARG VERSIONTAG=v0.1.9
 WORKDIR /edgeware
 
 COPY . /edgeware
@@ -36,7 +37,7 @@ LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
 COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
-COPY --from=builder /edgeware/testnets/v0.1.8/edgeware.json /usr/local/bin/testnets/v0.1.8/edgeware.json
+COPY --from=builder /edgeware/testnets/$VERSIONTAG/edgeware.json /usr/local/bin/testnets/$VERSIONTAG/edgeware.json
 
 RUN rm -rf /usr/lib/python* && \
 	mkdir -p /root/.local/share && \
