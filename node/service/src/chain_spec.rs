@@ -32,7 +32,7 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.1.9/edgeware.json")) {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.2.0/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
