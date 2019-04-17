@@ -14,56 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-extern crate substrate_cli as cli;
+#![warn(missing_docs)]
+#![warn(unused_extern_crates)]
 
-use service;
-use tokio::prelude::Future;
-use tokio::runtime::{Builder as RuntimeBuilder, Runtime};
-pub use substrate_cli::{VersionInfo, IntoExit, NoCustom};
-use substrate_service::{ServiceFactory, Roles as ServiceRoles};
-use chain_spec;
+extern crate edgeware_service as service;
+
+use substrate_cli as cli;
+use exit_future;
+
+#[macro_use]
+extern crate log;
+
+mod chain_spec;
+
 use std::ops::Deref;
-pub use substrate_cli::error;
+use chain_spec::ChainSpec;
+use futures::Future;
+use tokio::runtime::Runtime;
 
-/// The chain specification option.
-#[derive(Clone, Debug)]
-pub enum ChainSpec {
-	/// Whatever the current runtime is, with just Alice as an auth.
-	Development,
-	/// Whatever the current runtime is, with simple Alice/Bob auths.
-	LocalTestnet,
-	/// Edgeware testnet.
-	Edgeware,
-	EdgewareTestnet,
-	// Commonwealth CI testnet
-	CWCITestnet,
-}
 
-/// Get a chain config from a spec setting.
-impl ChainSpec {
-	pub(crate) fn load(self) -> Result<chain_spec::ChainSpec, String> {
-		Ok(match self {
-			ChainSpec::Edgeware => chain_spec::edgeware_config()?,
-			ChainSpec::EdgewareTestnet => chain_spec::edgeware_testnet_config(),
-			ChainSpec::Development => chain_spec::development_config(),
-			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
-			ChainSpec::CWCITestnet => chain_spec::cwci_testnet_config(),
-		})
-	}
+pub use service::{ServiceFactory, Factory};
 
-	pub(crate) fn from(s: &str) -> Option<Self> {
-		match s {
-			"dev" => Some(ChainSpec::Development),
-			"local" => Some(ChainSpec::LocalTestnet),
-			"" | "edge" => Some(ChainSpec::Edgeware),
-			"edgeware" => Some(ChainSpec::EdgewareTestnet),
-			"cwci" => Some(ChainSpec::CWCITestnet),
-			_ => None,
-		}
-	}
-}
+pub use cli::{VersionInfo, IntoExit, NoCustom};
+pub use cli::error;
+pub use tokio::runtime::TaskExecutor;
 
-fn load_spec(id: &str) -> Result<Option<chain_spec::ChainSpec>, String> {
+fn load_spec(id: &str) -> Result<Option<service::ChainSpec>, String> {
 	Ok(match ChainSpec::from(id) {
 		Some(spec) => Some(spec.load()?),
 		None => None,
@@ -77,28 +53,28 @@ pub fn run<I, T, E>(args: I, exit: E, version: cli::VersionInfo) -> error::Resul
 	E: IntoExit,
 {
 	cli::parse_and_execute::<service::Factory, NoCustom, NoCustom, _, _, _, _, _>(
-		load_spec, &version, "substrate-node", args, exit,
+		load_spec, &version, "edgeware-node", args, exit,
 		|exit, _custom_args, config| {
 			info!("{}", version.name);
 			info!("  version {}", config.full_version());
-			info!("  by Commonwealth Labs, 2018-2019");
+			info!("  by {}, 2018-2019", version.author);
 			info!("Chain specification: {}", config.chain_spec.name());
 			info!("Node name: {}", config.name);
 			info!("Roles: {:?}", config.roles);
-			let runtime = RuntimeBuilder::new().name_prefix("main-tokio-").build()
-				.map_err(|e| format!("{:?}", e))?;
+			let runtime = Runtime::new().map_err(|e| format!("{:?}", e))?;
 			let executor = runtime.executor();
 			match config.roles {
-				ServiceRoles::LIGHT => run_until_exit(
-					runtime,
-					service::Factory::new_light(config, executor).map_err(|e| format!("{:?}", e))?,
-					exit
-				),
+				service::Roles::LIGHT =>
+					run_until_exit(
+						runtime,
+						Factory::new_light(config, executor).map_err(|e| format!("{:?}", e))?,
+						exit
+					),
 				_ => run_until_exit(
-					runtime,
-					service::Factory::new_full(config, executor).map_err(|e| format!("{:?}", e))?,
-					exit
-				),
+						runtime,
+						Factory::new_full(config, executor).map_err(|e| format!("{:?}", e))?,
+						exit
+					),
 			}.map_err(|e| format!("{:?}", e))
 		}
 	).map_err(Into::into).map(|_| ())
@@ -110,8 +86,8 @@ fn run_until_exit<T, C, E>(
 	e: E,
 ) -> error::Result<()>
 	where
-	    T: Deref<Target=substrate_service::Service<C>>,
-		C: substrate_service::Components,
+	    T: Deref<Target=service::Service<C>>,
+		C: service::Components,
 		E: IntoExit,
 {
 	let (exit_send, exit) = exit_future::signal();
