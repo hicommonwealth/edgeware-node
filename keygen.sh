@@ -1,17 +1,17 @@
-default=$(./target/release/subkey generate | grep -o '`.*`' | tr -d '`')
+default=$(subkey generate | grep -o '`.*`' | tr -d '`')
 mnemonic=${1:-$default}
 
-stash_seed=$(./target/release/subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '1!d' | tr -d ': ')
-stash_pubkey=$(./target/release/subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '2!d' | tr -d ': ')
-stash_address=$(./target/release/subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '3!d' | tr -d ': ')
+stash_seed=$(subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '1!d' | tr -d ': ')
+stash_pubkey=$(subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '2!d' | tr -d ': ')
+stash_address=$(subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '3!d' | tr -d ': ')
 
-controller_seed=$(./target/release/subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '1!d' | tr -d ': ')
-controller_pubkey=$(./target/release/subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '2!d' | tr -d ': ')
-controller_address=$(./target/release/subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '3!d' | tr -d ': ')
+controller_seed=$(subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '1!d' | tr -d ': ')
+controller_pubkey=$(subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '2!d' | tr -d ': ')
+controller_address=$(subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '3!d' | tr -d ': ')
 
-authority_seed=$(./target/release/subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '1!d' | tr -d ': ')
-authority_pubkey=$(./target/release/subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '2!d' | tr -d ': ')
-authority_address=$(./target/release/subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '3!d' | tr -d ': ')
+authority_seed=$(subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '1!d' | tr -d ': ')
+authority_pubkey=$(subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '2!d' | tr -d ': ')
+authority_address=$(subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '3!d' | tr -d ': ')
 
 echo "Mnemonic: ${mnemonic}"
 echo "Stash seed: ${stash_seed}"

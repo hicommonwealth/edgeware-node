@@ -35,5 +35,5 @@ if [ -z "$DEBUG_BUILD" ]; then
     RELEASE="--release"
 fi
 
+cargo install --force --git https://github.com/paritytech/substrate subkey
 cargo build $RELEASE
-cd subkey && cargo build --release
