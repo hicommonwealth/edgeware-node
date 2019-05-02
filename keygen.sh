@@ -1,3 +1,7 @@
+if [[ -z $(subkey) ]]; then
+	cargo install --force --git https://github.com/paritytech/substrate subkey
+fi
+
 new_mnemonic=$(subkey generate | grep -o '`.*`' | tr -d '`')
 mnemonic=${1:-$new_mnemonic}
 

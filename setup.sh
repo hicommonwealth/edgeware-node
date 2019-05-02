@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	echo "Found linux"
   # check for root
@@ -35,5 +36,5 @@ if [ -z "$DEBUG_BUILD" ]; then
     RELEASE="--release"
 fi
 
-cargo install --force --git https://github.com/paritytech/substrate subkey
+./build.sh
 cargo build $RELEASE
