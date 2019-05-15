@@ -7,6 +7,14 @@ If your device is clean (such as a fresh cloud VM) you can use this script, othe
 ```
 ./setup.sh
 ```
+To create a keypair, run
+```
+./keygen.sh
+```
+which will generate a mnemonic and 3 ed25519 keys. To create more keys you can then run the following.
+```
+subkey generate
+```
 Then proceed to the *Running* instructions or follow the instructions below for the manual setup.
 
 ### Initial Setup
