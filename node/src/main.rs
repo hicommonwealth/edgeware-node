@@ -22,18 +22,14 @@ extern crate edgeware_cli as cli;
 extern crate ctrlc;
 extern crate futures;
 
-#[macro_use]
-extern crate error_chain;
-
-use cli::{VersionInfo};
+use cli::VersionInfo;
 use futures::sync::oneshot;
 use futures::{future, Future};
-
 use std::cell::RefCell;
 
 // handles ctrl-c
 struct Exit;
-impl cli::IntoExit for Exit {
+impl edgeware_cli::IntoExit for Exit {
 	type Exit = future::MapErr<oneshot::Receiver<()>, fn(oneshot::Canceled) -> ()>;
 	fn into_exit(self) -> Self::Exit {
 		// can't use signal directly here because CtrlC takes only `Fn`.
@@ -50,9 +46,7 @@ impl cli::IntoExit for Exit {
 	}
 }
 
-error_chain::quick_main!(run);
-
-fn run() -> cli::error::Result<()> {
+fn main() {
 	let version = VersionInfo {
 		name: "Edgeware",
 		commit: env!("VERGEN_SHA_SHORT"),
@@ -62,5 +56,9 @@ fn run() -> cli::error::Result<()> {
 		description: "Edgeware Client Node",
 		support_url: "https://github.com/hicommonwealth/edgeware-node/issues/new",
 	};
-	cli::run(::std::env::args(), Exit, version)
+
+	if let Err(e) = edgeware_cli::run(::std::env::args(), Exit, version) {
+		eprintln!("Error starting the node: {}\n\n{:?}", e, e);
+		std::process::exit(1)
+	}
 }

@@ -73,7 +73,6 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 * [Identity](modules/edge-identity)
 * [Governance](modules/edge-governance)
 * [Voting](modules/edge-voting)
-* [Delegation](modules/edge-delegation)
 
 ### SRML
 

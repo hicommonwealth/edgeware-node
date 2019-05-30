@@ -243,7 +243,8 @@ mod tests {
 				System::events(),
 				vec![EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::identity(RawEvent::Register(identity_hash, public, expires_at))
+					event: Event::identity(RawEvent::Register(identity_hash, public, expires_at)),
+					topics: vec![],
 				}]
 			);
 			assert_eq!(Identity::identities(), vec![identity_hash]);
@@ -355,11 +356,13 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
+						topics: vec![],
 					}
 				]
 			);
@@ -403,11 +406,13 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
+						topics: vec![],
 					}
 				]
 			);
@@ -507,15 +512,18 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec()))
+						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec())),
+						topics: vec![],
 					}
 				]
 			);
@@ -557,7 +565,8 @@ mod tests {
 				events[events.len() - 1],
 				EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode()))
+						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode())),
+						topics: vec![],
 				}
 			);
 		});
@@ -693,11 +702,13 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Expired(identity_hash))
+						event: Event::identity(RawEvent::Expired(identity_hash)),
+						topics: vec![],
 					},
 				]
 			);

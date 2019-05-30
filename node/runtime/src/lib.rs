@@ -29,7 +29,6 @@ extern crate parity_codec;
 extern crate substrate_primitives;
 
 extern crate version;
-extern crate edge_delegation;
 extern crate edge_governance;
 extern crate edge_identity;
 extern crate edge_voting;
@@ -54,7 +53,6 @@ extern crate offchain_primitives;
 extern crate node_primitives;
 extern crate consensus_aura;
 
-use edge_delegation::delegation;
 use edge_governance::governance;
 use edge_identity::identity;
 use edge_voting::voting;
@@ -73,7 +71,7 @@ use client::{
 use runtime_primitives::{ApplyResult, generic, create_runtime_str};
 use runtime_primitives::transaction_validity::TransactionValidity;
 use runtime_primitives::traits::{
-	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup, CurrencyToVoteHandler,
+	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup, Convert,
 	AuthorityIdFor,
 };
 use version::RuntimeVersion;
@@ -110,6 +108,20 @@ pub fn native_version() -> NativeVersion {
 		runtime_version: VERSION,
 		can_author_with: Default::default(),
 	}
+}
+
+pub struct CurrencyToVoteHandler;
+
+impl CurrencyToVoteHandler {
+	fn factor() -> u128 { (Balances::total_issuance() / u64::max_value() as u128).max(1) }
+}
+
+impl Convert<u128, u64> for CurrencyToVoteHandler {
+	fn convert(x: u128) -> u64 { (x / Self::factor()) as u64 }
+}
+
+impl Convert<u128, u128> for CurrencyToVoteHandler {
+	fn convert(x: u128) -> u128 { x * Self::factor() }
 }
 
 impl system::Trait for Runtime {
@@ -233,10 +245,6 @@ impl finality_tracker::Trait for Runtime {
 	type OnFinalizationStalled = grandpa::SyncedAuthorities<Runtime>;
 }
 
-impl delegation::Trait for Runtime {
-	type Event = Event;
-}
-
 impl voting::Trait for Runtime {
 	type Event = Event;
 }
@@ -276,7 +284,6 @@ construct_runtime!(
 		Contract: contract::{Module, Call, Storage, Config<T>, Event<T>},
 		Sudo: sudo,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
-		Delegation: delegation::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
 	}
@@ -297,7 +304,7 @@ pub type UncheckedExtrinsic = generic::UncheckedMortalCompactExtrinsic<Address, 
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Index, Call>;
 /// Executive: handles dispatch to the various modules.
-pub type Executive = executive::Executive<Runtime, Block, system::ChainContext<Runtime>, Balances, AllModules>;
+pub type Executive = executive::Executive<Runtime, Block, system::ChainContext<Runtime>, Balances, Runtime, AllModules>;
 
 impl_runtime_apis! {
 	impl client_api::Core<Block> for Runtime {

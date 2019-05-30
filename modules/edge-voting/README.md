@@ -1,5 +1,5 @@
 # edge_voting
-This module contains logic for voting. It consumes the delegation module to tally votes and should similarly be consumed by all other modules that want to handle voting. It currently supports binary and multi-option elections with optional commit/reveal schemes using the Blake2Hash function as the hashing algorithm.
+This module contains logic for voting. It currently supports binary and multi-option elections with optional commit/reveal schemes using the Blake2Hash function as the hashing algorithm.
 
 # Setup
 Install rust or update to the latest versions.

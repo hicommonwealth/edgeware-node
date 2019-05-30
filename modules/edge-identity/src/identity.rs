@@ -35,7 +35,7 @@ extern crate srml_balances as balances;
 use srml_support::traits::{Currency, ReservableCurrency};
 
 use rstd::prelude::*;
-use runtime_primitives::traits::{Zero, Hash, As};
+use runtime_primitives::traits::{Zero, Hash};
 use runtime_support::dispatch::Result;
 use runtime_support::{StorageMap, StorageValue};
 use system::ensure_signed;
@@ -367,6 +367,6 @@ decl_storage! {
 		/// Verifier set
 		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
 		/// Registration bond
-		pub RegistrationBond get(registration_bond) config(): BalanceOf<T> = BalanceOf::<T>::sa(10);
+		pub RegistrationBond get(registration_bond) config(): BalanceOf<T> = 10.into();
 	}
 }

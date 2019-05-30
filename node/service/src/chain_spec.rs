@@ -19,7 +19,7 @@ use edgeware_primitives::{AccountId, AuthorityId};
 use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig,
 	SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
 	SudoConfig, ContractConfig, GrandpaConfig, IndicesConfig, Permill, Perbill,
-	IdentityConfig, GovernanceConfig, DelegationConfig};
+	IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
 use hex_literal::{hex, hex_impl};
@@ -185,12 +185,12 @@ pub fn testnet_genesis(
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			offline_slash: Perbill::from_billionths(1_000_000),
-			session_reward: Perbill::from_billionths(2_065),
+			offline_slash: Perbill::from_parts(1_000_000),
+			session_reward: Perbill::from_parts(2_065),
 			current_session_reward: 0,
 			validator_count: 7,
 			sessions_per_era: 12,
-			bonding_duration: 60 * MINUTES,
+			bonding_duration: 12,
 			offline_slash_grace: 4,
 			minimum_validator_count: 4,
 			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
@@ -230,6 +230,12 @@ pub fn testnet_genesis(
 			burn: Permill::from_percent(50),
 		}),
 		contract: Some(ContractConfig {
+			signed_claim_handicap: 2,
+			rent_byte_price: 4,
+			rent_deposit_offset: 1000,
+			storage_size_offset: 8,
+			surcharge_reward: 150,
+			tombstone_deposit: 16,
 			transaction_base_fee: 1 * CENTS,
 			transaction_byte_fee: 10 * MILLICENTS,
 			transfer_fee: 1 * CENTS,
@@ -243,7 +249,7 @@ pub fn testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: root_key,
+			key: endowed_accounts[0].clone(),
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
@@ -256,11 +262,6 @@ pub fn testnet_genesis(
 		governance: Some(GovernanceConfig {
 			voting_length: 604800, // 7 days
 			proposal_creation_bond: 100,
-
-		}),
-		delegation: Some(DelegationConfig {
-			delegation_depth: 5,
-			_genesis_phantom_data: Default::default(),
 		}),
 	}
 }
@@ -337,22 +338,22 @@ pub fn cwci_testnet_genesis(
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			offline_slash: Perbill::from_billionths(1_000_000),
-			session_reward: Perbill::from_billionths(2_065),
+			offline_slash: Perbill::from_parts(1_000_000),
+			session_reward: Perbill::from_parts(2_065),
 			current_session_reward: 0,
 			validator_count: 7,
 			sessions_per_era: 12,
-			bonding_duration: 60 * MINUTES,
+			bonding_duration: 12,
 			offline_slash_grace: 4,
 			minimum_validator_count: 4,
 			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
 			invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 		}),
 		democracy: Some(DemocracyConfig {
-			launch_period: 6,    // 1 day per public referendum
-			voting_period: 6,    // 3 days to discuss & vote on an active referendum
+			launch_period: 10 * MINUTES,    // 1 day per public referendum
+			voting_period: 10 * MINUTES,    // 3 days to discuss & vote on an active referendum
 			minimum_deposit: 50 * DOLLARS,    // 12000 as the minimum deposit for a referendum
-			public_delay: 0,
+			public_delay: 10 * MINUTES,
 			max_lock_periods: 6,
 		}),
 		council_seats: Some(CouncilSeatsConfig {
@@ -361,15 +362,15 @@ pub fn cwci_testnet_genesis(
 			voter_bond: 1 * DOLLARS,
 			present_slash_per_voter: 1 * CENTS,
 			carry_count: 6,
-			presentation_duration: 4,
-			approval_voting_period: 6,
-			term_duration: 1000,
-			desired_seats: 4,
+			presentation_duration: 1 * DAYS,
+			approval_voting_period: 2 * DAYS,
+			term_duration: 28 * DAYS,
+			desired_seats: 0,
 			inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
 		}),
 		council_voting: Some(CouncilVotingConfig {
-			cooloff_period: 5 * MINUTES,
-			voting_period: 6,
+			cooloff_period: 4 * DAYS,
+			voting_period: 1 * DAYS,
 			enact_delay_period: 0,
 		}),
 		timestamp: Some(TimestampConfig {
@@ -382,6 +383,12 @@ pub fn cwci_testnet_genesis(
 			burn: Permill::from_percent(50),
 		}),
 		contract: Some(ContractConfig {
+			signed_claim_handicap: 2,
+			rent_byte_price: 4,
+			rent_deposit_offset: 1000,
+			storage_size_offset: 8,
+			surcharge_reward: 150,
+			tombstone_deposit: 16,
 			transaction_base_fee: 1 * CENTS,
 			transaction_byte_fee: 10 * MILLICENTS,
 			transfer_fee: 1 * CENTS,
@@ -395,7 +402,7 @@ pub fn cwci_testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: root_key,
+			key: endowed_accounts[0].clone(),
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
@@ -409,10 +416,6 @@ pub fn cwci_testnet_genesis(
 			voting_length: 4,
 			proposal_creation_bond: 100,
 
-		}),
-		delegation: Some(DelegationConfig {
-			delegation_depth: 5,
-			_genesis_phantom_data: Default::default(),
 		}),
 	}
 }
@@ -472,7 +475,7 @@ pub fn cwci_testnet_config() -> ChainSpec {
 mod tests {
 	use super::*;
 	use service_test;
-	use crate::service::Factory;
+	use crate::Factory;
 
 	fn local_testnet_genesis_instant() -> GenesisConfig {
 		let mut genesis = local_testnet_genesis();

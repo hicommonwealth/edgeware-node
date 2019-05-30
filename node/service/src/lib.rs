@@ -23,8 +23,6 @@ extern crate log;
 #[macro_use]
 extern crate hex_literal;
 
-use edgeware_executor;
-
 use substrate_primitives as primitives;
 use substrate_client as client;
 #[macro_use]
@@ -41,27 +39,32 @@ pub mod chain_spec;
 
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::runtime::TaskExecutor;
-use service::{FactoryFullConfiguration, FullBackend, LightBackend, FullExecutor, LightExecutor};
+
+use client::{LongestChain};
+use grandpa::{FinalityProofProvider as GrandpaFinalityProofProvider};
 use transaction_pool::txpool::{Pool as TransactionPool};
 use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
 use inherents::InherentDataProviders;
 pub use service::{
-	Roles, PruningMode, TransactionPoolOptions, ComponentClient,
-	ErrorKind, Error, ComponentBlock, LightComponents, FullComponents,
-	FullClient, LightClient, Components, Service, ServiceFactory
+	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
+	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor, TaskExecutor,
+	error::{Error as ServiceError},
 };
 
+
 use primitives::{ed25519, crypto::Pair};
-use edgeware_primitives::{Block};
-use edgeware_runtime::{GenesisConfig, RuntimeApi};
 pub use client::{backend::Backend, runtime_api::Core as CoreApi, ExecutionStrategy};
 pub use primitives::{Blake2Hasher};
 pub use sr_primitives::traits::ProvideRuntimeApi;
 pub use chain_spec::ChainSpec;
 use network::construct_simple_protocol;
-use substrate_service::construct_service_factory;
+use substrate_service::{construct_service_factory, TelemetryOnConnect};
 use log::info;
+
+
+use edgeware_executor;
+use edgeware_primitives::{Block};
+use edgeware_runtime::{GenesisConfig, RuntimeApi};
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -69,18 +72,15 @@ construct_simple_protocol! {
 }
 
 /// Node specific configuration
-pub struct NodeConfig {
+pub struct NodeConfig<F: substrate_service::ServiceFactory> {
 	/// grandpa connection to import block
 	// FIXME #1134 rather than putting this on the config, let's have an actual intermediate setup state
-	pub grandpa_import_setup: Option<(
-		Arc<grandpa::BlockImportForService<Factory>>,
-		grandpa::LinkHalfForService<Factory>
-	)>,
+	pub grandpa_import_setup: Option<(Arc<grandpa::BlockImportForService<F>>, grandpa::LinkHalfForService<F>)>,
 	inherent_data_providers: InherentDataProviders,
 }
 
-impl Default for NodeConfig {
-	fn default() -> NodeConfig {
+impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
+	fn default() -> NodeConfig<F> {
 		NodeConfig {
 			grandpa_import_setup: None,
 			inherent_data_providers: InherentDataProviders::new(),
@@ -99,7 +99,7 @@ construct_service_factory! {
 		LightTransactionPoolApi = transaction_pool::ChainApi<client::Client<LightBackend<Self>, LightExecutor<Self>, Block, RuntimeApi>, Block>
 			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
 		Genesis = GenesisConfig,
-		Configuration = NodeConfig,
+		Configuration = NodeConfig<Self>,
 		FullService = FullComponents<Self>
 			{ |config: FactoryFullConfiguration<Self>, executor: TaskExecutor|
 				FullComponents::<Factory>::new(config, executor) },
@@ -113,14 +113,16 @@ construct_service_factory! {
 					let proposer = Arc::new(substrate_basic_authorship::ProposerFactory {
 						client: service.client(),
 						transaction_pool: service.transaction_pool(),
-						inherents_pool: service.inherents_pool(),
 					});
 
 					let client = service.client();
+					let select_chain = service.select_chain()
+						.ok_or(ServiceError::SelectChainRequired)?;
 					executor.spawn(start_aura(
 						SlotDuration::get_or_compute(&*client)?,
 						key.clone(),
 						client,
+						select_chain,
 						block_import.clone(),
 						proposer,
 						service.network(),
@@ -138,19 +140,40 @@ construct_service_factory! {
 					local_key
 				};
 
-				executor.spawn(grandpa::run_grandpa(
-					grandpa::Config {
-						local_key,
-						// FIXME #1578 make this available through chainspec
-						gossip_duration: Duration::from_millis(333),
-						justification_period: 4096,
-						name: Some(service.config.name.clone())
+				let config = grandpa::Config {
+					local_key,
+					// FIXME #1578 make this available through chainspec
+					gossip_duration: Duration::from_millis(333),
+					justification_period: 4096,
+					name: Some(service.config.name.clone())
+				};
+
+				match config.local_key {
+					None => {
+						executor.spawn(grandpa::run_grandpa_observer(
+							config,
+							link_half,
+							service.network(),
+							service.on_exit(),
+						)?);
 					},
-					link_half,
-					service.network(),
-					service.config.custom.inherent_data_providers.clone(),
-					service.on_exit(),
-				)?);
+					Some(_) => {
+						let telemetry_on_connect = TelemetryOnConnect {
+							on_exit: Box::new(service.on_exit()),
+							telemetry_connection_sinks: service.telemetry_on_connect_stream(),
+							executor: &executor,
+						};
+						let grandpa_config = grandpa::GrandpaParams {
+							config: config,
+							link: link_half,
+							network: service.network(),
+							inherent_data_providers: service.config.custom.inherent_data_providers.clone(),
+							on_exit: service.on_exit(),
+							telemetry_on_connect: Some(telemetry_on_connect),
+						};
+						executor.spawn(grandpa::run_grandpa_voter(grandpa_config)?);
+					},
+				}
 
 				Ok(service)
 			}
@@ -158,11 +181,11 @@ construct_service_factory! {
 		LightService = LightComponents<Self>
 			{ |config, executor| <LightComponents<Factory>>::new(config, executor) },
 		FullImportQueue = AuraImportQueue<Self::Block>
-			{ |config: &mut FactoryFullConfiguration<Self> , client: Arc<FullClient<Self>>| {
+			{ |config: &mut FactoryFullConfiguration<Self> , client: Arc<FullClient<Self>>, select_chain: Self::SelectChain| {
 				let slot_duration = SlotDuration::get_or_compute(&*client)?;
 				let (block_import, link_half) =
-					grandpa::block_import::<_, _, _, RuntimeApi, FullClient<Self>>(
-						client.clone(), client.clone()
+					grandpa::block_import::<_, _, _, RuntimeApi, FullClient<Self>, _>(
+						client.clone(), client.clone(), select_chain
 					)?;
 				let block_import = Arc::new(block_import);
 				let justification_import = block_import.clone();
@@ -173,6 +196,8 @@ construct_service_factory! {
 					slot_duration,
 					block_import,
 					Some(justification_import),
+					None,
+					None,
 					client,
 					NothingExtra,
 					config.custom.inherent_data_providers.clone(),
@@ -180,16 +205,41 @@ construct_service_factory! {
 			}},
 		LightImportQueue = AuraImportQueue<Self::Block>
 			{ |config: &FactoryFullConfiguration<Self>, client: Arc<LightClient<Self>>| {
+				#[allow(deprecated)]
+				let fetch_checker = client.backend().blockchain().fetcher()
+					.upgrade()
+					.map(|fetcher| fetcher.checker().clone())
+					.ok_or_else(|| "Trying to start light import queue without active fetch checker")?;
+				let block_import = grandpa::light_block_import::<_, _, _, RuntimeApi, LightClient<Self>>(
+					client.clone(), Arc::new(fetch_checker), client.clone()
+				)?;
+				let block_import = Arc::new(block_import);
+				let finality_proof_import = block_import.clone();
+				let finality_proof_request_builder = finality_proof_import.create_finality_proof_request_builder();
+
 				import_queue::<_, _, _, ed25519::Pair>(
 					SlotDuration::get_or_compute(&*client)?,
-					client.clone(),
+					block_import,
 					None,
+					Some(finality_proof_import),
+					Some(finality_proof_request_builder),
 					client,
 					NothingExtra,
 					config.custom.inherent_data_providers.clone(),
 				).map_err(Into::into)
+			}},
+		SelectChain = LongestChain<FullBackend<Self>, Self::Block>
+			{ |config: &FactoryFullConfiguration<Self>, client: Arc<FullClient<Self>>| {
+				#[allow(deprecated)]
+				Ok(LongestChain::new(
+					client.backend().clone(),
+					client.import_lock()
+				))
 			}
 		},
+		FinalityProofProvider = { |client: Arc<FullClient<Self>>| {
+			Ok(Some(Arc::new(GrandpaFinalityProofProvider::new(client.clone(), client)) as _))
+		}},
 	}
 }
 

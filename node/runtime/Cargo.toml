@@ -39,7 +39,6 @@ hex-literal = { version = "0.1.0", optional = true }
 serde = { version = "1.0", optional = true }
 substrate-keyring = { git = "https://github.com/paritytech/substrate", optional = true }
 edge-identity = { path = "../../modules/edge-identity", default-features = false }
-edge-delegation = { path = "../../modules/edge-delegation", default-features = false }
 edge-voting = { path = "../../modules/edge-voting", default-features = false }
 edge-governance = { path = "../../modules/edge-governance", default-features = false }
 
@@ -78,7 +77,6 @@ std = [
 	"consensus_authorities/std",
 	"offchain-primitives/std",
 	"edge-identity/std",
-	"edge-delegation/std",
 	"edge-voting/std",
 	"edge-governance/std",
 ]

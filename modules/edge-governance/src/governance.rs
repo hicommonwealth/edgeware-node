@@ -37,7 +37,7 @@ use srml_support::traits::{Currency, ReservableCurrency};
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::{Zero, Hash, As};
+use runtime_primitives::traits::{Zero, Hash};
 use codec::Encode;
 
 pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
@@ -219,6 +219,6 @@ decl_storage! {
 		/// Map for retrieving the information about any proposal from its hash. 
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
-		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T> = BalanceOf::<T>::sa(10);
+		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T> = 10.into();
 	}
 }
