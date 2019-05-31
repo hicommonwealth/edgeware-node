@@ -45,7 +45,6 @@ use codec::Encode;
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
-pub type Tally<Balance> = Option<Vec<(VoteOutcome, Balance)>>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]

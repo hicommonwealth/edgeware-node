@@ -1,3 +1,4 @@
+
 // Copyright 2018 Commonwealth Labs, Inc.
 // This file is part of Edgeware.
 
@@ -40,7 +41,7 @@ use runtime_support::dispatch::Result;
 use runtime_primitives::traits::{Zero, Hash};
 use codec::Encode;
 
-pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
+pub use voting::voting::{VoteType, VoteOutcome, TallyType};
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
