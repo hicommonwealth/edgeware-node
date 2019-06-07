@@ -220,6 +220,6 @@ decl_storage! {
 		/// Map for retrieving the information about any proposal from its hash. 
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
-		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T> = 10.into();
+		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T>;
 	}
 }

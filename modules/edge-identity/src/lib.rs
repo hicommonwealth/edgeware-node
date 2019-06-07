@@ -807,4 +807,16 @@ mod tests {
 			);
 		});
 	}
+
+	#[test]
+	fn hash_test() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+
+			let left: &[u8] = b"github";
+			let right: &[u8] = b"drewstone";
+			let hash = build_identity_hash(left, right);
+			
+		});
+	}
 }

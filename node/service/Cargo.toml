@@ -6,6 +6,8 @@ edition = "2018"
 
 [dependencies]
 parking_lot = "0.7.1"
+parity-codec = { version = "3.3" }
+futures = "0.1"
 error-chain = "0.12"
 lazy_static = "1.0"
 log = "0.4.6"
@@ -26,10 +28,16 @@ substrate-consensus-aura = { git = "https://github.com/paritytech/substrate" }
 substrate-telemetry = { git = "https://github.com/paritytech/substrate" }
 substrate-client = { git = "https://github.com/paritytech/substrate", default-features = false }
 substrate-finality-grandpa = { git = "https://github.com/paritytech/substrate" }
+finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }
+
+keyring = { package = "substrate-keyring", git = "https://github.com/paritytech/substrate" }
+indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
+timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate" }
 substrate-basic-authorship = { git = "https://github.com/paritytech/substrate" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 edgeware-executor = { path = "../executor" }
 
 [dev-dependencies]
+substrate-consensus-common = { git = "https://github.com/paritytech/substrate" }
 service-test = { package = "substrate-service-test", git = "https://github.com/paritytech/substrate" }

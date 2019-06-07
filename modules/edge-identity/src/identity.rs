@@ -367,6 +367,6 @@ decl_storage! {
 		/// Verifier set
 		pub Verifiers get(verifiers) config(): Vec<T::AccountId>;
 		/// Registration bond
-		pub RegistrationBond get(registration_bond) config(): BalanceOf<T> = 10.into();
+		pub RegistrationBond get(registration_bond) config(): BalanceOf<T>;
 	}
 }
