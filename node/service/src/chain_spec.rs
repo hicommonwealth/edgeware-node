@@ -16,7 +16,7 @@
 
 use substrate_primitives::{ed25519, sr25519, Pair, crypto::UncheckedInto};
 use edgeware_primitives::{AccountId, AuthorityId};
-use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, CouncilVotingConfig, DemocracyConfig,
+use edgeware_runtime::{ConsensusConfig, CouncilSeatsConfig, DemocracyConfig,
 	SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
 	SudoConfig, ContractConfig, GrandpaConfig, IndicesConfig, Permill, Perbill,
 	IdentityConfig, GovernanceConfig};
@@ -65,7 +65,8 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		]),
 		Some(vec![ // identity verifiers
 			hex!["6d4b9f54cc2b3f16d17a1cbe641592ef1e9ce280c5e466c21cc6bcca11b6b5eb"].unchecked_into()
-		]), 
+		]),
+		false,
 	)
 }
 
@@ -145,112 +146,97 @@ pub fn testnet_genesis(
 		]
 	});
 
-	const MILLICENTS: u128 = 1_000_000_000;
-	const CENTS: u128 = 1_000 * MILLICENTS;    // assume this is worth about a cent.
-	const DOLLARS: u128 = 100 * CENTS;
+	const STASH: u128 = 1 << 20;
+	const ENDOWMENT: u128 = 1 << 20;
 
-	const SECS_PER_BLOCK: u64 = 6;
-	const MINUTES: u64 = 60 / SECS_PER_BLOCK;
-	const HOURS: u64 = MINUTES * 60;
-	const DAYS: u64 = HOURS * 24;
+	let council_desired_seats = (endowed_accounts.len() / 2 - initial_authorities.len()) as u32;
+	let mut contract_config = ContractConfig {
+		signed_claim_handicap: 2,
+		rent_byte_price: 4,
+		rent_deposit_offset: 1000,
+		storage_size_offset: 8,
+		surcharge_reward: 150,
+		tombstone_deposit: 16,
+		transaction_base_fee: 1,
+		transaction_byte_fee: 0,
+		transfer_fee: 0,
+		creation_fee: 0,
+		contract_fee: 21,
+		call_base_fee: 135,
+		create_base_fee: 175,
+		gas_price: 1,
+		max_depth: 1024,
+		block_gas_limit: 10_000_000,
+		current_schedule: Default::default(),
+	};
+	// this should only be enabled on development chains
+	contract_config.current_schedule.enable_println = enable_println;
 
-	const ENDOWMENT: u128 = 10_000_000 * DOLLARS;
-	const STASH: u128 = 100 * DOLLARS;
 	GenesisConfig {
 		consensus: Some(ConsensusConfig {
 			code: include_bytes!("../../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
 			authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
 		}),
 		system: None,
-		balances: Some(BalancesConfig {
-			transaction_base_fee: 1 * CENTS,
-			transaction_byte_fee: 10 * MILLICENTS,
-			balances: endowed_accounts.iter().cloned()
-				.map(|k| (k, ENDOWMENT))
-				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
-				.collect(),
-			existential_deposit: 1 * DOLLARS,
-			transfer_fee: 1 * CENTS,
-			creation_fee: 1 * CENTS,
-			vesting: vec![],
-		}),
 		indices: Some(IndicesConfig {
-			ids: endowed_accounts.iter().cloned()
-				.chain(initial_authorities.iter().map(|x| x.0.clone()))
-				.collect::<Vec<_>>(),
+			ids: endowed_accounts.clone(),
+		}),
+		balances: Some(BalancesConfig {
+			transaction_base_fee: 1,
+			transaction_byte_fee: 0,
+			existential_deposit: 500,
+			transfer_fee: 0,
+			creation_fee: 0,
+			balances: endowed_accounts.iter().map(|k| (k.clone(), ENDOWMENT)).collect(),
+			vesting: vec![],
 		}),
 		session: Some(SessionConfig {
 			validators: initial_authorities.iter().map(|x| x.1.clone()).collect(),
-			session_length: 5 * MINUTES,
+			session_length: 10,
 			keys: initial_authorities.iter().map(|x| (x.1.clone(), x.2.clone())).collect::<Vec<_>>(),
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			offline_slash: Perbill::from_parts(1_000_000),
-			session_reward: Perbill::from_parts(2_065),
-			current_session_reward: 0,
-			validator_count: 7,
-			sessions_per_era: 12,
+			minimum_validator_count: 1,
+			validator_count: 2,
+			sessions_per_era: 5,
 			bonding_duration: 12,
-			offline_slash_grace: 4,
-			minimum_validator_count: 4,
+			offline_slash: Perbill::zero(),
+			session_reward: Perbill::zero(),
+			current_session_reward: 0,
+			offline_slash_grace: 0,
 			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
 			invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
 		}),
-		democracy: Some(DemocracyConfig {
-			launch_period: 10 * MINUTES,    // 1 day per public referendum
-			voting_period: 10 * MINUTES,    // 3 days to discuss & vote on an active referendum
-			minimum_deposit: 50 * DOLLARS,    // 12000 as the minimum deposit for a referendum
-			public_delay: 10 * MINUTES,
-			max_lock_periods: 6,
-		}),
+		democracy: Some(DemocracyConfig::default()),
 		council_seats: Some(CouncilSeatsConfig {
-			active_council: vec![],
-			candidacy_bond: 10 * DOLLARS,
-			voter_bond: 1 * DOLLARS,
-			present_slash_per_voter: 1 * CENTS,
-			carry_count: 6,
-			presentation_duration: 1 * DAYS,
-			approval_voting_period: 2 * DAYS,
-			term_duration: 28 * DAYS,
-			desired_seats: 0,
-			inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
-		}),
-		council_voting: Some(CouncilVotingConfig {
-			cooloff_period: 4 * DAYS,
-			voting_period: 1 * DAYS,
-			enact_delay_period: 0,
+			active_council: endowed_accounts.iter()
+				.filter(|&endowed| initial_authorities.iter().find(|&(_, controller, _)| controller == endowed).is_none())
+				.map(|a| (a.clone(), 1000000)).collect(),
+			candidacy_bond: 10,
+			voter_bond: 2,
+			voting_fee: 5,
+			present_slash_per_voter: 1,
+			carry_count: 4,
+			presentation_duration: 10,
+			approval_voting_period: 20,
+			term_duration: 1000000,
+			desired_seats: council_desired_seats,
+			decay_ratio: council_desired_seats / 3,
+			inactive_grace_period: 1,
 		}),
 		timestamp: Some(TimestampConfig {
-			minimum_period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
+			minimum_period: 2,                    // 2*2=4 second block time.
 		}),
 		treasury: Some(TreasuryConfig {
 			proposal_bond: Permill::from_percent(5),
-			proposal_bond_minimum: 1 * DOLLARS,
-			spend_period: 1 * DAYS,
+			proposal_bond_minimum: 1_000_000,
+			spend_period: 12 * 60 * 24,
 			burn: Permill::from_percent(50),
 		}),
-		contract: Some(ContractConfig {
-			signed_claim_handicap: 2,
-			rent_byte_price: 4,
-			rent_deposit_offset: 1000,
-			storage_size_offset: 8,
-			surcharge_reward: 150,
-			tombstone_deposit: 16,
-			transaction_base_fee: 1 * CENTS,
-			transaction_byte_fee: 10 * MILLICENTS,
-			transfer_fee: 1 * CENTS,
-			creation_fee: 1 * CENTS,
-			contract_fee: 1 * CENTS,
-			call_base_fee: 1000,
-			create_base_fee: 1000,
-			gas_price: 1 * MILLICENTS,
-			max_depth: 1024,
-			block_gas_limit: 10_000_000,
-			current_schedule: Default::default(),
-		}),
+		contract: Some(contract_config),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
@@ -258,11 +244,11 @@ pub fn testnet_genesis(
 		identity: Some(IdentityConfig {
 			verifiers: initial_verifiers,
 			expiration_length: 604800, // 7 days
-			registration_bond: 1 * CENTS,
+			registration_bond: 1_000_000,
 		}),
 		governance: Some(GovernanceConfig {
 			voting_length: 604800, // 7 days
-			proposal_creation_bond: 1 * CENTS,
+			proposal_creation_bond: 1_000_000,
 		}),
 	}
 }
@@ -273,7 +259,7 @@ pub fn cwci_testnet_genesis(
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	initial_verifiers: Option<Vec<AccountId>>,
-	enable_println: bool,
+	_enable_println: bool,
 ) -> GenesisConfig {
 	let initial_verifiers: Vec<AccountId> = initial_verifiers.unwrap_or_else(|| {
 		vec![
@@ -395,7 +381,7 @@ pub fn cwci_testnet_genesis(
 			current_schedule: Default::default(),
 		}),
 		sudo: Some(SudoConfig {
-			key: endowed_accounts[0].clone(),
+			key: root_key,
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
@@ -421,7 +407,7 @@ fn development_config_genesis() -> GenesisConfig {
 		get_account_id_from_seed("Alice"),
 		None,
 		None,
-		false,
+		true,
 	)
 }
 
@@ -439,7 +425,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 		get_account_id_from_seed("Alice"),
 		None,
 		None,
-		false,
+		true,
 	)
 }
 

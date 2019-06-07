@@ -225,7 +225,6 @@ impl council::Trait for Runtime {
 	type OnMembersChanged = CouncilMotions;
 }
 
-
 impl council::motions::Trait for Runtime {
 	type Origin = Origin;
 	type Proposal = Call;
