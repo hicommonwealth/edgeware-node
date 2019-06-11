@@ -230,7 +230,7 @@ mod tests {
 
 			let public = 1_u64;
 
- 			let expiration_length = Identity::expiration_length();
+			let expiration_length = Identity::expiration_length();
 			let now = System::block_number();
 			let expires_at = now + expiration_length;
 
@@ -340,14 +340,14 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
- 			let mut expiration_length = Identity::expiration_length();
+			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
 			let register_expires_at = now + expiration_length;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
- 			expiration_length = Identity::expiration_length();
+			expiration_length = Identity::expiration_length();
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
@@ -390,14 +390,14 @@ mod tests {
 
 			let public = 1_u64;
 
- 			let mut expiration_length = Identity::expiration_length();
+			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
 			let register_expires_at = now + expiration_length;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(register_and_attest(public, identity_type, identity, attestation));
 
- 			expiration_length = Identity::expiration_length();
+			expiration_length = Identity::expiration_length();
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
@@ -490,14 +490,14 @@ mod tests {
 			let after_register_balance = Balances::free_balance(public);
 			assert_eq!(balance - BOND, after_register_balance);
 
- 			let mut expiration_length = Identity::expiration_length();
+			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
 			let register_expires_at = now + expiration_length;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
- 			expiration_length = Identity::expiration_length();
+			expiration_length = Identity::expiration_length();
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
@@ -683,7 +683,7 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
- 			let expiration_length = Identity::expiration_length();
+			let expiration_length = Identity::expiration_length();
 			let now = System::block_number();
 			let expires_at = now + expiration_length;
 
@@ -808,15 +808,62 @@ mod tests {
 		});
 	}
 
+	fn get_bits(value: Option<&[u8]>, num_bits: usize, skip_bits: usize) -> Vec<Option<bool>> {
+		let bit_values = if let Some(value) = value {
+			let mut tmp = vec![];
+			for b in value.iter()
+						  .flat_map(|&m| (0..8).rev().map(move |i| m >> i & 1 == 1))
+						  .skip(skip_bits)
+			{
+				tmp.push(Some(b));
+			}
+			tmp
+		} else {
+			vec![None; num_bits]
+		};
+
+		bit_values
+	}
+
 	#[test]
 	fn hash_test() {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
-
 			let left: &[u8] = b"github";
 			let right: &[u8] = b"drewstone";
-			let hash = build_identity_hash(left, right);
-			
+			let mut buf = Vec::new();
+			buf.extend_from_slice(left);
+			buf.extend_from_slice(right);
+			let padding_len = 32 - buf.len();
+			for _i in 0..padding_len {
+				buf.push(0);
+			}
+			// println!("{:?}, {:?}", buf.len(), buf);
+			let _bits = get_bits(Some(&buf), 256, 0);
+			// println!("{:?}", bits);
+			let hash = Blake2Hasher::hash(&buf[..]);
+			let hash_bits = get_bits(Some(&hash.as_bytes()), 256, 0);
+			println!("{:?}", hash_bits);
+
+
+			// let mut buf2 = Vec::new();
+			// buf2.extend_from_slice(&left.to_vec().encode());
+			// buf2.extend_from_slice(&right.to_vec().encode());
+
+			// let mut buf3 = Vec::new();
+			// buf3.extend_from_slice(left);
+			// buf3.extend_from_slice(right);
+
+			// println!("{:?}, {:?}", buf, buf2);
+			// let bits = get_bits(Some(&buf2), 256, 0);
+			// let bitts = get_bits(Some(&buf3), 256, 0);
+			// let bittts = get_bits(Some(&[left, right].concat()), 256, 0);
+			// let bitttts = get_bits(Some(&buf), 256, 0);
+			// println!("{:?}, {:?}, {:?}, {:?}", bits.len(), bitts.len(), bittts.len(), bitttts.len());
+			// println!("{:?}\n\n{:?}\n\n{:?}\n\n{:?}", bits, bitts, bittts, bitttts);
+
+			// let hash = build_identity_hash(left, right);
+			// println!("{:?}", hash);
 		});
 	}
 }

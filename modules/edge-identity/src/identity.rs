@@ -94,8 +94,8 @@ decl_module! {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
 			let mut buf = Vec::new();
-			buf.extend_from_slice(&identity_type.encode());
-			buf.extend_from_slice(&identity.encode());
+			buf.extend_from_slice(&identity_type);
+			buf.extend_from_slice(&identity);
 			let hash = T::Hashing::hash(&buf[..]);
 			ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
 			// Reserve the registration bond amount
