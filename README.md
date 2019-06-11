@@ -2,6 +2,14 @@
 
 A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
+## To get started
+
+Download this entire repository to the file system that you are using to run the validator node.
+
+You can do this by going to [this page](https://github.com/hicommonwealth/edgeware-node) and selecting "Clone or download" followed by "Download ZIP".
+
+Once you have downloaded the zip file, unzip the `edgeware-node-master` folder onto the file system. All commands referenced in this document need to be run from within this `edgeware-node-master` folder.
+
 ## Fresh start
 If your device is clean (such as a fresh cloud VM) you can use this script, otherwise, proceed with the *Initial Setup*.
 ```
