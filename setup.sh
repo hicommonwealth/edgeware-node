@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 if [[ "$OSTYPE" == "linux-gnu" ]]; then
     echo "Found linux"
     # check for root
@@ -19,13 +18,14 @@ if [[ $(cargo --version) ]]; then
     echo "Found cargo"
 else
     curl https://sh.rustup.rs -sSf | sh -s -- -y
-    source $HOME/.cargo/env  
+    source $HOME/.cargo/env
+    export PATH=$HOME/.cargo/bin:$PATH
 fi
 
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
 rustup update stable
-    
+
 if [[ $(wasm-gc) ]]; then
     echo "Found wasm-gc"
 else
