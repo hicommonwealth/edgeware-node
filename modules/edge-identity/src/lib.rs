@@ -78,10 +78,6 @@ mod tests {
 		}
 	}
 
-	impl_outer_dispatch! {
-		pub enum Call for Test where origin: Origin { }
-	}
-
 	// For testing the module, we construct most of a mock runtime. This means
 	// first constructing a configuration type (`Test`) which `impl`s each of the
 	// configuration traits of modules we want to use.
@@ -805,65 +801,6 @@ mod tests {
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity_type, identity))
 			);
-		});
-	}
-
-	fn get_bits(value: Option<&[u8]>, num_bits: usize, skip_bits: usize) -> Vec<Option<bool>> {
-		let bit_values = if let Some(value) = value {
-			let mut tmp = vec![];
-			for b in value.iter()
-						  .flat_map(|&m| (0..8).rev().map(move |i| m >> i & 1 == 1))
-						  .skip(skip_bits)
-			{
-				tmp.push(Some(b));
-			}
-			tmp
-		} else {
-			vec![None; num_bits]
-		};
-
-		bit_values
-	}
-
-	#[test]
-	fn hash_test() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let left: &[u8] = b"github";
-			let right: &[u8] = b"drewstone";
-			let mut buf = Vec::new();
-			buf.extend_from_slice(left);
-			buf.extend_from_slice(right);
-			let padding_len = 32 - buf.len();
-			for _i in 0..padding_len {
-				buf.push(0);
-			}
-			// println!("{:?}, {:?}", buf.len(), buf);
-			let _bits = get_bits(Some(&buf), 256, 0);
-			// println!("{:?}", bits);
-			let hash = Blake2Hasher::hash(&buf[..]);
-			let hash_bits = get_bits(Some(&hash.as_bytes()), 256, 0);
-			println!("{:?}", hash_bits);
-
-
-			// let mut buf2 = Vec::new();
-			// buf2.extend_from_slice(&left.to_vec().encode());
-			// buf2.extend_from_slice(&right.to_vec().encode());
-
-			// let mut buf3 = Vec::new();
-			// buf3.extend_from_slice(left);
-			// buf3.extend_from_slice(right);
-
-			// println!("{:?}, {:?}", buf, buf2);
-			// let bits = get_bits(Some(&buf2), 256, 0);
-			// let bitts = get_bits(Some(&buf3), 256, 0);
-			// let bittts = get_bits(Some(&[left, right].concat()), 256, 0);
-			// let bitttts = get_bits(Some(&buf), 256, 0);
-			// println!("{:?}, {:?}, {:?}, {:?}", bits.len(), bitts.len(), bittts.len(), bitttts.len());
-			// println!("{:?}\n\n{:?}\n\n{:?}\n\n{:?}", bits, bitts, bittts, bitttts);
-
-			// let hash = build_identity_hash(left, right);
-			// println!("{:?}", hash);
 		});
 	}
 }
