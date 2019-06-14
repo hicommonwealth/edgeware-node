@@ -27,7 +27,7 @@ use substrate_primitives as primitives;
 use substrate_client as client;
 #[macro_use]
 extern crate substrate_service as service;
-use substrate_consensus_aura as aura;
+use substrate_consensus_aura as consensus;
 use substrate_finality_grandpa as grandpa;
 use substrate_network as network;
 use substrate_transaction_pool as transaction_pool;
@@ -43,7 +43,7 @@ use std::time::Duration;
 use client::{LongestChain};
 use grandpa::{FinalityProofProvider as GrandpaFinalityProofProvider};
 use transaction_pool::txpool::{Pool as TransactionPool};
-use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration};
+use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration};
 use inherents::InherentDataProviders;
 pub use service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,

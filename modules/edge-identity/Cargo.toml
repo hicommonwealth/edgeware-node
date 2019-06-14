@@ -17,7 +17,6 @@ sr-io = { git = "https://github.com/paritytech/substrate", default-features = fa
 sr-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-support = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-consensus = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
 
 [features]
@@ -34,6 +33,5 @@ std = [
     "srml-support/std",
     "sr-primitives/std",
     "srml-system/std",
-    "srml-consensus/std",
     "srml-balances/std",
 ]

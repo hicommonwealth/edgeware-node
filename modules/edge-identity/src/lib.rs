@@ -40,7 +40,6 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
-extern crate srml_consensus as consensus;
 extern crate srml_balances as balances;
 
 pub mod identity;
@@ -107,11 +106,6 @@ mod tests {
 		type DustRemoval = ();
 	}
 
-	impl consensus::Trait for Test {
-		type Log = DigestItem;
-		type SessionKey = UintAuthorityId;
-		type InherentOfflineReport = ();
-	}
 	impl Trait for Test {
 		type Event = Event;
 		type Currency = balances::Module<Self>;

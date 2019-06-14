@@ -41,7 +41,6 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate srml_consensus as consensus;
 extern crate edge_voting as voting;
 
 pub mod governance;
@@ -102,11 +101,6 @@ mod tests {
 		type Log = DigestItem;
 	}
 
-	impl consensus::Trait for Test {
-		type Log = DigestItem;
-		type SessionKey = UintAuthorityId;
-		type InherentOfflineReport = ();
-	}
 	impl balances::Trait for Test {
 		type Balance = u64;
 		type OnFreeBalanceZero = ();
