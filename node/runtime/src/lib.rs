@@ -50,7 +50,7 @@ extern crate finality_tracker;
 extern crate sudo;
 extern crate offchain_primitives;
 
-extern crate node_primitives;
+extern crate edgeware_primitives;
 extern crate consensus_aura;
 
 use edge_governance::governance;
@@ -60,7 +60,7 @@ use edge_voting::voting;
 use rstd::prelude::*;
 use support::{construct_runtime, parameter_types};
 use substrate_primitives::u32_trait::{_1, _2, _3, _4};
-use node_primitives::{
+use edgeware_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, AuthorityId, Signature, AuthoritySignature
 };
 use grandpa::fg_primitives::{self, ScheduledChange};
@@ -225,6 +225,7 @@ impl council::Trait for Runtime {
 	type OnMembersChanged = CouncilMotions;
 }
 
+
 impl council::motions::Trait for Runtime {
 	type Origin = Origin;
 	type Proposal = Call;
@@ -283,7 +284,7 @@ impl identity::Trait for Runtime {
 construct_runtime!(
 	pub enum Runtime with Log(InternalLog: DigestItem<Hash, AuthorityId, AuthoritySignature>) where
 		Block = Block,
-		NodeBlock = node_primitives::Block,
+		NodeBlock = edgeware_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
 		System: system::{default, Log(ChangesTrieRoot)},

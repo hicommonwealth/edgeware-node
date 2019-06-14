@@ -43,7 +43,7 @@ use std::time::Duration;
 use client::{LongestChain};
 use grandpa::{FinalityProofProvider as GrandpaFinalityProofProvider};
 use transaction_pool::txpool::{Pool as TransactionPool};
-use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
+use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration};
 use inherents::InherentDataProviders;
 pub use service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
@@ -194,14 +194,13 @@ construct_service_factory! {
 
 				config.custom.grandpa_import_setup = Some((block_import.clone(), link_half));
 
-				import_queue::<_, _, _, ed25519::Pair>(
+				import_queue::<_, _, ed25519::Pair>(
 					slot_duration,
 					block_import,
 					Some(justification_import),
 					None,
 					None,
 					client,
-					NothingExtra,
 					config.custom.inherent_data_providers.clone(),
 				).map_err(Into::into)
 			}},
@@ -219,14 +218,13 @@ construct_service_factory! {
 				let finality_proof_import = block_import.clone();
 				let finality_proof_request_builder = finality_proof_import.create_finality_proof_request_builder();
 
-				import_queue::<_, _, _, ed25519::Pair>(
+				import_queue::<_, _, ed25519::Pair>(
 					SlotDuration::get_or_compute(&*client)?,
 					block_import,
 					None,
 					Some(finality_proof_import),
 					Some(finality_proof_request_builder),
 					client,
-					NothingExtra,
 					config.custom.inherent_data_providers.clone(),
 				).map_err(Into::into)
 			}},
@@ -242,15 +240,16 @@ construct_service_factory! {
 	}
 }
 
+
 #[cfg(test)]
 mod tests {
 	use std::sync::Arc;
-	use substrate_consensus_aura::CompatibleDigestItem;
-	use substrate_consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
+	use consensus::CompatibleDigestItem;
+	use consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
 	use edgeware_primitives::DigestItem;
 	use edgeware_runtime::{Call, BalancesCall, UncheckedExtrinsic};
 	use parity_codec::{Compact, Encode, Decode};
-	use substrate_primitives::{
+	use primitives::{
 		crypto::Pair as CryptoPair, ed25519::Pair, blake2_256,
 		sr25519::Public as AddressPublic,
 	};
@@ -259,7 +258,7 @@ mod tests {
 	use finality_tracker;
 	use keyring::{ed25519::Keyring as AuthorityKeyring, sr25519::Keyring as AccountKeyring};
 	use substrate_service::ServiceFactory;
-	use crate::Factory;
+	use crate::service::Factory;
 
 	#[cfg(feature = "rhd")]
 	fn test_sync() {

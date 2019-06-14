@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 log = "0.4.6"
 tokio = "0.1.7"
+rand = "0.6"
 futures = "0.1.17"
 exit-future = "0.1"
 substrate-cli = { git = "https://github.com/paritytech/substrate" }
@@ -33,5 +34,4 @@ transaction-factory = { git = "https://github.com/paritytech/substrate" }
 keyring = { package = "substrate-keyring", git = "https://github.com/paritytech/substrate" }
 indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
 timestamp = { package = "srml-timestamp",git = "https://github.com/paritytech/substrate", default-features = false }
-rand = "0.6"
 finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }

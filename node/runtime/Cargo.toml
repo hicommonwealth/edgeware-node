@@ -30,7 +30,6 @@ system = { package = "srml-system", git = "https://github.com/paritytech/substra
 timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate", default-features = false }
 treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate", default-features = false }
 sudo = { package = "srml-sudo", git = "https://github.com/paritytech/substrate", default-features = false }
-node-primitives = { package = "node-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 consensus_aura = { package = "substrate-consensus-aura-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 consensus_authorities = { package = "substrate-consensus-authorities", git = "https://github.com/paritytech/substrate", default-features = false }
 
@@ -41,6 +40,7 @@ substrate-keyring = { git = "https://github.com/paritytech/substrate", optional 
 edge-identity = { path = "../../modules/edge-identity", default-features = false }
 edge-voting = { path = "../../modules/edge-voting", default-features = false }
 edge-governance = { path = "../../modules/edge-governance", default-features = false }
+edgeware-primitives = { path = "../primitives", default-features = false }
 
 [features]
 default = ["std"]
@@ -50,12 +50,14 @@ std = [
 	"rstd/std",
 	"runtime_primitives/std",
 	"support/std",
+	"aura/std",
 	"balances/std",
 	"consensus/std",
 	"contract/std",
 	"council/std",
 	"democracy/std",
 	"executive/std",
+	"finality-tracker/std",
 	"grandpa/std",
 	"indices/std",
 	"session/std",
@@ -65,18 +67,16 @@ std = [
 	"treasury/std",
 	"sudo/std",
 	"version/std",
-	"node-primitives/std",
 	"serde",
 	"safe-mix/std",
 	"client/std",
 	"consensus_aura/std",
 	"rustc-hex",
-	"hex-literal",
-	"serde",
 	"substrate-keyring",
-	"consensus_authorities/std",
 	"offchain-primitives/std",
+	"consensus_authorities/std",
 	"edge-identity/std",
 	"edge-voting/std",
 	"edge-governance/std",
+	"edgeware-primitives/std",
 ]
