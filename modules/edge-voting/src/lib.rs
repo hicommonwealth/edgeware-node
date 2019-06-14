@@ -25,9 +25,7 @@ extern crate serde;
 #[cfg(feature = "std")]
 extern crate serde_derive;
 #[cfg(test)]
-#[macro_use]
 extern crate hex_literal;
-#[macro_use] extern crate parity_codec_derive;
 #[macro_use] extern crate srml_support;
 
 
@@ -38,8 +36,6 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-
-extern crate srml_balances as balances;
 extern crate srml_system as system;
 
 pub mod voting;
@@ -60,7 +56,11 @@ mod tests {
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		BuildStorage, traits::{BlakeTwo256, Hash, IdentityLookup},
-		testing::{Digest, DigestItem, Header}
+		testing::{Header}
+	};
+
+	use runtime_support::{
+		impl_outer_origin, assert_ok
 	};
 
 	static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
@@ -71,12 +71,8 @@ mod tests {
 
 	impl_outer_event! {
 		pub enum Event for Test {
-			voting<T>, balances<T>,
+			voting<T>,
 		}
-	}
-
-	impl_outer_dispatch! {
-		pub enum Call for Test where origin: Origin {}
 	}
 
 	// For testing the module, we construct most of a mock runtime. This means
@@ -90,22 +86,10 @@ mod tests {
 		type BlockNumber = u64;
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
-		type Digest = Digest;
 		type AccountId = u64;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
-		type Log = DigestItem;
-	}
-
-	impl balances::Trait for Test {
-		type Balance = u64;
-		type OnFreeBalanceZero = ();
-		type OnNewAccount = ();
-		type Event = Event;
-		type TransactionPayment = ();
-		type TransferPayment = ();
-		type DustRemoval = ();
 	}
 
 	impl Trait for Test {
@@ -118,7 +102,7 @@ mod tests {
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.into()
 	}

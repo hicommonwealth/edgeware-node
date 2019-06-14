@@ -30,7 +30,6 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-extern crate srml_balances as balances;
 extern crate srml_system as system;
 
 use rstd::prelude::*;
@@ -39,9 +38,9 @@ use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
-use runtime_primitives::traits::{Zero, One};
-use runtime_primitives::traits::{CheckedAdd};
-use codec::Encode;
+
+
+use codec::{Encode, Decode};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
@@ -107,7 +106,7 @@ pub struct VoteRecord<AccountId> {
 	pub outcomes: Vec<VoteOutcome>,
 }
 
-pub trait Trait: balances::Trait {
+pub trait Trait: system::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
