@@ -44,6 +44,9 @@ edgeware-primitives = { path = "../primitives", default-features = false }
 
 [features]
 default = ["std"]
+core = [
+	"contract/core",
+]
 std = [
 	"parity-codec/std",
 	"substrate-primitives/std",
