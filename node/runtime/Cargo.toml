@@ -2,6 +2,7 @@
 name = "edgeware-runtime"
 version = "0.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
+edition = "2018"
 
 [dependencies]
 integer-sqrt = { version = "0.1.2" }
@@ -30,7 +31,6 @@ timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/s
 treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate", default-features = false }
 sudo = { package = "srml-sudo", git = "https://github.com/paritytech/substrate", default-features = false }
 consensus_aura = { package = "substrate-consensus-aura-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
-
 rustc-hex = { version = "2.0", optional = true }
 hex-literal = { version = "0.1.0", optional = true }
 serde = { version = "1.0", optional = true }

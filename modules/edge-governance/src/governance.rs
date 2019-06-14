@@ -39,7 +39,7 @@ use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::{Zero, Hash};
-use codec::Encode;
+use codec::{Encode, Decode};
 
 pub use voting::voting::{VoteType, VoteOutcome, TallyType};
 

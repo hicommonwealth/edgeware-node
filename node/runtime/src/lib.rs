@@ -20,38 +20,6 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit="256"]
 
-extern crate rstd;
-extern crate client;
-extern crate support;
-extern crate runtime_primitives;
-#[cfg(feature = "std")]
-extern crate parity_codec;
-extern crate substrate_primitives;
-extern crate serde;
-extern crate version;
-extern crate edge_governance;
-extern crate edge_identity;
-extern crate edge_voting;
-extern crate aura;
-extern crate balances;
-extern crate contract;
-extern crate council;
-extern crate democracy;
-extern crate executive;
-extern crate grandpa;
-extern crate indices;
-extern crate session;
-extern crate staking;
-extern crate system;
-extern crate timestamp;
-extern crate treasury;
-extern crate finality_tracker;
-extern crate sudo;
-extern crate offchain_primitives;
-
-extern crate edgeware_primitives;
-extern crate consensus_aura;
-
 use edge_governance::governance;
 use edge_identity::identity;
 use edge_voting::voting;
@@ -169,7 +137,7 @@ parameter_types! {
 
 type SessionHandlers = (Grandpa, Aura);
 #[cfg(feature = "std")]
-use serde::{Serialize, Deserialize};
+use runtime_primitives::serde::{Serialize, Deserialize};
 impl_opaque_keys! {
 	pub struct SessionKeys(grandpa::AuthorityId, AuraId);
 }

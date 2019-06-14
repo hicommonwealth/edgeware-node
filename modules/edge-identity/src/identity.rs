@@ -39,7 +39,7 @@ use runtime_primitives::traits::{Zero, Hash};
 use runtime_support::dispatch::Result;
 use runtime_support::{StorageMap, StorageValue};
 use system::ensure_signed;
-use codec::Encode;
+use codec::{Encode, Decode};
 
 pub trait Trait: balances::Trait {
     /// The overarching event type.

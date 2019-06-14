@@ -5,13 +5,13 @@ fi
 new_mnemonic=$(subkey generate | grep -o '`.*`' | tr -d '`')
 mnemonic=${1:-$new_mnemonic}
 
-stash_seed=$(subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '1!d' | tr -d ': ')
-stash_pubkey=$(subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '2!d' | tr -d ': ')
-stash_address=$(subkey -e inspect "${mnemonic}"//stash | grep -o ': .*' | sed '3!d' | tr -d ': ')
+stash_seed=$(subkey inspect "${mnemonic}"//stash | grep -o ': .*' | sed '1!d' | tr -d ': ')
+stash_pubkey=$(subkey inspect "${mnemonic}"//stash | grep -o ': .*' | sed '2!d' | tr -d ': ')
+stash_address=$(subkey inspect "${mnemonic}"//stash | grep -o ': .*' | sed '3!d' | tr -d ': ')
 
-controller_seed=$(subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '1!d' | tr -d ': ')
-controller_pubkey=$(subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '2!d' | tr -d ': ')
-controller_address=$(subkey -e inspect "${mnemonic}"//controller | grep -o ': .*' | sed '3!d' | tr -d ': ')
+controller_seed=$(subkey inspect "${mnemonic}"//controller | grep -o ': .*' | sed '1!d' | tr -d ': ')
+controller_pubkey=$(subkey inspect "${mnemonic}"//controller | grep -o ': .*' | sed '2!d' | tr -d ': ')
+controller_address=$(subkey inspect "${mnemonic}"//controller | grep -o ': .*' | sed '3!d' | tr -d ': ')
 
 authority_seed=$(subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '1!d' | tr -d ': ')
 authority_pubkey=$(subkey -e inspect "${mnemonic}"//authority | grep -o ': .*' | sed '2!d' | tr -d ': ')

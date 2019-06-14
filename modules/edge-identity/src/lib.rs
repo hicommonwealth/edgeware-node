@@ -25,10 +25,7 @@ extern crate serde;
 #[cfg(feature = "std")]
 extern crate serde_derive;
 #[cfg(test)]
-#[macro_use]
 extern crate hex_literal;
-#[macro_use]
-extern crate parity_codec_derive;
 #[macro_use]
 extern crate srml_support;
 
@@ -52,7 +49,6 @@ pub use identity::{
 #[cfg(test)]
 mod tests {
 	use super::*;
-
 	use codec::Encode;
 	use primitives::{Blake2Hasher, H256, Hasher};
 	use rstd::prelude::*;
@@ -62,7 +58,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		testing::{Digest, DigestItem, Header, UintAuthorityId},
+		testing::{Header},
 		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 		BuildStorage,
 	};
@@ -88,12 +84,10 @@ mod tests {
 		type BlockNumber = u64;
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
-		type Digest = Digest;
 		type AccountId = u64;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
-		type Log = DigestItem;
 	}
 
 	impl balances::Trait for Test {
@@ -161,14 +155,6 @@ mod tests {
 
 	fn verify_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
 		Identity::verify(Origin::signed(who), identity_hash, verifier_index)
-	}
-
-	fn deny_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
-		Identity::deny(Origin::signed(who), identity_hash, verifier_index)
-	}
-
-	fn verify_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
-		Identity::verify_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
 	}
 
 	fn deny_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {

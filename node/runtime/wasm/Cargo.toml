@@ -11,7 +11,10 @@ crate-type = ["cdylib"]
 edgeware-runtime = { path = "..", default-features = false }
 
 [features]
-default = []
+default = ["core"]
+core = [
+	"edgeware-runtime/core",
+]
 std = [
 	"edgeware-runtime/std",
 ]

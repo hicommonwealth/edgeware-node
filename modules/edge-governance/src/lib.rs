@@ -25,9 +25,7 @@ extern crate serde;
 #[cfg(feature = "std")]
 extern crate serde_derive;
 #[cfg(test)]
-#[macro_use]
 extern crate hex_literal;
-#[macro_use] extern crate parity_codec_derive;
 #[macro_use] extern crate srml_support;
 
 
@@ -63,7 +61,7 @@ mod tests {
 	use runtime_primitives::{
 		BuildStorage,
 		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
-		testing::{Digest, DigestItem, Header, UintAuthorityId}
+		testing::{Header}
 	};
 	use voting::{VoteStage, VoteType};
 	use voting::voting::{VoteOutcome, TallyType};
@@ -78,10 +76,6 @@ mod tests {
 		}
 	}
 
-	impl_outer_dispatch! {
-		pub enum Call for Test where origin: Origin {}
-	}
-
 	// For testing the module, we construct most of a mock runtime. This means
 	// first constructing a configuration type (`Test`) which `impl`s each of the
 	// configuration traits of modules we want to use.
@@ -93,12 +87,10 @@ mod tests {
 		type BlockNumber = u64;
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
-		type Digest = Digest;
 		type AccountId = u64;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
-		type Log = DigestItem;
 	}
 
 	impl balances::Trait for Test {
