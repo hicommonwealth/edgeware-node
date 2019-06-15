@@ -15,13 +15,21 @@ If your device is clean (such as a fresh cloud VM) you can use this script, othe
 ```
 ./setup.sh
 ```
-To create a keypair, run
-```
-./keygen.sh
-```
-which will generate a mnemonic and 3 ed25519 keys. To create more keys you can then run the following.
+To create a keypair, install subkey with `cargo install --force --git https://github.com/paritytech/substrate subkey`. Then run the following:
 ```
 subkey generate
+```
+To create an ED25519 keypair, run the following:
+```
+subkey -e generate
+```
+To create derived keypairs, use the mnemonic generated from a method above and run:
+```
+subkey inspect "<mnemonic>"//<derive_path>
+```
+For example:
+```
+subkey inspect "west paper guide park design weekend radar chaos space giggle execute canoe"//edgewarerocks
 ```
 Then proceed to the *Running* instructions or follow the instructions below for the manual setup.
 
