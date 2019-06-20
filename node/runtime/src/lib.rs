@@ -62,9 +62,9 @@ pub use staking::StakerStatus;
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 4,
+	authoring_version: 5,
 	spec_version: 6,
-	impl_version: 6,
+	impl_version: 7,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -268,7 +268,7 @@ construct_runtime!(
 		NodeBlock = edgeware_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: system::{Module, Call, Storage, Config<T>},
+		System: system::{default, Config<T>},
 		Aura: aura::{Module, Config<T>, Inherent(Timestamp)},
 		Timestamp: timestamp::{Module, Call, Storage, Config<T>, Inherent},
 		Indices: indices,

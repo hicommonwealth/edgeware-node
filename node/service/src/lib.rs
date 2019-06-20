@@ -35,6 +35,7 @@ use substrate_transaction_pool as transaction_pool;
 
 use substrate_inherents as inherents;
 
+pub mod fixtures;
 pub mod chain_spec;
 
 use std::sync::Arc;
