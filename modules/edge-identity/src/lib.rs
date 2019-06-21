@@ -161,6 +161,10 @@ mod tests {
 		Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
 	}
 
+	fn revoke(who: u64, identity_hash: H256) -> Result {
+		Identity::revoke(Origin::signed(who), identity_hash)
+	}
+
 	fn add_metadata_to_account(
 		who: u64,
 		identity_hash: H256,
@@ -780,6 +784,112 @@ mod tests {
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity_type, identity))
+			);
+		});
+	}
+
+	#[test]
+	fn revoke_verified_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			// Attest
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			System::set_block_number(2);
+			let verifier = 1_u64;
+			assert_ok!(verify_identity(verifier, identity_hash, 0));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_length: 0,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity_type, identity)
+				})
+			);
+			assert_ok!(revoke(public, identity_hash));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				None,
+			);
+		});
+	}
+
+	#[test]
+	fn revoke_from_wrong_sender_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			// Attest
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			System::set_block_number(2);
+			let verifier = 1_u64;
+			assert_ok!(verify_identity(verifier, identity_hash, 0));
+			assert_err!(revoke(2_u64, identity_hash), "Stored identity does not match sender");
+		});
+	}
+
+	#[test]
+	fn revoke_at_registered_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity_type, identity))
+			);
+			assert_ok!(revoke(public, identity_hash));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				None,
+			);
+		});
+	}
+
+	#[test]
+	fn revoke_at_attested_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			// Attest
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Attested,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity_type, identity)
+				})
+			);
+			assert_ok!(revoke(public, identity_hash));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				None,
 			);
 		});
 	}

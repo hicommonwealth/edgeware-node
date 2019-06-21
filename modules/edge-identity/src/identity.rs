@@ -205,17 +205,13 @@ decl_module! {
         }
 
         /// Add metadata to sender's account.
-        // TODO: make all options and only updated provided?
-        // TODO: limit the max length of these user-submitted types?
         pub fn add_metadata(origin, identity_hash: T::Hash, avatar: Vec<u8>, display_name: Vec<u8>, tagline: Vec<u8>) -> Result {
             let _sender = ensure_signed(origin)?;
             let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
-
             // Check that original sender and current sender match
             ensure!(record.account == _sender, "Stored identity does not match sender");
             ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
-
-            // TODO: Decide how to process metadata updates, for now it's all or nothing
+            // Replace all metadata
             let mut new_record = record;
             new_record.metadata = Some(MetadataRecord {
                 avatar: avatar,
@@ -223,7 +219,16 @@ decl_module! {
                 tagline: tagline,
             });
             <IdentityOf<T>>::insert(identity_hash, new_record);
-            // TODO: worth adding an event?
+            Ok(())
+        }
+
+        /// Revoke an identity from the creator/sender of such an identity
+        pub fn revoke(origin, identity_hash: T::Hash) -> Result {
+            let _sender = ensure_signed(origin)?;
+            let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+            // Check that original sender and current sender match
+            ensure!(record.account == _sender, "Stored identity does not match sender");
+            Self::remove_pending_identity(&identity_hash);
             Ok(())
         }
 
