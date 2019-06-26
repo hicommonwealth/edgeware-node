@@ -343,9 +343,9 @@ pub fn cwci_testnet_genesis(
             voting_fee: 2 * DOLLARS,
             present_slash_per_voter: 1 * CENTS,
             carry_count: 6,
-            presentation_duration: 10 * MINUTES,
-            approval_voting_period: 20 * MINUTES,
-            term_duration: 1 * HOURS,
+            presentation_duration: 4,
+            approval_voting_period: 6,
+            term_duration: 1000,
             desired_seats: 0,
             decay_ratio: 0,
             inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
@@ -390,11 +390,11 @@ pub fn cwci_testnet_genesis(
         }),
         identity: Some(IdentityConfig {
             verifiers: initial_verifiers,
-            expiration_length: 10 * MINUTES,
+            expiration_length: 4, // 4 blocks
             registration_bond: 1 * CENTS,
         }),
         governance: Some(GovernanceConfig {
-            voting_length: 10 * MINUTES,
+            voting_length: 4, // 4 blocks
             proposal_creation_bond: 1 * CENTS,
         }),
     }
