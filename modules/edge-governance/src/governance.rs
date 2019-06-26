@@ -1,3 +1,4 @@
+
 // Copyright 2018 Commonwealth Labs, Inc.
 // This file is part of Edgeware.
 
@@ -37,10 +38,10 @@ use srml_support::traits::{Currency, ReservableCurrency};
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::{Zero, Hash, As};
-use codec::Encode;
+use runtime_primitives::traits::{Zero, Hash};
+use codec::{Encode, Decode};
 
-pub use voting::voting::{Tally, VoteType, VoteOutcome, TallyType};
+pub use voting::voting::{VoteType, VoteOutcome, TallyType};
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq, Clone, Copy)]
@@ -66,7 +67,6 @@ pub struct ProposalRecord<AccountId, Moment> {
 	pub category: ProposalCategory,
 	pub title: Vec<u8>,
 	pub contents: Vec<u8>,
-	// TODO: for actions, we might need more data
 	pub vote_id: u64,
 }
 
@@ -102,7 +102,6 @@ decl_module! {
 			ensure!(!contents.is_empty(), "Proposal must not be empty");
 
 			// construct hash(origin + proposal) and check existence
-			// TODO: include title/category/etc?
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&_sender.encode());
 			buf.extend_from_slice(&contents.as_ref());
@@ -174,7 +173,6 @@ decl_module! {
 					Some(record) => {
 						// voting -> completed
 						let vote_id = record.vote_id;
-						// TODO: handle possible errors from advance_stage?
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
 						// Unreserve the proposal creation bond amount
 						T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
@@ -186,7 +184,7 @@ decl_module! {
 						});
 						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id));
 					},
-					None => { } // TODO: emit an error here?
+					None => {}
 				}
 			});
 		}
@@ -219,6 +217,6 @@ decl_storage! {
 		/// Map for retrieving the information about any proposal from its hash. 
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
-		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T> = BalanceOf::<T>::sa(10);
+		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T>;
 	}
 }

@@ -25,9 +25,7 @@ extern crate serde;
 #[cfg(feature = "std")]
 extern crate serde_derive;
 #[cfg(test)]
-#[macro_use]
 extern crate hex_literal;
-#[macro_use] extern crate parity_codec_derive;
 #[macro_use] extern crate srml_support;
 
 
@@ -38,16 +36,12 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-
-extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate edge_delegation as delegation;
 
 pub mod voting;
 pub use voting::{Module, Trait, RawEvent, Event};
 pub use voting::{VoteStage, VoteType, TallyType, VoteRecord, VoteData};
 
-// Tests for Delegation Module
 #[cfg(test)]
 mod tests {
 	use super::*;
@@ -62,7 +56,11 @@ mod tests {
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		BuildStorage, traits::{BlakeTwo256, Hash, IdentityLookup},
-		testing::{Digest, DigestItem, Header}
+		testing::{Header}
+	};
+
+	use runtime_support::{
+		impl_outer_origin, assert_ok
 	};
 
 	static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
@@ -73,12 +71,8 @@ mod tests {
 
 	impl_outer_event! {
 		pub enum Event for Test {
-			voting<T>, delegation<T>, balances<T>,
+			voting<T>,
 		}
-	}
-
-	impl_outer_dispatch! {
-		pub enum Call for Test where origin: Origin {}
 	}
 
 	// For testing the module, we construct most of a mock runtime. This means
@@ -92,25 +86,9 @@ mod tests {
 		type BlockNumber = u64;
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
-		type Digest = Digest;
 		type AccountId = u64;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
-		type Event = Event;
-		type Log = DigestItem;
-	}
-
-	impl balances::Trait for Test {
-		type Balance = u64;
-		type OnFreeBalanceZero = ();
-		type OnNewAccount = ();
-		type Event = Event;
-		type TransactionPayment = ();
-		type TransferPayment = ();
-		type DustRemoval = ();
-	}
-
-	impl delegation::Trait for Test {
 		type Event = Event;
 	}
 
@@ -119,19 +97,12 @@ mod tests {
 	}
 
 	pub type System = system::Module<Test>;
-	pub type Delegation = delegation::Module<Test>;
 	pub type Voting = Module<Test>;
 
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
-		t.extend(
-			delegation::delegation::GenesisConfig::<Test> {
-				delegation_depth: 5,
-				_genesis_phantom_data: Default::default(),
-			}.build_storage().unwrap().0,
-		);
+		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.into()
 	}
@@ -160,10 +131,6 @@ mod tests {
 
 	fn advance_stage_as_initiator(who: u64, vote_id: u64) -> Result {
 		Voting::advance_stage_as_initiator(Origin::signed(who), vote_id)
-	}
-
-	fn delegate_to(who: u64, to: u64) -> Result {
-		Delegation::delegate_to(Origin::signed(who), to)
 	}
 
 	fn get_test_key() -> u64 {
@@ -252,7 +219,8 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary)),
+					topics: vec![],
 				}
 			]);
 		});
@@ -383,11 +351,13 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting)),
+					topics: vec![],
 				}
 			]);
 		});
@@ -410,15 +380,18 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0])),
+					topics: vec![],
 				}
 			]);
 		});
@@ -472,19 +445,23 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Voting)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0])),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Voting, VoteStage::Completed))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Voting, VoteStage::Completed)),
+					topics: vec![],
 				}
 			]);
 		});
@@ -509,11 +486,13 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit)),
+					topics: vec![],
 				}
 			]);
 		});
@@ -586,60 +565,30 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(1, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::PreVoting, VoteStage::Commit)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCommitted(1, public2))
+					event: Event::voting(voting::RawEvent::VoteCommitted(1, public2)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Commit, VoteStage::Voting))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(1, VoteStage::Commit, VoteStage::Voting)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0]))
+					event: Event::voting(voting::RawEvent::VoteRevealed(1, public2, vote.3[0])),
+					topics: vec![],
 				}
 			]);
-		});
-	}
-
-	#[test]
-	fn delegation_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			/*  To test delegation, we'll generate a delegation graph, have some
-			 *  users vote, then make sure the vote tallies as expected.
-			 *  Delegation graph:
-			 *    1 --> 2 --> 3 --> 4
-			 *                ^     ^
-			 *                |     |
-			 *                5     6
-			 *  Voters: 2 (0x0), 4 (0x1), 5 (0x0)
-			 *  Expected Tally: 3 votes for 0x0, 3 votes for 0x1
-			 */
-			System::set_block_number(1);
-			// set up delegations
-			let users = vec![1,2,3,4,5,6,7];
-			assert_ok!(delegate_to(users[1], users[2]));
-			assert_ok!(delegate_to(users[2], users[3]));
-			assert_ok!(delegate_to(users[3], users[4]));
-			assert_ok!(delegate_to(users[5], users[3]));
-			assert_ok!(delegate_to(users[6], users[4]));
-
-			let creator = get_test_key();
-			let vote = generate_1p1v_public_binary_vote();
-			assert_eq!(Ok(1), create_vote(creator, vote.0, vote.1, vote.2, &vote.3));
-			assert_ok!(advance_stage_as_initiator(creator, 1));
-
-			// perform votes
-			assert_ok!(reveal(users[2], 1, vote.3[0], None));
-			assert_ok!(reveal(users[4], 1, vote.3[1], None));
-			assert_ok!(reveal(users[5], 1, vote.3[0], None));
-			assert_ok!(advance_stage_as_initiator(creator, 1));
 		});
 	}
 }

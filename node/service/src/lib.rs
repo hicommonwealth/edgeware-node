@@ -23,13 +23,11 @@ extern crate log;
 #[macro_use]
 extern crate hex_literal;
 
-use edgeware_executor;
-
 use substrate_primitives as primitives;
 use substrate_client as client;
 #[macro_use]
 extern crate substrate_service as service;
-use substrate_consensus_aura as aura;
+use substrate_consensus_aura as consensus;
 use substrate_finality_grandpa as grandpa;
 use substrate_network as network;
 use substrate_transaction_pool as transaction_pool;
@@ -37,31 +35,39 @@ use substrate_transaction_pool as transaction_pool;
 
 use substrate_inherents as inherents;
 
+pub mod fixtures;
 pub mod chain_spec;
 
 use std::sync::Arc;
 use std::time::Duration;
-use tokio::runtime::TaskExecutor;
-use service::{FactoryFullConfiguration, FullBackend, LightBackend, FullExecutor, LightExecutor};
+
+use client::{LongestChain};
+use grandpa::{FinalityProofProvider as GrandpaFinalityProofProvider};
 use transaction_pool::txpool::{Pool as TransactionPool};
-use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration, NothingExtra};
+use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration};
 use inherents::InherentDataProviders;
 pub use service::{
-	Roles, PruningMode, TransactionPoolOptions, ComponentClient,
-	ErrorKind, Error, ComponentBlock, LightComponents, FullComponents,
-	FullClient, LightClient, Components, Service, ServiceFactory
+	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
+	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor, TaskExecutor,
+	error::{Error as ServiceError},
 };
 
+
 use primitives::{ed25519, crypto::Pair};
-use edgeware_primitives::{Block};
-use edgeware_runtime::{GenesisConfig, RuntimeApi};
+use futures::prelude::*;
+
 pub use client::{backend::Backend, runtime_api::Core as CoreApi, ExecutionStrategy};
 pub use primitives::{Blake2Hasher};
 pub use sr_primitives::traits::ProvideRuntimeApi;
 pub use chain_spec::ChainSpec;
 use network::construct_simple_protocol;
-use substrate_service::construct_service_factory;
+use substrate_service::{construct_service_factory, TelemetryOnConnect};
 use log::info;
+
+
+use edgeware_executor;
+use edgeware_primitives::{Block};
+use edgeware_runtime::{GenesisConfig, RuntimeApi};
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -69,18 +75,15 @@ construct_simple_protocol! {
 }
 
 /// Node specific configuration
-pub struct NodeConfig {
+pub struct NodeConfig<F: substrate_service::ServiceFactory> {
 	/// grandpa connection to import block
 	// FIXME #1134 rather than putting this on the config, let's have an actual intermediate setup state
-	pub grandpa_import_setup: Option<(
-		Arc<grandpa::BlockImportForService<Factory>>,
-		grandpa::LinkHalfForService<Factory>
-	)>,
+	pub grandpa_import_setup: Option<(Arc<grandpa::BlockImportForService<F>>, grandpa::LinkHalfForService<F>)>,
 	inherent_data_providers: InherentDataProviders,
 }
 
-impl Default for NodeConfig {
-	fn default() -> NodeConfig {
+impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
+	fn default() -> NodeConfig<F> {
 		NodeConfig {
 			grandpa_import_setup: None,
 			inherent_data_providers: InherentDataProviders::new(),
@@ -99,7 +102,7 @@ construct_service_factory! {
 		LightTransactionPoolApi = transaction_pool::ChainApi<client::Client<LightBackend<Self>, LightExecutor<Self>, Block, RuntimeApi>, Block>
 			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
 		Genesis = GenesisConfig,
-		Configuration = NodeConfig,
+		Configuration = NodeConfig<Self>,
 		FullService = FullComponents<Self>
 			{ |config: FactoryFullConfiguration<Self>, executor: TaskExecutor|
 				FullComponents::<Factory>::new(config, executor) },
@@ -113,21 +116,23 @@ construct_service_factory! {
 					let proposer = Arc::new(substrate_basic_authorship::ProposerFactory {
 						client: service.client(),
 						transaction_pool: service.transaction_pool(),
-						inherents_pool: service.inherents_pool(),
 					});
 
 					let client = service.client();
-					executor.spawn(start_aura(
+					let select_chain = service.select_chain()
+						.ok_or(ServiceError::SelectChainRequired)?;
+					let aura = start_aura(
 						SlotDuration::get_or_compute(&*client)?,
 						key.clone(),
 						client,
+						select_chain,
 						block_import.clone(),
 						proposer,
 						service.network(),
-						service.on_exit(),
 						service.config.custom.inherent_data_providers.clone(),
 						service.config.force_authoring,
-					)?);
+					)?;
+					executor.spawn(aura.select(service.on_exit()).then(|_| Ok(())));
 
 					info!("Running Grandpa session as Authority {}", key.public());
 				}
@@ -138,19 +143,40 @@ construct_service_factory! {
 					local_key
 				};
 
-				executor.spawn(grandpa::run_grandpa(
-					grandpa::Config {
-						local_key,
-						// FIXME #1578 make this available through chainspec
-						gossip_duration: Duration::from_millis(333),
-						justification_period: 4096,
-						name: Some(service.config.name.clone())
+				let config = grandpa::Config {
+					local_key,
+					// FIXME #1578 make this available through chainspec
+					gossip_duration: Duration::from_millis(333),
+					justification_period: 4096,
+					name: Some(service.config.name.clone())
+				};
+
+				match config.local_key {
+					None => {
+						executor.spawn(grandpa::run_grandpa_observer(
+							config,
+							link_half,
+							service.network(),
+							service.on_exit(),
+						)?);
 					},
-					link_half,
-					service.network(),
-					service.config.custom.inherent_data_providers.clone(),
-					service.on_exit(),
-				)?);
+					Some(_) => {
+						let telemetry_on_connect = TelemetryOnConnect {
+							on_exit: Box::new(service.on_exit()),
+							telemetry_connection_sinks: service.telemetry_on_connect_stream(),
+							executor: &executor,
+						};
+						let grandpa_config = grandpa::GrandpaParams {
+							config: config,
+							link: link_half,
+							network: service.network(),
+							inherent_data_providers: service.config.custom.inherent_data_providers.clone(),
+							on_exit: service.on_exit(),
+							telemetry_on_connect: Some(telemetry_on_connect),
+						};
+						executor.spawn(grandpa::run_grandpa_voter(grandpa_config)?);
+					},
+				}
 
 				Ok(service)
 			}
@@ -158,44 +184,83 @@ construct_service_factory! {
 		LightService = LightComponents<Self>
 			{ |config, executor| <LightComponents<Factory>>::new(config, executor) },
 		FullImportQueue = AuraImportQueue<Self::Block>
-			{ |config: &mut FactoryFullConfiguration<Self> , client: Arc<FullClient<Self>>| {
+			{ |config: &mut FactoryFullConfiguration<Self> , client: Arc<FullClient<Self>>, select_chain: Self::SelectChain| {
 				let slot_duration = SlotDuration::get_or_compute(&*client)?;
 				let (block_import, link_half) =
-					grandpa::block_import::<_, _, _, RuntimeApi, FullClient<Self>>(
-						client.clone(), client.clone()
+					grandpa::block_import::<_, _, _, RuntimeApi, FullClient<Self>, _>(
+						client.clone(), client.clone(), select_chain
 					)?;
 				let block_import = Arc::new(block_import);
 				let justification_import = block_import.clone();
 
 				config.custom.grandpa_import_setup = Some((block_import.clone(), link_half));
 
-				import_queue::<_, _, _, ed25519::Pair>(
+				import_queue::<_, _, ed25519::Pair>(
 					slot_duration,
 					block_import,
 					Some(justification_import),
+					None,
+					None,
 					client,
-					NothingExtra,
 					config.custom.inherent_data_providers.clone(),
 				).map_err(Into::into)
 			}},
 		LightImportQueue = AuraImportQueue<Self::Block>
 			{ |config: &FactoryFullConfiguration<Self>, client: Arc<LightClient<Self>>| {
-				import_queue::<_, _, _, ed25519::Pair>(
+				#[allow(deprecated)]
+				let fetch_checker = client.backend().blockchain().fetcher()
+					.upgrade()
+					.map(|fetcher| fetcher.checker().clone())
+					.ok_or_else(|| "Trying to start light import queue without active fetch checker")?;
+				let block_import = grandpa::light_block_import::<_, _, _, RuntimeApi, LightClient<Self>>(
+					client.clone(), Arc::new(fetch_checker), client.clone()
+				)?;
+				let block_import = Arc::new(block_import);
+				let finality_proof_import = block_import.clone();
+				let finality_proof_request_builder = finality_proof_import.create_finality_proof_request_builder();
+
+				import_queue::<_, _, ed25519::Pair>(
 					SlotDuration::get_or_compute(&*client)?,
-					client.clone(),
+					block_import,
 					None,
+					Some(finality_proof_import),
+					Some(finality_proof_request_builder),
 					client,
-					NothingExtra,
 					config.custom.inherent_data_providers.clone(),
 				).map_err(Into::into)
+			}},
+		SelectChain = LongestChain<FullBackend<Self>, Self::Block>
+			{ |config: &FactoryFullConfiguration<Self>, client: Arc<FullClient<Self>>| {
+				#[allow(deprecated)]
+				Ok(LongestChain::new(client.backend().clone()))
 			}
 		},
+		FinalityProofProvider = { |client: Arc<FullClient<Self>>| {
+			Ok(Some(Arc::new(GrandpaFinalityProofProvider::new(client.clone(), client)) as _))
+		}},
 	}
 }
 
 
 #[cfg(test)]
 mod tests {
+	use std::sync::Arc;
+	use consensus::CompatibleDigestItem;
+	use consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
+	use edgeware_primitives::DigestItem;
+	use edgeware_runtime::{Call, BalancesCall, UncheckedExtrinsic};
+	use parity_codec::{Compact, Encode, Decode};
+	use primitives::{
+		crypto::Pair as CryptoPair, ed25519::Pair, blake2_256,
+		sr25519::Public as AddressPublic,
+	};
+	use sr_primitives::{generic::{BlockId, Era, Digest}, traits::{Block, Digest as DigestT}, OpaqueExtrinsic};
+	use timestamp;
+	use finality_tracker;
+	use keyring::{ed25519::Keyring as AuthorityKeyring, sr25519::Keyring as AccountKeyring};
+	use substrate_service::ServiceFactory;
+	use crate::service::Factory;
+
 	#[cfg(feature = "rhd")]
 	fn test_sync() {
 		use {service_test, Factory};
@@ -207,7 +272,7 @@ mod tests {
 		let keys: Vec<&ed25519::Pair> = vec![&*alice, &*bob];
 		let dummy_runtime = ::tokio::runtime::Runtime::new().unwrap();
 		let block_factory = |service: &<Factory as service::ServiceFactory>::FullService| {
-			let block_id = BlockId::number(service.client().info().unwrap().chain.best_number);
+			let block_id = BlockId::number(service.client().info().chain.best_number);
 			let parent_header = service.client().header(&block_id).unwrap().unwrap();
 			let consensus_net = ConsensusNetwork::new(service.network(), service.client().clone());
 			let proposer_factory = consensus::ProposerFactory {
@@ -241,5 +306,109 @@ mod tests {
 			OpaqueExtrinsic(v)
 		};
 		service_test::sync::<Factory, _, _>(chain_spec::integration_test_config(), block_factory, extrinsic_factory);
+	}
+
+	#[test]
+	#[ignore]
+	fn test_sync() {
+		let chain_spec = crate::chain_spec::tests::integration_test_config_with_single_authority();
+
+		let alice = Arc::new(AuthorityKeyring::Alice.pair());
+		let mut slot_num = 1u64;
+		let block_factory = |service: &<Factory as ServiceFactory>::FullService| {
+			let mut inherent_data = service.config.custom.inherent_data_providers
+				.create_inherent_data().unwrap();
+			inherent_data.replace_data(finality_tracker::INHERENT_IDENTIFIER, &1u64);
+			inherent_data.replace_data(timestamp::INHERENT_IDENTIFIER, &(slot_num * 10));
+
+			let parent_id = BlockId::number(service.client().info().chain.best_number);
+			let parent_header = service.client().header(&parent_id).unwrap().unwrap();
+			let proposer_factory = Arc::new(substrate_basic_authorship::ProposerFactory {
+				client: service.client(),
+				transaction_pool: service.transaction_pool(),
+			});
+			let mut digest = Digest::<DigestItem>::default();
+			digest.push(<DigestItem as CompatibleDigestItem<Pair>>::aura_pre_digest(slot_num * 10 / 2));
+			let proposer = proposer_factory.init(&parent_header, &[]).unwrap();
+			let new_block = proposer.propose(
+				inherent_data,
+				digest,
+				::std::time::Duration::from_secs(1),
+			).expect("Error making test block");
+
+			let (new_header, new_body) = new_block.deconstruct();
+			let pre_hash = new_header.hash();
+			// sign the pre-sealed hash of the block and then
+			// add it to a digest item.
+			let to_sign = pre_hash.encode();
+			let signature = alice.sign(&to_sign[..]);
+			let item = <DigestItem as CompatibleDigestItem<Pair>>::aura_seal(
+				signature,
+			);
+			slot_num += 1;
+
+			ImportBlock {
+				origin: BlockOrigin::File,
+				header: new_header,
+				justification: None,
+				post_digests: vec![item],
+				body: Some(new_body),
+				finalized: true,
+				auxiliary: Vec::new(),
+				fork_choice: ForkChoiceStrategy::LongestChain,
+			}
+		};
+
+		let bob = Arc::new(AccountKeyring::Bob.pair());
+		let charlie = Arc::new(AccountKeyring::Charlie.pair());
+
+		let mut index = 0;
+		let extrinsic_factory = |service: &<Factory as ServiceFactory>::FullService| {
+			let amount = 1000;
+			let to = AddressPublic::from_raw(bob.public().0);
+			let from = AddressPublic::from_raw(charlie.public().0);
+			let genesis_hash = service.client().block_hash(0).unwrap().unwrap();
+			let signer = charlie.clone();
+
+			let function = Call::Balances(BalancesCall::transfer(to.into(), amount));
+			let era = Era::immortal();
+			let raw_payload = (Compact(index), function, era, genesis_hash);
+			let signature = raw_payload.using_encoded(|payload| if payload.len() > 256 {
+				signer.sign(&blake2_256(payload)[..])
+			} else {
+				signer.sign(payload)
+			});
+			let xt = UncheckedExtrinsic::new_signed(
+				index,
+				raw_payload.1,
+				from.into(),
+				signature.into(),
+				era,
+			).encode();
+			let v: Vec<u8> = Decode::decode(&mut xt.as_slice()).unwrap();
+
+			index += 1;
+			OpaqueExtrinsic(v)
+		};
+
+		service_test::sync::<Factory, _, _>(
+			chain_spec,
+			block_factory,
+			extrinsic_factory,
+		);
+	}
+
+	#[test]
+	#[ignore]
+	fn test_consensus() {
+		use super::Factory;
+
+		service_test::consensus::<Factory>(
+			crate::chain_spec::tests::integration_test_config_with_two_authorities(),
+			vec![
+				"//Alice".into(),
+				"//Bob".into(),
+			],
+		)
 	}
 }

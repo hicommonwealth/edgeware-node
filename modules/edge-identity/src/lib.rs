@@ -25,10 +25,7 @@ extern crate serde;
 #[cfg(feature = "std")]
 extern crate serde_derive;
 #[cfg(test)]
-#[macro_use]
 extern crate hex_literal;
-#[macro_use]
-extern crate parity_codec_derive;
 #[macro_use]
 extern crate srml_support;
 
@@ -40,7 +37,6 @@ extern crate srml_support as runtime_support;
 extern crate substrate_primitives as primitives;
 
 extern crate srml_system as system;
-extern crate srml_consensus as consensus;
 extern crate srml_balances as balances;
 
 pub mod identity;
@@ -53,7 +49,6 @@ pub use identity::{
 #[cfg(test)]
 mod tests {
 	use super::*;
-
 	use codec::Encode;
 	use primitives::{Blake2Hasher, H256, Hasher};
 	use rstd::prelude::*;
@@ -63,7 +58,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		testing::{Digest, DigestItem, Header, UintAuthorityId},
+		testing::{Header},
 		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 		BuildStorage,
 	};
@@ -78,10 +73,6 @@ mod tests {
 		}
 	}
 
-	impl_outer_dispatch! {
-		pub enum Call for Test where origin: Origin { }
-	}
-
 	// For testing the module, we construct most of a mock runtime. This means
 	// first constructing a configuration type (`Test`) which `impl`s each of the
 	// configuration traits of modules we want to use.
@@ -93,12 +84,10 @@ mod tests {
 		type BlockNumber = u64;
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
-		type Digest = Digest;
 		type AccountId = u64;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
-		type Log = DigestItem;
 	}
 
 	impl balances::Trait for Test {
@@ -111,11 +100,6 @@ mod tests {
 		type DustRemoval = ();
 	}
 
-	impl consensus::Trait for Test {
-		type Log = DigestItem;
-		type SessionKey = UintAuthorityId;
-		type InherentOfflineReport = ();
-	}
 	impl Trait for Test {
 		type Event = Event;
 		type Currency = balances::Module<Self>;
@@ -173,16 +157,12 @@ mod tests {
 		Identity::verify(Origin::signed(who), identity_hash, verifier_index)
 	}
 
-	fn deny_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
-		Identity::deny(Origin::signed(who), identity_hash, verifier_index)
-	}
-
-	fn verify_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
-		Identity::verify_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
-	}
-
 	fn deny_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
 		Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
+	}
+
+	fn revoke(who: u64, identity_hash: H256) -> Result {
+		Identity::revoke(Origin::signed(who), identity_hash)
 	}
 
 	fn add_metadata_to_account(
@@ -230,7 +210,7 @@ mod tests {
 
 			let public = 1_u64;
 
- 			let expiration_length = Identity::expiration_length();
+			let expiration_length = Identity::expiration_length();
 			let now = System::block_number();
 			let expires_at = now + expiration_length;
 
@@ -243,7 +223,8 @@ mod tests {
 				System::events(),
 				vec![EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::identity(RawEvent::Register(identity_hash, public, expires_at))
+					event: Event::identity(RawEvent::Register(identity_hash, public, expires_at)),
+					topics: vec![],
 				}]
 			);
 			assert_eq!(Identity::identities(), vec![identity_hash]);
@@ -339,14 +320,14 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
- 			let mut expiration_length = Identity::expiration_length();
+			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
 			let register_expires_at = now + expiration_length;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
- 			expiration_length = Identity::expiration_length();
+			expiration_length = Identity::expiration_length();
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
@@ -355,11 +336,13 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
+						topics: vec![],
 					}
 				]
 			);
@@ -387,14 +370,14 @@ mod tests {
 
 			let public = 1_u64;
 
- 			let mut expiration_length = Identity::expiration_length();
+			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
 			let register_expires_at = now + expiration_length;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(register_and_attest(public, identity_type, identity, attestation));
 
- 			expiration_length = Identity::expiration_length();
+			expiration_length = Identity::expiration_length();
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
@@ -403,11 +386,13 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
+						topics: vec![],
 					}
 				]
 			);
@@ -485,14 +470,14 @@ mod tests {
 			let after_register_balance = Balances::free_balance(public);
 			assert_eq!(balance - BOND, after_register_balance);
 
- 			let mut expiration_length = Identity::expiration_length();
+			let mut expiration_length = Identity::expiration_length();
 			let mut now = System::block_number();
 			let register_expires_at = now + expiration_length;
 
 			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
 			assert_ok!(attest_to_identity(public, identity_hash, attestation));
 
- 			expiration_length = Identity::expiration_length();
+			expiration_length = Identity::expiration_length();
 			now = System::block_number();
 			let _attest_expires_at = now + expiration_length;
 
@@ -507,15 +492,18 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec()))
+						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec()))
+						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec())),
+						topics: vec![],
 					}
 				]
 			);
@@ -557,7 +545,8 @@ mod tests {
 				events[events.len() - 1],
 				EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode()))
+						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode())),
+						topics: vec![],
 				}
 			);
 		});
@@ -674,7 +663,7 @@ mod tests {
 
 			assert_ok!(register_identity(public, identity_type, identity));
 
- 			let expiration_length = Identity::expiration_length();
+			let expiration_length = Identity::expiration_length();
 			let now = System::block_number();
 			let expires_at = now + expiration_length;
 
@@ -693,11 +682,13 @@ mod tests {
 				vec![
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, expires_at))
+						event: Event::identity(RawEvent::Register(identity_hash, public, expires_at)),
+						topics: vec![],
 					},
 					EventRecord {
 						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Expired(identity_hash))
+						event: Event::identity(RawEvent::Expired(identity_hash)),
+						topics: vec![],
 					},
 				]
 			);
@@ -793,6 +784,112 @@ mod tests {
 			assert_eq!(
 				Identity::identity_of(identity_hash),
 				Some(default_identity_record(public, identity_type, identity))
+			);
+		});
+	}
+
+	#[test]
+	fn revoke_verified_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			// Attest
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			System::set_block_number(2);
+			let verifier = 1_u64;
+			assert_ok!(verify_identity(verifier, identity_hash, 0));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Verified,
+					expiration_length: 0,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity_type, identity)
+				})
+			);
+			assert_ok!(revoke(public, identity_hash));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				None,
+			);
+		});
+	}
+
+	#[test]
+	fn revoke_from_wrong_sender_should_not_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			// Attest
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+
+			System::set_block_number(2);
+			let verifier = 1_u64;
+			assert_ok!(verify_identity(verifier, identity_hash, 0));
+			assert_err!(revoke(2_u64, identity_hash), "Stored identity does not match sender");
+		});
+	}
+
+	#[test]
+	fn revoke_at_registered_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(default_identity_record(public, identity_type, identity))
+			);
+			assert_ok!(revoke(public, identity_hash));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				None,
+			);
+		});
+	}
+
+	#[test]
+	fn revoke_at_attested_should_work() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+			let public = 1_u64;
+			// Register
+			assert_ok!(register_identity(public, identity_type, identity));
+			// Attest
+			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
+			assert_ok!(attest_to_identity(public, identity_hash, attestation));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				Some(IdentityRecord {
+					stage: IdentityStage::Attested,
+					proof: Some(attestation.to_vec()),
+					..default_identity_record(public, identity_type, identity)
+				})
+			);
+			assert_ok!(revoke(public, identity_hash));
+			assert_eq!(
+				Identity::identity_of(identity_hash),
+				None,
 			);
 		});
 	}

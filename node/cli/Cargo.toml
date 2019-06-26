@@ -7,9 +7,31 @@ edition = "2018"
 [dependencies]
 log = "0.4.6"
 tokio = "0.1.7"
+rand = "0.6"
 futures = "0.1.17"
 exit-future = "0.1"
 substrate-cli = { git = "https://github.com/paritytech/substrate" }
+substrate-service = { git = "https://github.com/paritytech/substrate" }
 edgeware-service = { path = "../service" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
+
+parity-codec = { version = "3.3" }
+sr-io = { git = "https://github.com/paritytech/substrate" }
+primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate" }
+inherents = { package = "substrate-inherents", git = "https://github.com/paritytech/substrate" }
+hex-literal = "0.2"
+substrate-basic-authorship = { git = "https://github.com/paritytech/substrate" }
+transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/paritytech/substrate" }
+network = { package = "substrate-network", git = "https://github.com/paritytech/substrate" }
+consensus = { package = "substrate-consensus-aura", git = "https://github.com/paritytech/substrate" }
+grandpa = { package = "substrate-finality-grandpa", git = "https://github.com/paritytech/substrate" }
+sr-primitives = { git = "https://github.com/paritytech/substrate" }
+substrate-keystore = { git = "https://github.com/paritytech/substrate" }
+substrate-telemetry = { package = "substrate-telemetry", git = "https://github.com/paritytech/substrate" }
+structopt = "0.2"
+transaction-factory = { git = "https://github.com/paritytech/substrate" }
+keyring = { package = "substrate-keyring", git = "https://github.com/paritytech/substrate" }
+indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
+timestamp = { package = "srml-timestamp",git = "https://github.com/paritytech/substrate", default-features = false }
+finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }

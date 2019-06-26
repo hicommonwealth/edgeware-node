@@ -30,9 +30,7 @@ extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
 extern crate sr_io as runtime_io;
-extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate edge_delegation as delegation;
 
 use rstd::prelude::*;
 use rstd::result;
@@ -40,13 +38,12 @@ use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
-use runtime_primitives::traits::{Zero, One};
-use runtime_primitives::traits::{CheckedAdd};
-use codec::Encode;
+
+
+use codec::{Encode, Decode};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
-pub type Tally<Balance> = Option<Vec<(VoteOutcome, Balance)>>;
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq)]
@@ -109,7 +106,7 @@ pub struct VoteRecord<AccountId> {
 	pub outcomes: Vec<VoteOutcome>,
 }
 
-pub trait Trait: balances::Trait + delegation::Trait {
+pub trait Trait: system::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 }
@@ -128,7 +125,7 @@ decl_module! {
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.is_commit_reveal, "Commitments are not configured for this vote");
 			ensure!(record.data.stage == VoteStage::Commit, "Vote is not in commit stage");
-			// TODO: Allow changing of commits before commit stage ends
+			// No changing of commitments once placed
 			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
 
 			// Add commitment to record
@@ -148,7 +145,7 @@ decl_module! {
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
 			// Check vote is for a valid outcome
 			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote outcome is not valid");
-			// TODO: Allow changing of votes
+			// Reject vote or reveal changes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
 			// Ensure voter committed

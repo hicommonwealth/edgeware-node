@@ -23,7 +23,6 @@ balances = { package = "srml-balances", git = "https://github.com/paritytech/sub
 session = { package = "srml-session", git = "https://github.com/paritytech/substrate" }
 staking = { package = "srml-staking", git = "https://github.com/paritytech/substrate" }
 system = { package = "srml-system", git = "https://github.com/paritytech/substrate" }
-consensus = { package = "srml-consensus", git = "https://github.com/paritytech/substrate" }
 timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate" }
 treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate" }
 contract = { package = "srml-contract", git = "https://github.com/paritytech/substrate" }
