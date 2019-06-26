@@ -343,9 +343,9 @@ pub fn cwci_testnet_genesis(
             voting_fee: 2 * DOLLARS,
             present_slash_per_voter: 1 * CENTS,
             carry_count: 6,
-            presentation_duration: 1 * DAYS,
-            approval_voting_period: 2 * DAYS,
-            term_duration: 28 * DAYS,
+            presentation_duration: 10 * MINUTES,
+            approval_voting_period: 20 * MINUTES,
+            term_duration: 1 * HOURS,
             desired_seats: 0,
             decay_ratio: 0,
             inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
@@ -356,7 +356,7 @@ pub fn cwci_testnet_genesis(
         treasury: Some(TreasuryConfig {
             proposal_bond: Permill::from_percent(5),
             proposal_bond_minimum: 1 * DOLLARS,
-            spend_period: 1 * DAYS,
+            spend_period: 10 * MINUTES,
             burn: Permill::from_percent(50),
         }),
         contract: Some(ContractConfig {
@@ -390,11 +390,11 @@ pub fn cwci_testnet_genesis(
         }),
         identity: Some(IdentityConfig {
             verifiers: initial_verifiers,
-            expiration_length: 7 * DAYS, // 7 days
+            expiration_length: 10 * MINUTES,
             registration_bond: 1 * CENTS,
         }),
         governance: Some(GovernanceConfig {
-            voting_length: 7 * DAYS, // 7 days
+            voting_length: 10 * MINUTES,
             proposal_creation_bond: 1 * CENTS,
         }),
     }
@@ -438,7 +438,15 @@ fn local_testnet_genesis() -> GenesisConfig {
 
 /// Local testnet config (multivalidator Alice + Bob)
 pub fn local_testnet_config() -> ChainSpec {
-    ChainSpec::from_genesis("Local Testnet", "local_testnet", local_testnet_genesis, vec![], None, Some(DEFAULT_PROTOCOL_ID), None, None)
+    ChainSpec::from_genesis(
+        "Local Testnet",
+        "local_testnet",
+        local_testnet_genesis,
+        vec![],
+        None,
+        Some(DEFAULT_PROTOCOL_ID),
+        None,
+        None)
 }
 
 

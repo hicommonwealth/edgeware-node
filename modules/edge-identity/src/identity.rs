@@ -123,8 +123,6 @@ decl_module! {
             ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
             // Check that original sender and current sender match
             ensure!(record.account == _sender, "Stored identity does not match sender");
-            // Check that the original sender and the attestation sender match
-            // TODO
             // Attest to records
             return Self::attest_for(_sender, identity_hash, attestation);
         }
@@ -323,10 +321,7 @@ impl<T: Trait> Module<T> {
         let identity = record.identity.clone();
         let now = <system::Module<T>>::block_number();
         let expiration = now + Self::expiration_length();
-
-        // TODO: Decide how we want to process proof updates
-        // currently this implements no check against updating
-        // proof links
+        // Currently this implements no check against updating proof links
         <IdentityOf<T>>::insert(identity_hash, IdentityRecord {
             proof: Some(attestation.clone()),
             stage: IdentityStage::Attested,

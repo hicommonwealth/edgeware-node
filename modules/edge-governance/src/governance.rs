@@ -67,7 +67,6 @@ pub struct ProposalRecord<AccountId, Moment> {
 	pub category: ProposalCategory,
 	pub title: Vec<u8>,
 	pub contents: Vec<u8>,
-	// TODO: for actions, we might need more data
 	pub vote_id: u64,
 }
 
@@ -103,7 +102,6 @@ decl_module! {
 			ensure!(!contents.is_empty(), "Proposal must not be empty");
 
 			// construct hash(origin + proposal) and check existence
-			// TODO: include title/category/etc?
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&_sender.encode());
 			buf.extend_from_slice(&contents.as_ref());
@@ -175,7 +173,6 @@ decl_module! {
 					Some(record) => {
 						// voting -> completed
 						let vote_id = record.vote_id;
-						// TODO: handle possible errors from advance_stage?
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
 						// Unreserve the proposal creation bond amount
 						T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
@@ -187,7 +184,7 @@ decl_module! {
 						});
 						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id));
 					},
-					None => { } // TODO: emit an error here?
+					None => {}
 				}
 			});
 		}

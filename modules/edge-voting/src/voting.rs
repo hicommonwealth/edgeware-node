@@ -125,7 +125,7 @@ decl_module! {
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.is_commit_reveal, "Commitments are not configured for this vote");
 			ensure!(record.data.stage == VoteStage::Commit, "Vote is not in commit stage");
-			// TODO: Allow changing of commits before commit stage ends
+			// No changing of commitments once placed
 			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
 
 			// Add commitment to record
@@ -145,7 +145,7 @@ decl_module! {
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
 			// Check vote is for a valid outcome
 			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote outcome is not valid");
-			// TODO: Allow changing of votes
+			// Reject vote or reveal changes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 
 			// Ensure voter committed
