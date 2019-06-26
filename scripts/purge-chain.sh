@@ -11,8 +11,6 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	elif [[ "$db" == "edgeware" ]]; then
     	rm -rf ~/.local/share/edgeware/chains/edgeware/
     	rm -rf ~/.local/share/edgeware/chains/edgeware-testnet/
-	elif [[ "$db" == "cwci" ]]; then
-    	rm -rf ~/.local/share/edgeware/chains/cwci_testnet/
 	else
 		db="all"
 	    rm -rf ~/.local/share/edgeware/chains/dev/
@@ -20,7 +18,6 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
 	    rm -rf ~/.local/share/edgeware/chains/edgeware/
 	    rm -rf ~/.local/share/edgeware/chains/edgeware-testnet/
 	    rm -rf ~/.local/share/edgeware/chains/staging_testnet/
-    	rm -rf ~/.local/share/edgeware/chains/cwci_testnet/
     	rm -rf ~/.local/share/edgeware/chains/local_testnet/
 	fi
 elif [[ "$OSTYPE" == "darwin"* ]]; then
@@ -33,8 +30,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	elif [[ "$db" == "edgeware" ]]; then
 		rm -rf ~/Library/Application\ Support/edgeware/chains/edgeware/
 		rm -rf ~/Library/Application\ Support/edgeware/chains/edgeware-testnet/
-	elif [[ "$db" == "cwci" ]]; then
-		rm -rf ~/Library/Application\ Support/edgeware/chains/cwci_testnet/
 	else
 		db="all"
 		rm -rf ~/Library/Application\ Support/edgeware/chains/dev/
@@ -42,7 +37,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
 	    rm -rf ~/Library/Application\ Support/edgeware/chains/edgeware/
 	    rm -rf ~/Library/Application\ Support/edgeware/chains/edgeware-testnet/
 	    rm -rf ~/Library/Application\ Support/edgeware/chains/staging_testnet/
-		rm -rf ~/Library/Application\ Support/edgeware/chains/cwci_testnet/
 		rm -rf ~/Library/Application\ Support/edgeware/chains/local_testnet/
 	fi
 else
@@ -55,8 +49,6 @@ else
 	elif [[ "$db" == "edgeware" ]]; then
     	rm -rf ~/.local/share/edgeware/chains/edgeware/
     	rm -rf ~/.local/share/edgeware/chains/edgeware-testnet/
-	elif [[ "$db" == "cwci" ]]; then
-    	rm -rf ~/.local/share/edgeware/chains/cwci_testnet/
 	else
 		db="all"
 	    rm -rf ~/.local/share/edgeware/chains/dev/
@@ -64,7 +56,6 @@ else
 	    rm -rf ~/.local/share/edgeware/chains/edgeware/
 	    rm -rf ~/.local/share/edgeware/chains/edgeware-testnet/
 	    rm -rf ~/.local/share/edgeware/chains/staging_testnet/
-    	rm -rf ~/.local/share/edgeware/chains/cwci_testnet/
     	rm -rf ~/.local/share/edgeware/chains/local_testnet/
 	fi
 fi
