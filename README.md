@@ -4,11 +4,14 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 ## To get started
 
-Download this entire repository to the file system that you are using to run the validator node.
+- Download this entire repository to the file system that you are using to run the validator node.
+  - You can do this by going to [this page](https://github.com/hicommonwealth/edgeware-node) and selecting "Clone or download" followed by "Download ZIP".
+  - If you are installing via a command line interface (e.g. SSH into a remote server), you can download by running `wget https://github.com/hicommonwealth/edgeware-node/archive/master.zip`
+  - Once you have downloaded the zip file, unzip the `edgeware-node-master` folder onto the file system. If you are using a command line interface, you can unzip by running `unzip master.zip`
+  - **_All commands referenced in this document need to be run from within the `edgeware-node-master` folder._**
 
-You can do this by going to [this page](https://github.com/hicommonwealth/edgeware-node) and selecting "Clone or download" followed by "Download ZIP".
-
-Once you have downloaded the zip file, unzip the `edgeware-node-master` folder onto the file system. All commands referenced in this document need to be run from within this `edgeware-node-master` folder.
+- You will also need to install `rust` and `cargo` by installing `rustup` [here](https://rustup.rs/).
+  - **_Note_**: at the end of the install, you will need to log out and log in again, or run the suggested `source` command to configure the current shell.
 
 ## Fresh start
 If your device is clean (such as a fresh cloud VM) you can use this script, otherwise, proceed with the *Initial Setup*.
@@ -66,7 +69,7 @@ cargo build --release
 
 Ensure you have a fresh start if updating from another version:
 ```
-./purge-chain.sh
+./scripts/purge-chain.sh
 ```
 To start up the Edgeware node and connect to the latest testnet, run:
 ```
