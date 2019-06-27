@@ -58,7 +58,7 @@ brew install cmake pkg-config openssl git llvm
 ### Building
 
 ```
-./build.sh
+./scripts/build.sh
 cargo build --release
 ```
 
