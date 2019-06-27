@@ -16,7 +16,7 @@ edgeware-service = { path = "../service" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 
-parity-codec = { version = "3.3" }
+parity-codec = { version = "4.1.1" }
 sr-io = { git = "https://github.com/paritytech/substrate" }
 primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate" }
 inherents = { package = "substrate-inherents", git = "https://github.com/paritytech/substrate" }
@@ -35,3 +35,7 @@ keyring = { package = "substrate-keyring", git = "https://github.com/paritytech/
 indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
 timestamp = { package = "srml-timestamp",git = "https://github.com/paritytech/substrate", default-features = false }
 finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }
+
+[build-dependencies]
+cli = { package = "substrate-cli", git = "https://github.com/paritytech/substrate" }
+structopt = "0.2"

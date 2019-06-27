@@ -20,7 +20,7 @@ use substrate_primitives::{ed25519, sr25519, Pair};
 use edgeware_primitives::{AccountId, AuraId};
 use edgeware_runtime::{CouncilSeatsConfig, AuraConfig, DemocracyConfig, SystemConfig,
     SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
-    SudoConfig, ContractConfig, GrandpaConfig, IndicesConfig, Permill, Perbill, SessionKeys,
+    SudoConfig, ContractsConfig, GrandpaConfig, IndicesConfig, Permill, Perbill, SessionKeys,
     IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
@@ -213,7 +213,7 @@ pub fn testnet_genesis(
             spend_period: 1 * DAYS,
             burn: Permill::from_percent(50),
         }),
-        contract: Some(ContractConfig {
+        contracts: Some(ContractsConfig {
             signed_claim_handicap: 2,
             rent_byte_price: 4,
             rent_deposit_offset: 1000,

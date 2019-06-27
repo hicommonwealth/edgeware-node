@@ -25,7 +25,7 @@ use edge_identity::identity;
 use edge_voting::voting;
 
 use rstd::prelude::*;
-use parity_codec::{Encode, Decode};
+
 use support::{construct_runtime, parameter_types};
 use substrate_primitives::u32_trait::{_1, _2, _3, _4};
 use edgeware_primitives::{
@@ -62,9 +62,9 @@ pub use staking::StakerStatus;
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 6,
-	spec_version: 6,
-	impl_version: 7,
+	authoring_version: 10,
+	spec_version: 10,
+	impl_version: 10,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -117,7 +117,7 @@ impl indices::Trait for Runtime {
 
 impl balances::Trait for Runtime {
 	type Balance = Balance;
-	type OnFreeBalanceZero = ((Staking, Contract), Session);
+	type OnFreeBalanceZero = ((Staking, Contracts), Session);
 	type OnNewAccount = Indices;
 	type Event = Event;
 	type TransactionPayment = ();
@@ -136,8 +136,6 @@ parameter_types! {
 }
 
 type SessionHandlers = (Grandpa, Aura);
-#[cfg(feature = "std")]
-use runtime_primitives::serde::{Serialize, Deserialize};
 impl_opaque_keys! {
 	pub struct SessionKeys(grandpa::AuthorityId, AuraId);
 }
@@ -224,14 +222,13 @@ impl treasury::Trait for Runtime {
 	type ProposalRejection = ();
 }
 
-impl contract::Trait for Runtime {
+impl contracts::Trait for Runtime {
 	type Currency = Balances;
 	type Call = Call;
 	type Event = Event;
-	type Gas = u64;
-	type DetermineContractAddress = contract::SimpleAddressDeterminator<Runtime>;
-	type ComputeDispatchFee = contract::DefaultDispatchFeeComputor<Runtime>;
-	type TrieIdGenerator = contract::TrieIdFromParentCounter<Runtime>;
+	type DetermineContractAddress = contracts::SimpleAddressDeterminator<Runtime>;
+	type ComputeDispatchFee = contracts::DefaultDispatchFeeComputor<Runtime>;
+	type TrieIdGenerator = contracts::TrieIdFromParentCounter<Runtime>;
 	type GasPayment = ();
 }
 
@@ -247,6 +244,7 @@ impl grandpa::Trait for Runtime {
 impl finality_tracker::Trait for Runtime {
 	type OnFinalizationStalled = Grandpa;
 }
+
 
 impl voting::Trait for Runtime {
 	type Event = Event;
@@ -268,21 +266,21 @@ construct_runtime!(
 		NodeBlock = edgeware_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: system::{default, Config<T>},
+		System: system::{Module, Call, Storage, Config, Event},
 		Aura: aura::{Module, Config<T>, Inherent(Timestamp)},
 		Timestamp: timestamp::{Module, Call, Storage, Config<T>, Inherent},
 		Indices: indices,
 		Balances: balances,
 		Session: session::{Module, Call, Storage, Event, Config<T>},
 		Staking: staking::{default, OfflineWorker},
-		Democracy: democracy,
+		Democracy: democracy::{Module, Call, Storage, Config, Event<T>},
 		Council: council::{Module, Call, Storage, Event<T>},
 		CouncilMotions: council_motions::{Module, Call, Storage, Event<T>, Origin<T>},
 		CouncilSeats: council_seats::{Config<T>},
 		FinalityTracker: finality_tracker::{Module, Call, Inherent},
-		Grandpa: grandpa::{Module, Call, Storage, Config<T>, Event},
+		Grandpa: grandpa::{Module, Call, Storage, Config, Event},
 		Treasury: treasury,
-		Contract: contract::{Module, Call, Storage, Config<T>, Event<T>},
+		Contracts: contracts,
 		Sudo: sudo,
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

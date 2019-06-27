@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 trie-root = "0.12"
-parity-codec = "3.3"
+parity-codec = "4.1.1"
 runtime_io = { package = "sr-io", git = "https://github.com/paritytech/substrate" }
 state_machine = { package = "substrate-state-machine", git = "https://github.com/paritytech/substrate" }
 substrate-executor = { git = "https://github.com/paritytech/substrate" }
@@ -25,7 +25,7 @@ staking = { package = "srml-staking", git = "https://github.com/paritytech/subst
 system = { package = "srml-system", git = "https://github.com/paritytech/substrate" }
 timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate" }
 treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate" }
-contract = { package = "srml-contract", git = "https://github.com/paritytech/substrate" }
+contracts = { package = "srml-contracts", git = "https://github.com/paritytech/substrate" }
 grandpa = { package = "srml-grandpa", git = "https://github.com/paritytech/substrate" }
 indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
 wabt = "~0.7.4"

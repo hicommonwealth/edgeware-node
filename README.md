@@ -94,8 +94,7 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 
 * [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
 * [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
-* [Consensus](https://github.com/paritytech/substrate/tree/master/srml/consensus)
-* [Contract](https://github.com/paritytech/substrate/tree/master/srml/contract)
+* [Contracts](https://github.com/paritytech/substrate/tree/master/srml/contract)
 * [Council](https://github.com/paritytech/substrate/tree/master/srml/council)
 * [Democracy](https://github.com/paritytech/substrate/tree/master/srml/democracy)
 * [Executive](https://github.com/paritytech/substrate/tree/master/srml/executive)

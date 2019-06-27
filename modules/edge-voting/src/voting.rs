@@ -22,8 +22,7 @@ extern crate serde;
 // Needed for deriving `Serialize` and `Deserialize` for various types.
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
-//#[cfg(feature = "std")]
-
+#[cfg(feature = "std")]
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
 extern crate sr_std as rstd;
@@ -210,7 +209,7 @@ impl<T: Trait> Module<T> {
 			},
 		});
 
-		<VoteRecordCount<T>>::mutate(|i| *i += 1);
+		<VoteRecordCount>::mutate(|i| *i += 1);
 		Self::deposit_event(RawEvent::VoteCreated(id, sender, vote_type));
 		return Ok(id);
 	}

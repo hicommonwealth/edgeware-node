@@ -24,8 +24,6 @@ extern crate serde;
 // in the wasm runtime.
 #[cfg(feature = "std")]
 extern crate serde_derive;
-#[cfg(test)]
-extern crate hex_literal;
 #[macro_use] extern crate srml_support;
 
 
@@ -55,7 +53,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage, traits::{BlakeTwo256, Hash, IdentityLookup},
+		traits::{BlakeTwo256, Hash, IdentityLookup},
 		testing::{Header}
 	};
 
@@ -102,7 +100,7 @@ mod tests {
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		let t = system::GenesisConfig::default().build_storage::<Test>().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.into()
 	}

@@ -8,6 +8,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         echo "Running apt as sudo"
         SUDO_PREFIX='sudo'
     fi
+    $SUDO_PREFIX apt update
     $SUDO_PREFIX apt install -y build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Found macbook"
@@ -25,6 +26,7 @@ fi
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
 rustup update stable
+rustup default nightly
 
 if [[ $(wasm-gc) ]]; then
     echo "Found wasm-gc"
