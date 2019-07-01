@@ -154,7 +154,6 @@ pub fn testnet_genesis(
     GenesisConfig {
         system: Some(SystemConfig {
             code: include_bytes!("../../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
-            _genesis_phantom_data: Default::default(),
             changes_trie_config: Default::default(),
         }),
         balances: Some(BalancesConfig {
@@ -225,12 +224,14 @@ pub fn testnet_genesis(
             transfer_fee: 1 * CENTS,
             creation_fee: 1 * CENTS,
             contract_fee: 1 * CENTS,
-            call_base_fee: 1000,
-            create_base_fee: 1000,
             gas_price: 1 * MILLICENTS,
             max_depth: 1024,
             block_gas_limit: 10_000_000,
-            current_schedule: Default::default(),
+            current_schedule: contracts::Schedule {
+                call_base_cost: 1000,
+                instantiate_base_cost: 1000,
+                ..Default::default()
+            },
         }),
         sudo: Some(SudoConfig {
             key: root_key,
@@ -240,7 +241,6 @@ pub fn testnet_genesis(
         }),
         grandpa: Some(GrandpaConfig {
             authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
-            _genesis_phantom_data: Default::default(),
         }),
         identity: Some(IdentityConfig {
             verifiers: initial_verifiers,

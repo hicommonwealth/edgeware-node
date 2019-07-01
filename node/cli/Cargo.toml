@@ -37,5 +37,4 @@ timestamp = { package = "srml-timestamp",git = "https://github.com/paritytech/su
 finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }
 
 [build-dependencies]
-cli = { package = "substrate-cli", git = "https://github.com/paritytech/substrate" }
 structopt = "0.2"

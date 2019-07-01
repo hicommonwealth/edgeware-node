@@ -32,6 +32,7 @@ finality_tracker = { package = "srml-finality-tracker", git = "https://github.co
 keyring = { package = "substrate-keyring", git = "https://github.com/paritytech/substrate" }
 indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
 timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate" }
+contracts = { package = "srml-contracts", git = "https://github.com/paritytech/substrate" }
 substrate-basic-authorship = { git = "https://github.com/paritytech/substrate" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

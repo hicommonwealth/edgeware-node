@@ -41,9 +41,9 @@ pub mod chain_spec;
 use std::sync::Arc;
 use std::time::Duration;
 
-use client::{self, LongestChain};
+use client::{LongestChain};
 use consensus::{import_queue, start_aura, AuraImportQueue, SlotDuration};
-use grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
+use grandpa::{FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;
 use primitives::{Pair as PairT, ed25519};
 use futures::prelude::*;
@@ -54,7 +54,7 @@ use substrate_service::{
 	FullClient, LightClient, LightBackend, FullExecutor, LightExecutor,
 	error::{Error as ServiceError},
 };
-use transaction_pool::{self, txpool::{Pool as TransactionPool}};
+use transaction_pool::{txpool::{Pool as TransactionPool}};
 use inherents::InherentDataProviders;
 use network::construct_simple_protocol;
 use substrate_service::construct_service_factory;
@@ -235,12 +235,12 @@ construct_service_factory! {
 #[cfg(test)]
 mod tests {
 	use std::sync::Arc;
-	use consensus::CompatibleDigestItem;
-	use consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
+	use crate::consensus::CompatibleDigestItem;
+	use substrate_consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
 	use edgeware_primitives::DigestItem;
 	use edgeware_runtime::{Call, BalancesCall, UncheckedExtrinsic};
 	use parity_codec::{Compact, Encode, Decode};
-	use primitives::{
+	use substrate_primitives::{
 		crypto::Pair as CryptoPair, ed25519::Pair, blake2_256,
 		sr25519::Public as AddressPublic, H256,
 	};
@@ -250,7 +250,7 @@ mod tests {
 	use keyring::{ed25519::Keyring as AuthorityKeyring, sr25519::Keyring as AccountKeyring};
 	use substrate_service::ServiceFactory;
 	use service_test::SyncService;
-	use crate::service::Factory;
+	use crate::Factory;
 
 	#[cfg(feature = "rhd")]
 	fn test_sync() {
