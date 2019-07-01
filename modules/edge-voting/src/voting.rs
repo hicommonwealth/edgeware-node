@@ -154,14 +154,16 @@ decl_module! {
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
 			// Ensure voter committed
 			if record.data.is_commit_reveal {
+				// Ensure secret is passed in
 				ensure!(secret.is_some(), "Secret is invalid");
+				// Ensure the current sender has already committed previously
 				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender already committed");
 				let commit: (T::AccountId, VoteOutcome) = record.commitments
 					.iter()
 					.find(|c| &c.0 == &_sender)
 					.unwrap()
 					.clone();
-
+				// Create commitment hash using reported secret and ranked choice ordering
 				let mut buf = Vec::new();
 				buf.extend_from_slice(&_sender.encode());
 				buf.extend_from_slice(&secret.unwrap().encode());
@@ -169,9 +171,10 @@ decl_module! {
 					buf.extend_from_slice(&vote[i]);
 				}
 				let hash = T::Hashing::hash_of(&buf);
+				// Ensure the hashes match
 				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
 			}
-
+			// Record the revealed vote and emit an event
 			let id = record.id;
 			record.reveals.push((_sender.clone(), vote.clone()));
 			<VoteRecords<T>>::insert(id, record);
