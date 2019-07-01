@@ -62,6 +62,8 @@ pub enum VoteType {
 	Binary,
 	// Multi option decision vote, i.e. > 2 possible outcomes
 	MultiOption,
+	// Ranked choice voting
+	RankedChoice,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -96,7 +98,7 @@ pub struct VoteRecord<AccountId> {
 	// Vote commitments
 	pub commitments: Vec<(AccountId, VoteOutcome)>,
 	// Vote reveals
-	pub reveals: Vec<(AccountId, VoteOutcome)>,
+	pub reveals: Vec<(AccountId, Vec<VoteOutcome>)>,
 	// Vote data record
 	pub data: VoteData<AccountId>,
 	// Vote outcomes
@@ -136,15 +138,20 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
-		pub fn reveal(origin, vote_id: u64, vote: VoteOutcome, secret: Option<VoteOutcome>) -> Result {
+		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
-			// Check vote is for a valid outcome
-			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote outcome is not valid");
+			// Check vote is for valid outcomes
+			for i in 0..vote.len() {
+				ensure!(record.outcomes.iter().any(|o| o == &vote[i]), "Vote outcome is not valid");
+			}
+			// Ensure ranked choice votes have same number of votes as outcomes
+			if record.data.vote_type == VoteType::RankedChoice {
+				ensure!(record.outcomes.len() == vote.len(), "Vote must rank all outcomes in order");
+			}
 			// Reject vote or reveal changes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
-
 			// Ensure voter committed
 			if record.data.is_commit_reveal {
 				ensure!(secret.is_some(), "Secret is invalid");
@@ -158,13 +165,15 @@ decl_module! {
 				let mut buf = Vec::new();
 				buf.extend_from_slice(&_sender.encode());
 				buf.extend_from_slice(&secret.unwrap().encode());
-				buf.extend_from_slice(&vote);
+				for i in 0..vote.len() {
+					buf.extend_from_slice(&vote[i]);
+				}
 				let hash = T::Hashing::hash_of(&buf);
 				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
 			}
 
 			let id = record.id;
-			record.reveals.push((_sender.clone(), vote));
+			record.reveals.push((_sender.clone(), vote.clone()));
 			<VoteRecords<T>>::insert(id, record);
 			Self::deposit_event(RawEvent::VoteRevealed(id, _sender, vote));
 			Ok(())
@@ -190,7 +199,8 @@ impl<T: Trait> Module<T> {
 		outcomes: Vec<VoteOutcome>
 	) -> result::Result<u64, &'static str> {
 		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
-		if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
+		if vote_type == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
+		if vote_type == VoteType::RankedChoice { ensure!(outcomes.len() > 2, "Invalid ranked choice outcomes") }
 
 		let id = Self::vote_record_count() + 1;
 		<VoteRecords<T>>::insert(id, VoteRecord {
@@ -238,7 +248,7 @@ decl_event!(
 		/// user commits
 		VoteCommitted(u64, AccountId),
 		/// user reveals a vote
-		VoteRevealed(u64, AccountId, VoteOutcome),
+		VoteRevealed(u64, AccountId, Vec<VoteOutcome>),
 	}
 );
 
