@@ -143,8 +143,16 @@ decl_module! {
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
 			// Check vote is for valid outcomes
-			for i in 0..vote.len() {
-				ensure!(record.outcomes.iter().any(|o| o == &vote[i]), "Vote outcome is not valid");
+			if record.data.vote_type == VoteType::RankedChoice {
+				ensure!(Self::is_ranked_choice_vote_valid(
+					vote.clone(),
+					record.outcomes.clone()
+				), "Ranked choice vote invalid");
+			} else {
+				ensure!(Self::is_valid_vote(
+					vote.clone(),
+					record.outcomes.clone()
+				), "Vote outcome is not valid");
 			}
 			// Ensure ranked choice votes have same number of votes as outcomes
 			if record.data.vote_type == VoteType::RankedChoice {
@@ -239,6 +247,36 @@ impl<T: Trait> Module<T> {
 		<VoteRecords<T>>::insert(record.id, record);
 		Self::deposit_event(RawEvent::VoteAdvanced(vote_id, curr_stage, next_stage));
 		Ok(())
+	}
+
+	pub fn is_ranked_choice_vote_valid(mut vote: Vec<VoteOutcome>, mut outcomes: Vec<VoteOutcome>) -> bool {
+		// check length equality
+		if vote.len() == outcomes.len() {
+			// sort both sets
+			vote.sort();
+			outcomes.sort();
+			// check element wise equality
+			for i in 0..vote.len() {
+				if vote[i] == outcomes[i] { continue; }
+				else { return false }
+			}
+			
+			true
+		} else {
+			false
+		}
+	}
+
+	pub fn is_valid_vote(vote: Vec<VoteOutcome>, outcomes: Vec<VoteOutcome>) -> bool {
+		for i in 0..vote.len() {
+			if outcomes.iter().any(|o| o == &vote[i]) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+
+		true
 	}
 }
 

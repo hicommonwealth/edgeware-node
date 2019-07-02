@@ -682,7 +682,7 @@ mod tests {
 			let vote = generate_1p1v_public_ranked_choice_vote();
 			assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 			assert_ok!(advance_stage_as_initiator(public, 1));
-			assert_err!(reveal(public, 1, vec![vote.3[0]], None), "Vote must rank all outcomes in order");
+			assert_err!(reveal(public, 1, vec![vote.3[0]], None), "Ranked choice vote invalid");
 		});
 	}
 
