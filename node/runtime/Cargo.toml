@@ -16,6 +16,7 @@ offchain-primitives = { package = "substrate-offchain-primitives", git = "https:
 version = { package = "sr-version", git = "https://github.com/paritytech/substrate", default-features = false }
 support = { package = "srml-support", git = "https://github.com/paritytech/substrate", default-features = false }
 aura = { package = "srml-aura", git = "https://github.com/paritytech/substrate", default-features = false }
+authorship = { package = "srml-authorship", git = "https://github.com/paritytech/substrate", default-features = false }
 balances = { package = "srml-balances", git = "https://github.com/paritytech/substrate", default-features = false }
 contracts = { package = "srml-contracts", git = "https://github.com/paritytech/substrate", default-features = false }
 council = { package = "srml-council", git = "https://github.com/paritytech/substrate", default-features = false }
@@ -52,6 +53,7 @@ std = [
 	"runtime_primitives/std",
 	"support/std",
 	"aura/std",
+	"authorship/std",
 	"balances/std",
 	"contracts/std",
 	"council/std",

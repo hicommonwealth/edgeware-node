@@ -26,7 +26,6 @@ fi
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
 rustup update stable
-rustup default nightly
 
 if [[ $(wasm-gc) ]]; then
     echo "Found wasm-gc"

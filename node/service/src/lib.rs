@@ -234,6 +234,7 @@ construct_service_factory! {
 
 #[cfg(test)]
 mod tests {
+	use edgeware_runtime::CENTS;
 	use std::sync::Arc;
 	use crate::consensus::CompatibleDigestItem;
 	use substrate_consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
@@ -370,7 +371,7 @@ mod tests {
 
 		let mut index = 0;
 		let extrinsic_factory = |service: &SyncService<<Factory as ServiceFactory>::FullService>| {
-			let amount = 1000;
+			let amount = 5 * CENTS;
 			let to = AddressPublic::from_raw(bob.public().0);
 			let from = AddressPublic::from_raw(charlie.public().0);
 			let genesis_hash = service.get().client().block_hash(0).unwrap().unwrap();

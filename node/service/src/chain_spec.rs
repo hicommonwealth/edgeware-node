@@ -17,11 +17,15 @@
 
 use substrate_finality_grandpa::AuthorityId as GrandpaId;
 use substrate_primitives::{ed25519, sr25519, Pair};
-use edgeware_primitives::{AccountId, AuraId};
-use edgeware_runtime::{CouncilSeatsConfig, AuraConfig, DemocracyConfig, SystemConfig,
-    SessionConfig, StakingConfig, StakerStatus, TimestampConfig, BalancesConfig, TreasuryConfig,
-    SudoConfig, ContractsConfig, GrandpaConfig, IndicesConfig, Permill, Perbill, SessionKeys,
-    IdentityConfig, GovernanceConfig};
+use edgeware_primitives::{AccountId, AuraId, Balance};
+use edgeware_runtime::{
+    AuraConfig, BalancesConfig, ContractsConfig, CouncilSeatsConfig, DemocracyConfig,
+    GrandpaConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig,
+    SystemConfig, TimestampConfig,
+    Perbill, SessionKeys, StakerStatus,
+    DAYS, DOLLARS, MILLICENTS, SECS_PER_BLOCK,
+    IdentityConfig, GovernanceConfig
+};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
 
@@ -139,17 +143,8 @@ pub fn testnet_genesis(
         ]
     });
 
-    const MILLICENTS: u128 = 1_000_000_000;
-    const CENTS: u128 = 1_000 * MILLICENTS;    // assume this is worth about a cent.
-    const DOLLARS: u128 = 100 * CENTS;
-
-    const SECS_PER_BLOCK: u64 = 6;
-    const MINUTES: u64 = 60 / SECS_PER_BLOCK;
-    const HOURS: u64 = MINUTES * 60;
-    const DAYS: u64 = HOURS * 24;
-
-    const ENDOWMENT: u128 = 10_000_000 * DOLLARS;
-    const STASH: u128 = 100 * DOLLARS;
+    const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
+    const STASH: Balance = 100 * DOLLARS;
 
     GenesisConfig {
         system: Some(SystemConfig {
@@ -157,15 +152,10 @@ pub fn testnet_genesis(
             changes_trie_config: Default::default(),
         }),
         balances: Some(BalancesConfig {
-            transaction_base_fee: 1 * CENTS,
-            transaction_byte_fee: 10 * MILLICENTS,
             balances: endowed_accounts.iter().cloned()
                 .map(|k| (k, ENDOWMENT))
                 .chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
                 .collect(),
-            existential_deposit: 1 * DOLLARS,
-            transfer_fee: 1 * CENTS,
-            creation_fee: 1 * CENTS,
             vesting: vec![],
         }),
         indices: Some(IndicesConfig {
@@ -191,65 +181,34 @@ pub fn testnet_genesis(
         democracy: Some(DemocracyConfig::default()),
         council_seats: Some(CouncilSeatsConfig {
             active_council: vec![],
-            candidacy_bond: 10 * DOLLARS,
-            voter_bond: 1 * DOLLARS,
-            voting_fee: 2 * DOLLARS,
-            present_slash_per_voter: 1 * CENTS,
-            carry_count: 6,
             presentation_duration: 1 * DAYS,
-            approval_voting_period: 2 * DAYS,
             term_duration: 28 * DAYS,
             desired_seats: 0,
-            decay_ratio: 0,
-            inactive_grace_period: 1,    // one additional vote should go by before an inactive voter can be reaped.
         }),
         timestamp: Some(TimestampConfig {
             minimum_period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
         }),
-        treasury: Some(TreasuryConfig {
-            proposal_bond: Permill::from_percent(5),
-            proposal_bond_minimum: 1 * DOLLARS,
-            spend_period: 1 * DAYS,
-            burn: Permill::from_percent(50),
-        }),
         contracts: Some(ContractsConfig {
-            signed_claim_handicap: 2,
-            rent_byte_price: 4,
-            rent_deposit_offset: 1000,
-            storage_size_offset: 8,
-            surcharge_reward: 150,
-            tombstone_deposit: 16,
-            transaction_base_fee: 1 * CENTS,
-            transaction_byte_fee: 10 * MILLICENTS,
-            transfer_fee: 1 * CENTS,
-            creation_fee: 1 * CENTS,
-            contract_fee: 1 * CENTS,
+            current_schedule: Default::default(),
             gas_price: 1 * MILLICENTS,
-            max_depth: 1024,
-            block_gas_limit: 10_000_000,
-            current_schedule: contracts::Schedule {
-                call_base_cost: 1000,
-                instantiate_base_cost: 1000,
-                ..Default::default()
-            },
         }),
         sudo: Some(SudoConfig {
-            key: root_key,
+            key: endowed_accounts[0].clone(),
         }),
         aura: Some(AuraConfig {
             authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
         }),
         grandpa: Some(GrandpaConfig {
-            authorities: initial_authorities.iter().map(|x| (x.2.clone(), 1)).collect(),
+            authorities: initial_authorities.iter().map(|x| (x.3.clone(), 1)).collect(),
         }),
         identity: Some(IdentityConfig {
             verifiers: initial_verifiers,
             expiration_length: 7 * DAYS, // 7 days
-            registration_bond: 1 * CENTS,
+            registration_bond: 100 * MILLICENTS,
         }),
         governance: Some(GovernanceConfig {
             voting_length: 7 * DAYS, // 7 days
-            proposal_creation_bond: 1 * CENTS,
+            proposal_creation_bond: 1 * MILLICENTS,
         }),
     }
 }

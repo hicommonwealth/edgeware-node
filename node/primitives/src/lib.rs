@@ -50,6 +50,9 @@ pub type AuraId = primitives::ed25519::Public;
 /// Index of a transaction in the chain.
 pub type Index = u64;
 
+/// Type used for expressing timestamp.
+pub type Moment = u64;
+
 /// A hash of some data used by the chain.
 pub type Hash = primitives::H256;
 
