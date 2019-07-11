@@ -16,20 +16,20 @@
 
 
 use substrate_finality_grandpa::AuthorityId as GrandpaId;
-use substrate_primitives::{ed25519, sr25519, Pair};
+use substrate_primitives::{ed25519, sr25519, Pair, crypto::UncheckedInto};
 use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
-    AuraConfig, BalancesConfig, ContractsConfig, CouncilSeatsConfig, DemocracyConfig,
-    GrandpaConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig,
-    SystemConfig, TimestampConfig,
-    Perbill, SessionKeys, StakerStatus,
-    DAYS, DOLLARS, MILLICENTS, SECS_PER_BLOCK,
-    IdentityConfig, GovernanceConfig
+    GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
+    AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TechnicalCommitteeConfig,
+    SystemConfig, TimestampConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, DAYS, DOLLARS,
+    MILLICENTS, SECS_PER_BLOCK,
 };
+use edgeware_runtime::{IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
-
+use hex_literal::hex;
 use substrate_telemetry::TelemetryEndpoints;
+use grandpa::AuthorityId as GrandpaId;
 use crate::fixtures::*;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
@@ -148,7 +148,7 @@ pub fn testnet_genesis(
 
     GenesisConfig {
         system: Some(SystemConfig {
-            code: include_bytes!("../../runtime/wasm/target/wasm32-unknown-unknown/release/edgeware_runtime.compact.wasm").to_vec(),    // FIXME change once we have #1252
+            code: WASM_BINARY.to_vec(),
             changes_trie_config: Default::default(),
         }),
         balances: Some(BalancesConfig {
@@ -164,8 +164,7 @@ pub fn testnet_genesis(
                 .collect::<Vec<_>>(),
         }),
         session: Some(SessionConfig {
-            validators: initial_authorities.iter().map(|x| x.1.clone()).collect(),
-            keys: initial_authorities.iter().map(|x| (x.1.clone(), SessionKeys(x.2.clone(),x.2.clone()))).collect::<Vec<_>>(),
+            keys: initial_authorities.iter().map(|x| (x.1.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
         }),
         staking: Some(StakingConfig {
             current_era: 0,
@@ -179,8 +178,16 @@ pub fn testnet_genesis(
             invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
         }),
         democracy: Some(DemocracyConfig::default()),
-        council_seats: Some(CouncilSeatsConfig {
-            active_council: vec![],
+        collective_Instance1: Some(CouncilConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        collective_Instance2: Some(TechnicalCommitteeConfig {
+            members: vec![],
+            phantom: Default::default(),
+        }),
+        elections: Some(ElectionsConfig {
+            members: vec![],
             presentation_duration: 1 * DAYS,
             term_duration: 28 * DAYS,
             desired_seats: 0,
