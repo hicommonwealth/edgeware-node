@@ -23,9 +23,9 @@ else
     export PATH=$HOME/.cargo/bin:$PATH
 fi
 
+rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-rustup update stable
 
 if [[ $(wasm-gc) ]]; then
     echo "Found wasm-gc"
@@ -38,5 +38,4 @@ if [ -z "$DEBUG_BUILD" ]; then
     RELEASE="--release"
 fi
 
-./scripts/build.sh
 cargo build $RELEASE
