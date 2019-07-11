@@ -39,6 +39,9 @@ use substrate_service::construct_service_factory;
 use log::info;
 use substrate_service::TelemetryOnConnect;
 
+pub mod chain_spec;
+pub mod fixtures;
+
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
 	pub struct NodeProtocol where Block = Block { }
@@ -214,7 +217,7 @@ construct_service_factory! {
 mod tests {
 	use std::sync::Arc;
 	use aura::CompatibleDigestItem;
-	use consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
+	use substrate_consensus_common::{Environment, Proposer, ImportBlock, BlockOrigin, ForkChoiceStrategy};
 	use edgeware_primitives::DigestItem;
 	use edgeware_runtime::{BalancesCall, Call, CENTS, UncheckedExtrinsic};
 	use parity_codec::{Compact, Encode, Decode};

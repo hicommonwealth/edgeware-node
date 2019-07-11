@@ -1,7 +1,8 @@
 use edgeware_primitives::AuraId;
 use edgeware_primitives::AccountId;
-use substrate_finality_grandpa::AuthorityId as GrandpaId;
-use substrate_primitives::{crypto::UncheckedInto};
+use grandpa::AuthorityId as GrandpaId;
+use primitives::crypto::UncheckedInto;
+use hex_literal::hex;
 
 pub fn get_vals() -> Vec<(AccountId, AccountId, AuraId, GrandpaId)> {
 	return vec![(

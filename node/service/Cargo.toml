@@ -9,7 +9,6 @@ log = "0.4"
 tokio = "0.1.7"
 futures = "0.1"
 exit-future = "0.1"
-cli = { package = "substrate-cli", git = "https://github.com/paritytech/substrate" }
 parity-codec = { version = "4.1.1" }
 sr-io = { git = "https://github.com/paritytech/substrate" }
 client = { package = "substrate-client", git = "https://github.com/paritytech/substrate" }

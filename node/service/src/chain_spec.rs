@@ -14,9 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-
-use substrate_finality_grandpa::AuthorityId as GrandpaId;
-use substrate_primitives::{ed25519, sr25519, Pair, crypto::UncheckedInto};
+use primitives::{ed25519, sr25519, Pair};
 use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
     GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
@@ -27,7 +25,6 @@ use edgeware_runtime::{
 use edgeware_runtime::{IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
-use hex_literal::hex;
 use substrate_telemetry::TelemetryEndpoints;
 use grandpa::AuthorityId as GrandpaId;
 use crate::fixtures::*;
@@ -79,6 +76,10 @@ pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
         None,
         None
     ))
+}
+
+fn session_keys(key: ed25519::Public) -> SessionKeys {
+    SessionKeys { ed25519: key }
 }
 
 /// Helper function to generate AccountId from seed
@@ -200,7 +201,7 @@ pub fn testnet_genesis(
             gas_price: 1 * MILLICENTS,
         }),
         sudo: Some(SudoConfig {
-            key: endowed_accounts[0].clone(),
+            key: root_key,
         }),
         aura: Some(AuraConfig {
             authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
