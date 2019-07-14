@@ -14,16 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
 #[cfg(feature = "std")]
 extern crate serde;
 
 // Needed for deriving `Serialize` and `Deserialize` for various types.
 // We only implement the serde traits for std builds - they're unneeded
 // in the wasm runtime.
-//#[cfg(feature = "std")]
-
+#[cfg(feature = "std")]
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
 extern crate sr_std as rstd;
@@ -65,6 +62,8 @@ pub enum VoteType {
 	Binary,
 	// Multi option decision vote, i.e. > 2 possible outcomes
 	MultiOption,
+	// Ranked choice voting
+	RankedChoice,
 }
 
 #[cfg_attr(feature = "std", derive(Debug))]
@@ -99,7 +98,7 @@ pub struct VoteRecord<AccountId> {
 	// Vote commitments
 	pub commitments: Vec<(AccountId, VoteOutcome)>,
 	// Vote reveals
-	pub reveals: Vec<(AccountId, VoteOutcome)>,
+	pub reveals: Vec<(AccountId, Vec<VoteOutcome>)>,
 	// Vote data record
 	pub data: VoteData<AccountId>,
 	// Vote outcomes
@@ -139,35 +138,53 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
-		pub fn reveal(origin, vote_id: u64, vote: VoteOutcome, secret: Option<VoteOutcome>) -> Result {
+		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
-			// Check vote is for a valid outcome
-			ensure!(record.outcomes.iter().any(|o| o == &vote), "Vote outcome is not valid");
+			// Check vote is for valid outcomes
+			if record.data.vote_type == VoteType::RankedChoice {
+				ensure!(Self::is_ranked_choice_vote_valid(
+					vote.clone(),
+					record.outcomes.clone()
+				), "Ranked choice vote invalid");
+			} else {
+				ensure!(Self::is_valid_vote(
+					vote.clone(),
+					record.outcomes.clone()
+				), "Vote outcome is not valid");
+			}
+			// Ensure ranked choice votes have same number of votes as outcomes
+			if record.data.vote_type == VoteType::RankedChoice {
+				ensure!(record.outcomes.len() == vote.len(), "Vote must rank all outcomes in order");
+			}
 			// Reject vote or reveal changes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
-
 			// Ensure voter committed
 			if record.data.is_commit_reveal {
+				// Ensure secret is passed in
 				ensure!(secret.is_some(), "Secret is invalid");
+				// Ensure the current sender has already committed previously
 				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender already committed");
 				let commit: (T::AccountId, VoteOutcome) = record.commitments
 					.iter()
 					.find(|c| &c.0 == &_sender)
 					.unwrap()
 					.clone();
-
+				// Create commitment hash using reported secret and ranked choice ordering
 				let mut buf = Vec::new();
 				buf.extend_from_slice(&_sender.encode());
 				buf.extend_from_slice(&secret.unwrap().encode());
-				buf.extend_from_slice(&vote);
+				for i in 0..vote.len() {
+					buf.extend_from_slice(&vote[i]);
+				}
 				let hash = T::Hashing::hash_of(&buf);
+				// Ensure the hashes match
 				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
 			}
-
+			// Record the revealed vote and emit an event
 			let id = record.id;
-			record.reveals.push((_sender.clone(), vote));
+			record.reveals.push((_sender.clone(), vote.clone()));
 			<VoteRecords<T>>::insert(id, record);
 			Self::deposit_event(RawEvent::VoteRevealed(id, _sender, vote));
 			Ok(())
@@ -193,7 +210,8 @@ impl<T: Trait> Module<T> {
 		outcomes: Vec<VoteOutcome>
 	) -> result::Result<u64, &'static str> {
 		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
-		if vote_type  == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
+		if vote_type == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
+		if vote_type == VoteType::RankedChoice { ensure!(outcomes.len() > 2, "Invalid ranked choice outcomes") }
 
 		let id = Self::vote_record_count() + 1;
 		<VoteRecords<T>>::insert(id, VoteRecord {
@@ -210,7 +228,7 @@ impl<T: Trait> Module<T> {
 			},
 		});
 
-		<VoteRecordCount<T>>::mutate(|i| *i += 1);
+		<VoteRecordCount>::mutate(|i| *i += 1);
 		Self::deposit_event(RawEvent::VoteCreated(id, sender, vote_type));
 		return Ok(id);
 	}
@@ -230,6 +248,36 @@ impl<T: Trait> Module<T> {
 		Self::deposit_event(RawEvent::VoteAdvanced(vote_id, curr_stage, next_stage));
 		Ok(())
 	}
+
+	pub fn is_ranked_choice_vote_valid(mut vote: Vec<VoteOutcome>, mut outcomes: Vec<VoteOutcome>) -> bool {
+		// check length equality
+		if vote.len() == outcomes.len() {
+			// sort both sets
+			vote.sort();
+			outcomes.sort();
+			// check element wise equality
+			for i in 0..vote.len() {
+				if vote[i] == outcomes[i] { continue; }
+				else { return false }
+			}
+			
+			true
+		} else {
+			false
+		}
+	}
+
+	pub fn is_valid_vote(vote: Vec<VoteOutcome>, outcomes: Vec<VoteOutcome>) -> bool {
+		for i in 0..vote.len() {
+			if outcomes.iter().any(|o| o == &vote[i]) {
+				continue;
+			} else {
+				return false;
+			}
+		}
+
+		true
+	}
 }
 
 decl_event!(
@@ -241,7 +289,7 @@ decl_event!(
 		/// user commits
 		VoteCommitted(u64, AccountId),
 		/// user reveals a vote
-		VoteRevealed(u64, AccountId, VoteOutcome),
+		VoteRevealed(u64, AccountId, Vec<VoteOutcome>),
 	}
 );
 

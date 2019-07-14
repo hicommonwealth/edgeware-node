@@ -29,7 +29,6 @@ members = [
 	"modules/edge-identity",
 	"modules/edge-voting",
 ]
-exclude = [ "node/runtime/wasm" ]
 
 [badges]
 travis-ci = { repository = "paritytech/substrate", branch = "master" }

@@ -40,9 +40,9 @@ Then proceed to the *Running* instructions or follow the instructions below for 
 
 ```
 curl https://sh.rustup.rs -sSf | sh
+rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-rustup update stable
 cargo install --git https://github.com/alexcrichton/wasm-gc
 ```
 
@@ -89,29 +89,27 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 
 ### Edge
 
-* [Identity](modules/edge-identity)
-* [Governance](modules/edge-governance)
-* [Voting](modules/edge-voting)
+* [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
+* [Voting](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-voting)
+* [Governance](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-governance)
 
 ### SRML
-
-* [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
-* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
-* [Consensus](https://github.com/paritytech/substrate/tree/master/srml/consensus)
-* [Contract](https://github.com/paritytech/substrate/tree/master/srml/contract)
-* [Council](https://github.com/paritytech/substrate/tree/master/srml/council)
-* [Democracy](https://github.com/paritytech/substrate/tree/master/srml/democracy)
-* [Executive](https://github.com/paritytech/substrate/tree/master/srml/executive)
-* [Fees](https://github.com/paritytech/substrate/tree/master/srml/fees)
-* [Finality_tracker](https://github.com/paritytech/substrate/tree/master/srml/finality-tracker)
-* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
-* [Indices](https://github.com/paritytech/substrate/tree/master/srml/indices)
-* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
-* [Staking](https://github.com/paritytech/substrate/tree/master/srml/staking)
 * [System](https://github.com/paritytech/substrate/tree/master/srml/system)
+* [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
 * [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
+* [Authorship](https://github.com/paritytech/substrate/tree/master/srml/authorship)
+* [Indices](https://github.com/paritytech/substrate/tree/master/srml/indices)
+* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
+* [Staking](https://github.com/paritytech/substrate/tree/master/srml/staking)
+* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
+* [Democracy](https://github.com/paritytech/substrate/tree/master/srml/democracy)
+* [Council](https://github.com/paritytech/substrate/tree/master/srml/council)
+* [Elections](https://github.com/paritytech/substrate/tree/master/srml/elections)
+* [FinalityTracker](https://github.com/paritytech/substrate/tree/master/srml/finality-tracker)
+* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
 * [Treasury](https://github.com/paritytech/substrate/tree/master/srml/treasury)
-* [Sudo](https://github/com.paritytech/substrate/tree/master/srml/sudo)
+* [Contracts](https://github.com/paritytech/substrate/tree/master/srml/contracts)
+* [Sudo](https://github.com/paritytech/substrate/tree/master/srml/sudo)
 
 ## Developing on Edgeware
 

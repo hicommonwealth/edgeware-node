@@ -16,14 +16,8 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-#[cfg(feature = "std")]
-extern crate serde;
 
-// Needed for deriving `Serialize` and `Deserialize` for various types.
-// We only implement the serde traits for std builds - they're unneeded
-// in the wasm runtime.
 #[cfg(feature = "std")]
-
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
 extern crate sr_std as rstd;
@@ -119,8 +113,8 @@ decl_module! {
 				outcomes,
 			)?;
 
-			let index = <ProposalCount<T>>::get();
-			<ProposalCount<T>>::mutate(|i| *i += 1);
+			let index = <ProposalCount>::get();
+			<ProposalCount>::mutate(|i| *i += 1);
 			<ProposalOf<T>>::insert(hash, ProposalRecord {
 				index: index,
 				author: _sender.clone(),

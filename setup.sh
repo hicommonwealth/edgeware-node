@@ -8,7 +8,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         echo "Running apt as sudo"
         SUDO_PREFIX='sudo'
     fi
-    $SUDO_PREFIX apt-get update
+    $SUDO_PREFIX apt update
     $SUDO_PREFIX apt install -y build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Found macbook"
@@ -23,9 +23,9 @@ else
     export PATH=$HOME/.cargo/bin:$PATH
 fi
 
+rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-rustup update stable
 
 if [[ $(wasm-gc) ]]; then
     echo "Found wasm-gc"
@@ -38,5 +38,4 @@ if [ -z "$DEBUG_BUILD" ]; then
     RELEASE="--release"
 fi
 
-./scripts/build.sh
 cargo build $RELEASE
