@@ -35,7 +35,7 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_config() -> ChainSpec {
-    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.3.0/edgeware.json")) {
+    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.4.0/edgeware.json")) {
         Ok(spec) => spec,
         Err(e) => panic!(e),
     }
@@ -45,7 +45,11 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
     let initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId)> = get_vals();
     let root_key = get_root_key();
     // Add controller accounts to endowed accounts
-    let endowed_accounts = initial_authorities.clone().into_iter().map(|elt| elt.1).collect();
+    let endowed_accounts = initial_authorities.clone()
+        .into_iter()
+        .map(|elt| elt.1)
+        .chain(get_more_endowed())
+        .collect();
     let identity_verifiers = get_identity_verifiers();
 
     testnet_genesis(
