@@ -19,8 +19,7 @@ use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
     GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
     AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TechnicalCommitteeConfig,
-    SystemConfig, TimestampConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, DAYS, DOLLARS,
-    MILLICENTS, SECS_PER_BLOCK,
+    SystemConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, DAYS, DOLLARS, MILLICENTS,
 };
 use edgeware_runtime::{IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
@@ -192,9 +191,6 @@ pub fn testnet_genesis(
             presentation_duration: 1 * DAYS,
             term_duration: 28 * DAYS,
             desired_seats: 0,
-        }),
-        timestamp: Some(TimestampConfig {
-            minimum_period: SECS_PER_BLOCK / 2, // due to the nature of aura the slots are 2*period
         }),
         contracts: Some(ContractsConfig {
             current_schedule: Default::default(),
