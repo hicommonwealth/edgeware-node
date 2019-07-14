@@ -104,7 +104,6 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 * [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
 * [Democracy](https://github.com/paritytech/substrate/tree/master/srml/democracy)
 * [Council](https://github.com/paritytech/substrate/tree/master/srml/council)
-* [TechnicalCommittee](https://github.com/paritytech/substrate/tree/master/srml/technical-committee)
 * [Elections](https://github.com/paritytech/substrate/tree/master/srml/elections)
 * [FinalityTracker](https://github.com/paritytech/substrate/tree/master/srml/finality-tracker)
 * [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
