@@ -168,7 +168,7 @@ pub fn testnet_genesis(
                 .collect::<Vec<_>>(),
         }),
         session: Some(SessionConfig {
-            keys: initial_authorities.iter().map(|x| (x.1.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
+            keys: initial_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
         }),
         staking: Some(StakingConfig {
             current_era: 0,
@@ -179,7 +179,7 @@ pub fn testnet_genesis(
             offline_slash_grace: 4,
             minimum_validator_count: 4,
             stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
-            invulnerables: initial_authorities.iter().map(|x| x.1.clone()).collect(),
+            invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
         }),
         democracy: Some(DemocracyConfig::default()),
         collective_Instance1: Some(CouncilConfig {
@@ -268,55 +268,4 @@ pub fn local_testnet_config() -> ChainSpec {
         Some(DEFAULT_PROTOCOL_ID),
         None,
         None)
-}
-
-#[cfg(test)]
-pub(crate) mod tests {
-    use super::*;
-    use service_test;
-    use crate::Factory;
-
-    fn local_testnet_genesis_instant() -> GenesisConfig {
-        let mut genesis = local_testnet_genesis();
-        genesis.timestamp = Some(TimestampConfig { minimum_period: 1 });
-        genesis
-    }
-
-    fn local_testnet_genesis_instant_single() -> GenesisConfig {
-        let mut genesis = testnet_genesis(
-            vec![
-                get_authority_keys_from_seed("Alice"),
-            ],
-            get_account_id_from_seed("Alice"),
-            None,
-            None,
-        );
-        genesis.timestamp = Some(TimestampConfig { minimum_period: 1 });
-        genesis
-    }
-
-    /// Local testnet config (single validator - Alice)
-    pub fn integration_test_config_with_single_authority() -> ChainSpec {
-        ChainSpec::from_genesis(
-            "Integration Test",
-            "test",
-            local_testnet_genesis_instant_single,
-            vec![],
-            None,
-            None,
-            None,
-            None,
-        )
-    }
-
-    /// Local testnet config (multivalidator Alice + Bob)
-    pub fn integration_test_config_with_two_authorities() -> ChainSpec {
-        ChainSpec::from_genesis("Integration Test", "test", local_testnet_genesis_instant, vec![], None, None, None, None)
-    }
-
-    #[test]
-    #[ignore]
-    fn test_connectivity() {
-        service_test::connectivity::<Factory>(integration_test_config_with_two_authorities());
-    }
 }
