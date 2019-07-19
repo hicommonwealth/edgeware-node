@@ -117,6 +117,8 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 
 To run a chain locally for development purposes: `./target/release/edgeware --chain=local --alice --validator`
 
+To allow apps in your browser to connect, as well as anyone else on your local network, add the `--rpc_cors=all` flag.
+
 To force your local to create new blocks, even if offline, add the `--force-authoring` flag.
 
 ### Adding A Module
@@ -133,4 +135,3 @@ To force your local to create new blocks, even if offline, add the `--force-auth
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
-
