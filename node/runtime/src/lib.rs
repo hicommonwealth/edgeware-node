@@ -41,7 +41,7 @@ use client::{
 use runtime_primitives::{ApplyResult, impl_opaque_keys, generic, create_runtime_str, key_types};
 use runtime_primitives::transaction_validity::TransactionValidity;
 use runtime_primitives::traits::{
-	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup, Convert,
+	BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup,
 };
 use version::RuntimeVersion;
 use elections::VoteIndex;
@@ -60,6 +60,8 @@ pub use runtime_primitives::{Permill, Perbill};
 pub use support::StorageValue;
 pub use staking::StakerStatus;
 
+pub use node_runtime::impls::{CurrencyToVoteHandler, WeightMultiplierUpdateHandler};
+
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -73,7 +75,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
 	spec_version: 12,
-	impl_version: 13,
+	impl_version: 14,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -125,6 +127,7 @@ impl system::Trait for Runtime {
 	type AccountId = AccountId;
 	type Lookup = Indices;
 	type Header = generic::Header<BlockNumber, BlakeTwo256>;
+	type WeightMultiplierUpdate = WeightMultiplierUpdateHandler;
 	type Event = Event;
 	type BlockHashCount = BlockHashCount;
 }
@@ -224,20 +227,6 @@ impl session::historical::Trait for Runtime {
 parameter_types! {
 	pub const SessionsPerEra: session::SessionIndex = 6;
 	pub const BondingDuration: staking::EraIndex = 24 * 28;
-}
-
-pub struct CurrencyToVoteHandler;
-
-impl CurrencyToVoteHandler {
-	fn factor() -> u128 { (Balances::total_issuance() / u64::max_value() as u128).max(1) }
-}
-
-impl Convert<u128, u64> for CurrencyToVoteHandler {
-	fn convert(x: u128) -> u64 { (x / Self::factor()) as u64 }
-}
-
-impl Convert<u128, u128> for CurrencyToVoteHandler {
-	fn convert(x: u128) -> u128 { x * Self::factor() }
 }
 
 impl staking::Trait for Runtime {
@@ -373,6 +362,7 @@ impl contracts::Trait for Runtime {
 	type CallBaseFee = contracts::DefaultCallBaseFee;
 	type CreateBaseFee = contracts::DefaultCreateBaseFee;
 	type MaxDepth = contracts::DefaultMaxDepth;
+	type MaxValueSize = contracts::DefaultMaxValueSize;
 	type BlockGasLimit = contracts::DefaultBlockGasLimit;
 }
 
