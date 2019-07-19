@@ -60,7 +60,9 @@ pub use runtime_primitives::{Permill, Perbill};
 pub use support::StorageValue;
 pub use staking::StakerStatus;
 
-pub use node_runtime::impls::{CurrencyToVoteHandler, WeightMultiplierUpdateHandler};
+use runtime_primitives::weights::{Weight, WeightMultiplier, MAX_TRANSACTIONS_WEIGHT, IDEAL_TRANSACTIONS_WEIGHT};
+use runtime_primitives::traits::{Convert, Saturating};
+use runtime_primitives::Fixed64;
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
@@ -85,6 +87,75 @@ pub fn native_version() -> NativeVersion {
 	NativeVersion {
 		runtime_version: VERSION,
 		can_author_with: Default::default(),
+	}
+}
+
+/// Struct that handles the conversion of Balance -> `u64`. This is used for staking's election
+/// calculation.
+pub struct CurrencyToVoteHandler;
+
+impl CurrencyToVoteHandler {
+	fn factor() -> Balance { (Balances::total_issuance() / u64::max_value() as Balance).max(1) }
+}
+
+impl Convert<Balance, u64> for CurrencyToVoteHandler {
+	fn convert(x: Balance) -> u64 { (x / Self::factor()) as u64 }
+}
+
+impl Convert<u128, Balance> for CurrencyToVoteHandler {
+	fn convert(x: u128) -> Balance { x * Self::factor() }
+}
+
+/// A struct that updates the weight multiplier based on the saturation level of the previous block.
+/// This should typically be called once per-block.
+///
+/// This assumes that weight is a numeric value in the u32 range.
+///
+/// Formula:
+///   diff = (ideal_weight - current_block_weight)
+///   v = 0.00004
+///   next_weight = weight * (1 + (v . diff) + (v . diff)^2 / 2)
+///
+/// https://research.web3.foundation/en/latest/polkadot/Token%20Economics/#relay-chain-transaction-fees
+pub struct WeightMultiplierUpdateHandler;
+impl Convert<(Weight, WeightMultiplier), WeightMultiplier> for WeightMultiplierUpdateHandler {
+	fn convert(previous_state: (Weight, WeightMultiplier)) -> WeightMultiplier {
+		let (block_weight, multiplier) = previous_state;
+		let ideal = IDEAL_TRANSACTIONS_WEIGHT as u128;
+		let block_weight = block_weight as u128;
+
+		// determines if the first_term is positive
+		let positive = block_weight >= ideal;
+		let diff_abs = block_weight.max(ideal) - block_weight.min(ideal);
+		// diff is within u32, safe.
+		let diff = Fixed64::from_rational(diff_abs as i64, MAX_TRANSACTIONS_WEIGHT as u64);
+		let diff_squared = diff.saturating_mul(diff);
+
+		// 0.00004 = 4/100_000 = 40_000/10^9
+		let v = Fixed64::from_rational(4, 100_000);
+		// 0.00004^2 = 16/10^10 ~= 2/10^9. Taking the future /2 into account, then it is just 1 parts
+		// from a billionth.
+		let v_squared_2 = Fixed64::from_rational(1, 1_000_000_000);
+
+		let first_term = v.saturating_mul(diff);
+		// It is very unlikely that this will exist (in our poor perbill estimate) but we are giving
+		// it a shot.
+		let second_term = v_squared_2.saturating_mul(diff_squared);
+
+		if positive {
+			let excess = first_term.saturating_add(second_term);
+			multiplier.saturating_add(WeightMultiplier::from_fixed(excess))
+		} else {
+			// first_term > second_term
+			let negative = first_term - second_term;
+			multiplier.saturating_sub(WeightMultiplier::from_fixed(negative))
+				// despite the fact that apply_to saturates weight (final fee cannot go below 0)
+				// it is crucially important to stop here and don't further reduce the weight fee
+				// multiplier. While at -1, it means that the network is so un-congested that all
+				// transactions are practically free. We stop here and only increase if the network
+				// became more busy.
+				.max(WeightMultiplier::from_rational(-1, 1))
+		}
 	}
 }
 

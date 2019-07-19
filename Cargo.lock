@@ -752,7 +752,6 @@ dependencies = [
  "edge-voting 0.1.0",
  "edgeware-primitives 0.1.0",
  "integer-sqrt 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "node-runtime 2.0.0 (git+https://github.com/paritytech/substrate)",
  "parity-codec 4.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-hex 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2190,54 +2189,6 @@ dependencies = [
  "cfg-if 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.60 (registry+https://github.com/rust-lang/crates.io-index)",
  "void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "node-primitives"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate#afa583011eed3e8d49ee823257a3b448a24e213b"
-dependencies = [
- "parity-codec 4.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
- "sr-std 2.0.0 (git+https://github.com/paritytech/substrate)",
- "substrate-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
-]
-
-[[package]]
-name = "node-runtime"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate#afa583011eed3e8d49ee823257a3b448a24e213b"
-dependencies = [
- "integer-sqrt 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "node-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
- "parity-codec 4.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
- "sr-std 2.0.0 (git+https://github.com/paritytech/substrate)",
- "sr-version 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-aura 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-authorship 0.1.0 (git+https://github.com/paritytech/substrate)",
- "srml-balances 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-collective 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-contracts 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-democracy 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-elections 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-executive 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-finality-tracker 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-grandpa 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-indices 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-session 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-staking 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-sudo 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-support 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-system 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-timestamp 2.0.0 (git+https://github.com/paritytech/substrate)",
- "srml-treasury 2.0.0 (git+https://github.com/paritytech/substrate)",
- "substrate-client 2.0.0 (git+https://github.com/paritytech/substrate)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
- "substrate-offchain-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
- "substrate-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
- "substrate-wasm-builder-runner 1.0.2 (git+https://github.com/paritytech/substrate)",
 ]
 
 [[package]]
@@ -5258,8 +5209,6 @@ dependencies = [
 "checksum names 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ef320dab323286b50fb5cdda23f61c796a72a89998ab565ca32525c5c556f2da"
 "checksum net2 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)" = "42550d9fb7b6684a6d404d9fa7250c2eb2646df731d1c06afc06dcee9e1bcf88"
 "checksum nix 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)" = "6c722bee1037d430d0f8e687bbdbf222f27cc6e4e68d5caf630857bb2b6dbdce"
-"checksum node-primitives 2.0.0 (git+https://github.com/paritytech/substrate)" = "<none>"
-"checksum node-runtime 2.0.0 (git+https://github.com/paritytech/substrate)" = "<none>"
 "checksum nodrop 0.1.13 (registry+https://github.com/rust-lang/crates.io-index)" = "2f9667ddcc6cc8a43afc9b7917599d7216aa09c463919ea32c59ed6cac8bc945"
 "checksum nohash-hasher 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0d138afcce92d219ccb6eb53d9b1e8a96ac0d633cfd3c53cd9856d96d1741bb8"
 "checksum nom 4.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2ad2a91a8e869eeb30b9cb3119ae87773a8f4ae617f41b1eb9c154b2905f7bd6"
