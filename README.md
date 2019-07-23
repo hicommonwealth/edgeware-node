@@ -6,7 +6,7 @@ A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
 - Download this entire repository to the file system that you are using to run the validator node.
   - You can do this by going to [this page](https://github.com/hicommonwealth/edgeware-node) and selecting "Clone or download" followed by "Download ZIP".
-  - If you are installing via a command line interface (e.g. SSH into a remote server), you can download by running `wget https://github.com/hicommonwealth/edgeware-node/archive/master.zip`
+  - If you are installing via a command line interface (e.g. SSH into a remote server), you can dow-load by running `wget https://github.com/hicommonwealth/edgeware-node/archive/master.zip`
   - Once you have downloaded the zip file, unzip the `edgeware-node-master` folder onto the file system. If you are using a command line interface, you can unzip by running `unzip master.zip`
   - **_All commands referenced in this document need to be run from within the `edgeware-node-master` folder._**
 
@@ -117,7 +117,7 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 
 To run a chain locally for development purposes: `./target/release/edgeware --chain=local --alice --validator`
 
-To allow apps in your browser to connect, as well as anyone else on your local network, add the `--rpc_cors=all` flag.
+To allow apps in your browser to connect, as well as anyone else on your local network, add the `--rpc-cors=all` flag.
 
 To force your local to create new blocks, even if offline, add the `--force-authoring` flag.
 
