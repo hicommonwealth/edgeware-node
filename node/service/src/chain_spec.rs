@@ -19,8 +19,9 @@ use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
     GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
     AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TechnicalCommitteeConfig,
-    SystemConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, DAYS, DOLLARS, MILLICENTS,
+    SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus,
 };
+use edgeware_runtime::constants::{time::DAYS, currency::DOLLARS, currency::MILLICENTS};
 use edgeware_runtime::{IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
@@ -173,8 +174,6 @@ pub fn testnet_genesis(
         staking: Some(StakingConfig {
             current_era: 0,
             offline_slash: Perbill::from_parts(1_000_000),
-            session_reward: Perbill::from_parts(2_065),
-            current_session_reward: 0,
             validator_count: 7,
             offline_slash_grace: 4,
             minimum_validator_count: 4,
@@ -183,7 +182,7 @@ pub fn testnet_genesis(
         }),
         democracy: Some(DemocracyConfig::default()),
         collective_Instance1: Some(CouncilConfig {
-            members: vec![],
+            members: endowed_accounts.clone(),
             phantom: Default::default(),
         }),
         collective_Instance2: Some(TechnicalCommitteeConfig {
@@ -191,10 +190,12 @@ pub fn testnet_genesis(
             phantom: Default::default(),
         }),
         elections: Some(ElectionsConfig {
-            members: vec![],
+            members: endowed_accounts.iter()
+              .filter(|&endowed| initial_authorities.iter().find(|(_, controller, ..)| controller == endowed).is_none())
+              .map(|a| (a.clone(), 1000000)).collect(),
+            desired_seats: 3,
             presentation_duration: 1 * DAYS,
             term_duration: 28 * DAYS,
-            desired_seats: 0,
         }),
         contracts: Some(ContractsConfig {
             current_schedule: Default::default(),
@@ -203,6 +204,10 @@ pub fn testnet_genesis(
         sudo: Some(SudoConfig {
             key: root_key,
         }),
+		im_online: Some(ImOnlineConfig {
+			gossip_at: 0,
+			last_new_era_start: 0,
+		}),
         aura: Some(AuraConfig {
             authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
         }),

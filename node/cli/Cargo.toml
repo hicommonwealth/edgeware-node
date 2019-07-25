@@ -35,6 +35,8 @@ timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/s
 rand = "0.6"
 finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }
 contracts = { package = "srml-contracts", git = "https://github.com/paritytech/substrate" }
+system = { package = "srml-system", git = "https://github.com/paritytech/substrate" }
+balances = { package = "srml-balances", git = "https://github.com/paritytech/substrate" }
 
 edgeware-service = { path = "../service" }
 edgeware-primitives = { path = "../primitives" }

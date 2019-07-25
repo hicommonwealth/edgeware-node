@@ -438,6 +438,7 @@ construct_runtime!(
 		Grandpa: grandpa::{Module, Call, Storage, Config, Event},
 		Treasury: treasury::{Module, Call, Storage, Event<T>},
 		Contracts: contracts,
+		Sudo: sudo,
 		ImOnline: im_online::{default, ValidateUnsigned},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

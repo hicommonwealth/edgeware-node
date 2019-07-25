@@ -24,12 +24,12 @@ use rand::rngs::StdRng;
 use parity_codec::Decode;
 use keyring::sr25519::Keyring;
 use edgeware_primitives::Hash;
-use edgeware_runtime::{Call, CheckedExtrinsic, UncheckedExtrinsic, BalancesCall};
+use edgeware_runtime::{Call, CheckedExtrinsic, UncheckedExtrinsic, BalancesCall, SignedExtra};
 use primitives::sr25519;
 use primitives::crypto::Pair;
 use parity_codec::Encode;
 use sr_primitives::generic::Era;
-use sr_primitives::traits::{Block as BlockT, Header as HeaderT};
+use sr_primitives::traits::{Block as BlockT, Header as HeaderT, SignedExtension};
 use substrate_service::ServiceFactory;
 use transaction_factory::RuntimeAdapter;
 use transaction_factory::modes::Mode;
@@ -53,6 +53,17 @@ pub struct FactoryState<N> {
 }
 
 type Number = <<edgeware_primitives::Block as BlockT>::Header as HeaderT>::Number;
+
+impl<Number> FactoryState<Number> {
+	fn build_extra(index: edgeware_primitives::Index, phase: u64) -> edgeware_runtime::SignedExtra {
+		(
+			system::CheckEra::from(Era::mortal(256, phase)),
+			system::CheckNonce::from(index),
+			system::CheckWeight::from(),
+			balances::TakeFees::from(0)
+		)
+	}
+}
 
 impl RuntimeAdapter for FactoryState<Number> {
 	type AccountId = edgeware_primitives::AccountId;
@@ -132,16 +143,14 @@ impl RuntimeAdapter for FactoryState<Number> {
 		let phase = self.extract_phase(*prior_block_hash);
 
 		sign::<service::Factory, Self>(CheckedExtrinsic {
-			signed: Some((sender.clone(), index)),
+			signed: Some((sender.clone(), Self::build_extra(index, phase))),
 			function: Call::Balances(
 				BalancesCall::transfer(
-					indices::address::Address::Id(
-						destination.clone().into()
-					),
+					indices::address::Address::Id(destination.clone().into()),
 					(*amount).into()
 				)
 			)
-		}, key, &prior_block_hash, phase)
+		}, key, (prior_block_hash.clone(), (), (), ()))
 	}
 
 	fn inherent_extrinsics(&self) -> InherentData {
@@ -229,13 +238,11 @@ fn gen_seed_bytes(seed: u64) -> [u8; 32] {
 fn sign<F: ServiceFactory, RA: RuntimeAdapter>(
 	xt: CheckedExtrinsic,
 	key: &sr25519::Pair,
-	prior_block_hash: &Hash,
-	phase: u64,
+	additional_signed: <SignedExtra as SignedExtension>::AdditionalSigned,
 ) -> <RA::Block as BlockT>::Extrinsic {
 	let s = match xt.signed {
-		Some((signed, index)) => {
-			let era = Era::mortal(256, phase);
-			let payload = (index.into(), xt.function, era, prior_block_hash);
+		Some((signed, extra)) => {
+			let payload = (xt.function, extra.clone(), additional_signed);
 			let signature = payload.using_encoded(|b| {
 				if b.len() > 256 {
 					key.sign(&sr_io::blake2_256(b))
@@ -244,8 +251,8 @@ fn sign<F: ServiceFactory, RA: RuntimeAdapter>(
 				}
 			}).into();
 			UncheckedExtrinsic {
-				signature: Some((indices::address::Address::Id(signed), signature, payload.0, era)),
-				function: payload.1,
+				signature: Some((indices::address::Address::Id(signed), signature, extra)),
+				function: payload.0,
 			}
 		}
 		None => UncheckedExtrinsic {
