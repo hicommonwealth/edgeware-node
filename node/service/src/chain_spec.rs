@@ -182,7 +182,13 @@ pub fn testnet_genesis(
         }),
         democracy: Some(DemocracyConfig::default()),
         collective_Instance1: Some(CouncilConfig {
-            members: endowed_accounts.clone(),
+            members: vec![
+                get_account_id_from_seed("Alice"),
+                get_account_id_from_seed("Bob"),
+                get_account_id_from_seed("Charlie"),
+                get_account_id_from_seed("Dave"),
+                get_account_id_from_seed("Eve"),
+            ],
             phantom: Default::default(),
         }),
         collective_Instance2: Some(TechnicalCommitteeConfig {
@@ -193,9 +199,9 @@ pub fn testnet_genesis(
             members: endowed_accounts.iter()
               .filter(|&endowed| initial_authorities.iter().find(|(_, controller, ..)| controller == endowed).is_none())
               .map(|a| (a.clone(), 1000000)).collect(),
-            desired_seats: 3,
-            presentation_duration: 1 * DAYS,
-            term_duration: 28 * DAYS,
+            desired_seats: 5,
+            presentation_duration: 25,
+            term_duration: 1000,
         }),
         contracts: Some(ContractsConfig {
             current_schedule: Default::default(),
@@ -217,11 +223,11 @@ pub fn testnet_genesis(
         identity: Some(IdentityConfig {
             verifiers: initial_verifiers,
             expiration_length: 7 * DAYS, // 7 days
-            registration_bond: 100 * MILLICENTS,
+            registration_bond: 1 * DOLLARS,
         }),
         governance: Some(GovernanceConfig {
             voting_length: 7 * DAYS, // 7 days
-            proposal_creation_bond: 1 * MILLICENTS,
+            proposal_creation_bond: 1 * DOLLARS,
         }),
     }
 }
