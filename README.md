@@ -82,7 +82,7 @@ If you use the `--key` flag, ensure that either it is a 32-byte hex string or pr
 
 ### Visualization
 
-To ensure you followed the steps correctly, check https://telemetry.polkadot.io/#/Edgeware%20Testnet%20V0.2.0. If done correctly, you should see your node with the inserted name.
+To ensure you followed the steps correctly, check https://telemetry.polkadot.io/#list/Edgeware%20Testnet%20v0.4. If done correctly, you should see your node with the inserted name.
 
 ## Implemented Modules
 
