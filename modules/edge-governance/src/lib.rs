@@ -24,16 +24,10 @@ extern crate serde;
 // in the wasm runtime.
 #[cfg(feature = "std")]
 extern crate serde_derive;
-#[cfg(test)]
 #[macro_use]
-extern crate hex_literal;
-#[macro_use] extern crate parity_codec_derive;
-#[macro_use] extern crate srml_support;
-
-
+extern crate srml_support;
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
-#[cfg_attr(not(feature = "std"), macro_use)]
 extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
@@ -41,9 +35,6 @@ extern crate sr_io as runtime_io;
 
 extern crate srml_balances as balances;
 extern crate srml_system as system;
-extern crate srml_timestamp as timestamp;
-extern crate srml_consensus as consensus;
-extern crate edge_delegation as delegation;
 extern crate edge_voting as voting;
 
 pub mod governance;
@@ -64,9 +55,8 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
-		BuildStorage,
-		traits::{BlakeTwo256, OnFinalise, IdentityLookup},
-		testing::{Digest, DigestItem, Header, UintAuthorityId}
+		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
+		testing::{Header}
 	};
 	use voting::{VoteStage, VoteType};
 	use voting::voting::{VoteOutcome, TallyType};
@@ -77,12 +67,8 @@ mod tests {
 
 	impl_outer_event! {
 		pub enum Event for Test {
-			voting<T>, delegation<T>, balances<T>, governance<T>,
+			voting<T>, balances<T>, governance<T>,
 		}
-	}
-
-	impl_outer_dispatch! {
-		pub enum Call for Test where origin: Origin {}
 	}
 
 	// For testing the module, we construct most of a mock runtime. This means
@@ -96,32 +82,20 @@ mod tests {
 		type BlockNumber = u64;
 		type Hash = H256;
 		type Hashing = BlakeTwo256;
-		type Digest = Digest;
 		type AccountId = u64;
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
-		type Log = DigestItem;
 	}
 
-	impl consensus::Trait for Test {
-		type Log = DigestItem;
-		type SessionKey = UintAuthorityId;
-		type InherentOfflineReport = ();
-	}
-	impl timestamp::Trait for Test {
-		type Moment = u64;
-		type OnTimestampSet = ();
-	}
 	impl balances::Trait for Test {
 		type Balance = u64;
 		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
 		type Event = Event;
-	}
-
-	impl delegation::Trait for Test {
-		type Event = Event;
+		type TransactionPayment = ();
+		type TransferPayment = ();
+		type DustRemoval = ();
 	}
 
 	impl voting::Trait for Test {
@@ -130,18 +104,38 @@ mod tests {
 
 	impl Trait for Test {
 		type Event = Event;
+		type Currency = balances::Module<Self>;
 	}
 
+	pub type Balances = balances::Module<Test>;
 	pub type System = system::Module<Test>;
- 	pub type Timestamp = timestamp::Module<Test>;
 	pub type Governance = Module<Test>;
 
+	const BOND: u64 = 10;
+
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let mut t = system::GenesisConfig::<Test>::default().build_storage().unwrap().0;
+		let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
 			governance::GenesisConfig::<Test> {
-				voting_time: 10000,
+				voting_length: 10000,
+				proposal_creation_bond: BOND,
+			}.build_storage().unwrap().0,
+		);
+		t.extend(
+			balances::GenesisConfig::<Test> {
+				balances: vec![
+					(1, 100),
+					(2, 100),
+					(3, 100),
+					(4, 100),
+				],
+				transaction_base_fee: 0,
+				transaction_byte_fee: 0,
+				existential_deposit: 0,
+				transfer_fee: 0,
+				creation_fee: 0,
+				vesting: vec![],
 			}.build_storage().unwrap().0,
 		);
 		t.into()
@@ -220,11 +214,13 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash))
+					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					topics: vec![],
 				}]
 			);
 
@@ -237,19 +233,23 @@ mod tests {
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash))
+					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id2, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(vote_id2, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash2))
+					event: Event::governance(RawEvent::NewProposal(public, hash2)),
+					topics: vec![],
 				},]
 			);
 			assert_eq!(Governance::proposal_count(), 2);
@@ -338,34 +338,38 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_time();
-			let now = Timestamp::get();
+ 			let vote_time = Governance::voting_length();
+			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash))
+					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
+					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
+					topics: vec![],
 				},]
 			);
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -385,12 +389,12 @@ mod tests {
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
 									"Proposal not in pre-voting stage");
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
@@ -411,75 +415,81 @@ mod tests {
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_time();
-			let now = Timestamp::get();
+ 			let vote_time = Governance::voting_length();
+			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10000)]);
+			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
 				Governance::proposal_of(hash),
 				Some(ProposalRecord {
 					stage: ProposalStage::Voting,
-					transition_time: 10000,
+					transition_time: 10001,
 					..make_record(public, title, proposal, category)
 				})
 			);
 
-			<Governance as OnFinalise<u64>>::on_finalise(1);
 			System::set_block_number(2);
-
-			assert_eq!(System::events(), vec![
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting))
-				},
-				EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
-				},]
-			);
-
-			Timestamp::set_timestamp(10001);
-
-			<Governance as OnFinalise<u64>>::on_finalise(2);
+			<Governance as OnFinalize<u64>>::on_finalize(2);
 			System::set_block_number(3);
 
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary))
+					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash))
+					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at))
+					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
+					topics: vec![],
+				},]
+			);
+
+			System::set_block_number(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
+
+			assert_eq!(System::events(), vec![
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteCreated(vote_id, public, VoteType::Binary)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::Voting, VoteStage::Completed))
+					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					topics: vec![],
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingCompleted(
-						hash,
-						vote_id,
-						Some(vec![(governance::YES_VOTE, 0), (governance::NO_VOTE, 0)])
-					))
+					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::PreVoting, VoteStage::Voting)),
+					topics: vec![],
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
+					topics: vec![],
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::voting(voting::RawEvent::VoteAdvanced(vote_id, VoteStage::Voting, VoteStage::Completed)),
+					topics: vec![],
+				},
+				EventRecord {
+					phase: Phase::ApplyExtrinsic(0),
+					event: Event::governance(RawEvent::VotingCompleted(hash, vote_id)),
+					topics: vec![],
 				}]
 			);
 
@@ -507,10 +517,9 @@ mod tests {
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			
-			Timestamp::set_timestamp(10001);
-			
-			<Governance as OnFinalise<u64>>::on_finalise(1);
-			System::set_block_number(2);
+			System::set_block_number(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
 
 			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
 			assert_eq!(Governance::active_proposals(), vec![]);
@@ -543,6 +552,45 @@ mod tests {
 				Governance::proposal_of(hash),
 				Some(make_record(public, title, proposal, category))
 			);
+		});
+	}
+
+	#[test]
+	fn creating_proposal_with_insufficient_balance_fails() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = 100_u64;
+			let category = governance::ProposalCategory::Signaling;
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+
+			assert_err!(
+				propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin),
+				"Not enough currency for reserve bond");
+		});
+	}
+
+	#[test]
+	fn completed_proposal_should_return_creation_bond() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let category = governance::ProposalCategory::Signaling;
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let hash = build_proposal_hash(public, &proposal);
+			let balance = Balances::free_balance(public);
+			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let after_propose_balance = Balances::free_balance(public);
+			assert_eq!(balance - BOND, after_propose_balance);
+			assert_ok!(advance_proposal(public, hash));
+
+			System::set_block_number(10002);
+			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
+
+			let after_completion_balance = Balances::free_balance(public);
+			assert_eq!(balance, after_completion_balance);
 		});
 	}
 } 

@@ -4,12 +4,10 @@ version = "0.1.0"
 authors = ["Drew Stone <drew@commonwealth.im>"]
 
 [dependencies]
-hex-literal = "0.1.0"
-serde = { version = "1.0", default-features = false }
+serde = { version = "1.0", default-features = false, optional = true }
 serde_derive = { version = "1.0", optional = true }
-safe-mix = { version = "1.0", default-features = false}
-parity-codec = { version = "3.0", default-features = false }
-parity-codec-derive = { version = "3.0", default-features = false }
+safe-mix = { version = "1.0", default-features = false }
+parity-codec = { version = "4.1.1", default-features = false, features = ["derive"] }
 substrate-keyring = { git = "https://github.com/paritytech/substrate", optional = true }
 substrate-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 sr-std = { git = "https://github.com/paritytech/substrate", default-features = false }
@@ -18,7 +16,6 @@ sr-primitives = { git = "https://github.com/paritytech/substrate", default-featu
 srml-support = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
-edge-delegation = { path = "../edge-delegation", default-features = false }
 
 [features]
 default = ["std"]
@@ -27,7 +24,6 @@ std = [
     "serde_derive",
     "safe-mix/std",
     "parity-codec/std",
-    "parity-codec-derive/std",
     "substrate-primitives/std",
     "sr-std/std",
     "sr-io/std",
@@ -35,5 +31,4 @@ std = [
     "sr-primitives/std",
     "srml-system/std",
     "srml-balances/std",
-    "edge-delegation/std",
 ]

@@ -2,10 +2,37 @@
 
 A Parity Substrate node implementing [Edgeware](https://edgewa.re).
 
+## To get started
+
+- Download this entire repository to the file system that you are using to run the validator node.
+  - You can do this by going to [this page](https://github.com/hicommonwealth/edgeware-node) and selecting "Clone or download" followed by "Download ZIP".
+  - If you are installing via a command line interface (e.g. SSH into a remote server), you can download by running `wget https://github.com/hicommonwealth/edgeware-node/archive/master.zip`
+  - Once you have downloaded the zip file, unzip the `edgeware-node-master` folder onto the file system. If you are using a command line interface, you can unzip by running `unzip master.zip`
+  - **_All commands referenced in this document need to be run from within the `edgeware-node-master` folder._**
+
+- You will also need to install `rust` and `cargo` by installing `rustup` [here](https://rustup.rs/).
+  - **_Note_**: at the end of the install, you will need to log out and log in again, or run the suggested `source` command to configure the current shell.
+
 ## Fresh start
 If your device is clean (such as a fresh cloud VM) you can use this script, otherwise, proceed with the *Initial Setup*.
 ```
 ./setup.sh
+```
+To create a keypair, install subkey with `cargo install --force --git https://github.com/paritytech/substrate subkey`. Then run the following:
+```
+subkey generate
+```
+To create an ED25519 keypair, run the following:
+```
+subkey -e generate
+```
+To create derived keypairs, use the mnemonic generated from a method above and run:
+```
+subkey inspect "<mnemonic>"//<derive_path>
+```
+For example:
+```
+subkey inspect "west paper guide park design weekend radar chaos space giggle execute canoe"//edgewarerocks
 ```
 Then proceed to the *Running* instructions or follow the instructions below for the manual setup.
 
@@ -13,9 +40,9 @@ Then proceed to the *Running* instructions or follow the instructions below for 
 
 ```
 curl https://sh.rustup.rs -sSf | sh
+rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-rustup update stable
 cargo install --git https://github.com/alexcrichton/wasm-gc
 ```
 
@@ -34,7 +61,7 @@ brew install cmake pkg-config openssl git llvm
 ### Building
 
 ```
-./build.sh
+./scripts/build.sh
 cargo build --release
 ```
 
@@ -42,7 +69,7 @@ cargo build --release
 
 Ensure you have a fresh start if updating from another version:
 ```
-./purge-chain.sh
+./scripts/purge-chain.sh
 ```
 To start up the Edgeware node and connect to the latest testnet, run:
 ```
@@ -56,42 +83,43 @@ If you use the `--key` flag, ensure that either it is a 32-byte hex string or pr
 
 ### Visualization
 
-To ensure you followed the steps correctly, check https://telemetry.polkadot.io/#/Edgeware%20V0.1.8. If done correctly, you should see your node with the inserted name.
+To ensure you followed the steps correctly, check https://telemetry.polkadot.io/#/Edgeware%20Testnet%20V0.2.0. If done correctly, you should see your node with the inserted name.
 
 ## Implemented Modules
 
 ### Edge
 
-* [Identity](modules/edge-identity)
-* [Governance](modules/edge-governance)
-* [Voting](modules/edge-voting)
-* [Delegation](modules/edge-delegation)
+* [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
+* [Voting](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-voting)
+* [Governance](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-governance)
 
 ### SRML
-
-* [Aura](https://github/com/paritytech/substrate/tree/master/srml/aura)
-* [Balances](https://github/com/paritytech/substrate/tree/master/srml/balances)
-* [Consensus](https://github/com/paritytech/substrate/tree/master/srml/consensus)
-* [Contract](https://github/com/paritytech/substrate/tree/master/srml/contract)
-* [Council](https://github/com/paritytech/substrate/tree/master/srml/council)
-* [Democracy](https://github/com/paritytech/substrate/tree/master/srml/democracy)
-* [Executive](https://github/com/paritytech/substrate/tree/master/srml/executive)
-* [Fees](https://github/com/paritytech/substrate/tree/master/srml/fees)
-* [Finality_tracker](https://github/com/paritytech/substrate/tree/master/srml/finality-tracker)
-* [Grandpa](https://github/com/paritytech/substrate/tree/master/srml/grandpa)
-* [Indices](https://github/com/paritytech/substrate/tree/master/srml/indices)
-* [Session](https://github/com/paritytech/substrate/tree/master/srml/session)
-* [Staking](https://github/com/paritytech/substrate/tree/master/srml/staking)
-* [System](https://github/com/paritytech/substrate/tree/master/srml/system)
-* [Timestamp](https://github/com/paritytech/substrate/tree/master/srml/timestamp)
-* [Treasury](https://github/com/paritytech/substrate/tree/master/srml/treasury)
-* [Sudo](https://github/com/paritytech/substrate/tree/master/srml/sudo)
+* [System](https://github.com/paritytech/substrate/tree/master/srml/system)
+* [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
+* [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
+* [Authorship](https://github.com/paritytech/substrate/tree/master/srml/authorship)
+* [Indices](https://github.com/paritytech/substrate/tree/master/srml/indices)
+* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
+* [Staking](https://github.com/paritytech/substrate/tree/master/srml/staking)
+* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
+* [Democracy](https://github.com/paritytech/substrate/tree/master/srml/democracy)
+* [Council](https://github.com/paritytech/substrate/tree/master/srml/council)
+* [Elections](https://github.com/paritytech/substrate/tree/master/srml/elections)
+* [FinalityTracker](https://github.com/paritytech/substrate/tree/master/srml/finality-tracker)
+* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
+* [Treasury](https://github.com/paritytech/substrate/tree/master/srml/treasury)
+* [Contracts](https://github.com/paritytech/substrate/tree/master/srml/contracts)
+* [Sudo](https://github.com/paritytech/substrate/tree/master/srml/sudo)
 
 ## Developing on Edgeware
 
 ### Running A Local Chain
 
 To run a chain locally for development purposes: `./target/release/edgeware --chain=local --alice --validator`
+
+To allow apps in your browser to connect, as well as anyone else on your local network, add the `--rpc_cors=all` flag.
+
+To force your local to create new blocks, even if offline, add the `--force-authoring` flag.
 
 ### Adding A Module
 
@@ -107,4 +135,3 @@ To run a chain locally for development purposes: `./target/release/edgeware --ch
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
-

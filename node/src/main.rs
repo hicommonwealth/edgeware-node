@@ -17,48 +17,19 @@
 //! Substrate Node Template CLI library.
 
 #![warn(missing_docs)]
-#![warn(unused_extern_crates)]
 
+extern crate edgeware_cli as cli;
+extern crate ctrlc;
 extern crate futures;
-#[macro_use]
-extern crate error_chain;
-extern crate tokio;
-#[macro_use]
-extern crate log;
-extern crate substrate_cli;
-extern crate substrate_primitives as primitives;
-extern crate substrate_consensus_aura as consensus;
-extern crate substrate_client as client;
-#[macro_use]
-extern crate substrate_network as network;
-#[macro_use]
-extern crate substrate_executor;
-extern crate substrate_telemetry;
-extern crate substrate_transaction_pool as transaction_pool;
-#[macro_use]
-extern crate substrate_service;
-extern crate substrate_inherents;
 
-extern crate edgeware_runtime;
-extern crate node_executor;
-extern crate substrate_finality_grandpa as grandpa;
-extern crate node_primitives;
-#[macro_use]
-extern crate hex_literal;
-
+use cli::VersionInfo;
 use futures::sync::oneshot;
 use futures::{future, Future};
-
 use std::cell::RefCell;
 
-mod chain_spec;
-mod service;
-mod cli;
-
-pub use substrate_cli::{VersionInfo, IntoExit, error};
 // handles ctrl-c
 struct Exit;
-impl cli::IntoExit for Exit {
+impl edgeware_cli::IntoExit for Exit {
 	type Exit = future::MapErr<oneshot::Receiver<()>, fn(oneshot::Canceled) -> ()>;
 	fn into_exit(self) -> Self::Exit {
 		// can't use signal directly here because CtrlC takes only `Fn`.
@@ -75,17 +46,19 @@ impl cli::IntoExit for Exit {
 	}
 }
 
-quick_main!(run);
-
-fn run() -> cli::error::Result<()> {
+fn main() {
 	let version = VersionInfo {
-		name: "Edgeware Node",
+		name: "Edgeware",
 		commit: env!("VERGEN_SHA_SHORT"),
 		version: env!("CARGO_PKG_VERSION"),
 		executable_name: "edgeware",
-		author: "Commonwealth Labs",
-		description: "edgeware",
+		author: "Commonwealth Labs <hello@commonwealth.im>",
+		description: "Edgeware Client Node",
 		support_url: "https://github.com/hicommonwealth/edgeware-node/issues/new",
 	};
-	cli::run(::std::env::args(), Exit, version)
+
+	if let Err(e) = edgeware_cli::run(::std::env::args(), Exit, version) {
+		eprintln!("Error starting the node: {}\n\n{:?}", e, e);
+		std::process::exit(1)
+	}
 }

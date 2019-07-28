@@ -1,0 +1,30 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: phusion/baseimage:0.11
+        environment:
+          DEBUG_BUILD: true
+
+    working_directory: ~/edgeware
+
+    steps:
+      - checkout
+      - run: apt-get update
+
+      - restore_cache:
+          keys:
+            - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+
+      # initial build
+      - run: cd ~/edgeware && ./setup.sh
+
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target/debug/.fingerprint
+            - target/debug/build
+            - target/debug/deps
+          key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
+      # module test cases
+      - run: cd ~/edgeware && source ./.cargo/env && cargo test --all
