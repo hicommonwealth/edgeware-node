@@ -182,13 +182,7 @@ pub fn testnet_genesis(
         }),
         democracy: Some(DemocracyConfig::default()),
         collective_Instance1: Some(CouncilConfig {
-            members: vec![
-                get_account_id_from_seed("Alice"),
-                get_account_id_from_seed("Bob"),
-                get_account_id_from_seed("Charlie"),
-                get_account_id_from_seed("Dave"),
-                get_account_id_from_seed("Eve"),
-            ],
+            members: initial_authorities.iter().map(|x| x.1.clone()).collect(),
             phantom: Default::default(),
         }),
         collective_Instance2: Some(TechnicalCommitteeConfig {
@@ -196,9 +190,7 @@ pub fn testnet_genesis(
             phantom: Default::default(),
         }),
         elections: Some(ElectionsConfig {
-            members: endowed_accounts.iter()
-              .filter(|&endowed| initial_authorities.iter().find(|(_, controller, ..)| controller == endowed).is_none())
-              .map(|a| (a.clone(), 1000000)).collect(),
+            members: initial_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
             desired_seats: 5,
             presentation_duration: 25,
             term_duration: 1000,
