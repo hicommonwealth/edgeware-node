@@ -1,6 +1,11 @@
 # edgeware-node
 
-A Parity Substrate node implementing [Edgeware](https://edgewa.re).
+[Edgeware](https://edgewa.re) is an:
+- On-chain Governed,
+- Proof-of-Stake (PoS) Blockchain
+- with a WASM Runtime.
+
+Developer resources are available at [edgewa.re/dev](https://edgewa.re/dev/) and more detailed documentation at our [Github Wiki](https://github.com/hicommonwealth/edgeware-node/wiki). For more details about the project, visit the Edgeware website, or check the [blog](blog.edgewa.re) or [Twitter](http://twitter.com/heyedgeware) for the latest. Finally, for discussion and governance, you can utilize [Commonwealth.im](https://commonwealth.im).
 
 ## To get started
 
