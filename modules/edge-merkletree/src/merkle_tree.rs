@@ -121,47 +121,9 @@ decl_module! {
             let tree = <MerkleTreeMetadata<T>>::get(tree_id).ok_or("Tree doesn't exist")?;
             ensure!(<balances::Module<T>>::free_balance(_sender.clone()) >= tree.fee, "Insufficient balance from sender");    
             ensure!(tree.leaf_count < (1 << 31), "Insufficient capacity in tree");
-            println!("Hello");
             Self::add_leaf_element(tree_id, leaf_value);
             Ok(())
         }
-
-        // pub fn verify_zkproof(origin, tree_id: u32, _params: Vec<u8>, _proof: Vec<u8>, _nullifier_hex: Vec<u8>, _root_hex: Vec<u8>) -> Result {
-        //     let _sender = ensure_signed(origin)?;
-        //     let params = String::from_utf8(_params).expect("Found invalid UTF-8");
-        //     let proof = String::from_utf8(_proof).expect("Found invalid UTF-8");
-        //     let nullifier_hex = String::from_utf8(_nullifier_hex.clone()).expect("Found invalid UTF-8");
-
-        //     let tree_root = &<MerkleTreeLevels<T>>::get((tree_id, 0)).unwrap()[0];
-        //     let root_hex = String::from_utf8(tree_root.to_vec()).expect("Invalid root");
-
-        //     let params_hex = hex::decode(params).expect("Decoding params failed");
-        //     let de_params = Parameters::read(&params_hex[..], true).expect("Param bellman decode failed");
-
-
-        //     let pvk = prepare_verifying_key::<Bn256>(&de_params.vk);
-        //     // Nullifier
-        //     let nullifier_big = BigInt::from_str_radix(&nullifier_hex, 16).expect("Nullfier decode failed");
-        //     let nullifier_raw = &nullifier_big.to_str_radix(10);
-        //     let nullifier = Fr::from_str(nullifier_raw).ok_or("couldn't parse Fr")?;
-        //     // Root hash
-        //     let root_big = BigInt::from_str_radix(&root_hex, 16).expect("Root decode failed");
-        //     let root_raw = &root_big.to_str_radix(10);
-        //     let root = Fr::from_str(root_raw).ok_or("couldn't parse Fr")?;
-        //     let _result = verify_proof(
-        //         &pvk,
-        //         &Proof::read(&hex::decode(proof).expect("Proof hex decode failed")[..]).expect("Proof decode failed"),
-        //         &[
-        //             nullifier,
-        //             root
-        //         ]).expect("Verify proof failed");
-
-        //     if _result {
-        //         <UsedNullifiers<T>>::insert(_nullifier_hex, true);    
-        //     }
-            
-        //     Ok(())
-        // }
 	}
 }
 

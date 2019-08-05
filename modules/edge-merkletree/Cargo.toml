@@ -26,6 +26,7 @@ num-traits = "0.2"
 
 sapling-crypto = { git = "https://github.com/matterinc/sapling-crypto" }
 bellman = { git = 'https://github.com/matterinc/bellman', tag = "0.2.0"}
+jubjub = "0.2.0"
 
 [features]
 default = ["std"]
