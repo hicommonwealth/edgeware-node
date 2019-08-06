@@ -268,7 +268,7 @@ impl democracy::Trait for Runtime {
 	type MinimumDeposit = MinimumDeposit;
 	type ExternalOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilInstance>;
 	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type ExternalPushOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, TechnicalInstance>;
+	type ExternalPushOrigin = system::EnsureNever<u64>; // effectively disabling this feature
 	type EmergencyOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
 	type CancellationOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
 	type VetoOrigin = collective::EnsureMember<AccountId, CouncilInstance>;
@@ -310,13 +310,6 @@ impl elections::Trait for Runtime {
 	type InactiveGracePeriod = InactiveGracePeriod;
 	type VotingPeriod = ElectionsVotingPeriod;
 	type DecayRatio = DecayRatio;
-}
-
-type TechnicalInstance = collective::Instance2;
-impl collective::Trait<TechnicalInstance> for Runtime {
-	type Origin = Origin;
-	type Proposal = Call;
-	type Event = Event;
 }
 
 parameter_types! {
@@ -432,7 +425,6 @@ construct_runtime!(
 		Session: session::{Module, Call, Storage, Event, Config<T>},
 		Democracy: democracy::{Module, Call, Storage, Config, Event<T>},
 		Council: collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>},
-		TechnicalCommittee: collective::<Instance2>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>},
 		Elections: elections::{Module, Call, Storage, Event<T>, Config<T>},
 		FinalityTracker: finality_tracker::{Module, Call, Inherent},
 		Grandpa: grandpa::{Module, Call, Storage, Config, Event},

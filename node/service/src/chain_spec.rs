@@ -18,7 +18,7 @@ use primitives::{ed25519, sr25519, Pair};
 use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
     GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
-    AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TechnicalCommitteeConfig,
+    AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig,
     SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus,
 };
 use edgeware_runtime::constants::{time::DAYS, currency::DOLLARS, currency::MILLICENTS};
@@ -150,6 +150,7 @@ pub fn testnet_genesis(
 
     const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
     const STASH: Balance = 100 * DOLLARS;
+	let desired_seats: u32 = (endowed_accounts.len() / 2 - initial_authorities.len()) as u32;
 
     GenesisConfig {
         system: Some(SystemConfig {
@@ -185,15 +186,11 @@ pub fn testnet_genesis(
             members: initial_authorities.iter().map(|x| x.1.clone()).collect(),
             phantom: Default::default(),
         }),
-        collective_Instance2: Some(TechnicalCommitteeConfig {
-            members: vec![],
-            phantom: Default::default(),
-        }),
         elections: Some(ElectionsConfig {
             members: initial_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
-            desired_seats: 5,
-            presentation_duration: 25,
-            term_duration: 1000,
+            desired_seats: desired_seats,
+            presentation_duration: 1 * DAYS,
+            term_duration: 28 * DAYS,
         }),
         contracts: Some(ContractsConfig {
             current_schedule: Default::default(),
