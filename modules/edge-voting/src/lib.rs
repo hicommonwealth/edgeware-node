@@ -52,6 +52,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
+		Perbill,
 		traits::{BlakeTwo256, Hash, IdentityLookup},
 		testing::{Header}
 	};
@@ -72,11 +73,16 @@ mod tests {
 		}
 	}
 
-	// For testing the module, we construct most of a mock runtime. This means
-	// first constructing a configuration type (`Test`) which `impl`s each of the
-	// configuration traits of modules we want to use.
-	#[derive(Clone, Eq, PartialEq)]
+	#[derive(Clone, PartialEq, Eq, Debug)]
 	pub struct Test;
+
+	parameter_types! {
+		pub const BlockHashCount: u64 = 250;
+		pub const MaximumBlockWeight: u32 = 1024;
+		pub const MaximumBlockLength: u32 = 2 * 1024;
+		pub const AvailableBlockRatio: Perbill = Perbill::one();
+	}
+
 	impl system::Trait for Test {
 		type Origin = Origin;
 		type Index = u64;
@@ -87,6 +93,11 @@ mod tests {
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
+		type WeightMultiplierUpdate = ();
+		type BlockHashCount = BlockHashCount;
+		type MaximumBlockWeight = MaximumBlockWeight;
+		type MaximumBlockLength = MaximumBlockLength;
+		type AvailableBlockRatio = AvailableBlockRatio;
 	}
 
 	impl Trait for Test {
