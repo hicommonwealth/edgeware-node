@@ -12,19 +12,5 @@ jobs:
       - checkout
       - run: apt-get update
 
-      - restore_cache:
-          keys:
-            - v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
-
-      # initial build
-      - run: cd ~/edgeware && ./setup.sh
-
-      - save_cache:
-          paths:
-            - /usr/local/cargo/registry
-            - target/debug/.fingerprint
-            - target/debug/build
-            - target/debug/deps
-          key: v4-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       # module test cases
-      - run: cd ~/edgeware && source ./.cargo/env && cargo test --all
+      - run: cd ~/edgeware && source ./.cargo/env && ./scripts/test.sh
