@@ -11,6 +11,7 @@ jobs:
     steps:
       - checkout
       - run: apt-get update
+      - run: ~/edgeware/scripts/init.sh
 
       # module test cases
-      - run: cd ~/edgeware && source ./.cargo/env && ./scripts/test.sh
+      - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
