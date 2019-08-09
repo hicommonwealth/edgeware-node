@@ -36,7 +36,7 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_config() -> ChainSpec {
-    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.4.0/edgeware.json")) {
+    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.5.0/edgeware.json")) {
         Ok(spec) => spec,
         Err(e) => panic!(e),
     }
@@ -80,9 +80,9 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
         staking: Some(StakingConfig {
             current_era: 0,
             offline_slash: Perbill::from_parts(1_000_000),
-            validator_count: 7,
-            offline_slash_grace: 4,
-            minimum_validator_count: 4,
+            validator_count: 100,
+            offline_slash_grace: 10,
+            minimum_validator_count: 10,
             stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
                 .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
                 .collect(),
@@ -99,7 +99,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
             members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
             desired_seats: 9,
             presentation_duration: 1 * DAYS,
-            term_duration: 28 * DAYS,
+            term_duration: 3 * DAYS,
         }),
         contracts: Some(ContractsConfig {
             current_schedule: Default::default(),
@@ -122,12 +122,12 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
         }),
         identity: Some(IdentityConfig {
             verifiers: identity_verifiers,
-            expiration_length: 7 * DAYS, // 7 days
-            registration_bond: 1 * DOLLARS,
+            expiration_length: 1 * DAYS, // 1 days
+            registration_bond: 1 * MILLICENTS,
         }),
         governance: Some(GovernanceConfig {
-            voting_length: 7 * DAYS, // 7 days
-            proposal_creation_bond: 1 * DOLLARS,
+            voting_length: 3 * DAYS, // 7 days
+            proposal_creation_bond: 1 * MILLICENTS,
         }),
     }
 }
@@ -189,7 +189,7 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, AuraId
 }
 
 /// Helper function to create GenesisConfig for testing
-pub fn testnet_genesis(
+pub fn development_genesis(
     initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId)>,
     root_key: AccountId,
     endowed_accounts: Option<Vec<AccountId>>,
@@ -293,7 +293,7 @@ pub fn testnet_genesis(
 }
 
 fn development_config_genesis() -> GenesisConfig {
-    testnet_genesis(
+    development_genesis(
         vec![
             get_authority_keys_from_seed("Alice"),
         ],
@@ -316,8 +316,8 @@ pub fn development_config() -> ChainSpec {
         None)
 }
 
-fn local_testnet_genesis() -> GenesisConfig {
-    testnet_genesis(
+fn local_development_genesis() -> GenesisConfig {
+    development_genesis(
         vec![
             get_authority_keys_from_seed("Alice"),
             get_authority_keys_from_seed("Bob"),
@@ -333,7 +333,7 @@ pub fn local_testnet_config() -> ChainSpec {
     ChainSpec::from_genesis(
         "Local Testnet",
         "local_testnet",
-        local_testnet_genesis,
+        local_development_genesis,
         vec![],
         None,
         Some(DEFAULT_PROTOCOL_ID),

@@ -29,7 +29,7 @@ pub mod currency {
 pub mod time {
     use edgeware_primitives::Moment;
 
-    pub const SECS_PER_BLOCK: Moment = 6;
+    pub const SECS_PER_BLOCK: Moment = 5;
     pub const MINUTES: Moment = 60 / SECS_PER_BLOCK;
     pub const HOURS: Moment = MINUTES * 60;
     pub const DAYS: Moment = HOURS * 24;
