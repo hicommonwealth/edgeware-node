@@ -43,22 +43,93 @@ pub fn edgeware_config() -> ChainSpec {
 }
 
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
-    let initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId)> = get_vals();
+    let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance)> = get_commonwealth_validators();
+    let grandpa_nodes = get_grandpa_nodes();
+    let spec = get_spec_allocation().unwrap();
+    let lockdrop_balances = spec.0;
+    let lockdrop_vesting = spec.1;
+    let lockdrop_validators = spec.2;
     let root_key = get_root_key();
     // Add controller accounts to endowed accounts
-    let endowed_accounts = initial_authorities.clone()
-        .into_iter()
-        .map(|elt| elt.1)
-        .chain(get_more_endowed())
-        .collect();
+    let endowed_accounts = get_more_endowed();
     let identity_verifiers = get_identity_verifiers();
-
-    testnet_genesis(
-        initial_authorities, // authorities
-        root_key,
-        Some(endowed_accounts),
-        Some(identity_verifiers),
-    )
+    const ENDOWMENT: Balance = 10 * DOLLARS;
+    GenesisConfig {
+        system: Some(SystemConfig {
+            code: WASM_BINARY.to_vec(),
+            changes_trie_config: Default::default(),
+        }),
+        balances: Some(BalancesConfig {
+            balances: endowed_accounts.iter().cloned()
+                .map(|k| (k, ENDOWMENT))
+                .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
+                .chain(lockdrop_balances.iter().map(|x| (x.0.clone(), x.1.clone())))
+                .collect(),
+            vesting: lockdrop_vesting,
+        }),
+        indices: Some(IndicesConfig {
+            ids: endowed_accounts.iter().cloned()
+                .chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
+                .chain(commonwealth_authorities.iter().map(|x| x.1.clone()))
+                .chain(lockdrop_balances.iter().map(|x| x.0.clone()))
+                .collect::<Vec<_>>(),
+        }),
+        session: Some(SessionConfig {
+            keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
+        }),
+        staking: Some(StakingConfig {
+            current_era: 0,
+            offline_slash: Perbill::from_parts(1_000_000),
+            validator_count: 7,
+            offline_slash_grace: 4,
+            minimum_validator_count: 4,
+            stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
+                .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+                .collect(),
+            invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
+                .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
+                .collect(),
+        }),
+        democracy: Some(DemocracyConfig::default()),
+        collective_Instance1: Some(CouncilConfig {
+            members: commonwealth_authorities.iter().map(|x| x.1.clone()).collect(),
+            phantom: Default::default(),
+        }),
+        elections: Some(ElectionsConfig {
+            members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
+            desired_seats: 9,
+            presentation_duration: 1 * DAYS,
+            term_duration: 28 * DAYS,
+        }),
+        contracts: Some(ContractsConfig {
+            current_schedule: Default::default(),
+            gas_price: 1 * MILLICENTS,
+        }),
+        sudo: Some(SudoConfig {
+            key: root_key,
+        }),
+        im_online: Some(ImOnlineConfig {
+            gossip_at: 0,
+            last_new_era_start: 0,
+        }),
+        aura: Some(AuraConfig {
+            authorities: commonwealth_authorities.iter().map(|x| x.2.clone())
+                .chain(lockdrop_validators.iter().map(|x| x.2.clone()))
+                .collect(),
+        }),
+        grandpa: Some(GrandpaConfig {
+            authorities: grandpa_nodes.iter().map(|x| (x.clone(), 1)).collect(),
+        }),
+        identity: Some(IdentityConfig {
+            verifiers: identity_verifiers,
+            expiration_length: 7 * DAYS, // 7 days
+            registration_bond: 1 * DOLLARS,
+        }),
+        governance: Some(GovernanceConfig {
+            voting_length: 7 * DAYS, // 7 days
+            proposal_creation_bond: 1 * DOLLARS,
+        }),
+    }
 }
 
 /// Edgeware testnet generator

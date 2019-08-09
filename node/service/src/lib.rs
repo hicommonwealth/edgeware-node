@@ -15,6 +15,7 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
 #![warn(unused_extern_crates)]
+#![feature(rustc_private)]
 
 use std::sync::Arc;
 use std::time::Duration;

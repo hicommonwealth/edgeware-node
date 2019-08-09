@@ -20,7 +20,7 @@
 pub mod currency {
     use edgeware_primitives::Balance;
 
-    pub const MILLICENTS: Balance = 1_000_000_000_000;
+    pub const MILLICENTS: Balance = 10_000_000_000_000;
     pub const CENTS: Balance = 1_000 * MILLICENTS;    // assume this is worth about a cent.
     pub const DOLLARS: Balance = 100 * CENTS;
 }
@@ -37,7 +37,7 @@ pub mod time {
 
 // CRITICAL NOTE: The system module maintains two constants: a _maximum_ block weight and a
 // _ratio_ of it yielding the portion which is accessible to normal transactions (reserving the rest
-// for operational ones). `TARGET_BLOCK_FULLNESS` is entirely independent and the system module is
+// for operational ones). 0`TARGET_BLOCK_FULLNESS` is entirely independent and the system module is
 // not aware of if, nor should it care about it. This constant simply denotes on which ratio of the
 // _maximum_ block weight we tweak the fees. It does NOT care about the type of the dispatch.
 //
