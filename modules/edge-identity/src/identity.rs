@@ -14,8 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
 #[cfg(feature = "std")]
 extern crate serde;
 
@@ -98,16 +96,12 @@ decl_module! {
         /// the record if now. The record is indexed by the hash of the pair.
         pub fn register(origin, identity_type: IdentityType, identity: Identity) -> Result {
             let _sender = ensure_signed(origin)?;
-            ensure!(!<UsedTypes<T>>::get(_sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
+            // create hash
             let mut buf = Vec::new();
             buf.extend_from_slice(&identity_type.encode());
             buf.extend_from_slice(&identity.encode());
             let hash = T::Hashing::hash(&buf[..]);
-            ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
-            // Reserve the registration bond amount
-            T::Currency::reserve(&_sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
-            // Register the identity
-            return Self::register_identity(_sender, identity_type, identity, hash);
+            return Self::do_register_identity(_sender, identity_type, identity, hash);
         }
 
         /// A function that creates an identity attestation
@@ -117,16 +111,7 @@ decl_module! {
         /// implementation overwrites all proofs if safety checks pass.
         pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
             let _sender = ensure_signed(origin)?;
-            // Grab record
-            let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
-            // Ensure the record is not verified
-            ensure!(record.stage != IdentityStage::Verified, "Already verified");
-            // Ensure the record isn't expired if it still exists
-            ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
-            // Check that original sender and current sender match
-            ensure!(record.account == _sender, "Stored identity does not match sender");
-            // Attest to records
-            return Self::attest_for(_sender, identity_hash, attestation);
+            return Self::do_attest(_sender, identity_hash, attestation);
         }
 
         /// A function that registers and attests to an identity simultaneously.
@@ -135,25 +120,13 @@ decl_module! {
         /// requires only 1 transaction.
         pub fn register_and_attest(origin, identity_type: IdentityType, identity: Identity, attestation: Attestation) -> Result {
             let _sender = ensure_signed(origin)?;
-            // Check hash
+            // create hash
             let mut buf = Vec::new();
             buf.extend_from_slice(&identity_type.encode());
             buf.extend_from_slice(&identity.encode());
             let hash = T::Hashing::hash(&buf[..]);
-            ensure!(!<IdentityOf<T>>::exists(hash), "Identity already exists");
-            // Reserve the registration bond amount
-            T::Currency::reserve(&_sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
-            // Register identity
-            Self::register_identity(_sender.clone(), identity_type, identity, hash).unwrap();
-            // Grab record
-            let record = <IdentityOf<T>>::get(&hash).ok_or("Identity does not exist")?;
-            // Ensure the record is not verified
-            ensure!(record.stage != IdentityStage::Verified, "Already verified");
-            // Ensure the record isn't expired if it still exists
-            ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
-            // Check that original sender and current sender match
-            ensure!(record.account == _sender.clone(), "Stored identity does not match sender");
-            return Self::attest_for(_sender, hash, attestation);
+            Self::do_register_identity(_sender.clone(), identity_type, identity, hash)?;
+            return Self::do_attest(_sender, hash, attestation);
         }
 
         /// A function that verifies an identity attestation.
@@ -185,7 +158,7 @@ decl_module! {
             ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
             
             for i in 0..identity_hashes.len() {
-                Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], true).unwrap();
+                Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], true)?;
             }
 
             Ok(())
@@ -198,7 +171,7 @@ decl_module! {
             ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
             
             for i in 0..identity_hashes.len() {
-                Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], false).unwrap();
+                Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], false)?;
             }
 
             Ok(())
@@ -290,7 +263,13 @@ impl<T: Trait> Module<T> {
     }
 
     /// Helper function for executing the registration of identities
-    fn register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Identity, identity_hash: T::Hash) -> Result {
+    fn do_register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Identity, identity_hash: T::Hash) -> Result {
+        ensure!(!<UsedTypes<T>>::get(sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
+        ensure!(!<IdentityOf<T>>::exists(identity_hash), "Identity already exists");
+        // Reserve the registration bond amount
+        T::Currency::reserve(&sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
+
+        // reserve identity type
         let mut types = <UsedTypes<T>>::get(sender.clone());
         types.push(identity_type.clone());
         <UsedTypes<T>>::insert(sender.clone(), types);
@@ -316,9 +295,16 @@ impl<T: Trait> Module<T> {
     }
 
     /// Helper function for executing the attestation of identities
-    fn attest_for(sender: T::AccountId, identity_hash: T::Hash, attestation: Attestation) -> Result {
-        // Grab record
+    fn do_attest(sender: T::AccountId, identity_hash: T::Hash, attestation: Attestation) -> Result {
         let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+        // Ensure the record is not verified
+        ensure!(record.stage != IdentityStage::Verified, "Already verified");
+        // Ensure the record isn't expired if it still exists
+        ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
+        // Check that original sender and current sender match
+        ensure!(record.account == sender, "Stored identity does not match sender");
+
+        // update record
         let id_type = record.identity_type.clone();
         let identity = record.identity.clone();
         let now = <system::Module<T>>::block_number();
@@ -338,23 +324,6 @@ impl<T: Trait> Module<T> {
 
         Self::deposit_event(RawEvent::Attest(attestation, identity_hash, sender.into(), id_type, identity));
         Ok(())
-    }
-
-    pub fn parse_attestation(attestation: Vec<u8>, num_items: u8) -> Vec<Vec<u8>> {
-        let mut attestation_items = vec![];
-
-        let mut inx = 0;
-        for _ in 0..num_items {
-          let item_length = attestation[inx] as usize;
-          // println!("{:?}, {:?}, {:?}", inx, item_length, attestation[inx]);
-          let item = attestation[(inx + 1)..(inx + item_length + 1)].to_vec();
-          // println!("{:?}", item);
-          attestation_items.push(item);
-          inx = item_length + 1
-        }
-
-        attestation_items.push(attestation[(inx + 1)..attestation.len()].to_vec());
-        attestation_items
     }
 }
 

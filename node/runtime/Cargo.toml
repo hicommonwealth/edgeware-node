@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
@@ -34,6 +34,7 @@ timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/s
 treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate", default-features = false }
 sudo = { package = "srml-sudo", git = "https://github.com/paritytech/substrate", default-features = false }
 consensus_aura = { package = "substrate-consensus-aura-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
+im-online = { package = "srml-im-online", git = "https://github.com/paritytech/substrate", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0", optional = true }
 substrate-keyring = { git = "https://github.com/paritytech/substrate", optional = true }
@@ -82,6 +83,7 @@ std = [
 	"rustc-hex",
 	"substrate-keyring",
 	"offchain-primitives/std",
+	"im-online/std",
 	"edge-identity/std",
 	"edge-voting/std",
 	"edge-governance/std",

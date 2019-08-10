@@ -15,8 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-#![cfg_attr(not(feature = "std"), no_std)]
-
 #[cfg(feature = "std")]
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
@@ -73,8 +71,6 @@ pub trait Trait: voting::Trait + balances::Trait {
 
 pub type ProposalTitle = Vec<u8>;
 pub type ProposalContents = Vec<u8>;
-pub static YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-pub static NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
 
 decl_module! {

@@ -26,11 +26,8 @@ extern crate serde;
 extern crate serde_derive;
 #[macro_use]
 extern crate srml_support;
-
-
 extern crate parity_codec as codec;
 extern crate substrate_primitives as primitives;
-#[cfg_attr(not(feature = "std"), macro_use)]
 extern crate sr_std as rstd;
 extern crate srml_support as runtime_support;
 extern crate sr_primitives as runtime_primitives;
@@ -58,6 +55,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
+		Perbill,
 		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 		testing::{Header}
 	};
@@ -73,12 +71,17 @@ mod tests {
 			voting<T>, balances<T>, governance<T>,
 		}
 	}
-
-	// For testing the module, we construct most of a mock runtime. This means
-	// first constructing a configuration type (`Test`) which `impl`s each of the
-	// configuration traits of modules we want to use.
-	#[derive(Clone, Eq, PartialEq)]
+	
+	#[derive(Clone, PartialEq, Eq, Debug)]
 	pub struct Test;
+
+	parameter_types! {
+		pub const BlockHashCount: u64 = 250;
+		pub const MaximumBlockWeight: u32 = 1024;
+		pub const MaximumBlockLength: u32 = 2 * 1024;
+		pub const AvailableBlockRatio: Perbill = Perbill::one();
+	}
+
 	impl system::Trait for Test {
 		type Origin = Origin;
 		type Index = u64;
@@ -89,16 +92,34 @@ mod tests {
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
+		type WeightMultiplierUpdate = ();
+		type BlockHashCount = BlockHashCount;
+		type MaximumBlockWeight = MaximumBlockWeight;
+		type MaximumBlockLength = MaximumBlockLength;
+		type AvailableBlockRatio = AvailableBlockRatio;
 	}
 
+	parameter_types! {
+		pub const ExistentialDeposit: u64 = 0;
+		pub const TransferFee: u64 = 0;
+		pub const CreationFee: u64 = 0;
+		pub const TransactionBaseFee: u64 = 0;
+		pub const TransactionByteFee: u64 = 0;
+	}
 	impl balances::Trait for Test {
 		type Balance = u64;
-		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
+		type OnFreeBalanceZero = ();
 		type Event = Event;
 		type TransactionPayment = ();
 		type TransferPayment = ();
 		type DustRemoval = ();
+		type ExistentialDeposit = ExistentialDeposit;
+		type TransferFee = TransferFee;
+		type CreationFee = CreationFee;
+		type TransactionBaseFee = TransactionBaseFee;
+		type TransactionByteFee = TransactionByteFee;
+		type WeightToFee = ();
 	}
 
 	impl voting::Trait for Test {
@@ -115,6 +136,8 @@ mod tests {
 	pub type Governance = Module<Test>;
 
 	const BOND: u64 = 10;
+	const YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+	const NO_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
 	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
 		let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap().0;
@@ -133,11 +156,6 @@ mod tests {
 					(3, 100),
 					(4, 100),
 				],
-				transaction_base_fee: 0,
-				transaction_byte_fee: 0,
-				existential_deposit: 0,
-				transfer_fee: 0,
-				creation_fee: 0,
 				vesting: vec![],
 			}.build_storage().unwrap().0,
 		);
@@ -211,7 +229,7 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(System::events(), vec![
@@ -230,7 +248,7 @@ mod tests {
 			let title2: &[u8] = b"Proposal 2";
 			let proposal2: &[u8] = b"Proposal 2";
 			let hash2 = build_proposal_hash(public, &proposal2);
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title2, proposal2, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id2 = Governance::proposal_of(hash2).unwrap().vote_id;
 			assert_eq!(System::events(), vec![
@@ -281,7 +299,7 @@ mod tests {
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let category = governance::ProposalCategory::Signaling;
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes.clone(), VoteType::Binary, TallyType::OneCoin));
 			assert_eq!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal already exists"));
 			assert_eq!(Governance::proposal_count(), 1);
@@ -302,7 +320,7 @@ mod tests {
 			let proposal = vec![];
 			let hash = build_proposal_hash(public, &proposal);
 			let category = governance::ProposalCategory::Signaling;
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_eq!(propose(public, title, &proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must not be empty"));
 			assert_eq!(Governance::proposal_count(), 0);
 			assert_eq!(Governance::proposals(), vec![]);
@@ -319,7 +337,7 @@ mod tests {
 			let hash = build_proposal_hash(public, &proposal);
 			let title = vec![];
 			let category = governance::ProposalCategory::Signaling;
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_eq!(propose(public, &title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must have title"));
 			assert_eq!(Governance::proposal_count(), 0);
 			assert_eq!(Governance::proposals(), vec![]);
@@ -335,7 +353,7 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
@@ -387,7 +405,7 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
@@ -412,7 +430,7 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
@@ -516,7 +534,7 @@ mod tests {
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			
@@ -547,7 +565,7 @@ mod tests {
 			let hash = build_proposal_hash(public, &proposal);
 
 			let other_public = 2_u64;
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
 			assert_eq!(Governance::active_proposals(), vec![]);
@@ -565,7 +583,7 @@ mod tests {
 			let public = 100_u64;
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 
 			assert_err!(
 				propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin),
@@ -580,7 +598,7 @@ mod tests {
 			let public = get_test_key();
 			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
-			let outcomes = vec![governance::YES_VOTE, governance::NO_VOTE];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 			let hash = build_proposal_hash(public, &proposal);
 			let balance = Balances::free_balance(public);
 			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));

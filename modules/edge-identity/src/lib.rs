@@ -56,6 +56,7 @@ mod tests {
 	// The testing primitives are very useful for avoiding having to work with
 	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
+		Perbill,
 		testing::{Header},
 		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
 	};
@@ -70,11 +71,16 @@ mod tests {
 		}
 	}
 
-	// For testing the module, we construct most of a mock runtime. This means
-	// first constructing a configuration type (`Test`) which `impl`s each of the
-	// configuration traits of modules we want to use.
-	#[derive(Clone, Eq, PartialEq)]
+	#[derive(Clone, PartialEq, Eq, Debug)]
 	pub struct Test;
+
+	parameter_types! {
+		pub const BlockHashCount: u64 = 250;
+		pub const MaximumBlockWeight: u32 = 1024;
+		pub const MaximumBlockLength: u32 = 2 * 1024;
+		pub const AvailableBlockRatio: Perbill = Perbill::one();
+	}
+
 	impl system::Trait for Test {
 		type Origin = Origin;
 		type Index = u64;
@@ -85,16 +91,34 @@ mod tests {
 		type Lookup = IdentityLookup<Self::AccountId>;
 		type Header = Header;
 		type Event = Event;
+		type WeightMultiplierUpdate = ();
+		type BlockHashCount = BlockHashCount;
+		type MaximumBlockWeight = MaximumBlockWeight;
+		type MaximumBlockLength = MaximumBlockLength;
+		type AvailableBlockRatio = AvailableBlockRatio;
 	}
 
+	parameter_types! {
+		pub const ExistentialDeposit: u64 = 0;
+		pub const TransferFee: u64 = 0;
+		pub const CreationFee: u64 = 0;
+		pub const TransactionBaseFee: u64 = 0;
+		pub const TransactionByteFee: u64 = 0;
+	}
 	impl balances::Trait for Test {
 		type Balance = u64;
-		type OnFreeBalanceZero = ();
 		type OnNewAccount = ();
+		type OnFreeBalanceZero = ();
 		type Event = Event;
 		type TransactionPayment = ();
 		type TransferPayment = ();
 		type DustRemoval = ();
+		type ExistentialDeposit = ExistentialDeposit;
+		type TransferFee = TransferFee;
+		type CreationFee = CreationFee;
+		type TransactionBaseFee = TransactionBaseFee;
+		type TransactionByteFee = TransactionByteFee;
+		type WeightToFee = ();
 	}
 
 	impl Trait for Test {
@@ -127,11 +151,6 @@ mod tests {
 					(3, 100),
 					(4, 100),
 				],
-				transaction_base_fee: 0,
-				transaction_byte_fee: 0,
-				existential_deposit: 0,
-				transfer_fee: 0,
-				creation_fee: 0,
 				vesting: vec![],
 			}.build_storage().unwrap().0,
 		);

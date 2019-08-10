@@ -18,9 +18,10 @@ use primitives::{ed25519, sr25519, Pair};
 use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
     GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
-    AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TechnicalCommitteeConfig,
-    SystemConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, DAYS, DOLLARS, MILLICENTS,
+    AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig,
+    SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus,
 };
+use edgeware_runtime::constants::{time::DAYS, currency::DOLLARS, currency::MILLICENTS};
 use edgeware_runtime::{IdentityConfig, GovernanceConfig};
 pub use edgeware_runtime::GenesisConfig;
 use substrate_service;
@@ -35,29 +36,100 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_config() -> ChainSpec {
-    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.4.0/edgeware.json")) {
+    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.5.0/edgeware.json")) {
         Ok(spec) => spec,
         Err(e) => panic!(e),
     }
 }
 
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
-    let initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId)> = get_vals();
+    let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance)> = get_commonwealth_validators();
+    let grandpa_nodes = get_grandpa_nodes();
+    let spec = get_spec_allocation().unwrap();
+    let lockdrop_balances = spec.0;
+    let lockdrop_vesting = spec.1;
+    let lockdrop_validators = spec.2;
     let root_key = get_root_key();
     // Add controller accounts to endowed accounts
-    let endowed_accounts = initial_authorities.clone()
-        .into_iter()
-        .map(|elt| elt.1)
-        .chain(get_more_endowed())
-        .collect();
+    let endowed_accounts = get_more_endowed();
     let identity_verifiers = get_identity_verifiers();
-
-    testnet_genesis(
-        initial_authorities, // authorities
-        root_key,
-        Some(endowed_accounts),
-        Some(identity_verifiers),
-    )
+    const ENDOWMENT: Balance = 10 * DOLLARS;
+    GenesisConfig {
+        system: Some(SystemConfig {
+            code: WASM_BINARY.to_vec(),
+            changes_trie_config: Default::default(),
+        }),
+        balances: Some(BalancesConfig {
+            balances: endowed_accounts.iter().cloned()
+                .map(|k| (k, ENDOWMENT))
+                .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
+                .chain(lockdrop_balances.iter().map(|x| (x.0.clone(), x.1.clone())))
+                .collect(),
+            vesting: lockdrop_vesting,
+        }),
+        indices: Some(IndicesConfig {
+            ids: endowed_accounts.iter().cloned()
+                .chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
+                .chain(commonwealth_authorities.iter().map(|x| x.1.clone()))
+                .chain(lockdrop_balances.iter().map(|x| x.0.clone()))
+                .collect::<Vec<_>>(),
+        }),
+        session: Some(SessionConfig {
+            keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
+        }),
+        staking: Some(StakingConfig {
+            current_era: 0,
+            offline_slash: Perbill::from_parts(1_000_000),
+            validator_count: 100,
+            offline_slash_grace: 10,
+            minimum_validator_count: 10,
+            stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
+                .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+                .collect(),
+            invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
+                .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
+                .collect(),
+        }),
+        democracy: Some(DemocracyConfig::default()),
+        collective_Instance1: Some(CouncilConfig {
+            members: commonwealth_authorities.iter().map(|x| x.1.clone()).collect(),
+            phantom: Default::default(),
+        }),
+        elections: Some(ElectionsConfig {
+            members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
+            desired_seats: 9,
+            presentation_duration: 1 * DAYS,
+            term_duration: 3 * DAYS,
+        }),
+        contracts: Some(ContractsConfig {
+            current_schedule: Default::default(),
+            gas_price: 1 * MILLICENTS,
+        }),
+        sudo: Some(SudoConfig {
+            key: root_key,
+        }),
+        im_online: Some(ImOnlineConfig {
+            gossip_at: 0,
+            last_new_era_start: 0,
+        }),
+        aura: Some(AuraConfig {
+            authorities: commonwealth_authorities.iter().map(|x| x.2.clone())
+                .chain(lockdrop_validators.iter().map(|x| x.2.clone()))
+                .collect(),
+        }),
+        grandpa: Some(GrandpaConfig {
+            authorities: grandpa_nodes.iter().map(|x| (x.clone(), 1)).collect(),
+        }),
+        identity: Some(IdentityConfig {
+            verifiers: identity_verifiers,
+            expiration_length: 1 * DAYS, // 1 days
+            registration_bond: 1 * MILLICENTS,
+        }),
+        governance: Some(GovernanceConfig {
+            voting_length: 3 * DAYS, // 7 days
+            proposal_creation_bond: 1 * MILLICENTS,
+        }),
+    }
 }
 
 /// Edgeware testnet generator
@@ -117,7 +189,7 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, AuraId
 }
 
 /// Helper function to create GenesisConfig for testing
-pub fn testnet_genesis(
+pub fn development_genesis(
     initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId)>,
     root_key: AccountId,
     endowed_accounts: Option<Vec<AccountId>>,
@@ -149,6 +221,7 @@ pub fn testnet_genesis(
 
     const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
     const STASH: Balance = 100 * DOLLARS;
+	let desired_seats: u32 = (endowed_accounts.len() / 2 - initial_authorities.len()) as u32;
 
     GenesisConfig {
         system: Some(SystemConfig {
@@ -173,8 +246,6 @@ pub fn testnet_genesis(
         staking: Some(StakingConfig {
             current_era: 0,
             offline_slash: Perbill::from_parts(1_000_000),
-            session_reward: Perbill::from_parts(2_065),
-            current_session_reward: 0,
             validator_count: 7,
             offline_slash_grace: 4,
             minimum_validator_count: 4,
@@ -183,18 +254,14 @@ pub fn testnet_genesis(
         }),
         democracy: Some(DemocracyConfig::default()),
         collective_Instance1: Some(CouncilConfig {
-            members: vec![],
-            phantom: Default::default(),
-        }),
-        collective_Instance2: Some(TechnicalCommitteeConfig {
-            members: vec![],
+            members: initial_authorities.iter().map(|x| x.1.clone()).collect(),
             phantom: Default::default(),
         }),
         elections: Some(ElectionsConfig {
-            members: vec![],
+            members: initial_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
+            desired_seats: desired_seats,
             presentation_duration: 1 * DAYS,
             term_duration: 28 * DAYS,
-            desired_seats: 0,
         }),
         contracts: Some(ContractsConfig {
             current_schedule: Default::default(),
@@ -203,6 +270,10 @@ pub fn testnet_genesis(
         sudo: Some(SudoConfig {
             key: root_key,
         }),
+		im_online: Some(ImOnlineConfig {
+			gossip_at: 0,
+			last_new_era_start: 0,
+		}),
         aura: Some(AuraConfig {
             authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
         }),
@@ -212,17 +283,17 @@ pub fn testnet_genesis(
         identity: Some(IdentityConfig {
             verifiers: initial_verifiers,
             expiration_length: 7 * DAYS, // 7 days
-            registration_bond: 100 * MILLICENTS,
+            registration_bond: 1 * DOLLARS,
         }),
         governance: Some(GovernanceConfig {
             voting_length: 7 * DAYS, // 7 days
-            proposal_creation_bond: 1 * MILLICENTS,
+            proposal_creation_bond: 1 * DOLLARS,
         }),
     }
 }
 
 fn development_config_genesis() -> GenesisConfig {
-    testnet_genesis(
+    development_genesis(
         vec![
             get_authority_keys_from_seed("Alice"),
         ],
@@ -245,8 +316,8 @@ pub fn development_config() -> ChainSpec {
         None)
 }
 
-fn local_testnet_genesis() -> GenesisConfig {
-    testnet_genesis(
+fn local_development_genesis() -> GenesisConfig {
+    development_genesis(
         vec![
             get_authority_keys_from_seed("Alice"),
             get_authority_keys_from_seed("Bob"),
@@ -262,7 +333,7 @@ pub fn local_testnet_config() -> ChainSpec {
     ChainSpec::from_genesis(
         "Local Testnet",
         "local_testnet",
-        local_testnet_genesis,
+        local_development_genesis,
         vec![],
         None,
         Some(DEFAULT_PROTOCOL_ID),

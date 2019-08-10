@@ -165,7 +165,7 @@ decl_module! {
 				// Ensure secret is passed in
 				ensure!(secret.is_some(), "Secret is invalid");
 				// Ensure the current sender has already committed previously
-				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender already committed");
+				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender not yet committed");
 				let commit: (T::AccountId, VoteOutcome) = record.commitments
 					.iter()
 					.find(|c| &c.0 == &_sender)

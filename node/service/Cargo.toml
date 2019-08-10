@@ -37,6 +37,9 @@ contracts = { package = "srml-contracts", git = "https://github.com/paritytech/s
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 edgeware-executor = { path = "../executor" }
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+hex = "0.3.2"
 
 [dev-dependencies]
 substrate-consensus-common = { git = "https://github.com/paritytech/substrate" }

@@ -15,7 +15,6 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
 #![warn(unused_extern_crates)]
-
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -38,6 +37,7 @@ use network::construct_simple_protocol;
 use substrate_service::construct_service_factory;
 use log::info;
 use substrate_service::TelemetryOnConnect;
+use grandpa_primitives::AuthorityPair as GrandpaPair;
 
 pub mod chain_spec;
 pub mod fixtures;
@@ -67,6 +67,8 @@ impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
 construct_service_factory! {
 	struct Factory {
 		Block = Block,
+		ConsensusPair = AuraPair,
+		FinalityPair = GrandpaPair,
 		RuntimeApi = RuntimeApi,
 		NetworkProtocol = NodeProtocol { |config| Ok(NodeProtocol::new()) },
 		RuntimeDispatch = edgeware_executor::Executor,
@@ -84,7 +86,7 @@ construct_service_factory! {
 				let (block_import, link_half) = service.config.custom.grandpa_import_setup.take()
 					.expect("Link Half and Block Import are present for Full Services or setup failed before. qed");
 
-				if let Some(aura_key) = service.authority_key::<AuraPair>() {
+				if let Some(aura_key) = service.authority_key() {
 					info!("Using aura key {}", aura_key.public());
 
 					let proposer = Arc::new(substrate_basic_authorship::ProposerFactory {
@@ -114,7 +116,7 @@ construct_service_factory! {
 				let grandpa_key = if service.config.disable_grandpa {
 					None
 				} else {
-					service.authority_key::<grandpa_primitives::AuthorityPair>()
+					service.authority_key()
 				};
 
 				let config = grandpa::Config {
