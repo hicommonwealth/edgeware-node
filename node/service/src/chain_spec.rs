@@ -36,7 +36,7 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_config() -> ChainSpec {
-    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.5.0/edgeware.json")) {
+    match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.6.0/edgeware.json")) {
         Ok(spec) => spec,
         Err(e) => panic!(e),
     }
@@ -62,7 +62,11 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
         balances: Some(BalancesConfig {
             balances: endowed_accounts.iter().cloned()
                 .map(|k| (k, ENDOWMENT))
+                // give authorities their balances
                 .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
+                // give controllers an endowment
+                .chain(commonwealth_authorities.iter().map(|x| (x.1.clone(), ENDOWMENT)))
+                // give lockdropers their balances
                 .chain(lockdrop_balances.iter().map(|x| (x.0.clone(), x.1.clone())))
                 .collect(),
             vesting: lockdrop_vesting,
@@ -75,7 +79,9 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
                 .collect::<Vec<_>>(),
         }),
         session: Some(SessionConfig {
-            keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
+            keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone())))
+                .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))))
+                .collect::<Vec<_>>(),
         }),
         staking: Some(StakingConfig {
             current_era: 0,
@@ -92,11 +98,15 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
         }),
         democracy: Some(DemocracyConfig::default()),
         collective_Instance1: Some(CouncilConfig {
-            members: commonwealth_authorities.iter().map(|x| x.1.clone()).collect(),
+            members: commonwealth_authorities.iter().map(|x| x.1.clone())
+                .chain(endowed_accounts.iter().map(|x| x.clone()))
+                .collect(),
             phantom: Default::default(),
         }),
         elections: Some(ElectionsConfig {
-            members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)).collect(),
+            members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000))
+                .chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
+                .collect(),
             desired_seats: 9,
             presentation_duration: 1 * DAYS,
             term_duration: 3 * DAYS,
