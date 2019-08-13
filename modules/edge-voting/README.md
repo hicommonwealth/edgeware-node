@@ -40,7 +40,7 @@ Votes go through a number of stages, conditional on the type of vote.
 - Commit-reveal votes
 
 ## Prevoting
-The prevoting stage marks the creation of a vote. Additionally, in this stage no voting can take place. This is currently being used by the [edge-governance](modules/edge-governance) module.
+The prevoting stage marks the creation of a vote. Additionally, in this stage no voting can take place. This is currently being used by the [edge-signaling](modules/edge-signaling) module.
 
 ## Commit
 The commit stage is used for votes that require commit-reveal schemes. Within this stage, all participants submit commitments. After the commit phase, all participants should reveal.

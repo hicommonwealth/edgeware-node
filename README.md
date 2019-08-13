@@ -95,7 +95,7 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 
 * [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
 * [Voting](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-voting)
-* [Governance](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-governance)
+* [Signaling](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-signaling)
 
 ### SRML
 * [System](https://github.com/paritytech/substrate/tree/master/srml/system)

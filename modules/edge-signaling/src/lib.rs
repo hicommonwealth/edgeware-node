@@ -37,11 +37,9 @@ extern crate srml_balances as balances;
 extern crate srml_system as system;
 extern crate edge_voting as voting;
 
-pub mod governance;
-pub use governance::{
-	Module, Trait, RawEvent, Event,
-	ProposalStage, ProposalCategory, ProposalRecord
-};
+pub mod signaling;
+pub use signaling::{Module, Trait, RawEvent, Event, ProposalRecord};
+pub use voting::voting::{VoteType, VoteOutcome, VoteStage, TallyType};
 
 #[cfg(test)]
 mod tests {
@@ -68,7 +66,7 @@ mod tests {
 
 	impl_outer_event! {
 		pub enum Event for Test {
-			voting<T>, balances<T>, governance<T>,
+			voting<T>, balances<T>, signaling<T>,
 		}
 	}
 	
@@ -133,7 +131,7 @@ mod tests {
 
 	pub type Balances = balances::Module<Test>;
 	pub type System = system::Module<Test>;
-	pub type Governance = Module<Test>;
+	pub type Signaling = Module<Test>;
 
 	const BOND: u64 = 10;
 	const YES_VOTE: voting::voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
@@ -143,7 +141,7 @@ mod tests {
 		let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap().0;
 		// We use default for brevity, but you can configure as desired if needed.
 		t.extend(
-			governance::GenesisConfig::<Test> {
+			signaling::GenesisConfig::<Test> {
 				voting_length: 10000,
 				proposal_creation_bond: BOND,
 			}.build_storage().unwrap().0,
@@ -166,23 +164,21 @@ mod tests {
 		who: u64,
 		title: &[u8],
 		proposal: &[u8],
-		category: governance::ProposalCategory,
 		outcomes: Vec<VoteOutcome>,
 		vote_type: VoteType,
 		tally_type: TallyType
 	) -> Result {
-		Governance::create_proposal(
+		Signaling::create_proposal(
 			Origin::signed(who),
 			title.to_vec(),
 			proposal.to_vec(),
-			category,
 			outcomes,
 			vote_type,
 			tally_type)
 	}
 
 	fn advance_proposal(who: u64, proposal_hash: H256) -> Result {
-		Governance::advance_proposal(Origin::signed(who), proposal_hash)
+		Signaling::advance_proposal(Origin::signed(who), proposal_hash)
 	}
 
 	fn build_proposal_hash(who: u64, proposal: &[u8]) -> H256 {
@@ -206,14 +202,12 @@ mod tests {
 	fn make_record(
 		author: u64,
 		title: &[u8],
-		contents: &[u8],
-		category: ProposalCategory)
+		contents: &[u8])
 		-> ProposalRecord<u64, u64> {
 			ProposalRecord {
 				index: 0,
 				author: author,
-				stage: ProposalStage::PreVoting,
-				category: category,
+				stage: VoteStage::PreVoting,
 				transition_time: 0,
 				title: title.to_vec(),
 				contents: contents.to_vec(),
@@ -226,12 +220,11 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
-			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
@@ -240,7 +233,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					event: Event::signaling(RawEvent::NewProposal(public, hash)),
 					topics: vec![],
 				}]
 			);
@@ -249,8 +242,8 @@ mod tests {
 			let proposal2: &[u8] = b"Proposal 2";
 			let hash2 = build_proposal_hash(public, &proposal2);
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title2, proposal2, category, outcomes, VoteType::Binary, TallyType::OneCoin));
-			let vote_id2 = Governance::proposal_of(hash2).unwrap().vote_id;
+			assert_ok!(propose(public, title2, proposal2, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let vote_id2 = Signaling::proposal_of(hash2).unwrap().vote_id;
 			assert_eq!(System::events(), vec![
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
@@ -259,7 +252,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					event: Event::signaling(RawEvent::NewProposal(public, hash)),
 					topics: vec![],
 				},
 				EventRecord {
@@ -269,23 +262,27 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash2)),
+					event: Event::signaling(RawEvent::NewProposal(public, hash2)),
 					topics: vec![],
 				},]
 			);
-			assert_eq!(Governance::proposal_count(), 2);
-			assert_eq!(Governance::proposals(), vec![hash, hash2]);
-			assert_eq!(Governance::active_proposals(), vec![]);
+			assert_eq!(Signaling::proposal_count(), 2);
+			assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001), (hash2, 10001)]);
+			assert_eq!(Signaling::active_proposals(), vec![]);
 			assert_eq!(
-				Governance::proposal_of(hash),
-				Some(make_record(public, title, proposal, category))
+				Signaling::proposal_of(hash),
+				Some(ProposalRecord {
+					transition_time: 10001,
+					..make_record(public, title, proposal)
+				})
 			);
 			assert_eq!(
-				Governance::proposal_of(hash2),
+				Signaling::proposal_of(hash2),
 				Some(ProposalRecord {
 					index: 1,
 					vote_id: vote_id2,
-					..make_record(public, title2, proposal2, category)
+					transition_time: 10001,
+					..make_record(public, title2, proposal2)
 				})
 			);
 		});
@@ -298,15 +295,17 @@ mod tests {
 			let public = get_test_key();
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
-			let category = governance::ProposalCategory::Signaling;
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes.clone(), VoteType::Binary, TallyType::OneCoin));
-			assert_eq!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal already exists"));
-			assert_eq!(Governance::proposal_count(), 1);
-			assert_eq!(Governance::proposals(), vec![hash]);
+			assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin));
+			assert_eq!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal already exists"));
+			assert_eq!(Signaling::proposal_count(), 1);
+			assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
-				Governance::proposal_of(hash),
-				Some(make_record(public, title, proposal, category))
+				Signaling::proposal_of(hash),
+				Some(ProposalRecord {
+					transition_time: 10001,
+					..make_record(public, title, proposal)
+				})
 			);
 		});
 	}
@@ -319,12 +318,11 @@ mod tests {
 			let (title, _) = generate_proposal();
 			let proposal = vec![];
 			let hash = build_proposal_hash(public, &proposal);
-			let category = governance::ProposalCategory::Signaling;
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_eq!(propose(public, title, &proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must not be empty"));
-			assert_eq!(Governance::proposal_count(), 0);
-			assert_eq!(Governance::proposals(), vec![]);
-			assert_eq!(Governance::proposal_of(hash), None);
+			assert_eq!(propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must not be empty"));
+			assert_eq!(Signaling::proposal_count(), 0);
+			assert_eq!(Signaling::inactive_proposals(), vec![]);
+			assert_eq!(Signaling::proposal_of(hash), None);
 		});
 	}
 
@@ -336,12 +334,11 @@ mod tests {
 			let (_, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let title = vec![];
-			let category = governance::ProposalCategory::Signaling;
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_eq!(propose(public, &title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must have title"));
-			assert_eq!(Governance::proposal_count(), 0);
-			assert_eq!(Governance::proposals(), vec![]);
-			assert_eq!(Governance::proposal_of(hash), None);
+			assert_eq!(propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must have title"));
+			assert_eq!(Signaling::proposal_count(), 0);
+			assert_eq!(Signaling::inactive_proposals(), vec![]);
+			assert_eq!(Signaling::proposal_of(hash), None);
 		});
 	}
 
@@ -350,16 +347,15 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
-			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_length();
+			let vote_time = Signaling::voting_length();
 			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
@@ -371,7 +367,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					event: Event::signaling(RawEvent::NewProposal(public, hash)),
 					topics: vec![],
 				},
 				EventRecord {
@@ -381,17 +377,17 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
+					event: Event::signaling(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
 					topics: vec![],
 				},]
 			);
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
+			assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
-				Governance::proposal_of(hash),
+				Signaling::proposal_of(hash),
 				Some(ProposalRecord {
-					stage: ProposalStage::Voting,
+					stage: VoteStage::Voting,
 					transition_time: 10001,
-					..make_record(public, title, proposal, category)
+					..make_record(public, title, proposal)
 				})
 			);
 		});
@@ -402,21 +398,20 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
 			assert_err!(advance_proposal(public, hash),
-									"Proposal not in pre-voting stage");
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
+									"Proposal not in pre-voting or commit stage");
+			assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
-				Governance::proposal_of(hash),
+				Signaling::proposal_of(hash),
 				Some(ProposalRecord {
-					stage: ProposalStage::Voting,
+					stage: VoteStage::Voting,
 					transition_time: 10001,
-					..make_record(public, title, proposal, category)
+					..make_record(public, title, proposal)
 				})
 			);
 		});
@@ -427,31 +422,30 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
-			let vote_id = Governance::proposal_of(hash).unwrap().vote_id;
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 			assert_eq!(vote_id, 1);
 			assert_ok!(advance_proposal(public, hash));
 
- 			let vote_time = Governance::voting_length();
+			let vote_time = Signaling::voting_length();
 			let now = System::block_number();
 			let vote_ends_at = now + vote_time;
 
-			assert_eq!(Governance::active_proposals(), vec![(hash, 10001)]);
+			assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
 			assert_eq!(
-				Governance::proposal_of(hash),
+				Signaling::proposal_of(hash),
 				Some(ProposalRecord {
-					stage: ProposalStage::Voting,
+					stage: VoteStage::Voting,
 					transition_time: 10001,
-					..make_record(public, title, proposal, category)
+					..make_record(public, title, proposal)
 				})
 			);
 
 			System::set_block_number(2);
-			<Governance as OnFinalize<u64>>::on_finalize(2);
+			<Signaling as OnFinalize<u64>>::on_finalize(2);
 			System::set_block_number(3);
 
 			assert_eq!(System::events(), vec![
@@ -462,7 +456,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					event: Event::signaling(RawEvent::NewProposal(public, hash)),
 					topics: vec![],
 				},
 				EventRecord {
@@ -472,13 +466,13 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
+					event: Event::signaling(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
 					topics: vec![],
 				},]
 			);
 
 			System::set_block_number(10002);
-			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			<Signaling as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			assert_eq!(System::events(), vec![
@@ -489,7 +483,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::NewProposal(public, hash)),
+					event: Event::signaling(RawEvent::NewProposal(public, hash)),
 					topics: vec![],
 				},
 				EventRecord {
@@ -499,7 +493,7 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
+					event: Event::signaling(RawEvent::VotingStarted(hash, vote_id, vote_ends_at)),
 					topics: vec![],
 				},
 				EventRecord {
@@ -509,18 +503,18 @@ mod tests {
 				},
 				EventRecord {
 					phase: Phase::ApplyExtrinsic(0),
-					event: Event::governance(RawEvent::VotingCompleted(hash, vote_id)),
+					event: Event::signaling(RawEvent::VotingCompleted(hash, vote_id)),
 					topics: vec![],
 				}]
 			);
 
-			assert_eq!(Governance::active_proposals(), vec![]);
+			assert_eq!(Signaling::active_proposals(), vec![]);
 			assert_eq!(
-				Governance::proposal_of(hash),
+				Signaling::proposal_of(hash),
 				Some(ProposalRecord {
-					stage: ProposalStage::Completed,
-					transition_time: 0,
-					..make_record(public, title, proposal, category)
+					stage: VoteStage::Completed,
+					transition_time: 20002,
+					..make_record(public, title, proposal)
 				})
 			);
 		});
@@ -531,25 +525,23 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_ok!(advance_proposal(public, hash));
-			
+			assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
 			System::set_block_number(10002);
-			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			<Signaling as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
-
-			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting stage");
-			assert_eq!(Governance::active_proposals(), vec![]);
+			assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting or commit stage");
+			assert_eq!(Signaling::active_proposals(), vec![]);
 			assert_eq!(
-				Governance::proposal_of(hash),
+				Signaling::proposal_of(hash),
 				Some(ProposalRecord {
-					stage: ProposalStage::Completed,
-					transition_time: 0,
-					..make_record(public, title, proposal, category)
+					stage: VoteStage::Completed,
+					transition_time: 20002,
+					..make_record(public, title, proposal)
 				})
 			);
 		});
@@ -560,18 +552,20 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let hash = build_proposal_hash(public, &proposal);
 
 			let other_public = 2_u64;
 			let outcomes = vec![YES_VOTE, NO_VOTE];
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
 			assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
-			assert_eq!(Governance::active_proposals(), vec![]);
+			assert_eq!(Signaling::active_proposals(), vec![]);
 			assert_eq!(
-				Governance::proposal_of(hash),
-				Some(make_record(public, title, proposal, category))
+				Signaling::proposal_of(hash),
+				Some(ProposalRecord{
+					transition_time: 10001,
+					..make_record(public, title, proposal)
+				})
 			);
 		});
 	}
@@ -581,12 +575,11 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = 100_u64;
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let outcomes = vec![YES_VOTE, NO_VOTE];
 
 			assert_err!(
-				propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin),
+				propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
 				"Not enough currency for reserve bond");
 		});
 	}
@@ -596,22 +589,21 @@ mod tests {
 		with_externalities(&mut new_test_ext(), || {
 			System::set_block_number(1);
 			let public = get_test_key();
-			let category = governance::ProposalCategory::Signaling;
 			let (title, proposal) = generate_proposal();
 			let outcomes = vec![YES_VOTE, NO_VOTE];
 			let hash = build_proposal_hash(public, &proposal);
 			let balance = Balances::free_balance(public);
-			assert_ok!(propose(public, title, proposal, category, outcomes, VoteType::Binary, TallyType::OneCoin));
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
 			let after_propose_balance = Balances::free_balance(public);
 			assert_eq!(balance - BOND, after_propose_balance);
 			assert_ok!(advance_proposal(public, hash));
 
 			System::set_block_number(10002);
-			<Governance as OnFinalize<u64>>::on_finalize(10002);
+			<Signaling as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			let after_completion_balance = Balances::free_balance(public);
 			assert_eq!(balance, after_completion_balance);
 		});
 	}
-} 
+}

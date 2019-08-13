@@ -30,33 +30,18 @@ use srml_support::traits::{Currency, ReservableCurrency};
 use system::ensure_signed;
 use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
-use runtime_primitives::traits::{Zero, Hash};
+use runtime_primitives::traits::{Hash};
 use codec::{Encode, Decode};
 
-pub use voting::voting::{VoteType, VoteOutcome, TallyType};
-
-#[cfg_attr(feature = "std", derive(Debug))]
-#[derive(Encode, Decode, PartialEq, Clone, Copy)]
-pub enum ProposalStage {
-	PreVoting,
-	Voting,
-	Completed,
-}
-
-#[cfg_attr(feature = "std", derive(Debug))]
-#[derive(Encode, Decode, PartialEq, Clone, Copy)]
-pub enum ProposalCategory {
-	Signaling,
-}
+pub use voting::voting::{VoteType, VoteOutcome, VoteStage, TallyType};
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
 pub struct ProposalRecord<AccountId, Moment> {
 	pub index: u32,
 	pub author: AccountId,
-	pub stage: ProposalStage,
+	pub stage: VoteStage,
 	pub transition_time: Moment,
-	pub category: ProposalCategory,
 	pub title: Vec<u8>,
 	pub contents: Vec<u8>,
 	pub vote_id: u64,
@@ -77,12 +62,11 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
 
-		/// Creates a new governance proposal in the chosen category.
+		/// Creates a new signaling proposal.
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
 			contents: ProposalContents,
-			category: ProposalCategory,
 			outcomes: Vec<VoteOutcome>,
 			vote_type: voting::VoteType,
 			tally_type: voting::TallyType
@@ -110,73 +94,128 @@ decl_module! {
 			)?;
 
 			let index = <ProposalCount>::get();
+			let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
 			<ProposalCount>::mutate(|i| *i += 1);
 			<ProposalOf<T>>::insert(hash, ProposalRecord {
 				index: index,
 				author: _sender.clone(),
-				stage: ProposalStage::PreVoting,
-				category: category,
-				transition_time: T::BlockNumber::zero(),
+				stage: VoteStage::PreVoting,
+				transition_time: transition_time,
 				title: title,
 				contents: contents,
 				vote_id: vote_id,
 			});
-			<Proposals<T>>::mutate(|proposals| proposals.push(hash));
+			<InactiveProposals<T>>::mutate(|proposals| proposals.push((hash, transition_time)));
 			Self::deposit_event(RawEvent::NewProposal(_sender, hash));
 			Ok(())
 		}
 
-		/// Advance a governance proposal into the "voting" stage. Can only be
-		/// performed by the original author of the proposal.
+		/// Advance a signaling proposal into the "voting" or "commit" stage.
+		/// Can only be performed by the original author of the proposal.
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> Result {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
 
 			// only permit original author to advance
 			ensure!(record.author == _sender, "Proposal must be advanced by author");
-			ensure!(record.stage == ProposalStage::PreVoting, "Proposal not in pre-voting stage");
+			ensure!(record.stage == VoteStage::PreVoting
+				|| record.stage == VoteStage::Commit, "Proposal not in pre-voting or commit stage");
 			
-			// prevoting -> voting
+			// prevoting -> voting or commit
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
-			let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
-			let vote_id = record.vote_id;
-			<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
-				stage: ProposalStage::Voting,
-				transition_time: transition_time.clone(),
-				..record
-			});
-			<ActiveProposals<T>>::mutate(|proposals| proposals.push((proposal_hash, transition_time.clone())));
-			Self::deposit_event(RawEvent::VotingStarted(proposal_hash, vote_id, transition_time));
-			Ok(())
+			if let Some(vote_record) = <voting::Module<T>>::get_vote_record(record.vote_id) {
+				let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
+				let vote_id = record.vote_id;
+				<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
+					stage: vote_record.data.stage,
+					transition_time: transition_time.clone(),
+					..record
+				});
+				<InactiveProposals<T>>::mutate(|proposals| proposals.retain(|x| x.0 != proposal_hash));
+				<ActiveProposals<T>>::mutate(|proposals| proposals.push((proposal_hash, transition_time.clone())));
+
+				// emit event for voting if at this stage
+				if vote_record.data.stage == VoteStage::Voting {
+					Self::deposit_event(RawEvent::VotingStarted(proposal_hash, vote_id, transition_time));
+				}
+
+				// emit event for committing if at this stage
+				if vote_record.data.stage == VoteStage::Commit {
+					Self::deposit_event(RawEvent::CommitStarted(proposal_hash, vote_id, transition_time));
+				}
+				Ok(())
+			} else {
+				Err("Vote record does not exist")
+			}
 		}
 
 		/// Check all active proposals to see if they're completed. If so, update
 		/// them in storage and emit an event.
 		fn on_finalize(_n: T::BlockNumber) {
-			let (finished, active): (Vec<_>, _) = <ActiveProposals<T>>::get()
+			let (finished, mut active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
 				.partition(|(_, exp)| _n > *exp);
 			
-			<ActiveProposals<T>>::put(active);
-			finished.into_iter().for_each(move |(completed_hash, _)| {
-				match <ProposalOf<T>>::get(completed_hash) {
+			let (completed, mut pending): (Vec<_>, _) = <CompletedProposals<T>>::get()
+				.into_iter()
+				.partition(|(_, exp)| _n > *exp);
+
+			let (doubly_inactive, still_inactive): (Vec<_>, _) = <InactiveProposals<T>>::get()
+				.into_iter()
+				.partition(|(_, exp)| _n > *exp);
+
+			finished.into_iter().for_each(|(finished_hash, _)| {
+				match <ProposalOf<T>>::get(finished_hash) {
 					Some(record) => {
-						// voting -> completed
 						let vote_id = record.vote_id;
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
-						// Unreserve the proposal creation bond amount
-						T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
-						// Edit the proposal record to completed
-						<ProposalOf<T>>::insert(completed_hash, ProposalRecord {
-							stage: ProposalStage::Completed,
-							transition_time: T::BlockNumber::zero(),
-							..record
-						});
-						Self::deposit_event(RawEvent::VotingCompleted(completed_hash, vote_id));
+						if let Some(vote_record) = <voting::Module<T>>::get_vote_record(record.vote_id) {
+							// get next transition time
+							let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
+							// switch on either completed or voting stage from voting or committed stage
+							if vote_record.data.stage == VoteStage::Completed {
+								// unreserve the proposal creation bond amount
+								T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
+								// add these completed proposals, to the pending "deletion" collection
+								pending.push((finished_hash, transition_time.clone()));
+								Self::deposit_event(RawEvent::VotingCompleted(finished_hash, vote_id)); 
+							} else {
+								// add the vote record identifier back into the collection
+								active.push((finished_hash, transition_time));
+								Self::deposit_event(RawEvent::VotingStarted(finished_hash, vote_id, transition_time));
+							}
+							// edit the proposal record to its respective stage
+							<ProposalOf<T>>::insert(finished_hash.clone(), ProposalRecord {
+								stage: vote_record.data.stage,
+								transition_time: transition_time,
+								..record
+							});
+						}                       
 					},
 					None => {}
 				}
 			});
+
+			// delete all artifacts of "completed", completed proposals
+			completed.iter().for_each(|(finished_hash, _)| {
+				<ProposalOf<T>>::remove(finished_hash);
+			});
+			// we want to delete the doubly inactive, inactive proposals which never
+			// proceeded into a commit or voting stage, always remaining in prevoting,
+			// while also returning the bond.
+			doubly_inactive.into_iter().for_each(|(hash, _)| {
+				if let Some(record) = <ProposalOf<T>>::get(hash) {
+					T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
+				}
+				<ProposalOf<T>>::remove(hash);
+			});
+
+			// put back all active proposals
+			<ActiveProposals<T>>::put(active);
+			// put back only pending "to-be-deleted", completed proposals
+			<CompletedProposals<T>>::put(pending);
+			// put back singly, still_inactive, inactive proposals
+			<InactiveProposals<T>>::put(still_inactive);
 		}
 	}
 }
@@ -187,6 +226,8 @@ decl_event!(
 							<T as system::Trait>::BlockNumber {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
+		/// Emitted when commit stage begins: (ProposalHash, VoteId, CommitEndTime)
+		CommitStarted(Hash, u64, BlockNumber),
 		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
 		VotingStarted(Hash, u64, BlockNumber),
 		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
@@ -195,13 +236,15 @@ decl_event!(
 );
 
 decl_storage! {
-	trait Store for Module<T: Trait> as Governance {
+	trait Store for Module<T: Trait> as Signaling {
 		/// The total number of proposals created thus far.
 		pub ProposalCount get(proposal_count) : u32;
 		/// A list of all extant proposals.
-		pub Proposals get(proposals): Vec<T::Hash>;
+		pub InactiveProposals get(inactive_proposals): Vec<(T::Hash, T::BlockNumber)>;
 		/// A list of active proposals along with the time at which they complete.
 		pub ActiveProposals get(active_proposals): Vec<(T::Hash, T::BlockNumber)>;
+		/// A list of completed proposals, pending deletion
+		pub CompletedProposals get(completed_proposals): Vec<(T::Hash, T::BlockNumber)>;
 		/// Amount of time a proposal remains in "Voting" stage.
 		pub VotingLength get(voting_length) config(): T::BlockNumber;
 		/// Map for retrieving the information about any proposal from its hash. 

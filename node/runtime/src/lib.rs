@@ -20,7 +20,7 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit="256"]
 
-use edge_governance::governance;
+use edge_signaling::signaling;
 use edge_identity::identity;
 use edge_voting::voting;
 
@@ -149,7 +149,7 @@ impl indices::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ExistentialDeposit: Balance = 1 * DOLLARS;
+	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
 	pub const TransferFee: Balance = 1 * CENTS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
@@ -399,7 +399,7 @@ impl voting::Trait for Runtime {
 	type Event = Event;
 }
 
-impl governance::Trait for Runtime {
+impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
 }
@@ -434,7 +434,7 @@ construct_runtime!(
 		ImOnline: im_online::{default, ValidateUnsigned},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
-		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
+		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 
