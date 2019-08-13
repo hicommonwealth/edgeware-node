@@ -213,6 +213,12 @@ decl_module! {
                 .partition(|(_, exp)| (_n > *exp) && (*exp > T::BlockNumber::zero()));
 
             expired.into_iter().for_each(move |(exp_hash, _)| {
+                if let Some(id_record) = <IdentityOf<T>>::get(exp_hash) {
+                    let mut types = <UsedTypes<T>>::get(id_record.account.clone());
+                    types.retain(|t| *t != id_record.identity_type.clone());
+                    <UsedTypes<T>>::insert(id_record.account, types);
+                }
+
                 <Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
                 <IdentityOf<T>>::remove(exp_hash);
                 Self::deposit_event(RawEvent::Expired(exp_hash))

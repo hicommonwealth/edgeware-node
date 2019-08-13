@@ -597,13 +597,69 @@ mod tests {
 			let after_propose_balance = Balances::free_balance(public);
 			assert_eq!(balance - BOND, after_propose_balance);
 			assert_ok!(advance_proposal(public, hash));
-
+			println!("{:?}", Signaling::proposal_of(hash));
 			System::set_block_number(10002);
 			<Signaling as OnFinalize<u64>>::on_finalize(10002);
 			System::set_block_number(10003);
 
 			let after_completion_balance = Balances::free_balance(public);
 			assert_eq!(balance, after_completion_balance);
+		});
+	}
+
+	#[test]
+	fn expired_inactive_proposal_should_return_creation_bond() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![YES_VOTE, NO_VOTE];
+			let hash = build_proposal_hash(public, &proposal);
+			let balance = Balances::free_balance(public);
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
+			let after_propose_balance = Balances::free_balance(public);
+			assert_eq!(balance - BOND, after_propose_balance);
+			System::set_block_number(10002);
+			<Signaling as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
+
+			let after_completion_balance = Balances::free_balance(public);
+			assert_eq!(balance, after_completion_balance);
+			assert_eq!(
+				Signaling::proposal_of(hash),
+				None
+			);
+		});
+	}
+
+	#[test]
+	fn completed_proposal_should_remain_before_deletion() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let public = get_test_key();
+			let (title, proposal) = generate_proposal();
+			let outcomes = vec![YES_VOTE, NO_VOTE];
+			let hash = build_proposal_hash(public, &proposal);
+			assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
+			assert_ok!(advance_proposal(public, hash));
+			System::set_block_number(10002);
+			<Signaling as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
+			assert_eq!(
+				Signaling::proposal_of(hash),
+				Some(ProposalRecord{
+					stage: VoteStage::Completed,
+					transition_time: 20002,
+					..make_record(public, title, proposal)
+				})
+			);
+			System::set_block_number(20003);
+			<Signaling as OnFinalize<u64>>::on_finalize(20003);
+			System::set_block_number(20004);
+			assert_eq!(
+				Signaling::proposal_of(hash),
+				None
+			);
 		});
 	}
 }
