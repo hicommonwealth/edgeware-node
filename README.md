@@ -135,7 +135,7 @@ To force your local to create new blocks, even if offline, add the `--force-auth
   - Add it as an `extern crate`.
   - Implement its `Trait` with production types.
   - Add it to the `construct_runtime` macro with all implemented components.
-3. If its storage contains `config` elements, then you need to modify [the chain spec](node/src/chain_spec.rs):
+3. If its storage contains `config` elements, then you need to modify [the chain spec](node/cli/src/chain_spec.rs):
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
