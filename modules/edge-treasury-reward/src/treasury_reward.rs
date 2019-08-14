@@ -66,7 +66,7 @@ decl_module! {
 			let now = <T as staking::Trait>::Time::now();
 			let elapsed_time = now.clone() - previous_era_start;
 
-			if elapsed_time.is_zero() {
+			if !elapsed_time.is_zero() {
 				<CurrentRewardCycle<T>>::put(now.clone());
 				let total_payout = compute_total_payout(
 					total_rewarded_stake.clone(),
