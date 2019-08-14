@@ -1,7 +1,7 @@
 [package]
-name = "edge-signaling"
+name = "edge-treasury-reward"
 version = "0.1.0"
-authors = ["Jake Naviasky <jake@commonwealth.im>, Drew Stone <drew@commonwealth.im>"]
+authors = ["drewstone <drewstone329@gmail.com>"]
 edition = "2018"
 
 [dependencies]
@@ -16,8 +16,14 @@ sr-io = { git = "https://github.com/paritytech/substrate", default-features = fa
 sr-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-support = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-system = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-staking = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-session = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
-edge-voting = { path = "../edge-voting", default-features = false }
+srml-treasury = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false }
+srml-authorship = { git = "https://github.com/paritytech/substrate", default-features = false }
+
+edgeware-primitives = { path = "../../node/primitives", default-features = false }
 
 [features]
 default = ["std"]
@@ -30,8 +36,13 @@ std = [
 	"sr-std/std",
 	"sr-io/std",
 	"srml-support/std",
-	"sr-primitives/std",
 	"srml-system/std",
+	"srml-staking/std",
+	"srml-session/std",
+	"sr-primitives/std",
+	"srml-treasury/std",
 	"srml-balances/std",
-	"edge-voting/std",
+	"srml-timestamp/std",
+	"srml-authorship/std",
+	"edgeware-primitives/std"
 ]

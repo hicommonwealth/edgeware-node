@@ -107,8 +107,8 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000))
 				.chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
 				.collect(),
-			desired_seats: 9,
-			presentation_duration: 1 * DAYS,
+			desired_seats: 13,
+			presentation_duration: 2 * DAYS,
 			term_duration: 3 * DAYS,
 		}),
 		contracts: Some(ContractsConfig {
@@ -133,11 +133,11 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		identity: Some(IdentityConfig {
 			verifiers: identity_verifiers,
 			expiration_length: 1 * DAYS, // 1 days
-			registration_bond: 1 * MILLICENTS,
+			registration_bond: 1 * DOLLARS,
 		}),
 		signaling: Some(SignalingConfig {
 			voting_length: 3 * DAYS, // 7 days
-			proposal_creation_bond: 1 * MILLICENTS,
+			proposal_creation_bond: 100 * DOLLARS,
 		}),
 	}
 }

@@ -7,6 +7,8 @@
 
 Developer resources are available at [edgewa.re/dev](https://edgewa.re/dev/) and more detailed documentation at our [Github Wiki](https://github.com/hicommonwealth/edgeware-node/wiki). For more details about the project, visit the Edgeware website, or check the [blog](blog.edgewa.re) or [Twitter](http://twitter.com/heyedgeware) for the latest. Finally, for discussion and governance, you can utilize [Commonwealth.im](https://commonwealth.im).
 
+The latest substrate hash we pegged to is: f9e5a3742cfecb7f8f89c7c961ae900cca645b65
+
 ## To get started
 
 - Download this entire repository to the file system that you are using to run the validator node.
@@ -135,7 +137,7 @@ To force your local to create new blocks, even if offline, add the `--force-auth
   - Add it as an `extern crate`.
   - Implement its `Trait` with production types.
   - Add it to the `construct_runtime` macro with all implemented components.
-3. If its storage contains `config` elements, then you need to modify [the chain spec](node/src/chain_spec.rs):
+3. If its storage contains `config` elements, then you need to modify [the chain spec](node/service/src/chain_spec.rs):
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
