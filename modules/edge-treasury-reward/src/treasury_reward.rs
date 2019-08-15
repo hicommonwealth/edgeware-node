@@ -70,8 +70,6 @@ decl_module! {
 					<T as staking::Trait>::Currency::total_issuance(),
 					<BalanceOf<T>>::from(elapsed_time.saturated_into::<u32>()));
 				<T as staking::Trait>::Currency::deposit_creating(&<treasury::Module<T>>::account_id(), total_payout);
-				let bal = <T as staking::Trait>::Currency::free_balance(&<treasury::Module<T>>::account_id());
-				<CurrentPot<T>>::put(bal);
 				Self::deposit_event(RawEvent::TreasuryMinting(total_payout, <system::Module<T>>::block_number()));
 			}
 		}
@@ -92,7 +90,5 @@ decl_storage! {
 		pub MintingInterval get(minting_interval) config(): T::BlockNumber;
 		/// Time of current reward cycle starting point
 		pub CurrentRewardCycle get(current_reward_cycle): T::BlockNumber;
-		/// Current treasury pot
-		pub CurrentPot get(current_pot): BalanceOf<T>;
 	}
 }

@@ -81,7 +81,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 10,
+	authoring_version: 11,
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
@@ -146,7 +146,11 @@ impl indices::Trait for Runtime {
 
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
-	pub const TransferFee: Balance = 999999999 * DOLLARS;
+	// Mainnet genesis tx fee
+	// pub const TransferFee: Balance = 999999999 * DOLLARS;
+	
+	// Testnet genesis tx fee
+	pub const TransferFee: Balance = 1 * DOLLARS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -230,9 +234,11 @@ impl session::historical::Trait for Runtime {
 parameter_types! {
 	pub const SessionsPerEra: session::SessionIndex = 6;
 	// number of eras to bond where eras are 1 hour long
-	// 24 hours * 21 days
+	// Mainnet genesis bonding duration
 	// pub const BondingDuration: staking::EraIndex = 24 * 21;
-	pub const BondingDuration: staking::EraIndex = 24 * 21;
+	
+	// Testnet genesis bonding duration
+	pub const BondingDuration: staking::EraIndex = 24 * 1;
 }
 
 impl staking::Trait for Runtime {

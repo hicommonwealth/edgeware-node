@@ -402,7 +402,6 @@ use super::*;
 			// Initial Era and session
 			assert_eq!(Staking::current_era(), 0);
 			let treasury_address = Treasury::account_id();
-			println!("{:?}", Balances::free_balance(treasury_address));
 			System::set_block_number(1);
 			<TreasuryReward as OnFinalize<u64>>::on_finalize(1);
 			System::set_block_number(2);
@@ -415,8 +414,7 @@ use super::*;
 			<TreasuryReward as OnFinalize<u64>>::on_finalize(103);
 			System::set_block_number(103);
 			<TreasuryReward as OnFinalize<u64>>::on_finalize(104);
-			println!("{:?}", Balances::free_balance(treasury_address));
+			assert_eq!(Balances::free_balance(treasury_address) > 0, true);
 		});
 	}
-
 }
