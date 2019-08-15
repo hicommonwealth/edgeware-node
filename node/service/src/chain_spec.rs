@@ -18,7 +18,7 @@ use primitives::{ed25519, sr25519, Pair};
 use edgeware_primitives::{AccountId, AuraId, Balance};
 use edgeware_runtime::{
 	GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
-	AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig,
+	AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TreasuryRewardConfig,
 	SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus,
 };
 use edgeware_runtime::constants::{time::DAYS, currency::DOLLARS, currency::MILLICENTS};
@@ -28,6 +28,9 @@ use substrate_service;
 use substrate_telemetry::TelemetryEndpoints;
 use grandpa::AuthorityId as GrandpaId;
 use crate::fixtures::*;
+use sr_primitives::{
+	traits::{One},
+};
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const DEFAULT_PROTOCOL_ID: &str = "edg";
@@ -138,6 +141,9 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		signaling: Some(SignalingConfig {
 			voting_length: 3 * DAYS, // 7 days
 			proposal_creation_bond: 100 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			minting_interval: One::one(),
 		}),
 	}
 }
@@ -298,6 +304,9 @@ pub fn development_genesis(
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS, // 7 days
 			proposal_creation_bond: 1 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			minting_interval: One::one(),
 		}),
 	}
 }

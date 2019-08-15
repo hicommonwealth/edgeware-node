@@ -44,26 +44,31 @@ use runtime_support::{
 	impl_outer_origin, parameter_types,
 	traits::{FindAuthor},
 };
-use staking::{EraIndex, StakerStatus};
+use staking::{EraIndex, StakerStatus, ValidatorPrefs};
 pub mod treasury_reward;
 pub mod inflation;
-pub use treasury_reward::{Module, Trait, RawEvent, Event, GenesisConfig};
+pub use treasury_reward::{Module, Trait, RawEvent, Event};
 
 use srml_staking::StashOf;
 use srml_staking::Exposure;
 use srml_staking::ExposureOf;
 
 use primitives::{H256, Blake2Hasher};
-use std::{collections::HashSet, cell::RefCell};
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+	#[cfg(feature = "std")]
+	use std::{collections::HashSet, cell::RefCell};
+	use sr_io::with_externalities;
+	use srml_staking::Validators;
+	use srml_staking::StakingLedger;
+	use srml_staking::IndividualExposure;
+use super::*;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
 		Perbill, Permill,
-		traits::{BlakeTwo256, IdentityLookup, Convert, OpaqueKeys, One},
+		traits::{BlakeTwo256, IdentityLookup, Convert, OpaqueKeys, One, OnFinalize},
 		testing::{Header, UintAuthorityId}
 	};
 	
@@ -162,6 +167,7 @@ mod tests {
 		pub const TransactionBaseFee: u64 = 0;
 		pub const TransactionByteFee: u64 = 0;
 	}
+
 	impl balances::Trait for Test {
 		type Balance = u64;
 		type OnNewAccount = ();
@@ -183,6 +189,7 @@ mod tests {
 		pub const Offset: BlockNumber = 0;
 		pub const UncleGenerations: u64 = 0;
 	}
+
 	impl session::Trait for Test {
 		type OnSessionEnding = session::historical::NoteHistoricalRoot<Test, Staking>;
 		type Keys = UintAuthorityId;
@@ -204,6 +211,7 @@ mod tests {
 		type FilterUncle = ();
 		type EventHandler = staking::Module<Test>;
 	}
+
 	parameter_types! {
 		pub const MinimumPeriod: u64 = 5;
 	}
@@ -319,7 +327,7 @@ mod tests {
 			EXISTENTIAL_DEPOSIT.with(|v| *v.borrow_mut() = self.existential_deposit);
 		}
 
-		fn new_test_ext(self) -> sr_io::TestExternalities<Blake2Hasher> {
+		fn build(self) -> sr_io::TestExternalities<Blake2Hasher> {
 			self.set_associated_consts();
 			let balance_factor = if self.existential_deposit > 0 {
 				256
@@ -330,20 +338,20 @@ mod tests {
 			t.extend(
 				balances::GenesisConfig::<Test> {
 					balances: vec![
-							(1, 10 * balance_factor),
-							(2, 20 * balance_factor),
-							(3, 300 * balance_factor),
-							(4, 400 * balance_factor),
-							(10, balance_factor),
-							(11, balance_factor * 1000),
-							(20, balance_factor),
-							(21, balance_factor * 2000),
-							(30, balance_factor),
-							(31, balance_factor * 2000),
-							(40, balance_factor),
-							(41, balance_factor * 2000),
-							(100, 2000 * balance_factor),
-							(101, 2000 * balance_factor),
+							(1, 10000000000 * balance_factor),
+							(2, 10000000000 * balance_factor),
+							(3, 10000000000 * balance_factor),
+							(4, 10000000000 * balance_factor),
+							(10, 10000000000 * balance_factor),
+							(11, 10000000000 * balance_factor),
+							(20, 10000000000 * balance_factor),
+							(21, 10000000000 * balance_factor),
+							(30, 10000000000 * balance_factor),
+							(31, 10000000000 * balance_factor),
+							(40, 10000000000 * balance_factor),
+							(41, 10000000000 * balance_factor),
+							(100, 10000000000 * balance_factor),
+							(101, 10000000000 * balance_factor),
 							// This allow us to have a total_payout different from 0.
 							(999, 1_000_000_000_000),
 					],
@@ -363,12 +371,11 @@ mod tests {
 				staking::GenesisConfig::<Test> {
 					current_era: 0,
 					stakers: vec![
-						(11, 10, balance_factor * 1000, StakerStatus::<AccountId>::Validator),
-						(21, 20, stake_21, StakerStatus::<AccountId>::Validator),
-						(31, 30, stake_31, StakerStatus::<AccountId>::Validator),
-						(41, 40, balance_factor * 1000, status_41),
-						// nominator
-						(101, 100, balance_factor * 500, StakerStatus::<AccountId>::Nominator(nominated))
+						// (11, 10, balance_factor * 1000, StakerStatus::<AccountId>::Validator),
+						// (21, 20, stake_21, StakerStatus::<AccountId>::Validator),
+						// (31, 30, stake_31, StakerStatus::<AccountId>::Validator),
+						// (41, 40, balance_factor * 1000, status_41),
+						// (101, 100, balance_factor * 500, StakerStatus::<AccountId>::Nominator(nominated))
 					],
 					validator_count: self.validator_count,
 					minimum_validator_count: self.minimum_validator_count,
@@ -385,4 +392,31 @@ mod tests {
 			t.into()
 		}
 	}
+
+	#[test]
+	fn basic_setup_works() {
+		// Verifies initial conditions of mock
+		with_externalities(&mut ExtBuilder::default()
+			.build(),
+		|| {
+			// Initial Era and session
+			assert_eq!(Staking::current_era(), 0);
+			let treasury_address = Treasury::account_id();
+			println!("{:?}", Balances::free_balance(treasury_address));
+			System::set_block_number(1);
+			<TreasuryReward as OnFinalize<u64>>::on_finalize(1);
+			System::set_block_number(2);
+			<TreasuryReward as OnFinalize<u64>>::on_finalize(2);
+			System::set_block_number(100);
+			<TreasuryReward as OnFinalize<u64>>::on_finalize(101);
+			System::set_block_number(101);
+			<TreasuryReward as OnFinalize<u64>>::on_finalize(102);
+			System::set_block_number(102);
+			<TreasuryReward as OnFinalize<u64>>::on_finalize(103);
+			System::set_block_number(103);
+			<TreasuryReward as OnFinalize<u64>>::on_finalize(104);
+			println!("{:?}", Balances::free_balance(treasury_address));
+		});
+	}
+
 }

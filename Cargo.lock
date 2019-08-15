@@ -775,6 +775,7 @@ version = "0.3.0"
 dependencies = [
  "edge-identity 0.1.0",
  "edge-signaling 0.1.0",
+ "edge-treasury-reward 0.1.0",
  "edge-voting 0.1.0",
  "edgeware-primitives 0.1.0",
  "integer-sqrt 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",

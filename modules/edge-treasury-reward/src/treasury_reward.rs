@@ -14,9 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-#[cfg(feature = "std")]
-
-
 use sr_std as rstd;
 use srml_support as runtime_support;
 use sr_primitives as runtime_primitives;
@@ -55,7 +52,7 @@ decl_module! {
 		fn on_finalize(_n: T::BlockNumber) {
 			// Set the start of the first era.
 			if !<CurrentRewardCycle<T>>::exists() {
-				<CurrentRewardCycle<T>>::put(<T as staking::Trait>::Time::now());
+				<CurrentRewardCycle<T>>::put(<system::Module<T>>::block_number());
 			}
 
 			let previous_era_start = <CurrentRewardCycle<T>>::get();
@@ -63,27 +60,29 @@ decl_module! {
 			let slot_stake = <staking::Module<T>>::slot_stake();
 			let validator_len: BalanceOf<T> = (validators.len() as u32).into();
 			let total_rewarded_stake = validator_len * slot_stake;
-			let now = <T as staking::Trait>::Time::now();
+			let now = <system::Module<T>>::block_number();
 			let elapsed_time = now.clone() - previous_era_start;
 
 			if !elapsed_time.is_zero() {
-				<CurrentRewardCycle<T>>::put(now.clone());
+				<CurrentRewardCycle<T>>::put(<system::Module<T>>::block_number());
 				let total_payout = compute_total_payout(
 					total_rewarded_stake.clone(),
 					<T as staking::Trait>::Currency::total_issuance(),
 					<BalanceOf<T>>::from(elapsed_time.saturated_into::<u32>()));
-				<T as staking::Trait>::Currency::deposit_into_existing(&<treasury::Module<T>>::account_id(), total_payout).ok();
-				Self::deposit_event(RawEvent::TreasuryMinting(total_payout, now));
+				<T as staking::Trait>::Currency::deposit_creating(&<treasury::Module<T>>::account_id(), total_payout);
+				let bal = <T as staking::Trait>::Currency::free_balance(&<treasury::Module<T>>::account_id());
+				<CurrentPot<T>>::put(bal);
+				Self::deposit_event(RawEvent::TreasuryMinting(total_payout, <system::Module<T>>::block_number()));
 			}
 		}
 	}
 }
 
 decl_event!(
-	pub enum Event<T> where Moment = <<T as staking::Trait>::Time as Time>::Moment,
+	pub enum Event<T> where <T as system::Trait>::BlockNumber,
 							Balance = <<T as staking::Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance 
 							{
-		TreasuryMinting(Balance, Moment),
+		TreasuryMinting(Balance, BlockNumber),
 	}
 );
 
@@ -92,6 +91,8 @@ decl_storage! {
 		/// Interval in number of blocks to reward treasury
 		pub MintingInterval get(minting_interval) config(): T::BlockNumber;
 		/// Time of current reward cycle starting point
-		pub CurrentRewardCycle get(current_reward_cycle): MomentOf<T>;
+		pub CurrentRewardCycle get(current_reward_cycle): T::BlockNumber;
+		/// Current treasury pot
+		pub CurrentPot get(current_pot): BalanceOf<T>;
 	}
 }

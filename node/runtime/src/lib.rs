@@ -23,6 +23,7 @@
 use edge_signaling::signaling;
 use edge_identity::identity;
 use edge_voting::voting;
+use edge_treasury_reward::treasury_reward;
 
 use rstd::prelude::*;
 use support::{
@@ -84,8 +85,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 15,
-	impl_version: 15,
+	spec_version: 16,
+	impl_version: 16,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -190,7 +191,8 @@ impl authorship::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const Period: BlockNumber = 10 * MINUTES;
+	// pub const Period: BlockNumber = 10 * MINUTES;
+	pub const Period: BlockNumber = SECS_PER_BLOCK;
 	pub const Offset: BlockNumber = 0;
 }
 
@@ -229,6 +231,7 @@ parameter_types! {
 	pub const SessionsPerEra: session::SessionIndex = 6;
 	// number of eras to bond where eras are 1 hour long
 	// 24 hours * 21 days
+	// pub const BondingDuration: staking::EraIndex = 24 * 21;
 	pub const BondingDuration: staking::EraIndex = 24 * 21;
 }
 
@@ -246,12 +249,18 @@ impl staking::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	// pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	// pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	// pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	// pub const MinimumDeposit: Balance = 100 * DOLLARS;
+	// pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
+	// pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
-	pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK;
 }
 
 impl democracy::Trait for Runtime {
@@ -263,17 +272,12 @@ impl democracy::Trait for Runtime {
 	type VotingPeriod = VotingPeriod;
 	type EmergencyVotingPeriod = EmergencyVotingPeriod;
 	type MinimumDeposit = MinimumDeposit;
-	/// A straight majority of the council can decide what their next motion is.
-	type ExternalOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
-	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
-	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>;
-	// To cancel a proposal which has been passed, 2/3 of the council must agree to it.
-	type CancellationOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>;
-	// Any single technical committee member may veto a coming council proposal, however they can
-	// only do it once and it lasts only for the cooloff period.
-	type VetoOrigin = collective::EnsureMember<AccountId, TechnicalCollective>;
-	type ExternalPushOrigin = system::EnsureNever<u64>; // effectively disabling this feature
+	type ExternalOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilInstance>;
+	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
+	type ExternalPushOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
 	type EmergencyOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
+	type CancellationOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
+	type VetoOrigin = collective::EnsureMember<AccountId, CouncilInstance>;
 	type CooloffPeriod = CooloffPeriod;
 }
 
@@ -292,7 +296,7 @@ parameter_types! {
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = 14 * DAYS;
+	pub const ElectionsVotingPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -315,9 +319,13 @@ impl elections::Trait for Runtime {
 }
 
 parameter_types! {
+	// pub const ProposalBond: Permill = Permill::from_percent(2);
+	// pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
+	// pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	// pub const Burn: Permill = Permill::from_percent(10);
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	pub const SpendPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
 	pub const Burn: Permill = Permill::from_percent(10);
 }
 
@@ -335,7 +343,7 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 999999999 * DOLLARS;
+	pub const ContractTransferFee: Balance = 1 * DOLLARS;
 	pub const ContractCreationFee: Balance = 1 * CENTS;
 	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;
@@ -411,6 +419,12 @@ impl identity::Trait for Runtime {
 	type Currency = Balances;
 }
 
+impl treasury_reward::Trait for Runtime {
+	type Event = Event;
+	type Currency = Balances;
+	type Time = Timestamp;
+}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -437,6 +451,7 @@ construct_runtime!(
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
+		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 

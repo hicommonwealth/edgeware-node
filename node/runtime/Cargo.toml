@@ -42,6 +42,7 @@ substrate-keyring = { git = "https://github.com/paritytech/substrate", optional 
 edge-identity = { path = "../../modules/edge-identity", default-features = false }
 edge-voting = { path = "../../modules/edge-voting", default-features = false }
 edge-signaling = { path = "../../modules/edge-signaling", default-features = false }
+edge-treasury-reward = { path = "../../modules/edge-treasury-reward", default-features = false }
 edgeware-primitives = { path = "../primitives", default-features = false }
 
 [build-dependencies]
@@ -87,5 +88,6 @@ std = [
 	"edge-identity/std",
 	"edge-voting/std",
 	"edge-signaling/std",
+	"edge-treasury-reward/std",
 	"edgeware-primitives/std",
 ]
