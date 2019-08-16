@@ -20,9 +20,10 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit="256"]
 
-use edge_governance::governance;
+use edge_signaling::signaling;
 use edge_identity::identity;
 use edge_voting::voting;
+use edge_treasury_reward::treasury_reward;
 
 use rstd::prelude::*;
 use support::{
@@ -80,12 +81,12 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 10,
+	authoring_version: 11,
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 15,
-	impl_version: 15,
+	spec_version: 16,
+	impl_version: 16,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -106,11 +107,6 @@ pub type DealWithFees = SplitTwoWays<
 	_4, Treasury,   // 4 parts (80%) goes to the treasury.
 	_1, Author,     // 1 part (20%) goes to the block author.
 >;
-
-pub const SECS_PER_BLOCK: Moment = 6;
-pub const MINUTES: Moment = 60 / SECS_PER_BLOCK;
-pub const HOURS: Moment = MINUTES * 60;
-pub const DAYS: Moment = HOURS * 24;
 
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 250;
@@ -149,8 +145,12 @@ impl indices::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ExistentialDeposit: Balance = 1 * DOLLARS;
-	pub const TransferFee: Balance = 1 * CENTS;
+	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
+	// Mainnet genesis tx fee
+	// pub const TransferFee: Balance = 999999999 * DOLLARS;
+	
+	// Testnet genesis tx fee
+	pub const TransferFee: Balance = 1 * DOLLARS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -195,7 +195,8 @@ impl authorship::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const Period: BlockNumber = 10 * MINUTES;
+	// pub const Period: BlockNumber = 10 * MINUTES;
+	pub const Period: BlockNumber = SECS_PER_BLOCK;
 	pub const Offset: BlockNumber = 0;
 }
 
@@ -232,7 +233,12 @@ impl session::historical::Trait for Runtime {
 
 parameter_types! {
 	pub const SessionsPerEra: session::SessionIndex = 6;
-	pub const BondingDuration: staking::EraIndex = 24 * 28;
+	// number of eras to bond where eras are 1 hour long
+	// Mainnet genesis bonding duration
+	// pub const BondingDuration: staking::EraIndex = 24 * 21;
+	
+	// Testnet genesis bonding duration
+	pub const BondingDuration: staking::EraIndex = 24 * 1;
 }
 
 impl staking::Trait for Runtime {
@@ -249,12 +255,18 @@ impl staking::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
-	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	// pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	// pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	// pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	// pub const MinimumDeposit: Balance = 100 * DOLLARS;
+	// pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
+	// pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 30 * 24 * 60 * MINUTES;
-	pub const CooloffPeriod: BlockNumber = 30 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK;
 }
 
 impl democracy::Trait for Runtime {
@@ -268,7 +280,7 @@ impl democracy::Trait for Runtime {
 	type MinimumDeposit = MinimumDeposit;
 	type ExternalOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilInstance>;
 	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type ExternalPushOrigin = system::EnsureNever<u64>; // effectively disabling this feature
+	type ExternalPushOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
 	type EmergencyOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
 	type CancellationOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
 	type VetoOrigin = collective::EnsureMember<AccountId, CouncilInstance>;
@@ -283,14 +295,14 @@ impl collective::Trait<CouncilInstance> for Runtime {
 }
 
 parameter_types! {
-	pub const CandidacyBond: Balance = 10 * DOLLARS;
-	pub const VotingBond: Balance = 1 * DOLLARS;
-	pub const VotingFee: Balance = 2 * DOLLARS;
-	pub const PresentSlashPerVoter: Balance = 1 * CENTS;
+	pub const CandidacyBond: Balance = 500 * DOLLARS;
+	pub const VotingBond: Balance = 50 * DOLLARS;
+	pub const VotingFee: Balance = 1 * DOLLARS;
+	pub const PresentSlashPerVoter: Balance = 1 * DOLLARS;
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = 2 * DAYS;
+	pub const ElectionsVotingPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -313,10 +325,14 @@ impl elections::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 1 * DAYS;
-	pub const Burn: Permill = Permill::from_percent(50);
+	// pub const ProposalBond: Permill = Permill::from_percent(2);
+	// pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
+	// pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	// pub const Burn: Permill = Permill::from_percent(10);
+	pub const ProposalBond: Permill = Permill::from_percent(2);
+	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
+	pub const SpendPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
+	pub const Burn: Permill = Permill::from_percent(10);
 }
 
 impl treasury::Trait for Runtime {
@@ -333,7 +349,7 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 1 * CENTS;
+	pub const ContractTransferFee: Balance = 1 * DOLLARS;
 	pub const ContractCreationFee: Balance = 1 * CENTS;
 	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;
@@ -399,7 +415,7 @@ impl voting::Trait for Runtime {
 	type Event = Event;
 }
 
-impl governance::Trait for Runtime {
+impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
 }
@@ -407,6 +423,12 @@ impl governance::Trait for Runtime {
 impl identity::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
+}
+
+impl treasury_reward::Trait for Runtime {
+	type Event = Event;
+	type Currency = Balances;
+	type Time = Timestamp;
 }
 
 construct_runtime!(
@@ -434,7 +456,8 @@ construct_runtime!(
 		ImOnline: im_online::{default, ValidateUnsigned},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
-		Governance: governance::{Module, Call, Storage, Config<T>, Event<T>},
+		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
+		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
 

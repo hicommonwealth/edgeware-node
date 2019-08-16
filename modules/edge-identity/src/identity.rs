@@ -48,15 +48,10 @@ pub trait Trait: balances::Trait {
     type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 }
 
-/// An attestation is composed of the following data. || denotes concatenation
-/// [length_of_next||sender_public_key||identity_hash||attestation]
-/// We encode the length of next data for parsing. This yields something for 32 byte
-/// keys that is 1 + 32 + 32 + X = 65 + X bytes long since attestations can be arbitrary.
 pub type Attestation = Vec<u8>;
 pub type IdentityType = Vec<u8>;
 pub type Identity = Vec<u8>;
 type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
-
 
 #[cfg_attr(feature = "std", derive(Debug))]
 #[derive(Encode, Decode, PartialEq)]
@@ -213,6 +208,12 @@ decl_module! {
                 .partition(|(_, exp)| (_n > *exp) && (*exp > T::BlockNumber::zero()));
 
             expired.into_iter().for_each(move |(exp_hash, _)| {
+                if let Some(id_record) = <IdentityOf<T>>::get(exp_hash) {
+                    let mut types = <UsedTypes<T>>::get(id_record.account.clone());
+                    types.retain(|t| *t != id_record.identity_type.clone());
+                    <UsedTypes<T>>::insert(id_record.account, types);
+                }
+
                 <Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
                 <IdentityOf<T>>::remove(exp_hash);
                 Self::deposit_event(RawEvent::Expired(exp_hash))

@@ -909,4 +909,23 @@ mod tests {
 			);
 		});
 	}
+
+	#[test]
+	fn register_should_expire_and_work_again() {
+		with_externalities(&mut new_test_ext(), || {
+			System::set_block_number(1);
+			let identity_type: &[u8] = b"github";
+			let identity: &[u8] = b"drewstone";
+			let identity_hash = build_identity_hash(identity_type, identity);
+
+			let public = 1_u64;
+
+			assert_ok!(register_identity(public, identity_type, identity));
+			System::set_block_number(10002);
+			<Identity as OnFinalize<u64>>::on_finalize(10002);
+			System::set_block_number(10003);
+			assert_eq!(Identity::identity_of(identity_hash), None);
+			assert_ok!(register_identity(public, identity_type, identity));
+		});
+	}
 }
