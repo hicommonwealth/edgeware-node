@@ -52,6 +52,7 @@ use version::NativeVersion;
 use substrate_primitives::OpaqueMetadata;
 use grandpa::{AuthorityId as GrandpaId, AuthorityWeight as GrandpaWeight};
 use finality_tracker::{DEFAULT_REPORT_LATENCY, DEFAULT_WINDOW_SIZE};
+use im_online::{AuthorityId as ImOnlineId};
 
 #[cfg(any(feature = "std", test))]
 pub use runtime_primitives::BuildStorage;
@@ -67,7 +68,9 @@ use runtime_primitives::Fixed64;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
-use impls::{CurrencyToVoteHandler, WeightMultiplierUpdateHandler, Author, WeightToFee};
+use impls::{
+	CurrencyToVoteHandler, WeightMultiplierUpdateHandler, WeightToFee, Author,
+};
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -117,6 +120,7 @@ parameter_types! {
 
 impl system::Trait for Runtime {
 	type Origin = Origin;
+	type Call = Call;
 	type Index = Index;
 	type BlockNumber = BlockNumber;
 	type Hash = Hash;
@@ -133,7 +137,6 @@ impl system::Trait for Runtime {
 }
 
 impl aura::Trait for Runtime {
-	type HandleReport = aura::StakingSlasher<Runtime>;
 	type AuthorityId = AuraId;
 }
 
@@ -186,12 +189,11 @@ parameter_types! {
 	pub const UncleGenerations: u64 = 0;
 }
 
-// TODO: #2986 implement this properly
 impl authorship::Trait for Runtime {
-	type FindAuthor = ();
+	type FindAuthor = session::FindAccountFromAuthorIndex<Self, Aura>;
 	type UncleGenerations = UncleGenerations;
 	type FilterUncle = ();
-	type EventHandler = ();
+	type EventHandler = Staking;
 }
 
 parameter_types! {
@@ -204,8 +206,12 @@ type SessionHandlers = (Grandpa, Aura, ImOnline);
 
 impl_opaque_keys! {
 	pub struct SessionKeys {
+		#[id(key_types::AURA)]
+		pub aura: AuraId,
 		#[id(key_types::ED25519)]
 		pub ed25519: GrandpaId,
+		#[id(key_types::IM_ONLINE)]
+		pub im_online: ImOnlineId,
 	}
 }
 
@@ -232,7 +238,7 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: session::SessionIndex = 6;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 6;
 	// number of eras to bond where eras are 1 hour long
 	// Mainnet genesis bonding duration
 	// pub const BondingDuration: staking::EraIndex = 24 * 21;
@@ -278,11 +284,20 @@ impl democracy::Trait for Runtime {
 	type VotingPeriod = VotingPeriod;
 	type EmergencyVotingPeriod = EmergencyVotingPeriod;
 	type MinimumDeposit = MinimumDeposit;
+	/// A straight majority of the council can decide what their next motion is.
 	type ExternalOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilInstance>;
-	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type ExternalPushOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type EmergencyOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
+	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
+	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilInstance>;
+	/// A unanimous council can have the next scheduled referendum be a straight default-carries
+	/// (NTB) vote.
+	type ExternalDefaultOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
+	/// Two thirds of the technical committee can have an ExternalMajority/ExternalDefault vote
+	/// be tabled immediately and with a shorter voting/enactment period.
+	type FastTrackOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
+	// To cancel a proposal which has been passed, 2/3 of the council must agree to it.
 	type CancellationOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
+	// Any single technical committee member may veto a coming council proposal, however they can
+	// only do it once and it lasts only for the cooloff period.
 	type VetoOrigin = collective::EnsureMember<AccountId, CouncilInstance>;
 	type CooloffPeriod = CooloffPeriod;
 }
@@ -388,12 +403,17 @@ impl sudo::Trait for Runtime {
 }
 
 impl im_online::Trait for Runtime {
-	type AuthorityId = AuraId;
 	type Call = Call;
 	type Event = Event;
-	type SessionsPerEra = SessionsPerEra;
 	type UncheckedExtrinsic = UncheckedExtrinsic;
-	type IsValidAuthorityId = Aura;
+	type ReportUnresponsiveness = Offences;
+	type CurrentElectedSet = staking::CurrentElectedStashAccounts<Runtime>;
+}
+
+impl offences::Trait for Runtime {
+	type Event = Event;
+	type IdentificationTuple = session::historical::IdentificationTuple<Self>;
+	type OnOffenceHandler = Staking;
 }
 
 impl grandpa::Trait for Runtime {
@@ -440,7 +460,7 @@ construct_runtime!(
 		System: system::{Module, Call, Storage, Config, Event},
 		Aura: aura::{Module, Call, Storage, Config<T>, Inherent(Timestamp)},
 		Timestamp: timestamp::{Module, Call, Storage, Inherent},
-		Authorship: authorship::{Module, Call, Storage},
+		Authorship: authorship::{Module, Call, Storage, Inherent},
 		Indices: indices,
 		Balances: balances,
 		Staking: staking::{default, OfflineWorker},
@@ -453,7 +473,8 @@ construct_runtime!(
 		Treasury: treasury::{Module, Call, Storage, Event<T>},
 		Contracts: contracts,
 		Sudo: sudo,
-		ImOnline: im_online::{default, ValidateUnsigned},
+		ImOnline: im_online::{Module, Call, Storage, Event, ValidateUnsigned, Config},
+		Offences: offences::{Module, Call, Storage, Event},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
@@ -473,11 +494,13 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
+	system::CheckGenesis<Runtime>,
 	system::CheckEra<Runtime>,
 	system::CheckNonce<Runtime>,
 	system::CheckWeight<Runtime>,
 	balances::TakeFees<Runtime>
 );
+
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
 /// Extrinsic type that has already been checked.

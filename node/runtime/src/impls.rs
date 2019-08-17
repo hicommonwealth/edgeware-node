@@ -21,7 +21,7 @@ use runtime_primitives::weights::{Weight, WeightMultiplier};
 use runtime_primitives::traits::{Convert, Saturating};
 use runtime_primitives::Fixed64;
 use support::traits::{OnUnbalanced, Currency};
-use crate::{Balances, Authorship, MaximumBlockWeight, NegativeImbalance};
+use crate::{Balances, Authorship, Aura, MaximumBlockWeight, NegativeImbalance};
 use crate::constants::fee::TARGET_BLOCK_FULLNESS;
 
 pub struct Author;
