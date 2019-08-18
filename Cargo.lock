@@ -710,7 +710,7 @@ dependencies = [
  "futures 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex-literal 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "parity-codec 4.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
+ "parity-scale-codec 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "sr-io 2.0.0 (git+https://github.com/paritytech/substrate)",
  "sr-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
@@ -826,6 +826,7 @@ dependencies = [
  "substrate-keyring 2.0.0 (git+https://github.com/paritytech/substrate)",
  "substrate-offchain-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
  "substrate-primitives 2.0.0 (git+https://github.com/paritytech/substrate)",
+ "substrate-session 2.0.0 (git+https://github.com/paritytech/substrate)",
  "substrate-wasm-builder-runner 1.0.2 (git+https://github.com/paritytech/substrate)",
 ]
 

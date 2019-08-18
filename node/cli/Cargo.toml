@@ -10,7 +10,7 @@ tokio = "0.1.7"
 futures = "0.1"
 exit-future = "0.1"
 substrate-cli = { git = "https://github.com/paritytech/substrate" }
-parity-codec = { version = "4.1.1" }
+parity-codec = { package = "parity-scale-codec", version = "1.0.0" }
 sr-io = { git = "https://github.com/paritytech/substrate" }
 client = { package = "substrate-client", git = "https://github.com/paritytech/substrate" }
 primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate" }

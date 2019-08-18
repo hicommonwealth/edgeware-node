@@ -65,7 +65,7 @@ pub use staking::StakerStatus;
 
 use runtime_primitives::traits::{Convert, Saturating};
 use runtime_primitives::Fixed64;
-
+use core::convert::TryInto;
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
 use impls::{
@@ -176,7 +176,7 @@ impl balances::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const MinimumPeriod: u64 = SECS_PER_BLOCK / 2;
+	pub const MinimumPeriod: u64 = (SECS_PER_BLOCK / 2).try_into().unwrap();
 }
 
 impl timestamp::Trait for Runtime {
@@ -186,7 +186,7 @@ impl timestamp::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const UncleGenerations: u64 = 0;
+	pub const UncleGenerations: u32 = 0;
 }
 
 impl authorship::Trait for Runtime {
@@ -198,7 +198,7 @@ impl authorship::Trait for Runtime {
 
 parameter_types! {
 	// pub const Period: BlockNumber = 10 * MINUTES;
-	pub const Period: BlockNumber = SECS_PER_BLOCK;
+	pub const Period: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
 	pub const Offset: BlockNumber = 0;
 }
 
@@ -267,12 +267,12 @@ parameter_types! {
 	// pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	// pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	// pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK;
-	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK;
-	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK;
-	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
 }
 
 impl democracy::Trait for Runtime {
@@ -317,7 +317,7 @@ parameter_types! {
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
+	pub const ElectionsVotingPeriod: BlockNumber = (1 * SECS_PER_BLOCK).try_into().unwrap();
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -346,7 +346,7 @@ parameter_types! {
 	// pub const Burn: Permill = Permill::from_percent(10);
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
+	pub const SpendPeriod: BlockNumber = (1 * SECS_PER_BLOCK).try_into().unwrap();
 	pub const Burn: Permill = Permill::from_percent(10);
 }
 
@@ -587,6 +587,13 @@ impl_runtime_apis! {
 		}
 		fn authorities() -> Vec<AuraId> {
 			Aura::authorities()
+		}
+	}
+
+	impl substrate_session::SessionKeys<Block> for Runtime {
+		fn generate_session_keys(seed: Option<Vec<u8>>) -> Vec<u8> {
+			let seed = seed.as_ref().map(|s| rstd::str::from_utf8(&s).expect("Seed is an utf8 string"));
+			SessionKeys::generate(seed)
 		}
 	}
 }

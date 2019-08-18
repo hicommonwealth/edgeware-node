@@ -25,7 +25,10 @@ use runtime_primitives::{
 };
 
 /// An index to a block.
-pub type BlockNumber = u64;
+pub type BlockNumber = u32;
+
+/// An accounts nonce
+pub type Nonce = u32;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = primitives::sr25519::Signature;
@@ -38,7 +41,7 @@ pub type AccountId = <AccountSignature as Verify>::Signer;
 
 /// The type for looking up accounts. We don't expect more than 4 billion of them, but you
 /// never know...
-pub type AccountIndex = u32;
+pub type AccountIndex = Nonce;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -57,7 +60,7 @@ pub type AuraId = consensus_aura::sr25519::AuthorityId;
 pub type AuraSignature = consensus_aura::sr25519::AuthoritySignature;
 
 /// Index of a transaction in the chain.
-pub type Index = u32;
+pub type Index = Nonce;
 
 /// A hash of some data used by the chain.
 pub type Hash = primitives::H256;

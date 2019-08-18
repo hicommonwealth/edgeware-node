@@ -49,9 +49,9 @@ pub fn get_spec_allocation()
 		return (
 			<[u8; 32]>::from_hex(e.0).unwrap().unchecked_into(),
 			<[u8; 32]>::from_hex(e.1).unwrap().unchecked_into(),
-			<[u8; 32]>::from_hex(e.2).unwrap().unchecked_into(),
+			<[u8; 32]>::from_hex(e.2.clone()).unwrap().unchecked_into(),
 			e.3.to_string().parse::<Balance>().unwrap(),
-			<[u8; 32]>::from_hex(e.2).unwrap().unchecked_into(),
+			<[u8; 32]>::from_hex(e.2.clone()).unwrap().unchecked_into(),
 			<[u8; 32]>::from_hex(e.2).unwrap().unchecked_into(),
 		);
 	}).collect();

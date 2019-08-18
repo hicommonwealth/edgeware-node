@@ -22,9 +22,9 @@ use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration};
 use client::{self, LongestChain};
 use grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;
-use primitives::Pair;
+
 use futures::prelude::*;
-use edgeware_primitives::{AuraPair, Block};
+use edgeware_primitives::{Block};
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use substrate_service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
@@ -35,10 +35,11 @@ use transaction_pool::{self, txpool::{Pool as TransactionPool}};
 use inherents::InherentDataProviders;
 use network::construct_simple_protocol;
 use substrate_service::construct_service_factory;
-use log::info;
+
 use substrate_service::TelemetryOnConnect;
-use grandpa_primitives::AuthorityPair as GrandpaPair;
+
 use aura_primitives::sr25519::AuthorityPair as AuraAuthorityPair;
+use substrate_basic_authorship::ProposerFactory;
 
 pub mod chain_spec;
 pub mod fixtures;
@@ -93,7 +94,7 @@ construct_service_factory! {
 				FullComponents::<Factory>::new(config) },
 		AuthoritySetup = {
 			|mut service: Self::FullService| {
-				let (block_import, link_half) = service.config().custom.grandpa_import_setup.take()
+				let (block_import, link_half) = service.config_mut().custom.grandpa_import_setup.take()
 					.expect("Link Half and Block Import are present for Full Services or setup failed before. qed");
 
 				// spawn any futures that were created in the previous setup steps
@@ -108,12 +109,10 @@ construct_service_factory! {
 				}
 
 				if service.config().roles.is_authority() {
-					// info!("Using aura key {}", aura_key.public());
-
-					let proposer = Arc::new(substrate_basic_authorship::ProposerFactory {
+					let proposer = ProposerFactory {
 						client: service.client(),
 						transaction_pool: service.transaction_pool(),
-					});
+					};
 
 					let client = service.client();
 					let select_chain = service.select_chain()
@@ -123,7 +122,7 @@ construct_service_factory! {
 						SlotDuration::get_or_compute(&*client)?,
 						client.clone(),
 						select_chain,
-						client,
+						block_import,
 						proposer,
 						service.network(),
 						service.config().custom.inherent_data_providers.clone(),
@@ -133,12 +132,6 @@ construct_service_factory! {
 					let select = aura.select(service.on_exit()).then(|_| Ok(()));
 					service.spawn_task(Box::new(select));
 				}
-
-				let grandpa_key = if service.config().disable_grandpa {
-					None
-				} else {
-					service.authority_key()
-				};
 
 				let config = grandpa::Config {
 					// FIXME #1578 make this available through chainspec
@@ -206,9 +199,9 @@ construct_service_factory! {
 					)?;
 				let justification_import = block_import.clone();
 
-				let (import_queue, ..) = import_queue::<_, _, AuraAuthorityPair, _>(
+				let import_queue = import_queue::<_, _, AuraAuthorityPair, _>(
 					SlotDuration::get_or_compute(&*client)?,
-					block_import,
+					Box::new(block_import),
 					Some(Box::new(justification_import)),
 					None,
 					client.clone(),
@@ -234,12 +227,11 @@ construct_service_factory! {
 					finality_proof_import.create_finality_proof_request_builder();
 
 				// FIXME: pruning task isn't started since light client doesn't do `AuthoritySetup`.
-				let (import_queue, ..) = import_queue::<_, _, _, _, _, _, TransactionPool<Self::FullTransactionPoolApi>>(
+				let import_queue = import_queue::<_, _, AuraAuthorityPair, TransactionPool<Self::FullTransactionPoolApi>>(
 					SlotDuration::get_or_compute(&*client)?,
-					block_import,
+					Box::new(block_import),
 					None,
 					Some(Box::new(finality_proof_import)),
-					client.clone(),
 					client,
 					config.custom.inherent_data_providers.clone(),
 					None,
