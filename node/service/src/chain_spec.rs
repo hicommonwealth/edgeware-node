@@ -14,8 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
-use primitives::{ed25519, sr25519, Pair};
+use primitives::{Pair, Public};
 use edgeware_primitives::{AccountId, AuraId, Balance};
+use im_online::{AuthorityId as ImOnlineId};
 use edgeware_runtime::{
 	GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
 	AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TreasuryRewardConfig,
@@ -46,7 +47,7 @@ pub fn edgeware_config() -> ChainSpec {
 }
 
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
-	let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance)> = get_commonwealth_validators();
+	let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_commonwealth_validators();
 	let grandpa_nodes = get_grandpa_nodes();
 	let spec = get_spec_allocation().unwrap();
 	let lockdrop_balances = spec.0;
@@ -82,15 +83,13 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 				.collect::<Vec<_>>(),
 		}),
 		session: Some(SessionConfig {
-			keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone())))
-				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))))
+			keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
+				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
 				.collect::<Vec<_>>(),
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			offline_slash: Perbill::from_parts(1_000_000),
 			validator_count: 100,
-			offline_slash_grace: 10,
 			minimum_validator_count: 10,
 			stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
 				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
@@ -98,6 +97,8 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
 				.chain(lockdrop_validators.iter().map(|x| x.0.clone()))
 				.collect(),
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
 		collective_Instance1: Some(CouncilConfig {
@@ -122,8 +123,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			key: root_key,
 		}),
 		im_online: Some(ImOnlineConfig {
-			gossip_at: 0,
-			last_new_era_start: 0,
+			keys: vec![],
 		}),
 		aura: Some(AuraConfig {
 			authorities: commonwealth_authorities.iter().map(|x| x.2.clone())
@@ -169,69 +169,50 @@ pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 	))
 }
 
-fn session_keys(key: ed25519::Public) -> SessionKeys {
-	SessionKeys { ed25519: key }
+fn session_keys(aura: AuraId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys {
+	SessionKeys { aura, grandpa, im_online }
 }
 
-/// Helper function to generate AccountId from seed
-pub fn get_account_id_from_seed(seed: &str) -> AccountId {
-	sr25519::Pair::from_string(&format!("//{}", seed), None)
+/// Helper function to generate a crypto pair from seed
+pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
+	TPublic::Pair::from_string(&format!("//{}", seed), None)
 		.expect("static values are valid; qed")
 		.public()
 }
 
-/// Helper function to generate AuraId from seed
-pub fn get_aura_id_from_seed(seed: &str) -> AuraId {
-	ed25519::Pair::from_string(&format!("//{}", seed), None)
-		.expect("static values are valid; qed")
-		.public()
-}
-
-/// Helper function to generate GrandpaId from seed
-pub fn get_grandpa_id_from_seed(seed: &str) -> GrandpaId {
-	ed25519::Pair::from_string(&format!("//{}", seed), None)
-		.expect("static values are valid; qed")
-		.public()
-}
 
 /// Helper function to generate stash, controller and session key from seed
-pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, AuraId, GrandpaId) {
+pub fn get_authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, AuraId, GrandpaId, ImOnlineId) {
 	(
-		get_account_id_from_seed(&format!("{}//stash", seed)),
-		get_account_id_from_seed(seed),
-		get_aura_id_from_seed(seed),
-		get_grandpa_id_from_seed(seed)
+		get_from_seed::<AccountId>(&format!("{}//stash", seed)),
+		get_from_seed::<AccountId>(seed),
+		get_from_seed::<AuraId>(seed),
+		get_from_seed::<GrandpaId>(seed),
+		get_from_seed::<ImOnlineId>(seed),
 	)
 }
 
 /// Helper function to create GenesisConfig for testing
 pub fn development_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId)>,
+	initial_authorities: Vec<(AccountId, AccountId, AuraId, GrandpaId, ImOnlineId)>,
 	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	initial_verifiers: Option<Vec<AccountId>>,
 ) -> GenesisConfig {
 	let initial_verifiers: Vec<AccountId> = initial_verifiers.unwrap_or_else(|| {
 		vec![
-			get_account_id_from_seed("Alice"),
-			get_account_id_from_seed("Bob"),
+			get_authority_keys_from_seed("Alice").1,
 		]
 	});
 
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
-			get_account_id_from_seed("Alice"),
-			get_account_id_from_seed("Bob"),
-			get_account_id_from_seed("Charlie"),
-			get_account_id_from_seed("Dave"),
-			get_account_id_from_seed("Eve"),
-			get_account_id_from_seed("Ferdie"),
-			get_account_id_from_seed("Alice//stash"),
-			get_account_id_from_seed("Bob//stash"),
-			get_account_id_from_seed("Charlie//stash"),
-			get_account_id_from_seed("Dave//stash"),
-			get_account_id_from_seed("Eve//stash"),
-			get_account_id_from_seed("Ferdie//stash"),
+			get_authority_keys_from_seed("Alice").1,
+			get_authority_keys_from_seed("Bob").1,
+			get_authority_keys_from_seed("Charlie").1,
+			get_authority_keys_from_seed("Dave").1,
+			get_authority_keys_from_seed("Eve").1,
+			get_authority_keys_from_seed("Ferdie").1,
 		]
 	});
 
@@ -257,16 +238,18 @@ pub fn development_genesis(
 				.collect::<Vec<_>>(),
 		}),
 		session: Some(SessionConfig {
-			keys: initial_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone()))).collect::<Vec<_>>(),
+			keys: initial_authorities.iter().map(|x|
+				(x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone()))
+			).collect::<Vec<_>>(),
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			offline_slash: Perbill::from_parts(1_000_000),
 			validator_count: 7,
-			offline_slash_grace: 4,
 			minimum_validator_count: 4,
 			stakers: initial_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)).collect(),
 			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
 		collective_Instance1: Some(CouncilConfig {
@@ -287,8 +270,7 @@ pub fn development_genesis(
 			key: root_key,
 		}),
 		im_online: Some(ImOnlineConfig {
-			gossip_at: 0,
-			last_new_era_start: 0,
+			keys: vec![],
 		}),
 		aura: Some(AuraConfig {
 			authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
@@ -298,12 +280,12 @@ pub fn development_genesis(
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_verifiers,
-			expiration_length: 7 * DAYS, // 7 days
+			expiration_length: 1 * DAYS, // 1 days
 			registration_bond: 1 * DOLLARS,
 		}),
 		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS, // 7 days
-			proposal_creation_bond: 1 * DOLLARS,
+			voting_length: 3 * DAYS, // 7 days
+			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			minting_interval: One::one(),
@@ -316,7 +298,7 @@ fn development_config_genesis() -> GenesisConfig {
 		vec![
 			get_authority_keys_from_seed("Alice"),
 		],
-		get_account_id_from_seed("Alice"),
+		get_authority_keys_from_seed("Alice").0,
 		None,
 		None,
 	)
@@ -341,7 +323,7 @@ fn local_development_genesis() -> GenesisConfig {
 			get_authority_keys_from_seed("Alice"),
 			get_authority_keys_from_seed("Bob"),
 		],
-		get_account_id_from_seed("Alice"),
+		get_authority_keys_from_seed("Alice").0,
 		None,
 		None,
 	)

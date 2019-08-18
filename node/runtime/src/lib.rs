@@ -209,7 +209,7 @@ impl_opaque_keys! {
 		#[id(key_types::AURA)]
 		pub aura: AuraId,
 		#[id(key_types::ED25519)]
-		pub ed25519: GrandpaId,
+		pub grandpa: GrandpaId,
 		#[id(key_types::IM_ONLINE)]
 		pub im_online: ImOnlineId,
 	}
