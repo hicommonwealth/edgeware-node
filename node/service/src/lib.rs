@@ -201,7 +201,7 @@ construct_service_factory! {
 
 				let import_queue = import_queue::<_, _, AuraAuthorityPair, _>(
 					SlotDuration::get_or_compute(&*client)?,
-					Box::new(block_import),
+					Box::new(block_import.clone()),
 					Some(Box::new(justification_import)),
 					None,
 					client.clone(),
@@ -209,6 +209,7 @@ construct_service_factory! {
 					transaction_pool,
 				)?;
 
+				config.custom.grandpa_import_setup = Some((block_import.clone(), link_half));
 				Ok(import_queue)
 			}},
 		LightImportQueue = AuraImportQueue<Self::Block>

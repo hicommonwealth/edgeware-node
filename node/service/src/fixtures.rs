@@ -67,8 +67,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5D8sbkeQpqoAXt7E4WcNTBEK3sn4CGp67HRBJRQsqXFfsXB5
 		hex!["2f6a032ba0dbdcac7fa68607533971ba399a9a06002978b4c071f87334d153b0"].unchecked_into(),
 		50000000000000000000000000,
-		// 5D8sbkeQpqoAXt7E4WcNTBEK3sn4CGp67HRBJRQsqXFfsXB5
-		hex!["2f6a032ba0dbdcac7fa68607533971ba399a9a06002978b4c071f87334d153b0"].unchecked_into(),
+		// 5GywTGqF81sdGsynZG7hr8DgibrCDsdvNN9mGCQhf7CNqHpv
+		hex!["d98ab5ea66c0ee4d443b3b6f896daf9c7fefb4d1d2eeca7653ffae84557cf5f3"].unchecked_into(),
 		// 5D8sbkeQpqoAXt7E4WcNTBEK3sn4CGp67HRBJRQsqXFfsXB5
 		hex!["2f6a032ba0dbdcac7fa68607533971ba399a9a06002978b4c071f87334d153b0"].unchecked_into(),
 	), (
@@ -79,8 +79,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5HPtGdWoRmiReRYE16AQitm4MG8s47ngfHLGUeKHZuo1Cdry
 		hex!["ebcde238597379c874dd51fcca5e0f651972b218c46aa21c471167474e089c86"].unchecked_into(),
 		50000000000000000000000000,
-		// 5HPtGdWoRmiReRYE16AQitm4MG8s47ngfHLGUeKHZuo1Cdry
-		hex!["ebcde238597379c874dd51fcca5e0f651972b218c46aa21c471167474e089c86"].unchecked_into(),
+		// 5GCJ3HKN5MaseCwqwNJ4pUbpJqRbfAmZXWB8SCMJM6FMyM9B
+		hex!["b6bab8caa7be249400b5062d17908c59c0e40dcbe2bd1c818098a5dae916a869"].unchecked_into(),
 		// 5HPtGdWoRmiReRYE16AQitm4MG8s47ngfHLGUeKHZuo1Cdry
 		hex!["ebcde238597379c874dd51fcca5e0f651972b218c46aa21c471167474e089c86"].unchecked_into(),
 	), (
@@ -91,8 +91,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5HWaNteWt4qUKVRY4bF6nbbX6BwJmpp2dgggXVnEPX8ksB4K
 		hex!["f0e85f197f2e4f9ebff4bf0896ddaf59cb42acce608507f43e2a14741f467163"].unchecked_into(),
 		50000000000000000000000000,
-		// 5HWaNteWt4qUKVRY4bF6nbbX6BwJmpp2dgggXVnEPX8ksB4K
-		hex!["f0e85f197f2e4f9ebff4bf0896ddaf59cb42acce608507f43e2a14741f467163"].unchecked_into(),
+		// 5HNBgaLkwhDNb798Xe2j7Z1PBJSxNKzZT16uKHwQLQrN9ftn
+		hex!["ea82027e6819e1b2e85127cec6b94da2fad2bb9dbcdd8a9449b7871fad7942b7"].unchecked_into(),
 		// 5HWaNteWt4qUKVRY4bF6nbbX6BwJmpp2dgggXVnEPX8ksB4K
 		hex!["f0e85f197f2e4f9ebff4bf0896ddaf59cb42acce608507f43e2a14741f467163"].unchecked_into(),
 	), (
@@ -103,8 +103,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5GnSM7vxsa5weU2EFTFi3qBRtxB66g4MtbaRpgCBRfEzA1G9
 		hex!["d0c50804164d9e79b3899df678d6de83a226b581fc972f8b8bdc74070ae7e8af"].unchecked_into(),
 		50000000000000000000000000,
-		// 5GnSM7vxsa5weU2EFTFi3qBRtxB66g4MtbaRpgCBRfEzA1G9
-		hex!["d0c50804164d9e79b3899df678d6de83a226b581fc972f8b8bdc74070ae7e8af"].unchecked_into(),
+		// 5DU7imzCeBoaWPkw6dqVpMUj8zzkgKom3uG3RJtPLNQpVhzk
+		hex!["3e1735fcc35cf289761f00cddabc74e91a9b565b9838a205f0027e23d06e76b1"].unchecked_into(),
 		// 5GnSM7vxsa5weU2EFTFi3qBRtxB66g4MtbaRpgCBRfEzA1G9
 		hex!["d0c50804164d9e79b3899df678d6de83a226b581fc972f8b8bdc74070ae7e8af"].unchecked_into(),
 	), (
@@ -115,8 +115,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5DDtisexsMoEG94f4tr5qRaSKJ42f1H1kBxEHKgq5Kocvsdq
 		hex!["333e04dd11f60ebf3037e2615be6d63b01f310b920f8022fb1d6737a2c73dfa5"].unchecked_into(),
 		50000000000000000000000000,
-		// 5DDtisexsMoEG94f4tr5qRaSKJ42f1H1kBxEHKgq5Kocvsdq
-		hex!["333e04dd11f60ebf3037e2615be6d63b01f310b920f8022fb1d6737a2c73dfa5"].unchecked_into(),
+		// 5CzV3FMTHzQxtF3TSkVcp2CNJHnuwUCJjhTsuYEUGxizRAUq
+		hex!["29041a9d8ca43fd99a9c0e2447c6d137e7ba991d8475c790cbf78744636f9915"].unchecked_into(),
 		// 5DDtisexsMoEG94f4tr5qRaSKJ42f1H1kBxEHKgq5Kocvsdq
 		hex!["333e04dd11f60ebf3037e2615be6d63b01f310b920f8022fb1d6737a2c73dfa5"].unchecked_into(),
 	), (
@@ -127,8 +127,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5ETqvphCpj22HfKcKRc4zS1VCdZXKtaF1ArhHAyQU73ceVm5
 		hex!["6a1e4860a31716685e0e0f49f3333c5799bbdab5dd3bb1e674134f6f9b2be689"].unchecked_into(),
 		50000000000000000000000000,
-		// 5ETqvphCpj22HfKcKRc4zS1VCdZXKtaF1ArhHAyQU73ceVm5
-		hex!["6a1e4860a31716685e0e0f49f3333c5799bbdab5dd3bb1e674134f6f9b2be689"].unchecked_into(),
+		// 5HfcYNfpoch9w88CzAqH9PuWHUzwbSJHBA1v3BF9WsRoLht7
+		hex!["f7ccdcf57cd3ecd9e56c3324ad95a1484e6f21b0b6f3540a09ada389499cab9d"].unchecked_into(),
 		// 5ETqvphCpj22HfKcKRc4zS1VCdZXKtaF1ArhHAyQU73ceVm5
 		hex!["6a1e4860a31716685e0e0f49f3333c5799bbdab5dd3bb1e674134f6f9b2be689"].unchecked_into(),
 	), (
@@ -139,8 +139,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5He2hStVecXboJfsQvJDgPTtWpExQBw9N4ER2FMSyeMqyzGn
 		hex!["f697b0a9e1401161380c5df2b3147646beb2bc0132f1c4b8bd8bdeb5f9532b2e"].unchecked_into(),
 		50000000000000000000000000,
-		// 5He2hStVecXboJfsQvJDgPTtWpExQBw9N4ER2FMSyeMqyzGn
-		hex!["f697b0a9e1401161380c5df2b3147646beb2bc0132f1c4b8bd8bdeb5f9532b2e"].unchecked_into(),
+		// 5FERuAqE9SBT4jmiivs6bWd37riU3svikz4LnndykvJvTn6b
+		hex!["8c1f7054a919f65fc2eaa15f73b5e7912416c3526ec9d8e8005341921a1b0c58"].unchecked_into(),
 		// 5He2hStVecXboJfsQvJDgPTtWpExQBw9N4ER2FMSyeMqyzGn
 		hex!["f697b0a9e1401161380c5df2b3147646beb2bc0132f1c4b8bd8bdeb5f9532b2e"].unchecked_into(),
 	), (
@@ -151,8 +151,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5EBoJbE1WRvocBwGfYydXenBsJ8eKvUkxNduf6qWgx2bndvK
 		hex!["5de1854fccd7bd5bf8abfcfd3e50bbeb05649c827a0cdefbd8ec02005b1ee4ef"].unchecked_into(),
 		50000000000000000000000000,
-		// 5EBoJbE1WRvocBwGfYydXenBsJ8eKvUkxNduf6qWgx2bndvK
-		hex!["5de1854fccd7bd5bf8abfcfd3e50bbeb05649c827a0cdefbd8ec02005b1ee4ef"].unchecked_into(),
+		// 5HoL4YjE6hNbsFCFNo369i4tDHB19qSQDeh6KaeKnCwgrkgJ
+		hex!["fdaf59bb00991a4a412a1cb73cf592e187064dd65dd8bfdbcc9f32645e52c57d"].unchecked_into(),
 		// 5EBoJbE1WRvocBwGfYydXenBsJ8eKvUkxNduf6qWgx2bndvK
 		hex!["5de1854fccd7bd5bf8abfcfd3e50bbeb05649c827a0cdefbd8ec02005b1ee4ef"].unchecked_into(),
 	), (
@@ -163,8 +163,8 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5Ec2hh96mXEavdu2C866hgUC4joBYpBVujXQJgQsDWfUMmM1
 		hex!["705c8360296c7b6af2f842e7a0804492c86a855aaa605fdf419f577f1f4fecbe"].unchecked_into(),
 		50000000000000000000000000,
-		// 5Ec2hh96mXEavdu2C866hgUC4joBYpBVujXQJgQsDWfUMmM1
-		hex!["705c8360296c7b6af2f842e7a0804492c86a855aaa605fdf419f577f1f4fecbe"].unchecked_into(),
+		// 5GokhX8Ce1VrMaWFt5RMdAq2EkzoBxdUerFoMzRLDYNPyS2M
+		hex!["d1c60ddadc9a3f65da208c5c50e7fc9ed0ab069e79553d08dcc36a401948fa1a"].unchecked_into(),
 		// 5Ec2hh96mXEavdu2C866hgUC4joBYpBVujXQJgQsDWfUMmM1
 		hex!["705c8360296c7b6af2f842e7a0804492c86a855aaa605fdf419f577f1f4fecbe"].unchecked_into(),
 	), (
@@ -175,32 +175,11 @@ pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balan
 		// 5G2yXYTi1JsgbvkRcnzMe6EABrBpi3g1w4QtWe1W4XHmJxpW
 		hex!["af9f319aa910050d7bed99f5ee2ba4e25429ac9e7746b94edcdf154b8a901a3c"].unchecked_into(),
 		50000000000000000000000000,
-		// 5G2yXYTi1JsgbvkRcnzMe6EABrBpi3g1w4QtWe1W4XHmJxpW
-		hex!["af9f319aa910050d7bed99f5ee2ba4e25429ac9e7746b94edcdf154b8a901a3c"].unchecked_into(),
+		// 5EJbF7phraRrRmSi6a9P9RKVfHZTtwC29qdu7TdaZxE9vJdZ
+		hex!["630fa435592579438ffe7a5e6c074617c972a09ff3850bdc25cebaeca40b5c13"].unchecked_into(),
 		// 5G2yXYTi1JsgbvkRcnzMe6EABrBpi3g1w4QtWe1W4XHmJxpW
 		hex!["af9f319aa910050d7bed99f5ee2ba4e25429ac9e7746b94edcdf154b8a901a3c"].unchecked_into(),
 	)];
-}
-
-pub fn get_grandpa_nodes() -> Vec<GrandpaId> {
-	return vec![
-		// 5GywTGqF81sdGsynZG7hr8DgibrCDsdvNN9mGCQhf7CNqHpv (validator9)
-		hex!["d98ab5ea66c0ee4d443b3b6f896daf9c7fefb4d1d2eeca7653ffae84557cf5f3"].unchecked_into(),
-		// 5GCJ3HKN5MaseCwqwNJ4pUbpJqRbfAmZXWB8SCMJM6FMyM9B (validator10)
-		hex!["b6bab8caa7be249400b5062d17908c59c0e40dcbe2bd1c818098a5dae916a869"].unchecked_into(),
-		// 5HNBgaLkwhDNb798Xe2j7Z1PBJSxNKzZT16uKHwQLQrN9ftn (validator4)
-		hex!["ea82027e6819e1b2e85127cec6b94da2fad2bb9dbcdd8a9449b7871fad7942b7"].unchecked_into(),
-		// 5DU7imzCeBoaWPkw6dqVpMUj8zzkgKom3uG3RJtPLNQpVhzk (validator7)
-		hex!["3e1735fcc35cf289761f00cddabc74e91a9b565b9838a205f0027e23d06e76b1"].unchecked_into(),
-		// 5CzV3FMTHzQxtF3TSkVcp2CNJHnuwUCJjhTsuYEUGxizRAUq (validator8)
-		hex!["29041a9d8ca43fd99a9c0e2447c6d137e7ba991d8475c790cbf78744636f9915"].unchecked_into(),
-		// 5HfcYNfpoch9w88CzAqH9PuWHUzwbSJHBA1v3BF9WsRoLht7 (validator6)
-		hex!["f7ccdcf57cd3ecd9e56c3324ad95a1484e6f21b0b6f3540a09ada389499cab9d"].unchecked_into(),
-		// 5GokhX8Ce1VrMaWFt5RMdAq2EkzoBxdUerFoMzRLDYNPyS2M (validator11)
-		hex!["d1c60ddadc9a3f65da208c5c50e7fc9ed0ab069e79553d08dcc36a401948fa1a"].unchecked_into(),
-		// 5EJbF7phraRrRmSi6a9P9RKVfHZTtwC29qdu7TdaZxE9vJdZ (validator5)
-		hex!["630fa435592579438ffe7a5e6c074617c972a09ff3850bdc25cebaeca40b5c13"].unchecked_into(),
-	];
 }
 
 pub fn get_more_endowed() -> Vec<AccountId> {

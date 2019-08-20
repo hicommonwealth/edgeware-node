@@ -49,7 +49,6 @@ pub fn edgeware_config() -> ChainSpec {
 
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_commonwealth_validators();
-	let grandpa_nodes = get_grandpa_nodes();
 	let spec = get_spec_allocation().unwrap();
 	let lockdrop_balances = spec.0;
 	let lockdrop_vesting = spec.1;
@@ -127,12 +126,10 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			keys: vec![],
 		}),
 		aura: Some(AuraConfig {
-			authorities: commonwealth_authorities.iter().map(|x| x.2.clone())
-				.chain(lockdrop_validators.iter().map(|x| x.2.clone()))
-				.collect(),
+			authorities: vec![],
 		}),
 		grandpa: Some(GrandpaConfig {
-			authorities: grandpa_nodes.iter().map(|x| (x.clone(), 1)).collect(),
+			authorities: vec![],
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: identity_verifiers,
@@ -274,10 +271,10 @@ pub fn development_genesis(
 			keys: vec![],
 		}),
 		aura: Some(AuraConfig {
-			authorities: initial_authorities.iter().map(|x| x.2.clone()).collect(),
+			authorities: vec![],
 		}),
 		grandpa: Some(GrandpaConfig {
-			authorities: initial_authorities.iter().map(|x| (x.3.clone(), 1)).collect(),
+			authorities: vec![],
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_verifiers,

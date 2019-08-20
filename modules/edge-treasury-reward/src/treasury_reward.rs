@@ -56,6 +56,7 @@ decl_module! {
 			}
 
 			let previous_era_start = <CurrentRewardCycle<T>>::get();
+			let minting_interval = <MintingInterval<T>>::get();
 			let validators = <staking::Module<T>>::current_elected();
 			let slot_stake = <staking::Module<T>>::slot_stake();
 			let validator_len: BalanceOf<T> = (validators.len() as u32).into();
@@ -63,7 +64,7 @@ decl_module! {
 			let now = <system::Module<T>>::block_number();
 			let elapsed_time = now.clone() - previous_era_start;
 
-			if !elapsed_time.is_zero() {
+			if !elapsed_time.is_zero() && elapsed_time > minting_interval {
 				<CurrentRewardCycle<T>>::put(<system::Module<T>>::block_number());
 				let total_payout = compute_total_payout(
 					total_rewarded_stake.clone(),
