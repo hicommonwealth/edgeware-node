@@ -178,7 +178,7 @@ impl balances::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const MinimumPeriod: u64 = (SECS_PER_BLOCK / 2).try_into().unwrap();
+	pub const MinimumPeriod: u64 = (SLOT_DURATION / 2).try_into().unwrap();
 }
 
 impl timestamp::Trait for Runtime {

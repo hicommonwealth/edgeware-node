@@ -28,11 +28,12 @@ pub mod currency {
 /// Time.
 pub mod time {
     use edgeware_primitives::Moment;
-
-    pub const SECS_PER_BLOCK: Moment = 5;
+    pub const MILLISECS_PER_BLOCK: Moment = 6000;
+    pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
     pub const MINUTES: Moment = 60 / SECS_PER_BLOCK;
     pub const HOURS: Moment = MINUTES * 60;
     pub const DAYS: Moment = HOURS * 24;
+    pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
 }
 
 // CRITICAL NOTE: The system module maintains two constants: a _maximum_ block weight and a

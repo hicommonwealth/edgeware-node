@@ -42,7 +42,6 @@ use srml_treasury as treasury;
 use runtime_support::{impl_outer_origin, parameter_types, impl_outer_event};
 use staking::{EraIndex, StakerStatus, ValidatorPrefs};
 pub mod treasury_reward;
-pub mod inflation;
 pub use treasury_reward::{Module, Trait, RawEvent, Event};
 
 use srml_staking::StashOf;
