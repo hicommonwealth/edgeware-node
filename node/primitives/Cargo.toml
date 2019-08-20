@@ -5,16 +5,18 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
-serde = { version = "1.0", optional = true }
+serde = { version = "1.0", optional = true, features = ["derive"] }
 parity-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false, features = ["derive"] }
 primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 rstd = { package = "sr-std", git = "https://github.com/paritytech/substrate", default-features = false }
 runtime_primitives = { package = "sr-primitives", git = "https://github.com/paritytech/substrate", default-features = false }
 consensus-aura = { package = "substrate-consensus-aura-primitives", git = "https://github.com/paritytech/substrate", default_features = false }
+client = { package = "substrate-client", git = "https://github.com/paritytech/substrate", default-features = false }
+
 
 [dev-dependencies]
 substrate-serializer = { git = "https://github.com/paritytech/substrate" }
-pretty_assertions = "0.5"
+pretty_assertions = "0.6.1"
 
 [features]
 default = ["std"]
@@ -24,4 +26,5 @@ std = [
 	"rstd/std",
 	"runtime_primitives/std",
 	"serde",
+	"client/std",
 ]

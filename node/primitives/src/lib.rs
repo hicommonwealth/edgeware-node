@@ -21,7 +21,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use runtime_primitives::{
-	generic, traits::{Verify, BlakeTwo256}, OpaqueExtrinsic
+	generic, traits::{Verify, BlakeTwo256}, OpaqueExtrinsic, AnySignature
 };
 
 /// An index to a block.
@@ -31,13 +31,13 @@ pub type BlockNumber = u32;
 pub type Nonce = u32;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = primitives::sr25519::Signature;
+pub type Signature = AnySignature;
 
 /// The type used by authorities to prove their ID.
 pub type AccountSignature = primitives::sr25519::Signature;
 
 /// Alias to pubkey that identifies an account on the chain.
-pub type AccountId = <AccountSignature as Verify>::Signer;
+pub type AccountId = <Signature as Verify>::Signer;
 
 /// The type for looking up accounts. We don't expect more than 4 billion of them, but you
 /// never know...
@@ -81,3 +81,11 @@ pub type BlockId = generic::BlockId<Block>;
 
 /// Opaque, encoded, unchecked extrinsic.
 pub type UncheckedExtrinsic = OpaqueExtrinsic;
+
+client::decl_runtime_apis! {
+	/// The API to query account account nonce (aka index).
+	pub trait AccountNonceApi {
+		/// Get current account nonce of given `AccountId`.
+		fn account_nonce(account: AccountId) -> Index;
+	}
+}
