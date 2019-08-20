@@ -38,12 +38,8 @@ use srml_staking as staking;
 use srml_session as session;
 use srml_timestamp as timestamp;
 use srml_treasury as treasury;
-use srml_authorship as authorship;
 
-use runtime_support::{
-	impl_outer_origin, parameter_types,
-	traits::{FindAuthor},
-};
+use runtime_support::{impl_outer_origin, parameter_types, impl_outer_event};
 use staking::{EraIndex, StakerStatus, ValidatorPrefs};
 pub mod treasury_reward;
 pub mod inflation;
@@ -54,6 +50,7 @@ use srml_staking::Exposure;
 use srml_staking::ExposureOf;
 
 use primitives::{H256, Blake2Hasher};
+use sr_staking_primitives::SessionIndex;
 
 #[cfg(test)]
 mod tests {
@@ -63,7 +60,7 @@ mod tests {
 	use srml_staking::Validators;
 	use srml_staking::StakingLedger;
 	use srml_staking::IndividualExposure;
-use super::*;
+	use super::*;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
 	use runtime_primitives::{
@@ -95,6 +92,8 @@ use super::*;
 
 	pub struct TestSessionHandler;
 	impl session::SessionHandler<AccountId> for TestSessionHandler {
+		fn on_genesis_session<Ks: OpaqueKeys>(_validators: &[(AccountId, Ks)]) {}
+
 		fn on_new_session<Ks: OpaqueKeys>(
 			_changed: bool,
 			validators: &[(AccountId, Ks)],
@@ -119,16 +118,6 @@ use super::*;
 		SESSION.with(|d| d.borrow().1.contains(&stash))
 	}
 
-	/// Author of block is always 11
-	pub struct Author11;
-	impl FindAuthor<u64> for Author11 {
-		fn find_author<'a, I>(_digests: I) -> Option<u64>
-			where I: 'a + IntoIterator<Item=(srml_support::ConsensusEngineId, &'a [u8])>
-		{
-			Some(11)
-		}
-	}
-
 	impl_outer_origin! {
 		pub enum Origin for Test {}
 	}
@@ -145,6 +134,7 @@ use super::*;
 
 	impl system::Trait for Test {
 		type Origin = Origin;
+		type Call = ();
 		type Index = u64;
 		type BlockNumber = u64;
 		type Hash = H256;
@@ -158,6 +148,7 @@ use super::*;
 		type MaximumBlockWeight = MaximumBlockWeight;
 		type MaximumBlockLength = MaximumBlockLength;
 		type AvailableBlockRatio = AvailableBlockRatio;
+		type Version = ();
 	}
 
 	parameter_types! {
@@ -205,12 +196,6 @@ use super::*;
 		type FullIdentification = crate::Exposure<AccountId, Balance>;
 		type FullIdentificationOf = crate::ExposureOf<Test>;
 	}
-	impl authorship::Trait for Test {
-		type FindAuthor = Author11;
-		type UncleGenerations = UncleGenerations;
-		type FilterUncle = ();
-		type EventHandler = staking::Module<Test>;
-	}
 
 	parameter_types! {
 		pub const MinimumPeriod: u64 = 5;
@@ -221,7 +206,7 @@ use super::*;
 		type MinimumPeriod = MinimumPeriod;
 	}
 	parameter_types! {
-		pub const SessionsPerEra: session::SessionIndex = 3;
+		pub const SessionsPerEra: SessionIndex = 3;
 		pub const BondingDuration: EraIndex = 3;
 	}
 	impl staking::Trait for Test {
@@ -295,47 +280,14 @@ use super::*;
 	}
 
 	impl ExtBuilder {
-		pub fn existential_deposit(mut self, existential_deposit: u64) -> Self {
-			self.existential_deposit = existential_deposit;
-			self
-		}
-		pub fn validator_pool(mut self, validator_pool: bool) -> Self {
-			self.validator_pool = validator_pool;
-			self
-		}
-		pub fn nominate(mut self, nominate: bool) -> Self {
-			self.nominate = nominate;
-			self
-		}
-		pub fn validator_count(mut self, count: u32) -> Self {
-			self.validator_count = count;
-			self
-		}
-		pub fn minimum_validator_count(mut self, count: u32) -> Self {
-			self.minimum_validator_count = count;
-			self
-		}
-		pub fn fair(mut self, is_fair: bool) -> Self {
-			self.fair = is_fair;
-			self
-		}
-		pub fn num_validators(mut self, num_validators: u32) -> Self {
-			self.num_validators = Some(num_validators);
-			self
-		}
-		pub fn set_associated_consts(&self) {
-			EXISTENTIAL_DEPOSIT.with(|v| *v.borrow_mut() = self.existential_deposit);
-		}
-
 		fn build(self) -> sr_io::TestExternalities<Blake2Hasher> {
-			self.set_associated_consts();
 			let balance_factor = if self.existential_deposit > 0 {
 				256
 			} else {
 				1
 			};
-			let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap().0;
-			t.extend(
+			let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
+			t.0.extend(
 				balances::GenesisConfig::<Test> {
 					balances: vec![
 							(1, 10000000000 * balance_factor),
@@ -359,32 +311,18 @@ use super::*;
 				}.build_storage().unwrap().0,
 			);
 
-			let stake_21 = if self.fair { 1000 } else { 2000 };
-			let stake_31 = if self.validator_pool { balance_factor * 1000 } else { 1 };
-			let status_41 = if self.validator_pool {
-				StakerStatus::<AccountId>::Validator
-			} else {
-				StakerStatus::<AccountId>::Idle
-			};
-			let nominated = if self.nominate { vec![11, 21] } else { vec![] };
-			t.extend(
+			t.0.extend(
 				staking::GenesisConfig::<Test> {
 					current_era: 0,
-					stakers: vec![
-						// (11, 10, balance_factor * 1000, StakerStatus::<AccountId>::Validator),
-						// (21, 20, stake_21, StakerStatus::<AccountId>::Validator),
-						// (31, 30, stake_31, StakerStatus::<AccountId>::Validator),
-						// (41, 40, balance_factor * 1000, status_41),
-						// (101, 100, balance_factor * 500, StakerStatus::<AccountId>::Nominator(nominated))
-					],
+					stakers: vec![],
 					validator_count: self.validator_count,
 					minimum_validator_count: self.minimum_validator_count,
-					offline_slash: Perbill::from_percent(5),
-					offline_slash_grace: 0,
 					invulnerables: vec![],
+					slash_reward_fraction: Perbill::from_percent(10),
+					.. Default::default()
 				}.build_storage().unwrap().0,
 			);
-			t.extend(
+			t.0.extend(
 				treasury_reward::GenesisConfig::<Test> {
 					minting_interval: One::one(),
 				}.build_storage().unwrap().0,

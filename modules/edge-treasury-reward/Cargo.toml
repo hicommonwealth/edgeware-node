@@ -11,6 +11,7 @@ safe-mix = { version = "1.0", default-features = false }
 parity-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false, features = ["derive"] }
 substrate-keyring = { git = "https://github.com/paritytech/substrate", optional = true }
 substrate-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
+sr-staking-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
 sr-std = { git = "https://github.com/paritytech/substrate", default-features = false }
 sr-io = { git = "https://github.com/paritytech/substrate", default-features = false }
 sr-primitives = { git = "https://github.com/paritytech/substrate", default-features = false }
@@ -21,9 +22,6 @@ srml-session = { git = "https://github.com/paritytech/substrate", default-featur
 srml-balances = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-treasury = { git = "https://github.com/paritytech/substrate", default-features = false }
 srml-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false }
-srml-authorship = { git = "https://github.com/paritytech/substrate", default-features = false }
-
-edgeware-primitives = { path = "../../node/primitives", default-features = false }
 
 [features]
 default = ["std"]
@@ -43,6 +41,5 @@ std = [
 	"srml-treasury/std",
 	"srml-balances/std",
 	"srml-timestamp/std",
-	"srml-authorship/std",
-	"edgeware-primitives/std"
+	"sr-staking-primitives/std",
 ]

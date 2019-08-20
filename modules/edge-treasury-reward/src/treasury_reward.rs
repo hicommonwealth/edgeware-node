@@ -22,7 +22,7 @@ use srml_treasury as treasury;
 use srml_staking as staking;
 
 use runtime_support::traits::{Time};
-use crate::inflation::compute_total_payout;
+use staking::inflation::compute_total_payout;
 
 use rstd::prelude::*;
 use srml_support::{
