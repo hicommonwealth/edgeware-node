@@ -84,12 +84,12 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 11,
+	authoring_version: 12,
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 16,
-	impl_version: 16,
+	spec_version: 17,
+	impl_version: 17,
 	apis: RUNTIME_API_VERSIONS,
 };
 
