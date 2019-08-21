@@ -36,6 +36,7 @@ indices = { package = "srml-indices", git = "https://github.com/paritytech/subst
 im-online = { package = "srml-im-online", git = "https://github.com/paritytech/substrate" }
 timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate", default-features = false }
 rand = "0.6"
+rand_chacha = "0.2.1"
 finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/paritytech/substrate", default-features = false }
 contracts = { package = "srml-contracts", git = "https://github.com/paritytech/substrate" }
 edgeware-primitives = { path = "../primitives" }

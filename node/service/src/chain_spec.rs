@@ -33,6 +33,8 @@ use sr_primitives::{
 	traits::{One},
 };
 use core::convert::TryInto;
+use rand::{thread_rng, Rng};
+use rand::seq::SliceRandom;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const DEFAULT_PROTOCOL_ID: &str = "edg";
@@ -41,7 +43,7 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
 pub fn edgeware_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.6.0/edgeware.json")) {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.7.0/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
@@ -58,6 +60,13 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let endowed_accounts = get_more_endowed();
 	let identity_verifiers = get_identity_verifiers();
 	const ENDOWMENT: Balance = 10 * DOLLARS;
+	// randomize the session keys
+	let mut rng = thread_rng();
+    let mut session_keys = commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
+		.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+		.collect::<Vec<_>>();
+	session_keys.shuffle(&mut rng);
+
 	GenesisConfig {
 		system: Some(SystemConfig {
 			code: WASM_BINARY.to_vec(),
@@ -83,9 +92,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 				.collect::<Vec<_>>(),
 		}),
 		session: Some(SessionConfig {
-			keys: commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
-				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
-				.collect::<Vec<_>>(),
+			keys: session_keys,
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
