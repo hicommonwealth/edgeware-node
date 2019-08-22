@@ -64,7 +64,7 @@ decl_module! {
 			let now = <system::Module<T>>::block_number();
 			let elapsed_time = now.clone() - previous_era_start;
 
-			if !elapsed_time.is_zero() && elapsed_time > minting_interval {
+			if now % minting_interval == Zero::zero() && !elapsed_time.is_zero() {
 				<CurrentRewardCycle<T>>::put(<system::Module<T>>::block_number());
 				let total_payout = compute_total_payout(
 					total_rewarded_stake.clone(),
