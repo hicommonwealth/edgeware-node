@@ -127,7 +127,7 @@ construct_service_factory! {
 						service.network(),
 						service.config().custom.inherent_data_providers.clone(),
 						service.config().force_authoring,
-						Some(service.keystore()),
+						service.keystore(),
 					)?;
 					let select = aura.select(service.on_exit()).then(|_| Ok(()));
 					service.spawn_task(Box::new(select));

@@ -20,6 +20,7 @@ use sr_primitives as runtime_primitives;
 use srml_system as system;
 use srml_treasury as treasury;
 use srml_staking as staking;
+use srml_balances as balances;
 
 use runtime_support::traits::{Time};
 use staking::inflation::compute_total_payout;
@@ -35,7 +36,7 @@ use runtime_primitives::traits::{Zero, SaturatedConversion};
 pub type BalanceOf<T> = <<T as staking::Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
 pub type MomentOf<T>= <<T as staking::Trait>::Time as Time>::Moment;
 
-pub trait Trait: staking::Trait + treasury::Trait {
+pub trait Trait: staking::Trait + treasury::Trait + balances::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
 	/// The account balance
@@ -47,7 +48,6 @@ pub trait Trait: staking::Trait + treasury::Trait {
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		fn deposit_event<T>() = default;
-
 		/// Mint money for the treasury!
 		fn on_finalize(_n: T::BlockNumber) {
 			// Set the start of the first era.
@@ -71,6 +71,7 @@ decl_module! {
 					<T as staking::Trait>::Currency::total_issuance(),
 					<BalanceOf<T>>::from(elapsed_time.saturated_into::<u32>()));
 				<T as staking::Trait>::Currency::deposit_creating(&<treasury::Module<T>>::account_id(), total_payout);
+				<Pot<T>>::put(<balances::Module<T>>::free_balance(&<treasury::Module<T>>::account_id()));
 				Self::deposit_event(RawEvent::TreasuryMinting(total_payout, <system::Module<T>>::block_number()));
 			}
 		}
@@ -91,5 +92,7 @@ decl_storage! {
 		pub MintingInterval get(minting_interval) config(): T::BlockNumber;
 		/// Time of current reward cycle starting point
 		pub CurrentRewardCycle get(current_reward_cycle): T::BlockNumber;
+		/// Current pot
+		pub Pot get(pot): T::Balance;
 	}
 }

@@ -24,9 +24,6 @@ extern crate serde;
 // in the wasm runtime.
 #[cfg(feature = "std")]
 extern crate serde_derive;
-#[macro_use]
-use srml_support;
-
 use substrate_primitives as primitives;
 
 use srml_support as runtime_support;
@@ -39,8 +36,8 @@ use srml_session as session;
 use srml_timestamp as timestamp;
 use srml_treasury as treasury;
 
-use runtime_support::{impl_outer_origin, parameter_types, impl_outer_event};
-use staking::{EraIndex, StakerStatus, ValidatorPrefs};
+use runtime_support::{impl_outer_origin, parameter_types};
+use staking::{EraIndex};
 pub mod treasury_reward;
 pub use treasury_reward::{Module, Trait, RawEvent, Event};
 
@@ -56,9 +53,9 @@ mod tests {
 	#[cfg(feature = "std")]
 	use std::{collections::HashSet, cell::RefCell};
 	use sr_io::with_externalities;
-	use srml_staking::Validators;
-	use srml_staking::StakingLedger;
-	use srml_staking::IndividualExposure;
+	
+	
+	
 	use super::*;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
@@ -70,7 +67,6 @@ mod tests {
 	
 	/// The AccountId alias in this test module.
 	pub type AccountId = u64;
-	pub type BlockNumber = u64;
 	pub type Balance = u64;
 
 	/// Simple structure that exposes how u64 currency can be represented as... u64.
@@ -110,11 +106,6 @@ mod tests {
 				d.1.insert(value);
 			})
 		}
-	}
-
-	pub fn is_disabled(validator: AccountId) -> bool {
-		let stash = Staking::ledger(&validator).unwrap().stash;
-		SESSION.with(|d| d.borrow().1.contains(&stash))
 	}
 
 	impl_outer_origin! {
@@ -175,8 +166,8 @@ mod tests {
 	}
 
 	parameter_types! {
-		pub const Period: BlockNumber = 1;
-		pub const Offset: BlockNumber = 0;
+		pub const Period: u64 = 1;
+		pub const Offset: u64 = 0;
 		pub const UncleGenerations: u64 = 0;
 	}
 
@@ -250,30 +241,17 @@ mod tests {
 	pub type Balances = balances::Module<Test>;
 	pub type System = system::Module<Test>;
 	pub type Staking = staking::Module<Test>;
-	pub type Timestamp = timestamp::Module<Test>;
 	pub type Treasury = treasury::Module<Test>;
 	pub type TreasuryReward = Module<Test>;
 
 	pub struct ExtBuilder {
 		existential_deposit: u64,
-		validator_pool: bool,
-		nominate: bool,
-		validator_count: u32,
-		minimum_validator_count: u32,
-		fair: bool,
-		num_validators: Option<u32>,
 	}
 
 	impl Default for ExtBuilder {
 		fn default() -> Self {
 			Self {
 				existential_deposit: 0,
-				validator_pool: false,
-				nominate: true,
-				validator_count: 2,
-				minimum_validator_count: 0,
-				fair: true,
-				num_validators: None,
 			}
 		}
 	}
@@ -314,8 +292,8 @@ mod tests {
 				staking::GenesisConfig::<Test> {
 					current_era: 0,
 					stakers: vec![],
-					validator_count: self.validator_count,
-					minimum_validator_count: self.minimum_validator_count,
+					validator_count: 2,
+					minimum_validator_count: 0,
 					invulnerables: vec![],
 					slash_reward_fraction: Perbill::from_percent(10),
 					.. Default::default()
