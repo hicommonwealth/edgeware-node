@@ -1,6 +1,6 @@
 [package]
 name = "edgeware"
-version = "0.6.0"
+version = "0.7.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 build = "build.rs"
 edition = "2018"
@@ -25,6 +25,7 @@ members = [
 	"node/executor",
 	"node/primitives",
 	"node/service",
+	"node/rpc",
 	"modules/edge-signaling",
 	"modules/edge-identity",
 	"modules/edge-voting",

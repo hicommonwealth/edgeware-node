@@ -52,6 +52,7 @@ use version::NativeVersion;
 use substrate_primitives::OpaqueMetadata;
 use grandpa::{AuthorityId as GrandpaId, AuthorityWeight as GrandpaWeight};
 use finality_tracker::{DEFAULT_REPORT_LATENCY, DEFAULT_WINDOW_SIZE};
+use im_online::{AuthorityId as ImOnlineId};
 
 #[cfg(any(feature = "std", test))]
 pub use runtime_primitives::BuildStorage;
@@ -64,10 +65,13 @@ pub use staking::StakerStatus;
 
 use runtime_primitives::traits::{Convert, Saturating};
 use runtime_primitives::Fixed64;
+use core::convert::TryInto;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
-use impls::{CurrencyToVoteHandler, WeightMultiplierUpdateHandler, Author, WeightToFee};
+use impls::{
+	CurrencyToVoteHandler, WeightMultiplierUpdateHandler, WeightToFee, Author,
+};
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -81,12 +85,12 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 11,
+	authoring_version: 12,
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 16,
-	impl_version: 16,
+	spec_version: 17,
+	impl_version: 17,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -113,10 +117,12 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1_000_000_000;
 	pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
 	pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
+	pub const Version: RuntimeVersion = VERSION;
 }
 
 impl system::Trait for Runtime {
 	type Origin = Origin;
+	type Call = Call;
 	type Index = Index;
 	type BlockNumber = BlockNumber;
 	type Hash = Hash;
@@ -130,10 +136,10 @@ impl system::Trait for Runtime {
 	type MaximumBlockWeight = MaximumBlockWeight;
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
+	type Version = Version;
 }
 
 impl aura::Trait for Runtime {
-	type HandleReport = aura::StakingSlasher<Runtime>;
 	type AuthorityId = AuraId;
 }
 
@@ -173,7 +179,7 @@ impl balances::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const MinimumPeriod: u64 = SECS_PER_BLOCK / 2;
+	pub const MinimumPeriod: u64 = (SLOT_DURATION / 2).try_into().unwrap();
 }
 
 impl timestamp::Trait for Runtime {
@@ -183,20 +189,19 @@ impl timestamp::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const UncleGenerations: u64 = 0;
+	pub const UncleGenerations: u32 = 0;
 }
 
-// TODO: #2986 implement this properly
 impl authorship::Trait for Runtime {
-	type FindAuthor = ();
+	type FindAuthor = session::FindAccountFromAuthorIndex<Self, Aura>;
 	type UncleGenerations = UncleGenerations;
 	type FilterUncle = ();
-	type EventHandler = ();
+	type EventHandler = Staking;
 }
 
 parameter_types! {
 	// pub const Period: BlockNumber = 10 * MINUTES;
-	pub const Period: BlockNumber = SECS_PER_BLOCK;
+	pub const Period: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
 	pub const Offset: BlockNumber = 0;
 }
 
@@ -204,8 +209,12 @@ type SessionHandlers = (Grandpa, Aura, ImOnline);
 
 impl_opaque_keys! {
 	pub struct SessionKeys {
-		#[id(key_types::ED25519)]
-		pub ed25519: GrandpaId,
+		#[id(key_types::AURA)]
+		pub aura: AuraId,
+		#[id(key_types::GRANDPA)]
+		pub grandpa: GrandpaId,
+		#[id(key_types::IM_ONLINE)]
+		pub im_online: ImOnlineId,
 	}
 }
 
@@ -232,7 +241,7 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: session::SessionIndex = 6;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 6;
 	// number of eras to bond where eras are 1 hour long
 	// Mainnet genesis bonding duration
 	// pub const BondingDuration: staking::EraIndex = 24 * 21;
@@ -261,12 +270,12 @@ parameter_types! {
 	// pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	// pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	// pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK;
-	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK;
-	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK;
-	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK;
+	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
 }
 
 impl democracy::Trait for Runtime {
@@ -278,12 +287,17 @@ impl democracy::Trait for Runtime {
 	type VotingPeriod = VotingPeriod;
 	type EmergencyVotingPeriod = EmergencyVotingPeriod;
 	type MinimumDeposit = MinimumDeposit;
+	/// A straight majority of the council can decide what their next motion is.
 	type ExternalOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilInstance>;
-	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type ExternalPushOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type EmergencyOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
+	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
+	type ExternalMajorityOrigin = collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilInstance>;
+	/// A unanimous council can have the next scheduled referendum be a straight default-carries
+	/// (NTB) vote.
+	type ExternalDefaultOrigin = collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilInstance>;
+	type FastTrackOrigin = system::EnsureNever<AccountId>;
+	// To cancel a proposal which has been passed, 2/3 of the council must agree to it.
 	type CancellationOrigin = collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilInstance>;
-	type VetoOrigin = collective::EnsureMember<AccountId, CouncilInstance>;
+	type VetoOrigin = system::EnsureNever<AccountId>;
 	type CooloffPeriod = CooloffPeriod;
 }
 
@@ -302,7 +316,7 @@ parameter_types! {
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
+	pub const ElectionsVotingPeriod: BlockNumber = (1 * SECS_PER_BLOCK).try_into().unwrap();
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -331,7 +345,7 @@ parameter_types! {
 	// pub const Burn: Permill = Permill::from_percent(10);
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 1 * SECS_PER_BLOCK;
+	pub const SpendPeriod: BlockNumber = (1 * SECS_PER_BLOCK).try_into().unwrap();
 	pub const Burn: Permill = Permill::from_percent(10);
 }
 
@@ -388,12 +402,17 @@ impl sudo::Trait for Runtime {
 }
 
 impl im_online::Trait for Runtime {
-	type AuthorityId = AuraId;
 	type Call = Call;
 	type Event = Event;
-	type SessionsPerEra = SessionsPerEra;
 	type UncheckedExtrinsic = UncheckedExtrinsic;
-	type IsValidAuthorityId = Aura;
+	type ReportUnresponsiveness = Offences;
+	type CurrentElectedSet = staking::CurrentElectedStashAccounts<Runtime>;
+}
+
+impl offences::Trait for Runtime {
+	type Event = Event;
+	type IdentificationTuple = session::historical::IdentificationTuple<Self>;
+	type OnOffenceHandler = Staking;
 }
 
 impl grandpa::Trait for Runtime {
@@ -440,7 +459,7 @@ construct_runtime!(
 		System: system::{Module, Call, Storage, Config, Event},
 		Aura: aura::{Module, Call, Storage, Config<T>, Inherent(Timestamp)},
 		Timestamp: timestamp::{Module, Call, Storage, Inherent},
-		Authorship: authorship::{Module, Call, Storage},
+		Authorship: authorship::{Module, Call, Storage, Inherent},
 		Indices: indices,
 		Balances: balances,
 		Staking: staking::{default, OfflineWorker},
@@ -453,7 +472,8 @@ construct_runtime!(
 		Treasury: treasury::{Module, Call, Storage, Event<T>},
 		Contracts: contracts,
 		Sudo: sudo,
-		ImOnline: im_online::{default, ValidateUnsigned},
+		ImOnline: im_online::{Module, Call, Storage, Event, ValidateUnsigned, Config},
+		Offences: offences::{Module, Call, Storage, Event},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
@@ -473,6 +493,8 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
+	system::CheckVersion<Runtime>,
+	system::CheckGenesis<Runtime>,
 	system::CheckEra<Runtime>,
 	system::CheckNonce<Runtime>,
 	system::CheckWeight<Runtime>,
@@ -558,12 +580,25 @@ impl_runtime_apis! {
 		}
 	}
 
+	impl edgeware_primitives::AccountNonceApi<Block> for Runtime {
+		fn account_nonce(account: AccountId) -> Index {
+			System::account_nonce(account)
+		}
+	}
+
 	impl consensus_aura::AuraApi<Block, AuraId> for Runtime {
 		fn slot_duration() -> u64 {
 			Aura::slot_duration()
 		}
 		fn authorities() -> Vec<AuraId> {
 			Aura::authorities()
+		}
+	}
+
+	impl substrate_session::SessionKeys<Block> for Runtime {
+		fn generate_session_keys(seed: Option<Vec<u8>>) -> Vec<u8> {
+			let seed = seed.as_ref().map(|s| rstd::str::from_utf8(&s).expect("Seed is an utf8 string"));
+			SessionKeys::generate(seed)
 		}
 	}
 }

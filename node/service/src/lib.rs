@@ -22,9 +22,9 @@ use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration};
 use client::{self, LongestChain};
 use grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;
-use primitives::Pair;
+
 use futures::prelude::*;
-use edgeware_primitives::{AuraPair, Block};
+use edgeware_primitives::{Block};
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use substrate_service::{
 	FactoryFullConfiguration, LightComponents, FullComponents, FullBackend,
@@ -35,9 +35,11 @@ use transaction_pool::{self, txpool::{Pool as TransactionPool}};
 use inherents::InherentDataProviders;
 use network::construct_simple_protocol;
 use substrate_service::construct_service_factory;
-use log::info;
+
 use substrate_service::TelemetryOnConnect;
-use grandpa_primitives::AuthorityPair as GrandpaPair;
+
+use aura_primitives::sr25519::AuthorityPair as AuraAuthorityPair;
+use substrate_basic_authorship::ProposerFactory;
 
 pub mod chain_spec;
 pub mod fixtures;
@@ -52,6 +54,8 @@ pub struct NodeConfig<F: substrate_service::ServiceFactory> {
 	/// grandpa connection to import block
 	// FIXME #1134 rather than putting this on the config, let's have an actual intermediate setup state
 	pub grandpa_import_setup: Option<(grandpa::BlockImportForService<F>, grandpa::LinkHalfForService<F>)>,
+	/// Tasks that were created by previous setup steps and should be spawned.
+	pub tasks_to_spawn: Option<Vec<Box<dyn Future<Item = (), Error = ()> + Send>>>,
 	inherent_data_providers: InherentDataProviders,
 }
 
@@ -60,6 +64,7 @@ impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
 		NodeConfig {
 			grandpa_import_setup: None,
 			inherent_data_providers: InherentDataProviders::new(),
+			tasks_to_spawn: None,
 		}
 	}
 }
@@ -67,15 +72,21 @@ impl<F> Default for NodeConfig<F> where F: substrate_service::ServiceFactory {
 construct_service_factory! {
 	struct Factory {
 		Block = Block,
-		ConsensusPair = AuraPair,
-		FinalityPair = GrandpaPair,
 		RuntimeApi = RuntimeApi,
 		NetworkProtocol = NodeProtocol { |config| Ok(NodeProtocol::new()) },
 		RuntimeDispatch = edgeware_executor::Executor,
-		FullTransactionPoolApi = transaction_pool::ChainApi<client::Client<FullBackend<Self>, FullExecutor<Self>, Block, RuntimeApi>, Block>
-			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
-		LightTransactionPoolApi = transaction_pool::ChainApi<client::Client<LightBackend<Self>, LightExecutor<Self>, Block, RuntimeApi>, Block>
-			{ |config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client))) },
+		FullTransactionPoolApi = transaction_pool::ChainApi<
+			client::Client<FullBackend<Self>, FullExecutor<Self>, Block, RuntimeApi>,
+			Block
+		> {
+			|config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client)))
+		},
+		LightTransactionPoolApi = transaction_pool::ChainApi<
+			client::Client<LightBackend<Self>, LightExecutor<Self>, Block, RuntimeApi>,
+			Block
+		> {
+			|config, client| Ok(TransactionPool::new(config, transaction_pool::ChainApi::new(client)))
+		},
 		Genesis = GenesisConfig,
 		Configuration = NodeConfig<Self>,
 		FullService = FullComponents<Self>
@@ -83,52 +94,56 @@ construct_service_factory! {
 				FullComponents::<Factory>::new(config) },
 		AuthoritySetup = {
 			|mut service: Self::FullService| {
-				let (block_import, link_half) = service.config.custom.grandpa_import_setup.take()
+				let (block_import, link_half) = service.config_mut().custom.grandpa_import_setup.take()
 					.expect("Link Half and Block Import are present for Full Services or setup failed before. qed");
 
-				if let Some(aura_key) = service.authority_key() {
-					info!("Using aura key {}", aura_key.public());
+				// spawn any futures that were created in the previous setup steps
+				if let Some(tasks) = service.config_mut().custom.tasks_to_spawn.take() {
+					for task in tasks {
+						service.spawn_task(
+							task.select(service.on_exit())
+								.map(|_| ())
+								.map_err(|_| ())
+						);
+					}
+				}
 
-					let proposer = Arc::new(substrate_basic_authorship::ProposerFactory {
+				if service.config().roles.is_authority() {
+					let proposer = ProposerFactory {
 						client: service.client(),
 						transaction_pool: service.transaction_pool(),
-					});
+					};
 
 					let client = service.client();
 					let select_chain = service.select_chain()
 						.ok_or(ServiceError::SelectChainRequired)?;
 
-					let aura = start_aura(
+					let aura = start_aura::<_, _, _, _, _, AuraAuthorityPair, _, _, _>(
 						SlotDuration::get_or_compute(&*client)?,
-						Arc::new(aura_key),
-						client,
+						client.clone(),
 						select_chain,
 						block_import,
 						proposer,
 						service.network(),
-						service.config.custom.inherent_data_providers.clone(),
-						service.config.force_authoring,
+						service.config().custom.inherent_data_providers.clone(),
+						service.config().force_authoring,
+						service.keystore(),
 					)?;
 					let select = aura.select(service.on_exit()).then(|_| Ok(()));
 					service.spawn_task(Box::new(select));
 				}
 
-				let grandpa_key = if service.config.disable_grandpa {
-					None
-				} else {
-					service.authority_key()
-				};
-
 				let config = grandpa::Config {
-					local_key: grandpa_key.map(Arc::new),
 					// FIXME #1578 make this available through chainspec
 					gossip_duration: Duration::from_millis(333),
 					justification_period: 4096,
-					name: Some(service.config.name.clone())
+					name: Some(service.config().name.clone()),
+					keystore: Some(service.keystore()),
 				};
 
-				match config.local_key {
-					None if !service.config.grandpa_voter => {
+				match (service.config().roles.is_authority(), service.config().disable_grandpa) {
+					(false, false) => {
+						// start the lightweight GRANDPA observer
 						service.spawn_task(Box::new(grandpa::run_grandpa_observer(
 							config,
 							link_half,
@@ -136,8 +151,8 @@ construct_service_factory! {
 							service.on_exit(),
 						)?));
 					},
-					// Either config.local_key is set, or user forced voter service via `--grandpa-voter` flag.
-					_ => {
+					(true, false) => {
+						// start the full GRANDPA voter
 						let telemetry_on_connect = TelemetryOnConnect {
 							telemetry_connection_sinks: service.telemetry_on_connect_stream(),
 						};
@@ -145,11 +160,21 @@ construct_service_factory! {
 							config: config,
 							link: link_half,
 							network: service.network(),
-							inherent_data_providers: service.config.custom.inherent_data_providers.clone(),
+							inherent_data_providers:
+								service.config().custom.inherent_data_providers.clone(),
 							on_exit: service.on_exit(),
 							telemetry_on_connect: Some(telemetry_on_connect),
 						};
-						service.spawn_task(Box::new(grandpa::run_grandpa_voter(grandpa_config)?));
+						// the GRANDPA voter task is considered infallible, i.e.
+						// if it fails we take down the service with it.
+						service.spawn_essential_task(grandpa::run_grandpa_voter(grandpa_config)?);
+					},
+					(_, true) => {
+						grandpa::setup_disabled_grandpa(
+							service.client(),
+							&service.config().custom.inherent_data_providers,
+							service.network(),
+						)?;
 					},
 				}
 
@@ -159,24 +184,32 @@ construct_service_factory! {
 		LightService = LightComponents<Self>
 			{ |config| <LightComponents<Factory>>::new(config) },
 		FullImportQueue = AuraImportQueue<Self::Block>
-			{ |config: &mut FactoryFullConfiguration<Self> , client: Arc<FullClient<Self>>, select_chain: Self::SelectChain| {
-				let slot_duration = SlotDuration::get_or_compute(&*client)?;
+			{
+				|
+					config: &mut FactoryFullConfiguration<Self>,
+					client: Arc<FullClient<Self>>,
+					select_chain: Self::SelectChain,
+					transaction_pool: Option<Arc<TransactionPool<Self::FullTransactionPoolApi>>>,
+				|
+			{
 				let (block_import, link_half) =
 					grandpa::block_import::<_, _, _, RuntimeApi, FullClient<Self>, _>(
 						client.clone(), client.clone(), select_chain
 					)?;
 				let justification_import = block_import.clone();
 
-				config.custom.grandpa_import_setup = Some((block_import.clone(), link_half));
-
-				import_queue::<_, _, AuraPair>(
-					slot_duration,
-					Box::new(block_import),
+				let import_queue = import_queue::<_, _, AuraAuthorityPair, _>(
+					SlotDuration::get_or_compute(&*client)?,
+					Box::new(block_import.clone()),
 					Some(Box::new(justification_import)),
 					None,
-					client,
+					client.clone(),
 					config.custom.inherent_data_providers.clone(),
-				).map_err(Into::into)
+					transaction_pool,
+				)?;
+
+				config.custom.grandpa_import_setup = Some((block_import.clone(), link_half));
+				Ok(import_queue)
 			}},
 		LightImportQueue = AuraImportQueue<Self::Block>
 			{ |config: &FactoryFullConfiguration<Self>, client: Arc<LightClient<Self>>| {
@@ -188,17 +221,23 @@ construct_service_factory! {
 				let block_import = grandpa::light_block_import::<_, _, _, RuntimeApi, LightClient<Self>>(
 					client.clone(), Arc::new(fetch_checker), client.clone()
 				)?;
-				let finality_proof_import = block_import.clone();
-				let finality_proof_request_builder = finality_proof_import.create_finality_proof_request_builder();
 
-				import_queue::<_, _, AuraPair>(
+				let finality_proof_import = block_import.clone();
+				let finality_proof_request_builder =
+					finality_proof_import.create_finality_proof_request_builder();
+
+				// FIXME: pruning task isn't started since light client doesn't do `AuthoritySetup`.
+				let import_queue = import_queue::<_, _, AuraAuthorityPair, TransactionPool<Self::FullTransactionPoolApi>>(
 					SlotDuration::get_or_compute(&*client)?,
 					Box::new(block_import),
 					None,
 					Some(Box::new(finality_proof_import)),
 					client,
 					config.custom.inherent_data_providers.clone(),
-				).map(|q| (q, finality_proof_request_builder)).map_err(Into::into)
+					None,
+				)?;
+
+				Ok((import_queue, finality_proof_request_builder))
 			}},
 		SelectChain = LongestChain<FullBackend<Self>, Self::Block>
 			{ |config: &FactoryFullConfiguration<Self>, client: Arc<FullClient<Self>>| {
@@ -208,6 +247,16 @@ construct_service_factory! {
 		},
 		FinalityProofProvider = { |client: Arc<FullClient<Self>>| {
 			Ok(Some(Arc::new(GrandpaFinalityProofProvider::new(client.clone(), client)) as _))
+		}},
+		RpcExtensions = jsonrpc_core::IoHandler<substrate_rpc::Metadata>
+		{ |client, pool| {
+			use edgeware_rpc::accounts::{Accounts, AccountsApi};
+
+			let mut io = jsonrpc_core::IoHandler::default();
+			io.extend_with(
+				AccountsApi::to_delegate(Accounts::new(client, pool))
+			);
+			io
 		}},
 	}
 }
