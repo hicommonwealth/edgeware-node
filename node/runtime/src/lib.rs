@@ -66,6 +66,7 @@ pub use staking::StakerStatus;
 use runtime_primitives::traits::{Convert, Saturating};
 use runtime_primitives::Fixed64;
 use core::convert::TryInto;
+
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
 use impls::{

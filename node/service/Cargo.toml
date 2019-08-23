@@ -13,7 +13,6 @@ jsonrpc-core = "13.0.0"
 parity-codec = { version = "4.1.1" }
 sr-io = { git = "https://github.com/paritytech/substrate" }
 client = { package = "substrate-client", git = "https://github.com/paritytech/substrate" }
-node-rpc = { package = "node-rpc", git = "https://github.com/paritytech/substrate" }
 substrate-rpc = { package = "substrate-rpc", git = "https://github.com/paritytech/substrate" }
 primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate" }
 inherents = { package = "substrate-inherents", git = "https://github.com/paritytech/substrate" }
@@ -42,6 +41,7 @@ contracts = { package = "srml-contracts", git = "https://github.com/paritytech/s
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 edgeware-executor = { path = "../executor" }
+edgeware-rpc = { path = "../rpc" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 hex = "0.3.2"
