@@ -25,6 +25,7 @@ members = [
 	"node/executor",
 	"node/primitives",
 	"node/service",
+	"node/rpc",
 	"modules/edge-signaling",
 	"modules/edge-identity",
 	"modules/edge-voting",

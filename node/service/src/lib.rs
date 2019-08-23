@@ -165,7 +165,6 @@ construct_service_factory! {
 							on_exit: service.on_exit(),
 							telemetry_on_connect: Some(telemetry_on_connect),
 						};
-
 						// the GRANDPA voter task is considered infallible, i.e.
 						// if it fails we take down the service with it.
 						service.spawn_essential_task(grandpa::run_grandpa_voter(grandpa_config)?);

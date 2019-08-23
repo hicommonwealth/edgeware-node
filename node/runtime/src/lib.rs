@@ -211,7 +211,7 @@ impl_opaque_keys! {
 	pub struct SessionKeys {
 		#[id(key_types::AURA)]
 		pub aura: AuraId,
-		#[id(key_types::ED25519)]
+		#[id(key_types::GRANDPA)]
 		pub grandpa: GrandpaId,
 		#[id(key_types::IM_ONLINE)]
 		pub im_online: ImOnlineId,

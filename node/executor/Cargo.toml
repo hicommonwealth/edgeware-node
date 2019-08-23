@@ -7,28 +7,28 @@ edition = "2018"
 [dependencies]
 trie-root = "0.14.0"
 parity-codec = "4.1.1"
-runtime_io = { package = "sr-io", git = "https://github.com/paritytech/substrate" }
-state_machine = { package = "substrate-state-machine", git = "https://github.com/paritytech/substrate" }
-substrate-executor = { git = "https://github.com/paritytech/substrate" }
-primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate" }
-trie = { package = "substrate-trie", git = "https://github.com/paritytech/substrate" }
+runtime_io = { package = "sr-io", git = "https://github.com/hicommonwealth/substrate" }
+state_machine = { package = "substrate-state-machine", git = "https://github.com/hicommonwealth/substrate" }
+substrate-executor = { git = "https://github.com/hicommonwealth/substrate" }
+primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate" }
+trie = { package = "substrate-trie", git = "https://github.com/hicommonwealth/substrate" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 
 [dev-dependencies]
-test-client = { package = "substrate-test-client", git = "https://github.com/paritytech/substrate" }
-keyring = { package = "substrate-keyring", git = "https://github.com/paritytech/substrate" }
-runtime_primitives = { package = "sr-primitives", git = "https://github.com/paritytech/substrate" }
-runtime_support = { package = "srml-support", git = "https://github.com/paritytech/substrate" }
-balances = { package = "srml-balances", git = "https://github.com/paritytech/substrate" }
-session = { package = "srml-session", git = "https://github.com/paritytech/substrate" }
-staking = { package = "srml-staking", git = "https://github.com/paritytech/substrate" }
-system = { package = "srml-system", git = "https://github.com/paritytech/substrate" }
-timestamp = { package = "srml-timestamp", git = "https://github.com/paritytech/substrate" }
-treasury = { package = "srml-treasury", git = "https://github.com/paritytech/substrate" }
-contracts = { package = "srml-contracts", git = "https://github.com/paritytech/substrate" }
-grandpa = { package = "srml-grandpa", git = "https://github.com/paritytech/substrate" }
-indices = { package = "srml-indices", git = "https://github.com/paritytech/substrate" }
+test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate" }
+keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate" }
+runtime_primitives = { package = "sr-primitives", git = "https://github.com/hicommonwealth/substrate" }
+runtime_support = { package = "srml-support", git = "https://github.com/hicommonwealth/substrate" }
+balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate" }
+session = { package = "srml-session", git = "https://github.com/hicommonwealth/substrate" }
+staking = { package = "srml-staking", git = "https://github.com/hicommonwealth/substrate" }
+system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate" }
+timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate" }
+treasury = { package = "srml-treasury", git = "https://github.com/hicommonwealth/substrate" }
+contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate" }
+grandpa = { package = "srml-grandpa", git = "https://github.com/hicommonwealth/substrate" }
+indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate" }
 wabt = "~0.7.4"
 
 [features]
