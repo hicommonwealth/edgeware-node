@@ -34,7 +34,7 @@ pub type Nonce = u32;
 pub type Signature = AnySignature;
 
 /// The type used by authorities to prove their ID.
-pub type AccountSignature = primitives::sr25519::Signature;
+pub type AccountSignature = primitives::ed25519::Signature;
 
 /// Alias to pubkey that identifies an account on the chain.
 pub type AccountId = <Signature as Verify>::Signer;
@@ -51,13 +51,13 @@ pub type Moment = u64;
 
 /// The aura crypto scheme defined via the keypair type.
 #[cfg(feature = "std")]
-pub type AuraPair = consensus_aura::sr25519::AuthorityPair;
+pub type AuraPair = consensus_aura::ed25519::AuthorityPair;
 
 /// The Ed25519 pub key of an session that belongs to an Aura authority of the chain.
-pub type AuraId = consensus_aura::sr25519::AuthorityId;
+pub type AuraId = consensus_aura::ed25519::AuthorityId;
 
 /// Alias to the signature scheme used for Aura authority signatures.
-pub type AuraSignature = consensus_aura::sr25519::AuthoritySignature;
+pub type AuraSignature = consensus_aura::ed25519::AuthoritySignature;
 
 /// Index of a transaction in the chain.
 pub type Index = Nonce;
