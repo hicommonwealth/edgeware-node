@@ -1,23 +1,20 @@
 #!/bin/bash
-cat <<EOF
-For more options and help: ./purge-chain.sh --help
-Description: Purges the local database of installed chains.
-
-EOF
 
 set -e
-SCRIPT_VERSION="0.1.2"
+SCRIPT_VERSION="0.2.0"
 COLOR_OPT="always"
 
 color_option() {
 	# * Test color support * #
 	totalColors="$(tput colors)"
-	if [[ $COLOR_OPT == "never" ]]; then
+	# Check for NO_COLOR see https://no-color.org/ for more information.
+	if [[ $COLOR_OPT == "never" ]] || [[ -n "$NO_COLOR" ]]; then
 		COLOR_DEFAULT="\\033[0m"
 		COLOR_ERROR="$COLOR_DEFAULT"
 		COLOR_INFO="$COLOR_DEFAULT"
 		COLOR_SUCCESS="$COLOR_DEFAULT"
 		COLOR_WARNING="$COLOR_DEFAULT"
+		return 0
 	fi
 
 	if test -t 1 && test -n "$totalColors" && test "$totalColors" -ge 8; then
@@ -30,7 +27,7 @@ color_option() {
 			COLOR_WARNING="\\033[93m"
 		fi
 	fi
-	echo -e "${COLOR_SUCCESS}Selected --color=${COLOR_OPT:=always}${COLOR_DEFAULT}"
+	echo -e "${COLOR_SUCCESS}Selected --color ${COLOR_OPT:=always}${COLOR_DEFAULT}"
 	return
 }
 
@@ -46,17 +43,17 @@ prompt_purge() {
 		No) break ;;
 		esac
 	done
-
 }
 
 find_chain_name() {
-	CHAIN_NAME_AUTO="$(find "$PWD/target" -maxdepth 2 -perm -111 -type f | sed 's#.*/##' | head -n 1)"
-	echo "$PWD && $CHAIN_NAME_AUTO"
+	CARGO_BIN_NAME="$(find . -iname Cargo.toml -exec grep -nHF -A1 -- "[[bin]]" {} \; | awk -e '/name = / { print $3 }' | sort | tr -d '"')"
+	# CHAIN_NAME_AUTO="$(find "$PWD/target" -maxdepth 2 -perm -111 -type f | sed 's#.*/##' | head -n 1)"
+	CHAIN_NAME_AUTO=$(find . -iname "${CARGO_BIN_NAME}")
+	echo "$CHAIN_NAME_AUTO" | head -n1 | awk '{print $1;}'
 	if [[ -n $CHAIN_NAME_AUTO ]]; then
-		CHAIN_NAME=$CHAIN_NAME_AUTO
-		echo -e "${COLOR_DEFAULT}Found chain executable name: ${COLOR_INFO}${CHAIN_NAME}${COLOR_DEFAULT}"
+		CHAIN_NAME=${CARGO_BIN_NAME}
+		echo -e "${COLOR_DEFAULT}Found chain executables at: \\n${COLOR_INFO}${CHAIN_NAME_AUTO}${COLOR_DEFAULT}"
 	fi
-
 }
 
 print_help() {
@@ -66,7 +63,6 @@ print_help() {
 		"\`$0 -V\` \\t\\t\\tdisplays the script version.\\n" \
 		"\`$0 --color[=WHEN]\` \\tuse color when (auto, never) \\n" \
 		"\`$0 --chain-name NAME\` \\tsets the name of the chain; Ommiting this option will autoscan for any chains.\\n"
-
 }
 
 purge_chain() {
@@ -87,18 +83,18 @@ purge_chain() {
 	if [[ -d "$OS_CHAIN_DIR$CHAIN_NAME/chains" ]]; then
 		echo -e "Listing chains inside of: ${COLOR_INFO}$OS_CHAIN_DIR$CHAIN_NAME/chains${COLOR_DEFAULT}"
 		cd "$OS_CHAIN_DIR$CHAIN_NAME/chains" || return
-		dirCount=0
+		dirCount=1
 		for dir in */; do
-			dirCount=$((dirCount + 1))
 			if [[ -d "$dir" ]]; then
 				dirFullPath=$PWD/$dir
 				echo -e "Chain #$dirCount: ${COLOR_INFO}$dir${COLOR_DEFAULT}"
 				prompt_purge
 			fi
-			if [[ $dirCount -lt 2 ]]; then
+			if [[ $dirCount -lt 1 ]]; then
 				echo -e "The directory is already purged...exiting."
 				exit 0
 			fi
+			dirCount=$((dirCount + 1))
 		done
 	fi
 }
@@ -160,6 +156,7 @@ if [[ ! -f Cargo.toml ]]; then
 fi
 
 # * Run functions * #
+print_help
 color_option
 find_chain_name
 purge_chain
