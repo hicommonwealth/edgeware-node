@@ -38,7 +38,7 @@ use substrate_service::construct_service_factory;
 
 use substrate_service::TelemetryOnConnect;
 
-use aura_primitives::sr25519::AuthorityPair as AuraAuthorityPair;
+use aura_primitives::ed25519::AuthorityPair as AuraAuthorityPair;
 use substrate_basic_authorship::ProposerFactory;
 
 pub mod chain_spec;
