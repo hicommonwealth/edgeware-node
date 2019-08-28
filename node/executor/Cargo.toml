@@ -7,28 +7,28 @@ edition = "2018"
 [dependencies]
 trie-root = "0.14.0"
 parity-codec = "4.1.1"
-runtime_io = { package = "sr-io", git = "https://github.com/hicommonwealth/substrate" }
-state_machine = { package = "substrate-state-machine", git = "https://github.com/hicommonwealth/substrate" }
-substrate-executor = { git = "https://github.com/hicommonwealth/substrate" }
-primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate" }
-trie = { package = "substrate-trie", git = "https://github.com/hicommonwealth/substrate" }
+runtime_io = { package = "sr-io", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+state_machine = { package = "substrate-state-machine", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+substrate-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+trie = { package = "substrate-trie", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 
 [dev-dependencies]
-test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate" }
-keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate" }
-runtime_primitives = { package = "sr-primitives", git = "https://github.com/hicommonwealth/substrate" }
-runtime_support = { package = "srml-support", git = "https://github.com/hicommonwealth/substrate" }
-balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate" }
-session = { package = "srml-session", git = "https://github.com/hicommonwealth/substrate" }
-staking = { package = "srml-staking", git = "https://github.com/hicommonwealth/substrate" }
-system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate" }
-timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate" }
-treasury = { package = "srml-treasury", git = "https://github.com/hicommonwealth/substrate" }
-contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate" }
-grandpa = { package = "srml-grandpa", git = "https://github.com/hicommonwealth/substrate" }
-indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate" }
+test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+runtime_primitives = { package = "sr-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+runtime_support = { package = "srml-support", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+session = { package = "srml-session", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+staking = { package = "srml-staking", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+treasury = { package = "srml-treasury", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+grandpa = { package = "srml-grandpa", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 wabt = "~0.7.4"
 
 [features]

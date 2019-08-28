@@ -16,11 +16,11 @@
 
 use primitives::{Pair, Public};
 use edgeware_primitives::{AccountId, AuraId, Balance};
-use im_online::{AuthorityId as ImOnlineId};
+use im_online::ed25519::{AuthorityId as ImOnlineId};
 use edgeware_runtime::{
 	GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
 	AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TreasuryRewardConfig,
-	SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus,
+	SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, AuthorityDiscoveryConfig,
 };
 use edgeware_runtime::constants::{time::DAYS, currency::DOLLARS, currency::MILLICENTS};
 use edgeware_runtime::{IdentityConfig, SignalingConfig};
@@ -137,6 +137,9 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: identity_verifiers,
@@ -282,6 +285,9 @@ pub fn development_genesis(
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_verifiers,

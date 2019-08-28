@@ -52,7 +52,7 @@ use version::NativeVersion;
 use substrate_primitives::OpaqueMetadata;
 use grandpa::{AuthorityId as GrandpaId, AuthorityWeight as GrandpaWeight};
 use finality_tracker::{DEFAULT_REPORT_LATENCY, DEFAULT_WINDOW_SIZE};
-use im_online::{AuthorityId as ImOnlineId};
+use im_online::ed25519::{AuthorityId as ImOnlineId};
 
 #[cfg(any(feature = "std", test))]
 pub use runtime_primitives::BuildStorage;
@@ -85,12 +85,12 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 12,
+	authoring_version: 13,
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 17,
-	impl_version: 17,
+	spec_version: 18,
+	impl_version: 18,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -189,7 +189,7 @@ impl timestamp::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const UncleGenerations: u32 = 0;
+	pub const UncleGenerations: u32 = 5;
 }
 
 impl authorship::Trait for Runtime {
@@ -201,7 +201,7 @@ impl authorship::Trait for Runtime {
 
 parameter_types! {
 	// pub const Period: BlockNumber = 10 * MINUTES;
-	pub const Period: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const Period: BlockNumber = 10;
 	pub const Offset: BlockNumber = 0;
 }
 
@@ -270,12 +270,12 @@ parameter_types! {
 	// pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	// pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	// pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const LaunchPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
-	pub const VotingPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
-	pub const EmergencyVotingPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const LaunchPeriod: BlockNumber = (MINUTES).try_into().unwrap();
+	pub const VotingPeriod: BlockNumber = (MINUTES).try_into().unwrap();
+	pub const EmergencyVotingPeriod: BlockNumber = (MINUTES).try_into().unwrap();
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
-	pub const CooloffPeriod: BlockNumber = SECS_PER_BLOCK.try_into().unwrap();
+	pub const EnactmentPeriod: BlockNumber = (MINUTES).try_into().unwrap();
+	pub const CooloffPeriod: BlockNumber = (MINUTES).try_into().unwrap();
 }
 
 impl democracy::Trait for Runtime {
@@ -316,7 +316,7 @@ parameter_types! {
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = (1 * SECS_PER_BLOCK).try_into().unwrap();
+	pub const ElectionsVotingPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -345,7 +345,7 @@ parameter_types! {
 	// pub const Burn: Permill = Permill::from_percent(10);
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = (1 * SECS_PER_BLOCK).try_into().unwrap();
+	pub const SpendPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
 	pub const Burn: Permill = Permill::from_percent(10);
 }
 
@@ -402,6 +402,7 @@ impl sudo::Trait for Runtime {
 }
 
 impl im_online::Trait for Runtime {
+	type AuthorityId = ImOnlineId;
 	type Call = Call;
 	type Event = Event;
 	type UncheckedExtrinsic = UncheckedExtrinsic;
@@ -414,6 +415,8 @@ impl offences::Trait for Runtime {
 	type IdentificationTuple = session::historical::IdentificationTuple<Self>;
 	type OnOffenceHandler = Staking;
 }
+
+impl authority_discovery::Trait for Runtime {}
 
 impl grandpa::Trait for Runtime {
 	type Event = Event;
@@ -472,8 +475,9 @@ construct_runtime!(
 		Treasury: treasury::{Module, Call, Storage, Event<T>},
 		Contracts: contracts,
 		Sudo: sudo,
-		ImOnline: im_online::{Module, Call, Storage, Event, ValidateUnsigned, Config},
+		ImOnline: im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
 		Offences: offences::{Module, Call, Storage, Event},
+		AuthorityDiscovery: authority_discovery::{Module, Call, Config<T>},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
@@ -583,6 +587,23 @@ impl_runtime_apis! {
 	impl edgeware_primitives::AccountNonceApi<Block> for Runtime {
 		fn account_nonce(account: AccountId) -> Index {
 			System::account_nonce(account)
+		}
+	}
+
+	impl authority_discovery_primitives::AuthorityDiscoveryApi<Block, ImOnlineId> for Runtime {
+		fn authority_id() -> Option<ImOnlineId> {
+			AuthorityDiscovery::authority_id()
+		}
+		fn authorities() -> Vec<ImOnlineId> {
+			AuthorityDiscovery::authorities()
+		}
+
+		fn sign(payload: Vec<u8>, authority_id: ImOnlineId) -> Option<Vec<u8>> {
+			AuthorityDiscovery::sign(payload, authority_id)
+		}
+
+		fn verify(payload: Vec<u8>, signature: Vec<u8>, public_key: ImOnlineId) -> bool {
+			AuthorityDiscovery::verify(payload, signature, public_key)
 		}
 	}
 
