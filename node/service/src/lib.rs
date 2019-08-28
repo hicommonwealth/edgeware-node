@@ -33,7 +33,6 @@ use network::construct_simple_protocol;
 
 use aura_primitives::ed25519::AuthorityPair as AuraAuthorityPair;
 
-
 pub mod chain_spec;
 pub mod fixtures;
 
@@ -46,6 +45,7 @@ construct_simple_protocol! {
 ///
 /// Use this macro if you don't actually need the full service, but just the builder in order to
 /// be able to perform chain operations.
+#[macro_export]
 macro_rules! new_full_start {
 	($config:expr) => {{
 		let mut import_setup = None;
@@ -101,6 +101,7 @@ macro_rules! new_full_start {
 ///
 /// We need to use a macro because the test suit doesn't work with an opaque service. It expects
 /// concrete types instead.
+#[macro_export]
 macro_rules! new_full {
 	($config:expr) => {{
 		use futures::Future;
@@ -217,19 +218,19 @@ pub fn new_light<C: Send + Default + 'static>(config: Configuration<C, GenesisCo
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = import_queue::<_, _, AuraAuthorityPair, TransactionPool<_>>(
+			let import_queue = import_queue::<_, _, AuraAuthorityPair, _>(
 				SlotDuration::get_or_compute(&*client)?,
 				Box::new(block_import),
 				None,
 				Some(Box::new(finality_proof_import)),
 				client,
 				inherent_data_providers.clone(),
-				None,
+				Some(transaction_pool),
 			)?;
 
 			Ok((import_queue, finality_proof_request_builder))
 		})?
-		.with_network_protocol(|_| Ok(NodeProtocol::new()))?
+		.with_network_protocol(|_| Ok(crate::NodeProtocol::new()))?
 		.with_finality_proof_provider(|client|
 			Ok(Arc::new(GrandpaFinalityProofProvider::new(client.clone(), client)) as _)
 		)?
