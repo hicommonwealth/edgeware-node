@@ -33,7 +33,7 @@ use sr_primitives::{
 	traits::{One},
 };
 use core::convert::TryInto;
-use rand::{thread_rng, Rng};
+use rand::{thread_rng};
 use rand::seq::SliceRandom;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";

@@ -16,14 +16,12 @@
 
 #![warn(unused_extern_crates)]
 use std::sync::Arc;
-use std::time::Duration;
 
-use aura::{import_queue, start_aura, AuraImportQueue, SlotDuration};
+
+use aura::{import_queue, start_aura, SlotDuration};
 use client::{self, LongestChain};
 use grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;
-
-use futures::prelude::*;
 use edgeware_primitives::{Block};
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use substrate_service::{
@@ -34,7 +32,7 @@ use inherents::InherentDataProviders;
 use network::construct_simple_protocol;
 
 use aura_primitives::ed25519::AuthorityPair as AuraAuthorityPair;
-use substrate_basic_authorship::ProposerFactory;
+
 
 pub mod chain_spec;
 pub mod fixtures;
@@ -72,7 +70,7 @@ macro_rules! new_full_start {
 					)?;
 				let justification_import = block_import.clone();
 
-				let import_queue = import_queue(
+				let import_queue = import_queue::<_, _, AuraAuthorityPair, _>(
 					SlotDuration::get_or_compute(&*client)?,
 					Box::new(block_import.clone()),
 					Some(Box::new(justification_import)),
@@ -82,6 +80,7 @@ macro_rules! new_full_start {
 					Some(transaction_pool),
 				)?;
 
+				import_setup = Some((block_import.clone(), link_half));
 				Ok(import_queue)
 			})?
 			.with_rpc_extensions(|client, pool| {
@@ -218,7 +217,7 @@ pub fn new_light<C: Send + Default + 'static>(config: Configuration<C, GenesisCo
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = import_queue(
+			let import_queue = import_queue::<_, _, AuraAuthorityPair, TransactionPool<_>>(
 				SlotDuration::get_or_compute(&*client)?,
 				Box::new(block_import),
 				None,

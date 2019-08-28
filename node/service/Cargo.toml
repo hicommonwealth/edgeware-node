@@ -9,7 +9,7 @@ log = "0.4"
 tokio = "0.1.7"
 futures = "0.1"
 exit-future = "0.1"
-jsonrpc-core = "13.0.0"
+jsonrpc-core = "13.1.0"
 parity-codec = { version = "4.1.1" }
 sr-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
