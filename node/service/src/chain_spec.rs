@@ -62,10 +62,22 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	const ENDOWMENT: Balance = 10 * DOLLARS;
 	// randomize the session keys
 	let mut rng = thread_rng();
-    let mut session_keys = commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
-		.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+	let extras = vec![
+		get_authority_keys_from_seed("Alice"),
+		get_authority_keys_from_seed("Bob"),
+		get_authority_keys_from_seed("Charlie"),
+		get_authority_keys_from_seed("Dave"),
+		get_authority_keys_from_seed("Eve"),
+		get_authority_keys_from_seed("Ferdie"),
+	];
+
+    let mut session_keys = extras.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
+    	.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+		// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
 		.collect::<Vec<_>>();
-	session_keys.shuffle(&mut rng);
+	// session_keys.shuffle(&mut rng);
+
+
 
 	GenesisConfig {
 		system: Some(SystemConfig {
@@ -75,6 +87,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned()
 				.map(|k| (k, ENDOWMENT))
+				.chain(extras.iter().map(|x| (x.0.clone(), ENDOWMENT)))
 				// give authorities their balances
 				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
 				// give controllers an endowment
@@ -96,26 +109,29 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: 100,
-			minimum_validator_count: 10,
-			stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
-				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+			validator_count: 25,
+			minimum_validator_count: 0,
+			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), ENDOWMENT, StakerStatus::Validator))
+				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+				// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				.collect(),
 			invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
-				.chain(lockdrop_validators.iter().map(|x| x.0.clone()))
+				// .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
 				.collect(),
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
 		collective_Instance1: Some(CouncilConfig {
-			members: commonwealth_authorities.iter().map(|x| x.1.clone())
+			members: extras.iter().map(|x| x.1.clone())
+				.chain(commonwealth_authorities.iter().map(|x| x.1.clone()))
 				.chain(endowed_accounts.iter().map(|x| x.clone()))
 				.collect(),
 			phantom: Default::default(),
 		}),
 		elections: Some(ElectionsConfig {
-			members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000))
+			members: extras.iter().map(|x| (x.1.clone(), 1000000))
+				.chain(commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)))
 				.chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
 				.collect(),
 			desired_seats: 13,
