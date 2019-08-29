@@ -50,7 +50,6 @@ impl ChainSpec {
 	}
 
 	pub(crate) fn from(s: &str) -> Option<Self> {
-		println!("{:?}", s);
 		match s {
 			"dev" => Some(ChainSpec::Development),
 			"local" => Some(ChainSpec::LocalTestnet),

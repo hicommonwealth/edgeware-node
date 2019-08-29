@@ -122,7 +122,8 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				.collect(),
-			invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
+			invulnerables: extras.iter().map(|x| (x.0.clone()))
+				.chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
 				// .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
 				.collect(),
 			slash_reward_fraction: Perbill::from_percent(10),
