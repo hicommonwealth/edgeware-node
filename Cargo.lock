@@ -754,7 +754,7 @@ dependencies = [
  "edgeware-executor 0.1.0",
  "edgeware-primitives 0.1.0",
  "edgeware-rpc 0.1.0",
- "edgeware-runtime 0.7.0",
+ "edgeware-runtime 0.8.0",
  "edgeware-service 0.1.0",
  "exit-future 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -796,7 +796,7 @@ name = "edgeware-executor"
 version = "0.1.0"
 dependencies = [
  "edgeware-primitives 0.1.0",
- "edgeware-runtime 0.7.0",
+ "edgeware-runtime 0.8.0",
  "parity-codec 4.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=develop)",
  "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=develop)",
@@ -840,7 +840,7 @@ name = "edgeware-rpc"
 version = "0.1.0"
 dependencies = [
  "edgeware-primitives 0.1.0",
- "edgeware-runtime 0.7.0",
+ "edgeware-runtime 0.8.0",
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonrpc-core 13.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonrpc-core-client 13.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -858,7 +858,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "0.7.0"
+version = "0.8.0"
 dependencies = [
  "edge-identity 0.1.0",
  "edge-signaling 0.1.0",
@@ -912,7 +912,7 @@ dependencies = [
  "edgeware-executor 0.1.0",
  "edgeware-primitives 0.1.0",
  "edgeware-rpc 0.1.0",
- "edgeware-runtime 0.7.0",
+ "edgeware-runtime 0.8.0",
  "exit-future 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
