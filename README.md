@@ -7,7 +7,7 @@
 
 Developer resources are available at [edgewa.re/dev](https://edgewa.re/dev/) and more detailed documentation at our [Github Wiki](https://github.com/hicommonwealth/edgeware-node/wiki). For more details about the project, visit the Edgeware website, or check the [blog](blog.edgewa.re) or [Twitter](http://twitter.com/heyedgeware) for the latest. Finally, for discussion and governance, you can utilize [Commonwealth.im](https://commonwealth.im).
 
-The latest substrate hash we pegged to is: f9e5a3742cfecb7f8f89c7c961ae900cca645b65
+We are now pegged to: https://github.com/hicommonwealth/substrate.
 
 ## To get started
 
@@ -33,7 +33,7 @@ To create an ED25519 keypair, run the following:
 ```
 subkey -e generate
 ```
-To create derived keypairs, use the mnemonic generated from a method above and run:
+To create derived keypairs, use the mnemonic generated from a method above and run (use `-e` for ED25519):
 ```
 subkey inspect "<mnemonic>"//<derive_path>
 ```
@@ -79,17 +79,8 @@ Ensure you have a fresh start if updating from another version:
 ```
 To start up the Edgeware node and connect to the latest testnet, run:
 ```
-./target/release/edgeware --chain=edgeware --name <INSERT_NAME>
+./target/release/edgeware --chain=edgeware-testnet-v8 --name <INSERT_NAME>
 ```
-
-If you use the `--key` flag, ensure that either it is a 32-byte hex string or prefixed with `//` like so:
-```
-./target/release/edgeware --chain=edgeware --name <INSERT_NAME> --key //testkey
-```
-
-### Visualization
-
-To ensure you followed the steps correctly, check https://telemetry.polkadot.io/#list/Edgeware%20Testnet%20v0.4. If done correctly, you should see your node with the inserted name.
 
 ## Implemented Modules
 
@@ -98,24 +89,28 @@ To ensure you followed the steps correctly, check https://telemetry.polkadot.io/
 * [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
 * [Voting](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-voting)
 * [Signaling](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-signaling)
+* [TreasuryReward](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-treasury-reward)
 
 ### SRML
-* [System](https://github.com/paritytech/substrate/tree/master/srml/system)
-* [Aura](https://github.com/paritytech/substrate/tree/master/srml/aura)
-* [Timestamp](https://github.com/paritytech/substrate/tree/master/srml/timestamp)
-* [Authorship](https://github.com/paritytech/substrate/tree/master/srml/authorship)
-* [Indices](https://github.com/paritytech/substrate/tree/master/srml/indices)
-* [Balances](https://github.com/paritytech/substrate/tree/master/srml/balances)
-* [Staking](https://github.com/paritytech/substrate/tree/master/srml/staking)
-* [Session](https://github.com/paritytech/substrate/tree/master/srml/session)
-* [Democracy](https://github.com/paritytech/substrate/tree/master/srml/democracy)
-* [Council](https://github.com/paritytech/substrate/tree/master/srml/council)
-* [Elections](https://github.com/paritytech/substrate/tree/master/srml/elections)
-* [FinalityTracker](https://github.com/paritytech/substrate/tree/master/srml/finality-tracker)
-* [Grandpa](https://github.com/paritytech/substrate/tree/master/srml/grandpa)
-* [Treasury](https://github.com/paritytech/substrate/tree/master/srml/treasury)
-* [Contracts](https://github.com/paritytech/substrate/tree/master/srml/contracts)
-* [Sudo](https://github.com/paritytech/substrate/tree/master/srml/sudo)
+* [Aura](https://github.com/paritytech/hicommonwealth/tree/master/srml/aura)
+* [AuthorityDiscovery](https://github.com/paritytech/hicommonwealth/tree/master/srml/authority-discovery)
+* [Authorship](https://github.com/paritytech/hicommonwealth/tree/master/srml/authorship)
+* [Indices](https://github.com/paritytech/hicommonwealth/tree/master/srml/indices)
+* [Balances](https://github.com/paritytech/hicommonwealth/tree/master/srml/balances)
+* [Contracts](https://github.com/paritytech/hicommonwealth/tree/master/srml/contracts)
+* [Council](https://github.com/paritytech/hicommonwealth/tree/master/srml/council)
+* [Democracy](https://github.com/paritytech/hicommonwealth/tree/master/srml/democracy)
+* [Elections](https://github.com/paritytech/hicommonwealth/tree/master/srml/elections)
+* [FinalityTracker](https://github.com/paritytech/hicommonwealth/tree/master/srml/finality-tracker)
+* [Grandpa](https://github.com/paritytech/hicommonwealth/tree/master/srml/grandpa)
+* [ImOnline](https://github.com/paritytech/hicommonwealth/tree/master/srml/im-online)
+* [Offences](https://github.com/paritytech/hicommonwealth/tree/master/srml/offences)
+* [Session](https://github.com/paritytech/hicommonwealth/tree/master/srml/session)
+* [Staking](https://github.com/paritytech/hicommonwealth/tree/master/srml/staking)
+* [Sudo](https://github.com/paritytech/hicommonwealth/tree/master/srml/sudo)
+* [System](https://github.com/paritytech/hicommonwealth/tree/master/srml/system)
+* [Timestamp](https://github.com/paritytech/hicommonwealth/tree/master/srml/timestamp)
+* [Treasury](https://github.com/paritytech/hicommonwealth/tree/master/srml/treasury)
 
 ## Developing on Edgeware
 
@@ -141,3 +136,19 @@ To force your local to create new blocks, even if offline, add the `--force-auth
   - Add it to the `edgeware_runtime`'s list of `Config` types.
   - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
 4. Build and run the chain.
+
+## Session Key Setup
+If you plan to validate on Edgeware or a testnet with any non-default keys, then you will need to store the keys so that the node has access to them, for signing transactions and authoring new blocks. Keys in Edgeware are stored in the keystore in the file system. To store keys into this keystore, you need to use one of the two provided RPC calls. If your keys are encrypted or should be encrypted by the keystore, you need to provide the key using one of the cli arguments --password, --password-interactive or --password-filename.
+
+### Recommended RPC call
+For most users who want to run a validator node, the author_rotateKeys RPC call is sufficient. The RPC call will generate N Session keys for you and return their public keys. N is the number of session keys configured in the runtime. The output of the RPC call can be used as input for the session::set_keys transaction.
+```
+curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_rotateKeys", "id":1 }' localhost:9933
+```
+
+### Advanced RPC call
+If the Session keys need to match a fixed seed, they can be set individually key by key. The RPC call expects the key seed and the key type. The key types supported by default in Edgeware are `aura`, `gran`, and `imon`.
+```
+curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["KEY_TYPE", "SEED"],"id":1 }' localhost:9933
+```
+`KEY_TYPE` - needs to be replaced with the 4-character key type identifier. `SEED` - is the seed of the key.

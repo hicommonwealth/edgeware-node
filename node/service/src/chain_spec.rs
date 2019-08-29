@@ -34,7 +34,7 @@ use sr_primitives::{
 };
 use core::convert::TryInto;
 use rand::{thread_rng};
-use rand::seq::SliceRandom;
+
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const DEFAULT_PROTOCOL_ID: &str = "edg";
@@ -42,8 +42,15 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
-pub fn edgeware_config() -> ChainSpec {
+pub fn edgeware_testnet_v7_config() -> ChainSpec {
 	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.7.0/edgeware.json")) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
+	}
+}
+
+pub fn edgeware_testnet_v8_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.8.0/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
