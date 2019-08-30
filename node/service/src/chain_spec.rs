@@ -16,11 +16,11 @@
 
 use primitives::{Pair, Public};
 use edgeware_primitives::{AccountId, AuraId, Balance};
-use im_online::{AuthorityId as ImOnlineId};
+use im_online::ed25519::{AuthorityId as ImOnlineId};
 use edgeware_runtime::{
 	GrandpaConfig, BalancesConfig, ContractsConfig, ElectionsConfig, DemocracyConfig, CouncilConfig,
 	AuraConfig, IndicesConfig, SessionConfig, StakingConfig, SudoConfig, TreasuryRewardConfig,
-	SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus,
+	SystemConfig, ImOnlineConfig, WASM_BINARY, Perbill, SessionKeys, StakerStatus, AuthorityDiscoveryConfig,
 };
 use edgeware_runtime::constants::{time::DAYS, currency::DOLLARS, currency::MILLICENTS};
 use edgeware_runtime::{IdentityConfig, SignalingConfig};
@@ -33,8 +33,8 @@ use sr_primitives::{
 	traits::{One},
 };
 use core::convert::TryInto;
-use rand::{thread_rng, Rng};
-use rand::seq::SliceRandom;
+use rand::{thread_rng};
+
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const DEFAULT_PROTOCOL_ID: &str = "edg";
@@ -42,8 +42,15 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
-pub fn edgeware_config() -> ChainSpec {
+pub fn edgeware_testnet_v7_config() -> ChainSpec {
 	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.7.0/edgeware.json")) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
+	}
+}
+
+pub fn edgeware_testnet_v8_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.8.0/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
@@ -62,10 +69,22 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	const ENDOWMENT: Balance = 10 * DOLLARS;
 	// randomize the session keys
 	let mut rng = thread_rng();
-    let mut session_keys = commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
-		.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+	let extras = vec![
+		get_authority_keys_from_seed("Alice"),
+		get_authority_keys_from_seed("Bob"),
+		get_authority_keys_from_seed("Charlie"),
+		get_authority_keys_from_seed("Dave"),
+		get_authority_keys_from_seed("Eve"),
+		get_authority_keys_from_seed("Ferdie"),
+	];
+
+    let mut session_keys = extras.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
+    	.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+		// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
 		.collect::<Vec<_>>();
-	session_keys.shuffle(&mut rng);
+	// session_keys.shuffle(&mut rng);
+
+
 
 	GenesisConfig {
 		system: Some(SystemConfig {
@@ -75,6 +94,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned()
 				.map(|k| (k, ENDOWMENT))
+				.chain(extras.iter().map(|x| (x.0.clone(), ENDOWMENT)))
 				// give authorities their balances
 				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
 				// give controllers an endowment
@@ -96,26 +116,30 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: 100,
-			minimum_validator_count: 10,
-			stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
-				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+			validator_count: 25,
+			minimum_validator_count: 0,
+			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), ENDOWMENT, StakerStatus::Validator))
+				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+				// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				.collect(),
-			invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
-				.chain(lockdrop_validators.iter().map(|x| x.0.clone()))
+			invulnerables: extras.iter().map(|x| (x.0.clone()))
+				.chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
+				// .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
 				.collect(),
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
 		collective_Instance1: Some(CouncilConfig {
-			members: commonwealth_authorities.iter().map(|x| x.1.clone())
+			members: extras.iter().map(|x| x.1.clone())
+				.chain(commonwealth_authorities.iter().map(|x| x.1.clone()))
 				.chain(endowed_accounts.iter().map(|x| x.clone()))
 				.collect(),
 			phantom: Default::default(),
 		}),
 		elections: Some(ElectionsConfig {
-			members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000))
+			members: extras.iter().map(|x| (x.1.clone(), 1000000))
+				.chain(commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)))
 				.chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
 				.collect(),
 			desired_seats: 13,
@@ -137,6 +161,9 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: identity_verifiers,
@@ -282,6 +309,9 @@ pub fn development_genesis(
 		}),
 		grandpa: Some(GrandpaConfig {
 			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
 		}),
 		identity: Some(IdentityConfig {
 			verifiers: initial_verifiers,

@@ -9,37 +9,40 @@ log = "0.4"
 tokio = "0.1.7"
 futures = "0.1"
 exit-future = "0.1"
-substrate-cli = { git = "https://github.com/hicommonwealth/substrate" }
+jsonrpc-core = "13.1.0"
+substrate-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 parity-codec = { package = "parity-scale-codec", version = "1.0.0" }
-sr-io = { git = "https://github.com/hicommonwealth/substrate" }
-client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate" }
-primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate" }
-inherents = { package = "substrate-inherents", git = "https://github.com/hicommonwealth/substrate" }
+sr-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+inherents = { package = "substrate-inherents", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 hex-literal = "0.2"
-substrate-basic-authorship = { git = "https://github.com/hicommonwealth/substrate" }
-substrate-service = { git = "https://github.com/hicommonwealth/substrate" }
-transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate" }
-network = { package = "substrate-network", git = "https://github.com/hicommonwealth/substrate" }
-aura = { package = "substrate-consensus-aura", git = "https://github.com/hicommonwealth/substrate" }
-aura_primitives = { package = "substrate-consensus-aura-primitives", git = "https://github.com/hicommonwealth/substrate" }
-grandpa = { package = "substrate-finality-grandpa", git = "https://github.com/hicommonwealth/substrate" }
-grandpa_primitives = { package = "substrate-finality-grandpa-primitives", git = "https://github.com/hicommonwealth/substrate" }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate" }
-substrate-keystore = { git = "https://github.com/hicommonwealth/substrate" }
-substrate-telemetry = { package = "substrate-telemetry", git = "https://github.com/hicommonwealth/substrate" }
+substrate-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+substrate-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+network = { package = "substrate-network", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+aura = { package = "substrate-consensus-aura", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+aura_primitives = { package = "substrate-consensus-aura-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+grandpa = { package = "substrate-finality-grandpa", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+grandpa_primitives = { package = "substrate-finality-grandpa-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+substrate-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+substrate-telemetry = { package = "substrate-telemetry", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 structopt = "0.2"
-transaction-factory = { git = "https://github.com/hicommonwealth/substrate" }
-keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate" }
-indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate" }
-timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate", default-features = false }
+transaction-factory = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 rand = "0.6"
-finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/hicommonwealth/substrate", default-features = false }
-contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate" }
-system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate" }
-balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate" }
+finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 
+edgeware-executor = { path = "../executor" }
 edgeware-service = { path = "../service" }
 edgeware-primitives = { path = "../primitives" }
+edgeware-rpc = { path = "../rpc" }
 edgeware-runtime = { path = "../runtime" }
 [build-dependencies]
 structopt = "0.2"

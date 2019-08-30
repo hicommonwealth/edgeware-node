@@ -29,6 +29,5 @@ use substrate_executor::native_executor_instance;
 native_executor_instance!(
 	pub Executor,
 	edgeware_runtime::api::dispatch,
-	edgeware_runtime::native_version,
-	edgeware_runtime::WASM_BINARY
+	edgeware_runtime::native_version
 );

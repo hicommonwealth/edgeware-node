@@ -1,6 +1,6 @@
 use edgeware_primitives::{BlockNumber, Balance, AuraId, AccountId};
 use grandpa::AuthorityId as GrandpaId;
-use im_online::{AuthorityId as ImOnlineId};
+use im_online::ed25519::{AuthorityId as ImOnlineId};
 use primitives::crypto::UncheckedInto;
 use hex_literal::hex;
 use serde::{Deserialize, Serialize};
@@ -192,6 +192,8 @@ pub fn get_more_endowed() -> Vec<AccountId> {
 		hex!["1a1ec9b100da17f4062f5b23d4c442d6845ac913ff7d6d1ef5357be688b4ef16"].unchecked_into(),
 		// 5HNVCZustH928S8mWbQWPcNfEQ5zipccQTiCDbYDrdSDno4f
 		hex!["eabcfa4431091ab5742e21164a2e24b0e0d6f3ab96018c002b0188c213272d47"].unchecked_into(),
+		// 5CrLFRMME6MbaFXrTUuHZ6VcS3RFHNwtqiP52f8BnEQTARVB
+		hex!["22CC8CEE58420B7FF445DC9D6AFAEFC33B658A5F3A26322BA8DAB2D3FB6D2F1F"].unchecked_into(),
 	];
 }
 

@@ -18,22 +18,22 @@
 
 /// Money matters.
 pub mod currency {
-    use edgeware_primitives::Balance;
+	use edgeware_primitives::Balance;
 
-    pub const MILLICENTS: Balance = 10_000_000_000_000;
-    pub const CENTS: Balance = 1_000 * MILLICENTS;    // assume this is worth about a cent.
-    pub const DOLLARS: Balance = 100 * CENTS;
+	pub const MILLICENTS: Balance = 10_000_000_000_000;
+	pub const CENTS: Balance = 1_000 * MILLICENTS;    // assume this is worth about a cent.
+	pub const DOLLARS: Balance = 100 * CENTS;
 }
 
 /// Time.
 pub mod time {
-    use edgeware_primitives::Moment;
-    pub const MILLISECS_PER_BLOCK: Moment = 6000;
-    pub const SECS_PER_BLOCK: Moment = MILLISECS_PER_BLOCK / 1000;
-    pub const MINUTES: Moment = 60 / SECS_PER_BLOCK;
-    pub const HOURS: Moment = MINUTES * 60;
-    pub const DAYS: Moment = HOURS * 24;
-    pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
+	use edgeware_primitives::{Moment, BlockNumber};
+	pub const MILLISECS_PER_BLOCK: Moment = 6000;
+	pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
+	// These times are defined in block numbers
+	pub const MINUTES: BlockNumber = 60_000 / (MILLISECS_PER_BLOCK as BlockNumber);
+	pub const HOURS: BlockNumber = MINUTES * 60;
+	pub const DAYS: BlockNumber = HOURS * 24;
 }
 
 // CRITICAL NOTE: The system module maintains two constants: a _maximum_ block weight and a
@@ -46,8 +46,8 @@ pub mod time {
 // the ratio that `system` module uses to find normal transaction quota.
 /// Fee-related.
 pub mod fee {
-    pub use runtime_primitives::Perbill;
+	pub use runtime_primitives::Perbill;
 
-    /// The block saturation level. Fees will be updates based on this value.
-    pub const TARGET_BLOCK_FULLNESS: Perbill = Perbill::from_percent(25);
+	/// The block saturation level. Fees will be updates based on this value.
+	pub const TARGET_BLOCK_FULLNESS: Perbill = Perbill::from_percent(25);
 }
