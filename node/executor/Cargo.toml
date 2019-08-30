@@ -7,28 +7,28 @@ edition = "2018"
 [dependencies]
 trie-root = "0.14.0"
 parity-codec = "4.1.1"
-runtime_io = { package = "sr-io", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-state_machine = { package = "substrate-state-machine", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-substrate-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-trie = { package = "substrate-trie", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+runtime_io = { package = "sr-io", git = "https://github.com/hicommonwealth/substrate.git" }
+state_machine = { package = "substrate-state-machine", git = "https://github.com/hicommonwealth/substrate.git" }
+substrate-executor = { git = "https://github.com/hicommonwealth/substrate.git" }
+primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate.git" }
+trie = { package = "substrate-trie", git = "https://github.com/hicommonwealth/substrate.git" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 
 [dev-dependencies]
-test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-runtime_primitives = { package = "sr-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-runtime_support = { package = "srml-support", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-session = { package = "srml-session", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-staking = { package = "srml-staking", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-treasury = { package = "srml-treasury", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-grandpa = { package = "srml-grandpa", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate.git" }
+keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git" }
+runtime_primitives = { package = "sr-primitives", git = "https://github.com/hicommonwealth/substrate.git" }
+runtime_support = { package = "srml-support", git = "https://github.com/hicommonwealth/substrate.git" }
+balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate.git" }
+session = { package = "srml-session", git = "https://github.com/hicommonwealth/substrate.git" }
+staking = { package = "srml-staking", git = "https://github.com/hicommonwealth/substrate.git" }
+system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate.git" }
+timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git" }
+treasury = { package = "srml-treasury", git = "https://github.com/hicommonwealth/substrate.git" }
+contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git" }
+grandpa = { package = "srml-grandpa", git = "https://github.com/hicommonwealth/substrate.git" }
+indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git" }
 wabt = "~0.7.4"
 
 [features]
