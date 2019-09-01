@@ -1,141 +1,189 @@
-# edgeware-node
+# edgeware-node - Luke's version to run a validator using Linode
 
-[Edgeware](https://edgewa.re) is an:
-- On-chain Governed,
-- Proof-of-Stake (PoS) Blockchain
-- with a WASM Runtime.
+Note: I have removed parts of the original Readme and only left the parts that I need.
+If you're a visitor to this repo, please refer to the original repo too first so you're not missing out on anything important.
 
-Developer resources are available at [edgewa.re/dev](https://edgewa.re/dev/) and more detailed documentation at our [Github Wiki](https://github.com/hicommonwealth/edgeware-node/wiki). For more details about the project, visit the Edgeware website, or check the [blog](blog.edgewa.re) or [Twitter](http://twitter.com/heyedgeware) for the latest. Finally, for discussion and governance, you can utilize [Commonwealth.im](https://commonwealth.im).
+## Setup Validator
 
-We are now pegged to: https://github.com/hicommonwealth/substrate.
+### Reminder about security for validators
+* Note: For Mainnet, setup additional safeguards such as cloud HSM that cost ~USD$5k upfront and ~USD$1.5k per month when significant amount to protect on keys (to avoid handing in keys and having DDOS protection)
 
-## To get started
+### Setup account and get testnet EDG
 
-- Download this entire repository to the file system that you are using to run the validator node.
-  - You can do this by going to [this page](https://github.com/hicommonwealth/edgeware-node) and selecting "Clone or download" followed by "Download ZIP".
-  - If you are installing via a command line interface (e.g. SSH into a remote server), you can dow-load by running `wget https://github.com/hicommonwealth/edgeware-node/archive/master.zip`
-  - Once you have downloaded the zip file, unzip the `edgeware-node-master` folder onto the file system. If you are using a command line interface, you can unzip by running `unzip master.zip`
-  - **_All commands referenced in this document need to be run from within the `edgeware-node-master` folder._**
+* Run `./scripts/keygen.sh` to generate an account address to be used on the testnet.
+You'll need to use that private session key with the `--key` (in the Dockerfile) to run a node and possibly be chosen as a validator through the on-chain bonding system (depends on how much is bonded and nominated to your address). See how you can run an RPC call below too.
 
-- You will also need to install `rust` and `cargo` by installing `rustup` [here](https://rustup.rs/).
-  - **_Note_**: at the end of the install, you will need to log out and log in again, or run the suggested `source` command to configure the current shell.
+  * Note: In the Genesis config, check if only Commonwealth authorities have the session keys configured https://github.com/hicommonwealth/edgeware-node/blob/master/node/service/src/chain_spec.rs#L78
 
-## Fresh start
-If your device is clean (such as a fresh cloud VM) you can use this script, otherwise, proceed with the *Initial Setup*.
-```
-./setup.sh
-```
-To create a keypair, install subkey with `cargo install --force --git https://github.com/paritytech/substrate subkey`. Then run the following:
-```
-subkey generate
-```
-To create an ED25519 keypair, run the following:
-```
-subkey -e generate
-```
-To create derived keypairs, use the mnemonic generated from a method above and run (use `-e` for ED25519):
-```
-subkey inspect "<mnemonic>"//<derive_path>
-```
-For example:
-```
-subkey inspect "west paper guide park design weekend radar chaos space giggle execute canoe"//edgewarerocks
-```
-Then proceed to the *Running* instructions or follow the instructions below for the manual setup.
+* Ask someone from Edgware in Discord for Testnet EDG tokens for the Stash and Controller accounts that you generated, and provide them with you testnet address (NOT your seed or mnemonic)
+  * Or try and request from https://faucets.blockxlabs.com/edgeware
 
-### Initial Setup
+### Create a Basic Linode Instance
 
-```
-curl https://sh.rustup.rs -sSf | sh
-rustup update stable
-rustup update nightly
-rustup target add wasm32-unknown-unknown --toolchain nightly
-cargo install --git https://github.com/alexcrichton/wasm-gc
-```
+Create a [Linode account](https://www.linode.com/?r=4dbc9d2dfa5ba217a93e48d74a5b230eb5810cc0)
 
-You will also need to install the following packages:
+Create Linode instance in Linode Manager
+* Select Nanode 1GB instance
+* Select node location - i.e. Singapore
+* Click Create
 
-Linux:
+Deploy an Image
+* Go to "Dashboard" of Linode instance
+* Click Deploy an Image
+* Select Ubuntu 18.04 LTS or Debian 10
+* Select Disk 25000 MB (note that 12 GB is insufficient)
+* Select Swap Disk 512 MB
+
+Boot Image
+* Go to "Dashboard" of Linode instance
+* Click "Boot"
+
+### Close repo to Host Machine
+
+* Clone https://github.com/ltfschoen/edgeware-node
+  ```
+  git clone git@github.com:ltfschoen/edgeware-node.git
+  ```
+* Change to cloned directory
+  ```
+  cd ~/code/src/ltfschoen/edgeware-node
+  ```
+
+### Copy directory from Host Machine to Linode Instance
+
+* Install Rsync on Remote Machine
 ```
-sudo apt install cmake pkg-config libssl-dev git clang libclang-dev
+ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE> "sh -c 'nohup apt install rsync > /dev/null 2>&1 &'"
 ```
 
-Mac:
+* Install Docker CE on Remote Machine
 ```
-brew install cmake pkg-config openssl git llvm
-```
-
-### Building
-
-```
-cargo build --release
+ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_SUBSTRATE> 'bash -s' < ./scripts/setup-docker.sh;
 ```
 
-### Running
+* Copy the cloned Edgeware directory to the Linode instance
 
-Ensure you have a fresh start if updating from another version:
 ```
-./scripts/purge-chain.sh
-```
-To start up the Edgeware node and connect to the latest testnet, run:
-```
-./target/release/edgeware --chain=edgeware-testnet-v8 --name <INSERT_NAME>
+rsync -az --verbose --progress --stats --exclude='.git/' ~/code/src/ltfschoen/edgeware-node root@139.162.31.81:/root;
 ```
 
-## Implemented Modules
+### SSH Auth into to the Linode Instance
 
-### Edge
+* Go to "Remote Access" of Linode instance
+* Copy the "SSH Access" command from the Linode UI. i.e. ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE>, or copy the IP Address of the Linode instance and run:
 
-* [Identity](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-identity)
-* [Voting](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-voting)
-* [Signaling](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-signaling)
-* [TreasuryReward](https://github.com/hicommonwealth/edgeware-node/tree/master/modules/edge-treasury-reward)
+```
+ssh-keygen -R <INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE>;
+ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE>
+```
 
-### SRML
-* [Aura](https://github.com/paritytech/hicommonwealth/tree/master/srml/aura)
-* [AuthorityDiscovery](https://github.com/paritytech/hicommonwealth/tree/master/srml/authority-discovery)
-* [Authorship](https://github.com/paritytech/hicommonwealth/tree/master/srml/authorship)
-* [Indices](https://github.com/paritytech/hicommonwealth/tree/master/srml/indices)
-* [Balances](https://github.com/paritytech/hicommonwealth/tree/master/srml/balances)
-* [Contracts](https://github.com/paritytech/hicommonwealth/tree/master/srml/contracts)
-* [Council](https://github.com/paritytech/hicommonwealth/tree/master/srml/council)
-* [Democracy](https://github.com/paritytech/hicommonwealth/tree/master/srml/democracy)
-* [Elections](https://github.com/paritytech/hicommonwealth/tree/master/srml/elections)
-* [FinalityTracker](https://github.com/paritytech/hicommonwealth/tree/master/srml/finality-tracker)
-* [Grandpa](https://github.com/paritytech/hicommonwealth/tree/master/srml/grandpa)
-* [ImOnline](https://github.com/paritytech/hicommonwealth/tree/master/srml/im-online)
-* [Offences](https://github.com/paritytech/hicommonwealth/tree/master/srml/offences)
-* [Session](https://github.com/paritytech/hicommonwealth/tree/master/srml/session)
-* [Staking](https://github.com/paritytech/hicommonwealth/tree/master/srml/staking)
-* [Sudo](https://github.com/paritytech/hicommonwealth/tree/master/srml/sudo)
-* [System](https://github.com/paritytech/hicommonwealth/tree/master/srml/system)
-* [Timestamp](https://github.com/paritytech/hicommonwealth/tree/master/srml/timestamp)
-* [Treasury](https://github.com/paritytech/hicommonwealth/tree/master/srml/treasury)
+### Create a Docker Container in the Linode Instance
 
-## Developing on Edgeware
+* Change to the Edgeware directory on the Linode Instance and create a Docker container
 
-### Running A Local Chain
+```
+cd edgeware-node;
+docker-compose up --force-recreate --build -d;
+```
 
-To run a chain locally for development purposes: `./target/release/edgeware --chain=local --alice --validator`
+### Access the Docker Container in the Linode Instance
 
-To allow apps in your browser to connect, as well as anyone else on your local network, add the `--rpc-cors=all` flag.
+```
+docker exec -it $(docker ps -q) bash;
+```
 
-To force your local to create new blocks, even if offline, add the `--force-authoring` flag.
+* Create root screen. Later create other windows (non-root) using the `screen` program by pressing CTRL + A + C so that when you close the terminal window, it does not close the original screen's process.
 
-### Adding A Module
+```
+edgeware --validator \
+  --chain "edgeware" \
+  --base-path "/root/edgeware" \
+  --execution both \
+  --key "<INSERT_ACCOUNT_RAW_SEED_WITHOUT_0x_PREFIX>" \
+  --keystore-path "/root/edgeware/keys" \
+  --name "🔥🔥🔥" \
+  --port 30333 \
+  --pruning 256 \
+  --rpc-port 9933 \
+  --ws-port 9944
+```
 
-1. Add its github repo to:
-  - [Cargo.toml](Cargo.toml)
-  - [node/runtime/Cargo.toml](node/runtime/Cargo.toml)
-  - [node/runtime/wasm/Cargo.toml](node/runtime/wasm/Cargo.toml) (be sure to have `default-features = false`)
-2. Changes to [the runtime](node/runtime/src/lib.rs):
-  - Add it as an `extern crate`.
-  - Implement its `Trait` with production types.
-  - Add it to the `construct_runtime` macro with all implemented components.
-3. If its storage contains `config` elements, then you need to modify [the chain spec](node/service/src/chain_spec.rs):
-  - Add it to the `edgeware_runtime`'s list of `Config` types.
-  - Add it to the `testnet_genesis` function, initializing all storage fields set to `config()`.
-4. Build and run the chain.
+* Check disk spaced used by chain
+
+```
+du -hs /root/edgeware-node
+```
+
+* Check if listed as validator in Telemetry at https://telemetry.polkadot.io/#list/Edgeware%20Testnet%20V7
+* Check if the displayed "Aura Key" shown in the keygen output matches the Telemetry output
+* Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
+* Check that you're earning staking rewards when running session keyed validator. See what's shown under "Additional bonded by nominators" or "Commission"
+
+### View Node Information
+
+Open a Bash Terminal tab and SSH into Linode
+```
+ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE>
+```
+
+Access Docker container with Bash prompt
+```
+docker exec -it $(docker ps -q) bash;
+```
+
+View Disk Usage of Substrate chain DB
+```
+du -hs /root/edgeware-node
+```
+
+### Share Chain Database
+
+* Zip latest chain (i.e. if user on MacOS wants to share latest chain, just zip it)
+
+```
+tar -cvzf 2019-08-01-db-edgeware.tar.gz "/Users/Ls/Library/Application Support/Edgeware/chains/edgeware/db"
+```
+
+* Share zip file with your friend
+
+* Copy latest chain to Linode
+
+```
+rsync -avz "/Users/Ls/Library/Application Support/Edgeware/chains/edgeware/db/2019-08-01-db-edgeware.tar.gz" root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_SUBSTRATE_OR_POLKADOT>:/root/edgeware
+```
+
+### Show System Information of Linode Instance
+
+```
+cd /root/edgeware-node/scripts;
+bash system-info.sh
+```
+
+### Show Docker Information of Linode Instance
+
+```
+cd /root/edgeware-node/scripts;
+bash docker-info.sh
+```
+
+### Destroy all Docker Images and Containers on the Linode Instance
+
+```
+cd /root/edgeware-node/scripts;
+bash docker-destroy.sh
+```
+
+### Creation of Additional Nodes
+
+Creation of additional Edgeware Nodes should use a different `--base-path`, have a different name, run on a different port `--port` (i.e. initial node `30333`, second node `30334`, etc), and the `--bootnodes` should include details of other initial nodes shown in Bash Terminal (i.e. `--bootnodes 'enode://QmPLDpxxhYL7dBiaHH26YqzXjLaaADoa4ShJSDnufgPpm1@127.0.0.1:30333'`)
+
+## Setup Nominator
+
+* Nominators go through the on-chain nomination system. https://wiki.polkadot.network/en/latest/polkadot/node/nominator/. Try using the Polkadot.js Apps front-end
+
+## Launch Date
+
+Edgeware launches 15th Sept 2019
 
 ## Session Key Setup
 If you plan to validate on Edgeware or a testnet with any non-default keys, then you will need to store the keys so that the node has access to them, for signing transactions and authoring new blocks. Keys in Edgeware are stored in the keystore in the file system. To store keys into this keystore, you need to use one of the two provided RPC calls. If your keys are encrypted or should be encrypted by the keystore, you need to provide the key using one of the cli arguments --password, --password-interactive or --password-filename.
@@ -152,3 +200,31 @@ If the Session keys need to match a fixed seed, they can be set individually key
 curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["KEY_TYPE", "SEED"],"id":1 }' localhost:9933
 ```
 `KEY_TYPE` - needs to be replaced with the 4-character key type identifier. `SEED` - is the seed of the key.
+
+### Troubleshooting
+
+Note that the following may no longer be necessary since there have been upates to the Edgeware repo.
+
+* Use `--no-telemetry` if get error: `Rejected log entry because queue is full for`
+and to fix the stuck 100% cpu issue (since Telemetry turned on by default).
+Unless Cargo.lock already updated to use the fixed code in the substrate-telemetry package
+
+* Prevent logs stopping or not syncing by increasing the username's per process limit by adding line just above `# End of file` and after doing the following restart computer
+    ```
+    ulimit -a
+    sudo vi /etc/security/limits.conf
+    username soft nofile 10240
+    sudo reboot now
+    ```
+
+## Misc Resources
+  * https://edgewa.re
+  * https://edgewa.re/dev/
+  * https://github.com/hicommonwealth/edgeware-node/wiki
+  * blog.edgewa.re
+  * http://twitter.com/heyedgeware
+  * Discussion and governance https://commonwealth.im [Commonwealth.im](https://commonwealth.im)
+  * https://github.com/hicommonwealth/edgeware-node
+  * https://medium.com/@meleacrypto (Edgeware Validator Guide)
+  * https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-validate/
+  * https://github.com/ltfschoen/polkadot-linode

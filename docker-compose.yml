@@ -1,0 +1,12 @@
+version: '3'
+services:
+  edgeware:
+    build:
+      context: .
+    ports:
+      - "127.0.0.1:30333:30344/tcp"
+      - "127.0.0.1:9933:9944/tcp"
+    image: edgeware-sandbox:latest
+    volumes:
+      - ".:/data"
+    command: tail -f /dev/null
