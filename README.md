@@ -94,12 +94,14 @@ docker exec -it $(docker ps -q) bash;
 
 * Create root screen. Later create other windows (non-root) using the `screen` program by pressing CTRL + A + C so that when you close the terminal window, it does not close the original screen's process.
 
+* Run Edgware Validator node. Use the `--no-telemetry` to not use Telemetry, which is enabled by default
+
 ```
 edgeware --validator \
   --chain "edgeware" \
   --base-path "/root/edgeware" \
   --execution both \
-  --key "<INSERT_ACCOUNT_RAW_SEED_WITHOUT_0x_PREFIX>" \
+  --key "<INSERT_ACCOUNT_RAW_SEED_WITHOUT_0x_PREFIX>" or //0x_session_private_key \
   --keystore-path "/root/edgeware/keys" \
   --name "🔥🔥🔥" \
   --port 30333 \
@@ -107,6 +109,12 @@ edgeware --validator \
   --rpc-port 9933 \
   --ws-port 9944
 ```
+
+
+Note: If you use the `--key` flag, ensure that either it is a 32-byte hex string
+or prefixed with `//` as shown flag set to the session account private key.
+The stash is already bonded. See W3F Polkadot Docs.
+Try also running `--chain=edgeware-testnet-v8` or `--ws-external` if necessary.
 
 * Check disk spaced used by chain
 
@@ -118,6 +126,10 @@ du -hs /root/edgeware-node
 * Check if the displayed "Aura Key" shown in the keygen output matches the Telemetry output
 * Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
 * Check that you're earning staking rewards when running session keyed validator. See what's shown under "Additional bonded by nominators" or "Commission"
+
+### Interact with Edgeware Node
+
+* TBC - Use Edgeware's polkadot.js.org Apps equivalent
 
 ### View Node Information
 
