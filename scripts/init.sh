@@ -11,14 +11,6 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
     $SUDO_PREFIX apt-get update
     $SUDO_PREFIX apt-get install -y build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev
     $SUDO_PREFIX apt-get install -y vim unzip screen sudo
-
-    # Setup Docker CE. See https://github.com/ltfschoen/polkadot-linode/blob/master/setup-docker.sh
-    apt-get install -y apt-transport-https ca-certificates curl software-properties-common;
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -;
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic test";
-    apt-get -y update && apt-get -y upgrade;
-    apt-get install -y docker-ce docker-compose;
-    docker --version;
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Found macbook"
     brew install cmake pkg-config openssl git llvm
