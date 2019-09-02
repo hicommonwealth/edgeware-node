@@ -100,6 +100,8 @@ screen -S root
 * Run Edgware Validator node in the root screen
 
 ```
+cd /usr/local/bin;
+
 edgeware --validator \
   --base-path "/root/edgeware" \
   --chain "edgeware-testnet-v8" \
@@ -160,7 +162,7 @@ docker exec -it $(docker ps -q) bash;
 
 View Disk Usage of Substrate chain DB
 ```
-du -hs /root/edgeware-node
+du -hs /root/edgeware/chains/edgeware_testnet/db
 ```
 
 ### Share Chain Database
