@@ -92,29 +92,38 @@ docker-compose up --force-recreate --build -d;
 docker exec -it $(docker ps -q) bash;
 ```
 
-* Create root screen. Later create other windows (non-root) using the `screen` program by pressing CTRL + A + C so that when you close the terminal window, it does not close the original screen's process.
+* Create root screen (`apt-get update; apt-get install screen -y`)
+```
+screen -S root
+```
 
-* Run Edgware Validator node. Use the `--no-telemetry` to not use Telemetry, which is enabled by default
+* Run Edgware Validator node in the root screen
 
 ```
 edgeware --validator \
-  --chain "edgeware" \
   --base-path "/root/edgeware" \
+  --chain "edgeware-testnet-v8" \
   --execution both \
-  --key "<INSERT_ACCOUNT_RAW_SEED_WITHOUT_0x_PREFIX>" or //0x_session_private_key \
   --keystore-path "/root/edgeware/keys" \
-  --name "🔥🔥🔥" \
+  --name "Luke MXC 🔥🔥🔥" \
+  --node-key "000000000000000000000000000000000000000000000000000000000000000" \
+  --node-key-type ed25519 \
+  --password "mypassword" \
   --port 30333 \
-  --pruning 256 \
   --rpc-port 9933 \
+  --telemetry-url ws://telemetry.polkadot.io:1024 \
   --ws-port 9944
 ```
 
+Now create another terminal tabs (non-root screen) using the screen program by pressing CTRL + A + C. Then close the whole terminal window (all screens at once) and it won't close the original screen's actual process. Major disadvantage: There isn't any notification to tell you if you see your node goes offline, apart from receiving an email notification from your VPS or it no longer appearing on telemetry. If that happens restart it.
 
-Note: If you use the `--key` flag, ensure that either it is a 32-byte hex string
-or prefixed with `//` as shown flag set to the session account private key.
-The stash is already bonded. See W3F Polkadot Docs.
-Try also running `--chain=edgeware-testnet-v8` or `--ws-external` if necessary.
+Note: If you use the `--node-key` flag, ensure that either it is a 32-byte hex string (Aura pubkey, but without the 0x prefix) or prefixed with `//` as shown flag set to the session account private key.
+If you provide the session key incorrectly, it'll give you an error like: `Error starting the node: Invalid node key: Invalid input length`
+For extra security, I "think" you should load your session key from a file (instead of exposing it to bash history) so create a file, add your session key
+in it on the first line, and then add a line `--node-key-file "/root/edgeware/keys/mysessionkeyfile" \` (instead of `--node-key`).
+Also create a keystore password file and include your password in it, then load it with `--password-filename <PATH>` instead of using `--password "mypassword" \`
+See `edgeware --help`, and also see section "Session Key Setup" at the end of this README.
+The stash is already bonded. See W3F Polkadot Docs including https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-validate/
 
 * Check disk spaced used by chain
 
@@ -122,7 +131,7 @@ Try also running `--chain=edgeware-testnet-v8` or `--ws-external` if necessary.
 du -hs /root/edgeware-node
 ```
 
-* Check if listed as validator in Telemetry at https://telemetry.polkadot.io/#list/Edgeware%20Testnet%20V7
+* Check if listed as validator in Telemetry at https://telemetry.polkadot.io/#list/Edgeware%20Testnet
 * Check if the displayed "Aura Key" shown in the keygen output matches the Telemetry output
 * Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
 * Check that you're earning staking rewards when running session keyed validator. See what's shown under "Additional bonded by nominators" or "Commission"
