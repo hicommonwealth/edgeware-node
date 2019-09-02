@@ -10,23 +10,23 @@ use std::io::Read;
 use hex::FromHex;
 
 #[derive(Serialize, Deserialize)]
-struct Spec {
+struct Allocation {
     balances: Vec<(String, String)>,
     vesting: Vec<(String, u32, u32, String)>,
     validators: Vec<(String, String, String, String)>,
 }
 
-pub fn get_spec_allocation() 
+pub fn get_allocation() 
 	-> Result<(
 		Vec<(AccountId, Balance)>,
 		Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 		Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)>
 	)> {
-    let mut file = File::open("node/service/src/spec.json").unwrap();
+    let mut file = File::open("node/service/src/allocation.json").unwrap();
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
 
-	let json: Spec = serde_json::from_str(&data)?;;
+	let json: Allocation = serde_json::from_str(&data)?;;
 	let balances_json = json.balances;
 	let vesting_json = json.vesting;
 	let validators_json = json.validators;
