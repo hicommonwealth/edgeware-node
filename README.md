@@ -136,6 +136,10 @@ du -hs /root/edgeware-node
 * Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
 * Check that you're earning staking rewards when running session keyed validator. See what's shown under "Additional bonded by nominators" or "Commission"
 
+### Consider setting up an IP Failover solution
+
+See https://www.linode.com/docs/platform/manager/remote-access/#configuring-ip-sharing.
+
 ### Interact with Edgeware Node
 
 * TBC - Use Edgeware's polkadot.js.org Apps equivalent
