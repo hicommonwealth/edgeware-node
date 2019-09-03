@@ -3,6 +3,12 @@
 Note: I have removed parts of the original Readme and only left the parts that I need.
 If you're a visitor to this repo, please refer to the original repo too first so you're not missing out on anything important.
 
+## TODO
+
+* Subkey supports password-protecting the keys now https://substrate.dev/docs/en/next/ecosystem/subkey#password-protected-keys, which wasn't available a few months ago, so early adopters of Edgware keys may wish to transfer their funds to another account that has password protection after Edgeware activates of token transfers- https://substrate.dev/docs/en/next/ecosystem/subkey 
+* Unlock tool to unlock your locked ETH https://commonwealth.im/#!/unlock
+* Blogpost on how to be an Edgeware beta-net and mainnet Validator https://commonwealth.im/#!/edgeware-testnet/proposal/discussion/20
+
 ## Setup Validator
 
 ### Reminder about security for validators
