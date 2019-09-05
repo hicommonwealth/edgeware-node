@@ -47,7 +47,7 @@ pub trait Trait: staking::Trait + treasury::Trait + balances::Trait {
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
-		fn deposit_event<T>() = default;
+		fn deposit_event() = default;
 		/// Mint money for the treasury!
 		fn on_finalize(_n: T::BlockNumber) {
 			// Set the start of the first era.

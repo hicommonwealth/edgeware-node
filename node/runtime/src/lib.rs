@@ -53,6 +53,7 @@ use substrate_primitives::OpaqueMetadata;
 use grandpa::{AuthorityId as GrandpaId, AuthorityWeight as GrandpaWeight};
 use finality_tracker::{DEFAULT_REPORT_LATENCY, DEFAULT_WINDOW_SIZE};
 use im_online::ed25519::{AuthorityId as ImOnlineId};
+use system::offchain::TransactionSubmitter;
 
 #[cfg(any(feature = "std", test))]
 pub use runtime_primitives::BuildStorage;
@@ -85,12 +86,12 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
-	authoring_version: 13,
+	authoring_version: 14,
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 18,
-	impl_version: 18,
+	spec_version: 19,
+	impl_version: 19,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -401,11 +402,13 @@ impl sudo::Trait for Runtime {
 	type Proposal = Call;
 }
 
+type SubmitTransaction = TransactionSubmitter<ImOnlineId, Runtime, UncheckedExtrinsic>;
+
 impl im_online::Trait for Runtime {
 	type AuthorityId = ImOnlineId;
 	type Call = Call;
 	type Event = Event;
-	type UncheckedExtrinsic = UncheckedExtrinsic;
+	type SubmitTransaction = SubmitTransaction;
 	type ReportUnresponsiveness = Offences;
 	type CurrentElectedSet = staking::CurrentElectedStashAccounts<Runtime>;
 }
