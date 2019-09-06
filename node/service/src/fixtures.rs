@@ -22,7 +22,7 @@ pub fn get_allocation()
 		Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 		Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)>
 	)> {
-    let mut file = File::open("node/service/src/allocation.json").unwrap();
+    let mut file = File::open("node/service/src/genesis.json").unwrap();
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
 
