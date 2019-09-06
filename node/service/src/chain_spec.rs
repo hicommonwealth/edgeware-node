@@ -35,7 +35,6 @@ use sr_primitives::{
 use core::convert::TryInto;
 use rand::{thread_rng};
 
-
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const DEFAULT_PROTOCOL_ID: &str = "edg";
 
