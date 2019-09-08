@@ -70,7 +70,7 @@ ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_SUBSTRATE> 'bash -s' < ./scripts/set
 * Copy the cloned Edgeware directory to the Linode instance
 
 ```
-rsync -az --verbose --progress --stats --exclude='.git/' ~/code/src/ltfschoen/edgeware-node root@139.162.31.81:/root;
+rsync -az --verbose --progress --stats ~/code/src/ltfschoen/edgeware-node root@139.162.31.81:/root;
 ```
 
 ### SSH Auth into to the Linode Instance
@@ -88,9 +88,11 @@ ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE>
 * Change to the Edgeware directory on the Linode Instance and create a Docker container
 
 ```
-cd edgeware-node;
-docker-compose up --force-recreate --build -d;
+cd edgeware-node; docker-compose up --force-recreate --build -d;
 ```
+
+
+Note: Or try `ssh root@139.162.31.81 "sh -c 'cd edgeware-node; docker-compose up --force-recreate --build -d; > /dev/null 2>&1 &'"` if you keep getting broken pipe errors connecting via SSH and then running the commands
 
 ### Access the Docker Container in the Linode Instance
 
@@ -114,9 +116,8 @@ edgeware --validator \
   --execution both \
   --keystore-path "/root/edgeware/keys" \
   --name "Luke MXC 🔥🔥🔥" \
-  --node-key "000000000000000000000000000000000000000000000000000000000000000" \
+  --node-key "f32e2e27708256fa5bcf7633856fc1ea15a965d4a09d1087051f36fd589b8162" \
   --node-key-type ed25519 \
-  --password "mypassword" \
   --port 30333 \
   --rpc-port 9933 \
   --telemetry-url ws://telemetry.polkadot.io:1024 \
