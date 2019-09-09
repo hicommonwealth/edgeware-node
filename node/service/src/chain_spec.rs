@@ -71,10 +71,6 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let extras = vec![
 		get_authority_keys_from_seed("Alice"),
 		get_authority_keys_from_seed("Bob"),
-		get_authority_keys_from_seed("Charlie"),
-		get_authority_keys_from_seed("Dave"),
-		get_authority_keys_from_seed("Eve"),
-		get_authority_keys_from_seed("Ferdie"),
 	];
 
     let mut session_keys = extras.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
@@ -115,7 +111,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: 7,
+			validator_count: 3,
 			minimum_validator_count: 0,
 			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), ENDOWMENT, StakerStatus::Validator))
 				// .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
