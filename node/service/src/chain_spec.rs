@@ -41,15 +41,15 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
-pub fn edgeware_testnet_v7_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.7.0/edgeware.json")) {
+pub fn edgeware_testnet_v8_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.8.0/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
 }
 
-pub fn edgeware_testnet_v8_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.8.0/edgeware.json")) {
+pub fn edgeware_testnet_v9_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.9.0/edgeware.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
@@ -78,7 +78,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	];
 
     let mut session_keys = extras.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
-    	.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+    	// .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
 		// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
 		.collect::<Vec<_>>();
 	// session_keys.shuffle(&mut rng);
@@ -115,31 +115,32 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: 25,
+			validator_count: 7,
 			minimum_validator_count: 0,
 			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), ENDOWMENT, StakerStatus::Validator))
-				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+				// .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				.collect(),
-			invulnerables: extras.iter().map(|x| (x.0.clone()))
-				.chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
+			invulnerables: vec![],
+				// extras.iter().map(|x| (x.0.clone()))
+				// .chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
 				// .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
-				.collect(),
+				// .collect(),
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
 		collective_Instance1: Some(CouncilConfig {
 			members: extras.iter().map(|x| x.1.clone())
-				.chain(commonwealth_authorities.iter().map(|x| x.1.clone()))
-				.chain(endowed_accounts.iter().map(|x| x.clone()))
+				// .chain(commonwealth_authorities.iter().map(|x| x.1.clone()))
+				// .chain(endowed_accounts.iter().map(|x| x.clone()))
 				.collect(),
 			phantom: Default::default(),
 		}),
 		elections: Some(ElectionsConfig {
 			members: extras.iter().map(|x| (x.1.clone(), 1000000))
-				.chain(commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)))
-				.chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
+				// .chain(commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000)))
+				// .chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
 				.collect(),
 			desired_seats: 13,
 			presentation_duration: (2 * DAYS).try_into().unwrap(),
@@ -182,10 +183,16 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 /// Edgeware testnet generator
 pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![
-		"/ip4/157.230.218.41/tcp/30333/p2p/QmNYiKrVuztYuL42gs5kHLTqvKsmEnE3GvJQ8ewcvwtSVF".to_string(),
-		"/ip4/18.223.143.102/tcp/30333/p2p/QmdHoon1jbjeJfTdifknGefGrJHUNYgDDpnJBLLW1Pdt13".to_string(),
-		"/ip4/206.189.33.216/tcp/30333/p2p/QmNc7rakvWY1QL6LL9ssTfKTWUhHUfzMvygYdyMLpLQCR7".to_string(),
-		"/ip4/157.230.125.18/tcp/30333/p2p/QmTqM3sPbeaE7R2WaveJNg1Ma86dSFPTBHXxYSNjwcii1x".to_string(),
+	    "/ip4/108.61.209.73/tcp/30333/p2p/QmeufKtv4KgAQUAUcWvagyFy7skrmSavKYNWYsP1MkJg2N".to_string(),
+	    "/ip4/45.77.93.189/tcp/30333/p2p/QmZh6bVocFNJznraiETnjDVXvmiBDwhMRjc36Ej677L3sf".to_string(),
+	    "/ip4/45.76.17.97/tcp/30333/p2p/QmdcteLq4pnzxikcGUrTNrdZT4cepMMBb8r4CBtwC7q9ZK".to_string(),
+	    "/ip4/44.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
+	    "/ip4/96.30.192.236/tcp/30333/p2p/QmUkAMzwRrxD3gzMWSXgoGxPkWbnLk72KoTmENVVbBneZB".to_string(),
+	    "/ip4/45.77.78.68/tcp/30333/p2p/QmeFzPbhp6HZEZkwnkAyoiUFN7Kr3NcDdD3HEPWq5XSNH3".to_string(),
+	    "/ip4/45.32.139.96/tcp/30333/p2p/QmNmmJGNah4RCNaiwPuv19T4haJGLcbKnU3Rx6phJHq5c6".to_string(),
+	    "/ip4/66.42.79.81/tcp/30333/p2p/QmW9PtASCawTG2SzsTnqEasaAv1FVjM7HJ56dZFyBKBuiC".to_string(),
+	    "/ip4/45.77.108.5/tcp/30333/p2p/QmT1LLofb3p8LJBwMmenzoDgvUzs18hnciXEvTsEi71AQn".to_string(),
+	    "/ip4/144.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
 	];
 
 	Ok(ChainSpec::from_genesis(
