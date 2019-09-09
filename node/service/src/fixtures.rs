@@ -58,7 +58,11 @@ pub fn get_spec_allocation()
 	Ok((balances, vesting, validators))
 }
 
-pub fn get_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
+pub fn get_commonwealth_validators() -> -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
+	return vec![];
+}
+
+pub fn get_testnet_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
 	return vec![(
 		// 5DvWxEcMP66DgHigGm2eTTg4pPueDMMDS5F67ixK2WpCTKMU
 		hex!["5239cc265b2d7ac6dad6b640a28a64ce5e09b7de22fd0549c2d282d461da260e"].unchecked_into(),
