@@ -29,7 +29,7 @@ You'll need to use that private session key with the `--key` (in the Dockerfile)
 Create a [Linode account](https://www.linode.com/?r=4dbc9d2dfa5ba217a93e48d74a5b230eb5810cc0)
 
 Create Linode instance in Linode Manager
-* Select Nanode 1GB instance
+* Select Linode 4GB instance (2 CPU)
 * Select node location - i.e. Singapore
 * Click Create
 
@@ -37,12 +37,35 @@ Deploy an Image
 * Go to "Dashboard" of Linode instance
 * Click Deploy an Image
 * Select Ubuntu 18.04 LTS or Debian 10
-* Select Disk 25000 MB (note that 12 GB is insufficient)
-* Select Swap Disk 512 MB
+* Select Disk 80000 MB (note that 12 GB is insufficient)
+* Select Swap Disk 512 MB (you'll reduce your disk space and use it to increase your swap later)
 
 Boot Image
 * Go to "Dashboard" of Linode instance
 * Click "Boot"
+
+### Increas Swap Space
+
+https://www.linode.com/community/questions/9449/swap-resize-via-linode-manager
+
+* Below assumes you're on the Linode Standard 4GB Plan, which has swap set to 512MB by default.
+We're going to increase Swap space to 16 GB (should be at least 8 GB for a validator)
+* Power off linode instance (so it's not running), go to "Advanced" section called "Disks"
+  * Click the triple-dot icon next to "Debian 10 Disk" 81408 MB, 
+    * Change to 81408 - 16384 = 65024
+    * Wait for the size to update
+    * Click the triple-dot icon next to "512 MB Swap Image", choose "Resize", change from 512 to 16896
+* Power On the Linode again, enter the following when you're SSHed in again to see that it increased `cat /proc/swaps`
+```
+root@localhost:~# cat /proc/swaps
+Filename				Type		Size	Used	Priority
+/dev/sdb                                partition	17301500	0	-2
+```
+
+If you get the following error, it may have been due to incorrect swap size, but i'm not sure. This error triggered me to increase swap size:
+```
+Thread '<unnamed>' panicked at 'Due to validation `initial` and `maximum` should be valid: Memory("mmap returned an error")', src/libcore/result.rs:999
+```
 
 ### Close repo to Host Machine
 
@@ -70,7 +93,7 @@ ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_SUBSTRATE> 'bash -s' < ./scripts/set
 * Copy the cloned Edgeware directory to the Linode instance
 
 ```
-rsync -az --verbose --progress --stats ~/code/src/ltfschoen/edgeware-node root@139.162.31.81:/root;
+rsync -az --verbose --progress --stats ~/code/src/ltfschoen/edgeware-node root@<IP_ADDRESS>:/root;
 ```
 
 ### SSH Auth into to the Linode Instance
@@ -88,11 +111,17 @@ ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_EDGEWARE>
 * Change to the Edgeware directory on the Linode Instance and create a Docker container
 
 ```
+apt-get update; apt-get install screen -y;
+screen -S root;
+
 cd edgeware-node; docker-compose up --force-recreate --build -d;
 ```
 
-
-Note: Or try `ssh root@139.162.31.81 "sh -c 'cd edgeware-node; docker-compose up --force-recreate --build -d; > /dev/null 2>&1 &'"` if you keep getting broken pipe errors connecting via SSH and then running the commands
+Note:
+* Re-attach to a screen with `screen -r`
+* Switch between screens CTRL+A
+* Exit a screen with CTRL+A+D (MacOS)
+Reference: https://linuxize.com/post/how-to-use-linux-screen/
 
 ### Access the Docker Container in the Linode Instance
 
@@ -100,60 +129,176 @@ Note: Or try `ssh root@139.162.31.81 "sh -c 'cd edgeware-node; docker-compose up
 docker exec -it $(docker ps -q) bash;
 ```
 
+### Sync to latest block
+
 * Create root screen (`apt-get update; apt-get install screen -y`)
 ```
+apt-get update; apt-get install screen -y;
 screen -S root
 ```
 
-* Run Edgware Validator node in the root screen
+* Sync to the latest block. Ensure that you sync without using the `--validator` flag.
+Switch out of screen with CTRL+A+D
 
 ```
 cd /usr/local/bin;
 
-edgeware --validator \
-  --base-path "/root/edgeware" \
+edgeware --base-path "/root/edgeware" \
   --chain "edgeware-testnet-v8" \
-  --execution both \
   --keystore-path "/root/edgeware/keys" \
   --name "Luke MXC 🔥🔥🔥" \
-  --node-key "f32e2e27708256fa5bcf7633856fc1ea15a965d4a09d1087051f36fd589b8162" \
-  --node-key-type ed25519 \
   --port 30333 \
   --rpc-port 9933 \
   --telemetry-url ws://telemetry.polkadot.io:1024 \
   --ws-port 9944
 ```
 
+### Validator Setup
+
+Luke's notes when following the Validating on Edgeware v0.8.0 Guide https://github.com/hicommonwealth/edgeware-node/wiki/Validating-on-Edgeware-v0.8.0
+
+Note: The stash of validators from the lockdrop should already be bonded in https://github.com/hicommonwealth/edgeware-node/blob/master/node/service/src/genesis.json
+
+* Prerequisites
+  * https://github.com/hicommonwealth/edgeware-node/wiki/Validating-on-Edgeware-v0.8.0#pre-requisites
+
+Note: Testnet v0.8.0 isn't auto-bonded, you have to use the edgeware-cli. Its permissionless. The stash balances are there, just not bonded/staked
+Note: You need EDG to be in your stash, and your controller will have existential balance to make the required transactions that include: bonding your stash to your controller, and using your controller to set the session keys and validator settings, and then load the sessions keys into the node's keystore, and you're off to the races.
+
+* Bond the stash
+
+Note that you need to access the Docker Container again to do this with the following first:
+```
+docker exec -it $(docker ps -q) bash;
+
+apt-get install -y nodejs npm && \
+npm install edgeware-cli
+/bin/edge -r edgeware -s <STASH_SEED> staking bond <CONTROLLER_PUBLIC_KEY_HEX> <AMOUNT> <REWARD_DESTINATION>
+/usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s "some words here some words here"//Stash staking bond 0x... 1000000000000000000 stash
+```
+Note: Be sure to check case when entering <STASH_SEED> (i.e. //Stash or //stash)
+Note: You can recover key information with `subkey inspect...`
+Note: <CONTROLLER_B58_ADDRESS> should actually be the Controller public key (hex)m, not 5...
+Note: If it works, it should say "Transfer status: Ready", then just press Ctrl-C
+Note: You need to set a controller for bonding tokens on-chain
+Note: In lockdrop there was only one "hot" session key called "authority", but now there are three "hot" session keys that you need to be a validator "aura", "grandpa", and "imonline", so you need to generate them.
+
+```
+/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate <UNSTAKE_THRESHOLD> <VALIDATOR_PAYMENT>
+/usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate 3 0
+```
+Note: If it worked it should output "Making tx: staking.validate(["3","0"]) Transfer status: Ready"
+
+```
+/bin/edge -r edgeware -s <CONTROLLER_SEED> session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
+/usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s "..."//Controller session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
+```
+Note: If it works it should output the associated addresses of your aura, gran, and imon session keys (hot keys) as follows:
+```
+[ [ '5...',
+    '5...',
+    '5...' ],
+  Uint8Array [  ] ]
+Transfer status: Ready
+```
+* Definitions
+  * Grandpa - finalising
+  * Aura - authoring
+  * ImOnline (heartbeat) - signs a transaction that your validator is online to the chain
+* Note: you can't use `rotateKeys` instead of manually generating 3x session keys as mentioned in the guide. someone used `rotateKeys` first and had the slashing issue, but then I created each session key separately, added them to node's keystore, and now my validator seems to work properly.
+  * `rotateKeys` gives you one long string which you have to split into 3 keys and then add 0x at the start
+
+If Edgware node is already running and synced to latest block but you can't access the screen with `screen -r`, then run `ps -a`, and kill the process ID (PID) with name `edgeware` process with `kill -9 <PID>` so you can restart it again but with the validator flag `--validator` 
+
+### Run Validator
+
+* Must use `--no-telemetry` otherwise it kills itself
+```
+edgeware --validator \
+  --base-path "/root/edgeware" \
+  --chain "edgeware-testnet-v8" \
+  --keystore-path "/root/edgeware/keys" \
+  --port 30333 \
+  --rpc-port 9933 \
+  --ws-port 9944 \
+  --no-telemetry
+```
+
+Wait until synced to latest block, then exit to different screen with CTRL+A+D, and set the session keys
+
+Insert each session key that you generated with subkey into your node's keystore.
+Note that you need to access the Docker Container again to do this with the following first:
+```
+docker exec -it $(docker ps -q) bash;
+
+curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["aura", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
+curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["gran", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
+curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["imon", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
+```
+CTRL+D to Exit
+Then enter `screen -r` to switch back to the validator logs.
+
+Note: See section "Session Key Setup" at the end of this README for more info.
+Note: Stash and controller are "cold" keys. Aura, Gran (Grandpa), and Imon (Imonline) are "hot" keys
+
+You should now see yourself in the list of newly/pending validators to go into effect in future sessions. In the next era (up to 1 hour), if there is a slot available, your node will become an active validator.
+
 Now create another terminal tabs (non-root screen) using the screen program by pressing CTRL + A + C. Then close the whole terminal window (all screens at once) and it won't close the original screen's actual process. Major disadvantage: There isn't any notification to tell you if you see your node goes offline, apart from receiving an email notification from your VPS or it no longer appearing on telemetry. If that happens restart it.
 
-Note: If you use the `--node-key` flag, ensure that either it is a 32-byte hex string (Aura pubkey, but without the 0x prefix) or prefixed with `//` as shown flag set to the session account private key.
-If you provide the session key incorrectly, it'll give you an error like: `Error starting the node: Invalid node key: Invalid input length`
-For extra security, I "think" you should load your session key from a file (instead of exposing it to bash history) so create a file, add your session key
-in it on the first line, and then add a line `--node-key-file "/root/edgeware/keys/mysessionkeyfile" \` (instead of `--node-key`).
-Also create a keystore password file and include your password in it, then load it with `--password-filename <PATH>` instead of using `--password "mypassword" \`
-See `edgeware --help`, and also see section "Session Key Setup" at the end of this README.
-The stash is already bonded. See W3F Polkadot Docs including https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-validate/
+* Other notes:
+
+Note: DO NOT use the `--node-key` flag.
+Note: If you provide the session key incorrectly, it'll give you an error like: `Error starting the node: Invalid node key: Invalid input length`
+Note: Clear bash history after entering your keys with `history -c; rm ~/.bash_history`
+Note: If you setup a password with `subkey`, then create a keystore password file and include your password in it, then load it with `--password-filename <PATH>` instead of using `--password "mypassword" \`
+
+### Check Validator Status
+
+* Check you're validator node is healthy and sending online ping events to the network each session to prevent slashing at https://polkascan.io/pre/edgeware-testnet/event, then for the recent sessions imonline heartbeat events. Check to see if one of them shows your "imon" session key's public key. You first need to be bonded, and a validator in the current session, otherwise your node is just passive.
+  * Alternatively, uou could just send a transaction, and even if it fails, you know you're connected if it shows as a failed tx.
 
 * Check disk spaced used by chain
-
 ```
 du -hs /root/edgeware-node
 ```
-
-* Check if listed as validator in Telemetry at https://telemetry.polkadot.io/#list/Edgeware%20Testnet
+* Note: New validators are entered every 10 blocks. See them here https://polkascan.io/pre/edgeware-testnet/session/session. Initially the only validators listed appeared to be Edgeware-owned because they were auto-bonded. there's no staking/bond transactions associated with them, as one that was bonded did the set keys/validate setting transactions in the reverse order of the documentation (i.e. https://polkascan.io/pre/edgeware-testnet/account/5G9UbiviqfuShqjmVqFAUr4BAxWk8KZh4ho9RW2ZoE1rZZnE). All of the validators have "validatorPayment": 0, which is based on the amount you choose to give to nominators. Validator's cannot be auto-bonded unless it's sure they're online at genesis or else the network stalls
+* Check the bond shows up on Polkascan
+* Check bonded amount https://polkascan.io/pre/edgeware-testnet/session/validator
+* Watch the logs and check if you get slashed or not https://polkascan.io/pre/edgeware-testnet/session/validator/8461-12
+* Check slashed amount https://polkascan.io/pre/edgeware-testnet/event/35350-1 
+* Check available Staking commands via CLI `./bin/edge -r edgeware staking list`. View Storage methods for different SRML modules here: https://polkadot.js.org/api/METHODS_STORAGE.html
+* Check if listed in Telemetry when running node before disabling Telemetry when run validator https://telemetry.polkadot.io/#list/Edgeware%20Testnet
 * Check if the displayed "Aura Key" shown in the keygen output matches the Telemetry output
 * Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
+* Check account balance, e.g. https://polkascan.io/pre/edgeware-testnet/account/5DP33MYJsMJi8FNfKHRMAPoGJ4rvNLt5o7CA4MumJPE1GDVE
 * Check that you're earning staking rewards when running session keyed validator. See what's shown under "Additional bonded by nominators" or "Commission"
+
+### Interact with Edgeware Node
+
+* Edgeare UI - Use Edgeware's polkadot.js.org Apps equivalent
+  * Go to https://polkadot.js.org/apps/#/settings
+  * Toggle Custom Endpoint button
+  * Enter wss://testnet1.edgewa.re, and choose Substrate Address prefix, and then click "Save & Reload"?
+  * Add Custom Edgware Types by going to https://polkadot.js.org/apps/#/settings/developer and replacing `{}` with the contents of this Gist: https://gist.github.com/drewstone/cee02c503107d06badbdc49bea35c526
+
+* Edgeware CLI - https://github.com/hicommonwealth/edgeware-cli
+
+### Eras vs Epochs/Sessions vs Slots
+
+* you can see Eras and Epochs/Sessions changing in the Substrate/Polkadot UI here https://polkadot.js.org/apps/#/explorer.
+* Eras comprise of a number of Sessions/Epochs (where Sessions are coupled to Epochs).
+* Epochs have a duration that's measured in a number of Slots.
+* Slots are part of BABE (block authoring) and are measured in milliseconds.
+* Relevant Substrate interfaces values you'd use to calculate it include, SessionsPerEra from the Staking, EpochDuration from Babe, SlotDuration from Aura
+* Latest metadata from Substrate that's used for the front-end https://github.com/polkadot-js/api/blob/master/packages/types/src/Metadata/v7/static-substrate.json. Shown under "Substrate interfaces" in the API Reference docs https://polkadot.js.org/api/api/#api-selection
+https://substrate.dev/docs/en/overview/glossary#transaction-era
+* Polkascan here https://polkascan.io/pre/edgeware-testnet/session/session shows the Session ID associated with each Block Number, and then click the "Details" button for a specific Block Number, and the "Details" page will include the associated Era
 
 ### Consider setting up an IP Failover solution
 
 See https://www.linode.com/docs/platform/manager/remote-access/#configuring-ip-sharing. But have to somehow protect from double-signing. Say you have two linodes with IP failover detects it should switch after linode1 signs one block, and linode2 signs a different one just after. Credit: @fress
 
 An alternative solution using a different VPS with failover is here: https://medium.com/hackernoon/a-serverless-failover-solution-for-web-3-0-validator-nodes-e26b9d24c71d
-
-### Interact with Edgeware Node
-
-* TBC - Use Edgeware's polkadot.js.org Apps equivalent
 
 ### View Node Information
 
@@ -178,6 +323,10 @@ du -hs /root/edgeware/chains/edgeware_testnet/db
 
 ```
 tar -cvzf 2019-08-01-db-edgeware.tar.gz "/Users/Ls/Library/Application Support/Edgeware/chains/edgeware/db"
+```
+
+```
+tar -cvzf 2019-09-09-db-edgeware.tar.gz "~/edgeware/chains/edgeware_testnet/db"
 ```
 
 * Share zip file with your friend
@@ -237,7 +386,42 @@ curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"au
 ```
 `KEY_TYPE` - needs to be replaced with the 4-character key type identifier. `SEED` - is the seed of the key.
 
-### Troubleshooting
+### Systemd Setup
+
+INCOMPLETE, ask @gnossienli for help. More info https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-systemd/
+
+* Systemd Process Setup. Run `systemctl status edgeware.service`, `sudo journalctl -f -u edgeware` after setup with:
+
+```
+[Unit]
+Description=edgeware Node
+After=network-online.target
+
+[Service]
+User=root
+WorkingDirectory=/home/root/edgeware-node
+ExecStart=/root/edgeware-node/target/release/edgeware --chain=edgeware-testnet-v8 --name edge  
+
+Restart=always
+RestartSec=3
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
+```
+
+* Output should be:
+```
+● edgeware.service - edgeware Node
+Loaded: loaded (/etc/systemd/system/edgeware.service; enabled; vendor preset: enabled)
+Active: active (running) since Fri 2019-09-06 11:54:05 UTC; 5s ago
+Main PID: 21574 (edgeware)
+  Tasks: 1 (limit: 4915)
+CGroup: /system.slice/edgeware.service
+        └─21574 /root/edgeware-node/target/release/edgeware --chain=edgeware-testnet-v8 --name edge
+```
+
+### Troubleshooting / FAQ
 
 Note that the following may no longer be necessary since there have been upates to the Edgeware repo.
 
@@ -253,8 +437,35 @@ Unless Cargo.lock already updated to use the fixed code in the substrate-telemet
     sudo reboot now
     ```
 
+* If you're getting `Killed` shown in the stdout (i.e. `kernel out of memory error` in the syslog) then try getting synced to latest block with or without the `--validator` flag, then check you have around 2 CPU / 4 GB RAM (1 GB RAM is insufficient to run a node). View how much CPU % and RAM is being used when you're not is syncing to the latest block with Telemetry (but turn off when want to validate). Try also increasing your Swap to at least 8 GB
+  * See https://github.com/hicommonwealth/edgeware-node/issues/93, and https://github.com/hicommonwealth/edgeware-node/issues/98
+
+* If it's crashing when you're running with `--validator` then make sure you've turned off Telemetry with `--no-telemetry` (since it's not so efficient with memory and occasionally uses up too much CPU, and use Polkascan instead to check you're node is sending online ping events to the network each session to prevent slashing)
+
+* If you get an `InvalidAuthoritiesSet` related error, then don't use the flag `--execution "both"`
+
+* What do to after being slashed?
+
+Install latest edgeware-node
+Install latest edgeware-cli
+Purge chain if necessary
+Create and insert new session keys into node
+Purge chain db before re-running
+Check sufficient swap available space
+Check sufficient hard drive available space 
+
+* What are minimum hardware specs to be a validator?
+
+4GB/2CPU with 8GB swap and `--no-telemetry`
+2GB/2CPU with 16GB swap and `--no-telemetry`
+Note: Users have reported being killed using 8GB RAM but without an swap and `--no-telemetry`.
+Note: You'll usually use 3.5GB memory, as shown consistently on Telemetry
+Note: Using 1GB RAM on VPS is insufficient, it'll become unresponsive or crash
+
 ## Misc Resources
   * https://edgewa.re
+  * https://edgewa.re/lockdrop/
+  * https://blog.edgewa.re/edgeware-lockdrop-for-validators/
   * https://edgewa.re/dev/
   * https://github.com/hicommonwealth/edgeware-node/wiki
   * blog.edgewa.re
@@ -263,6 +474,8 @@ Unless Cargo.lock already updated to use the fixed code in the substrate-telemet
   * https://github.com/hicommonwealth/edgeware-node
   * https://medium.com/@meleacrypto (Edgeware Validator Guide)
   * https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-validate/
+  * https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-systemd/
   * https://github.com/ltfschoen/polkadot-linode
   * https://github.com/luboremo/Edgeware-seed-generating-script-SSSS
   * https://wiki.polkadot.network/en/latest/polkadot/node/node-operator/#security-key-management
+  * Validating discussion https://commonwealth.im/#!/edgeware-testnet/proposal/discussion/20
