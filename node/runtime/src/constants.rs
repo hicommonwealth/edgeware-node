@@ -28,7 +28,7 @@ pub mod currency {
 /// Time.
 pub mod time {
 	use edgeware_primitives::{Moment, BlockNumber};
-	pub const MILLISECS_PER_BLOCK: Moment = 1000;
+	pub const MILLISECS_PER_BLOCK: Moment = 6000;
 	pub const SLOT_DURATION: Moment = MILLISECS_PER_BLOCK;
 	// These times are defined in block numbers
 	pub const MINUTES: BlockNumber = 60_000 / (MILLISECS_PER_BLOCK as BlockNumber);

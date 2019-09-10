@@ -202,12 +202,6 @@ impl authorship::Trait for Runtime {
 	type EventHandler = Staking;
 }
 
-parameter_types! {
-	// pub const Period: BlockNumber = 60 * MINUTES;
-	pub const Period: BlockNumber = 10;
-	pub const Offset: BlockNumber = 0;
-}
-
 type SessionHandlers = (Grandpa, Aura, ImOnline, AuthorityDiscovery);
 
 impl_opaque_keys! {
@@ -227,6 +221,12 @@ impl_opaque_keys! {
 // TODO: Introduce some structure to tie these together to make it a bit less of a footgun. This
 // should be easy, since OneSessionHandler trait provides the `Key` as an associated type. #2858
 
+parameter_types! {
+	// pub const Period: BlockNumber = 60 * MINUTES;
+	pub const Period: BlockNumber = 10;
+	pub const Offset: BlockNumber = 0;
+}
+
 impl session::Trait for Runtime {
 	type OnSessionEnding = Staking;
 	type SessionHandler = SessionHandlers;
@@ -244,7 +244,7 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 6;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 2;
 	// number of eras to bond where eras are 1 hour long
 	// Mainnet genesis bonding duration
 	// pub const BondingDuration: staking::EraIndex = 24 * 21;
@@ -459,7 +459,6 @@ impl identity::Trait for Runtime {
 impl treasury_reward::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
-	type Time = Timestamp;
 }
 
 impl system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for Runtime {

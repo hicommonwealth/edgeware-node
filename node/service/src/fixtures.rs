@@ -58,7 +58,7 @@ pub fn get_spec_allocation()
 	Ok((balances, vesting, validators))
 }
 
-pub fn get_commonwealth_validators() -> -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
+pub fn get_mainnet_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
 	return vec![];
 }
 

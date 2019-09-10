@@ -56,7 +56,14 @@ pub fn edgeware_testnet_v9_config() -> ChainSpec {
 }
 
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
-	let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_commonwealth_validators();
+	let commonwealth_authorities: Vec<(
+		AccountId,
+		AccountId,
+		AuraId,
+		Balance,
+		GrandpaId,
+		ImOnlineId
+	)> = get_testnet_commonwealth_validators();
 	let spec = get_spec_allocation().unwrap();
 	let lockdrop_balances = spec.0;
 	let lockdrop_vesting = spec.1;
@@ -71,6 +78,10 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let extras = vec![
 		get_authority_keys_from_seed("Alice"),
 		get_authority_keys_from_seed("Bob"),
+		get_authority_keys_from_seed("Charlie"),
+		get_authority_keys_from_seed("Dave"),
+		get_authority_keys_from_seed("Eve"),
+		get_authority_keys_from_seed("Ferdie"),
 	];
 
     let mut session_keys = extras.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
@@ -111,7 +122,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: 3,
+			validator_count: 6,
 			minimum_validator_count: 0,
 			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), ENDOWMENT, StakerStatus::Validator))
 				// .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
@@ -122,7 +133,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 				// .chain(commonwealth_authorities.iter().map(|x| x.0.clone()))
 				// .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
 				// .collect(),
-			slash_reward_fraction: Perbill::from_percent(10),
+			slash_reward_fraction: Perbill::from_percent(0),
 			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
@@ -171,6 +182,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 158 * DOLLARS,
 			minting_interval: One::one(),
 		}),
 	}
@@ -179,16 +191,16 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 /// Edgeware testnet generator
 pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![
-	    "/ip4/108.61.209.73/tcp/30333/p2p/QmeufKtv4KgAQUAUcWvagyFy7skrmSavKYNWYsP1MkJg2N".to_string(),
-	    "/ip4/45.77.93.189/tcp/30333/p2p/QmZh6bVocFNJznraiETnjDVXvmiBDwhMRjc36Ej677L3sf".to_string(),
-	    "/ip4/45.76.17.97/tcp/30333/p2p/QmdcteLq4pnzxikcGUrTNrdZT4cepMMBb8r4CBtwC7q9ZK".to_string(),
-	    "/ip4/44.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
-	    "/ip4/96.30.192.236/tcp/30333/p2p/QmUkAMzwRrxD3gzMWSXgoGxPkWbnLk72KoTmENVVbBneZB".to_string(),
-	    "/ip4/45.77.78.68/tcp/30333/p2p/QmeFzPbhp6HZEZkwnkAyoiUFN7Kr3NcDdD3HEPWq5XSNH3".to_string(),
-	    "/ip4/45.32.139.96/tcp/30333/p2p/QmNmmJGNah4RCNaiwPuv19T4haJGLcbKnU3Rx6phJHq5c6".to_string(),
-	    "/ip4/66.42.79.81/tcp/30333/p2p/QmW9PtASCawTG2SzsTnqEasaAv1FVjM7HJ56dZFyBKBuiC".to_string(),
-	    "/ip4/45.77.108.5/tcp/30333/p2p/QmT1LLofb3p8LJBwMmenzoDgvUzs18hnciXEvTsEi71AQn".to_string(),
-	    "/ip4/144.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
+	    // "/ip4/108.61.209.73/tcp/30333/p2p/QmeufKtv4KgAQUAUcWvagyFy7skrmSavKYNWYsP1MkJg2N".to_string(),
+	    // "/ip4/45.77.93.189/tcp/30333/p2p/QmZh6bVocFNJznraiETnjDVXvmiBDwhMRjc36Ej677L3sf".to_string(),
+	    // "/ip4/45.76.17.97/tcp/30333/p2p/QmdcteLq4pnzxikcGUrTNrdZT4cepMMBb8r4CBtwC7q9ZK".to_string(),
+	    // "/ip4/44.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
+	    // "/ip4/96.30.192.236/tcp/30333/p2p/QmUkAMzwRrxD3gzMWSXgoGxPkWbnLk72KoTmENVVbBneZB".to_string(),
+	    // "/ip4/45.77.78.68/tcp/30333/p2p/QmeFzPbhp6HZEZkwnkAyoiUFN7Kr3NcDdD3HEPWq5XSNH3".to_string(),
+	    // "/ip4/45.32.139.96/tcp/30333/p2p/QmNmmJGNah4RCNaiwPuv19T4haJGLcbKnU3Rx6phJHq5c6".to_string(),
+	    // "/ip4/66.42.79.81/tcp/30333/p2p/QmW9PtASCawTG2SzsTnqEasaAv1FVjM7HJ56dZFyBKBuiC".to_string(),
+	    // "/ip4/45.77.108.5/tcp/30333/p2p/QmT1LLofb3p8LJBwMmenzoDgvUzs18hnciXEvTsEi71AQn".to_string(),
+	    // "/ip4/144.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
 	];
 
 	Ok(ChainSpec::from_genesis(
@@ -325,6 +337,7 @@ pub fn development_genesis(
 			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 158 * DOLLARS,
 			minting_interval: One::one(),
 		}),
 	}
