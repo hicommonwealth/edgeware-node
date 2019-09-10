@@ -179,7 +179,16 @@ npm install edgeware-cli
 Note: Be sure to check case when entering <STASH_SEED> (i.e. //Stash or //stash)
 Note: You can recover key information with `subkey inspect...`
 Note: <CONTROLLER_B58_ADDRESS> should actually be the Controller public key (hex)m, not 5...
-Note: If it works, it should say "Transfer status: Ready", then just press Ctrl-C
+Note: If it works, it should say the following. Then you just go to Polkascan, view your Stash public key SS58, and it'll show the transaction hash listed 
+```
+Making tx: staking.bond(["<CONTROLLER_PUBLIC_KEY_HEX>","<AMOUNT>","stash"])
+Transfer status: Ready
+Transfer status: Broadcast
+Transfer status: Finalized
+Completed at block hash <HASH>
+Events:
+	 {"ApplyExtrinsic":2} : system.ExtrinsicSuccess []
+```
 Note: You need to set a controller for bonding tokens on-chain
 Note: In lockdrop there was only one "hot" session key called "authority", but now there are three "hot" session keys that you need to be a validator "aura", "grandpa", and "imonline", so you need to generate them.
 
@@ -187,7 +196,17 @@ Note: In lockdrop there was only one "hot" session key called "authority", but n
 /bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate <UNSTAKE_THRESHOLD> <VALIDATOR_PAYMENT>
 /usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate 3 0
 ```
-Note: If it worked it should output "Making tx: staking.validate(["3","0"]) Transfer status: Ready"
+Note: If it worked it should output:
+```
+Making tx: staking.validate(["3","0"])
+Transfer status: Ready
+Transfer status: Broadcast
+Transfer status: Finalized
+Completed at block hash <HASH>
+Events:
+	 {"ApplyExtrinsic":2} : system.ExtrinsicSuccess []
+```
+
 
 ```
 /bin/edge -r edgeware -s <CONTROLLER_SEED> session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
@@ -200,6 +219,12 @@ Note: If it works it should output the associated addresses of your aura, gran, 
     '5...' ],
   Uint8Array [  ] ]
 Transfer status: Ready
+Transfer status: Broadcast
+Transfer status: Finalized
+Completed at block hash <HASH>
+Events:
+	 {"ApplyExtrinsic":2} : system.ExtrinsicSuccess []
+
 ```
 * Definitions
   * Grandpa - finalising
@@ -235,6 +260,7 @@ curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"au
 curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["gran", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
 curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["imon", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
 ```
+The output from each curl request should be: `{"jsonrpc":"2.0","result":"0x...","id":1}`
 CTRL+D to Exit
 Then enter `screen -r` to switch back to the validator logs.
 
