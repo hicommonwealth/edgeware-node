@@ -72,7 +72,8 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	// Add controller accounts to endowed accounts
 	let endowed_accounts = get_more_endowed();
 	let identity_verifiers = get_identity_verifiers();
-	const ENDOWMENT: Balance = 10 * DOLLARS;
+	// const ENDOWMENT: Balance = 1_000_000_000 * DOLLARS;
+	const ENDOWMENT: Balance = 1_000_000_000 * DOLLARS;
 	// randomize the session keys
 	let mut rng = thread_rng();
 	let extras = vec![
@@ -182,7 +183,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
-			current_payout: 158 * DOLLARS,
+			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		}),
 	}
