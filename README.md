@@ -176,6 +176,13 @@ npm install edgeware-cli
 /bin/edge -r edgeware -s <STASH_SEED> staking bond <CONTROLLER_PUBLIC_KEY_HEX> <AMOUNT> <REWARD_DESTINATION>
 /usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s "some words here some words here"//Stash staking bond 0x... 1000000000000000000 stash
 ```
+
+
+Note: 1000000000000000000 is equivalent to 1 testEDG (testnet EDG token)
+Note: Later you can Bond Extra with. See https://github.com/paritytech/substrate/blob/master/srml/staking/src/lib.rs#L744:
+  ```
+  /bin/edge -r edgeware -s <STASH_SEED> staking bondExtra <AMOUNT>
+  ```
 Note: Be sure to check case when entering <STASH_SEED> (i.e. //Stash or //stash)
 Note: You can recover key information with `subkey inspect...`
 Note: <CONTROLLER_B58_ADDRESS> should actually be the Controller public key (hex)m, not 5...
