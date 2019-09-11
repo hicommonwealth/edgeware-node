@@ -55,6 +55,107 @@ pub fn edgeware_testnet_v9_config() -> ChainSpec {
 	}
 }
 
+pub fn edgeware_mainnet_config_gensis() -> GenesisConfig {
+	let authorities: Vec<(
+		AccountId,
+		AccountId,
+		AuraId,
+		Balance,
+		GrandpaId,
+		ImOnlineId
+	)> = get_mainnet_validators();
+	let spec = get_spec_allocation().unwrap();
+	let lockdrop_balances = spec.0;
+	let lockdrop_vesting = spec.1;
+	let lockdrop_validators = spec.2;
+	let root_key = get_mainnet_root_key();
+	// Add controller accounts to endowed accounts
+	let endowed_accounts = get_more_endowed();
+	let identity_verifiers = get_identity_verifiers();
+	let election_members = get_election_members();
+
+    let mut session_keys = authorities
+    	.iter()
+    	.map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
+		.collect::<Vec<_>>();
+
+	GenesisConfig {
+		system: Some(SystemConfig {
+			code: WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		balances: Some(BalancesConfig {
+			balances: authorities.iter().map(|x| (x.0.clone(), x.3.clone()))
+				.chain(lockdrop_balances.iter().map(|x| (x.0.clone(), x.1.clone())))
+				.collect(),
+			vesting: lockdrop_vesting,
+		}),
+		indices: Some(IndicesConfig {
+			ids: authorities.iter().map(|x| x.0.clone())
+				.chain(authorities.iter().map(|x| x.1.clone()))
+				.chain(lockdrop_balances.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
+		}),
+		session: Some(SessionConfig {
+			keys: session_keys,
+		}),
+		staking: Some(StakingConfig {
+			current_era: 0,
+			validator_count: 60,
+			minimum_validator_count: 0,
+			stakers: authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
+				.chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
+				.collect(),
+			invulnerables: vec![],
+			slash_reward_fraction: Perbill::from_percent(0),
+			.. Default::default()
+		}),
+		democracy: Some(DemocracyConfig::default()),
+		collective_Instance1: Some(CouncilConfig {
+			members: authorities.iter().map(|x| x.1.clone()).collect(),
+			phantom: Default::default(),
+		}),
+		elections: Some(ElectionsConfig {
+			members: election_members.iter().map(|x| (x.1.clone(), 6 * 28 * DAYS)).collect(),
+			desired_seats: 6,
+			presentation_duration: (21 * DAYS).try_into().unwrap(),
+			term_duration: (6 * 28 * DAYS).try_into().unwrap(),
+		}),
+		contracts: Some(ContractsConfig {
+			current_schedule: Default::default(),
+			gas_price: 1 * MILLICENTS,
+		}),
+		sudo: Some(SudoConfig {
+			key: root_key,
+		}),
+		im_online: Some(ImOnlineConfig {
+			keys: vec![],
+		}),
+		aura: Some(AuraConfig {
+			authorities: vec![],
+		}),
+		grandpa: Some(GrandpaConfig {
+			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
+		}),
+		identity: Some(IdentityConfig {
+			verifiers: identity_verifiers,
+			expiration_length: (7 * DAYS).try_into().unwrap(), // 1 days
+			registration_bond: 1 * DOLLARS,
+		}),
+		signaling: Some(SignalingConfig {
+			voting_length: (14 * DAYS).try_into().unwrap(), // 7 days
+			proposal_creation_bond: 100 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
+			minting_interval: One::one(),
+		}),
+	}
+}
+
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let commonwealth_authorities: Vec<(
 		AccountId,
@@ -74,6 +175,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let identity_verifiers = get_identity_verifiers();
 	// const ENDOWMENT: Balance = 1_000_000_000 * DOLLARS;
 	const ENDOWMENT: Balance = 10 * DOLLARS;
+	const EXTRAS_ENDOWMENT: Balance = 3_000_000_000 * DOLLARS;
 	// randomize the session keys
 	let mut rng = thread_rng();
 	let extras = vec![
@@ -101,7 +203,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned()
 				.map(|k| (k, ENDOWMENT))
-				.chain(extras.iter().map(|x| (x.0.clone(), ENDOWMENT)))
+				.chain(extras.iter().map(|x| (x.0.clone(), EXTRAS_ENDOWMENT)))
 				// give authorities their balances
 				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
 				// give controllers an endowment
@@ -125,7 +227,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			current_era: 0,
 			validator_count: 6,
 			minimum_validator_count: 0,
-			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), ENDOWMENT, StakerStatus::Validator))
+			stakers: extras.iter().map(|x| (x.0.clone(), x.1.clone(), EXTRAS_ENDOWMENT, StakerStatus::Validator))
 				// .chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
 				.collect(),

@@ -156,10 +156,7 @@ impl indices::Trait for Runtime {
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
 	// Mainnet genesis tx fee
-	// pub const TransferFee: Balance = 999999999 * DOLLARS;
-	
-	// Testnet genesis tx fee
-	pub const TransferFee: Balance = 1 * DOLLARS;
+	pub const TransferFee: Balance = 999999999 * DOLLARS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -222,8 +219,7 @@ impl_opaque_keys! {
 // should be easy, since OneSessionHandler trait provides the `Key` as an associated type. #2858
 
 parameter_types! {
-	// pub const Period: BlockNumber = 60 * MINUTES;
-	pub const Period: BlockNumber = 10;
+	pub const Period: BlockNumber = 60 * MINUTES;
 	pub const Offset: BlockNumber = 0;
 }
 
@@ -244,13 +240,9 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 2;
-	// number of eras to bond where eras are 1 hour long
-	// Mainnet genesis bonding duration
-	// pub const BondingDuration: staking::EraIndex = 24 * 21;
-	
-	// Testnet genesis bonding duration
-	pub const BondingDuration: staking::EraIndex = 24 * 1;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 10;
+	// Mainnet genesis bonding duration - number of eras to bond where eras are 1 hour long
+	pub const BondingDuration: staking::EraIndex = 24 * 21;
 }
 
 impl staking::Trait for Runtime {
@@ -267,18 +259,12 @@ impl staking::Trait for Runtime {
 }
 
 parameter_types! {
-	// pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	// pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	// pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
-	// pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	// pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
-	// pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const LaunchPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
-	pub const VotingPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
-	pub const EmergencyVotingPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
+	pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
-	pub const CooloffPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
+	pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
+	pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
 }
 
 impl democracy::Trait for Runtime {
@@ -342,14 +328,10 @@ impl elections::Trait for Runtime {
 }
 
 parameter_types! {
-	// pub const ProposalBond: Permill = Permill::from_percent(2);
-	// pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	// pub const SpendPeriod: BlockNumber = 14 * DAYS;
-	// pub const Burn: Permill = Permill::from_percent(10);
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
-	pub const Burn: Permill = Permill::from_percent(10);
+	pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	pub const Burn: Permill = Permill::from_percent(0);
 }
 
 impl treasury::Trait for Runtime {
@@ -366,7 +348,7 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 1 * CENTS;
+	pub const ContractTransferFee: Balance = 999999999 * DOLLARS;
 	pub const ContractCreationFee: Balance = 1 * CENTS;
 	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;

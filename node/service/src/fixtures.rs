@@ -58,7 +58,7 @@ pub fn get_spec_allocation()
 	Ok((balances, vesting, validators))
 }
 
-pub fn get_mainnet_commonwealth_validators() -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
+pub fn get_mainnet_validators() -> Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> {
 	return vec![];
 }
 
@@ -213,3 +213,11 @@ pub fn get_root_key() -> AccountId {
 	return hex!["40e8f152a7015fb3867e7c108514029942ef9004602d0f3a5f8061a54dfa6f35"].unchecked_into();
 }
 
+pub fn get_mainnet_root_key() -> AccountId {
+	// 5DXp7vdd8uS5HnodyNzXhE7oGrJWh7PpVa3DzwoAtRH66SMv
+	return hex!["40e8f152a7015fb3867e7c108514029942ef9004602d0f3a5f8061a54dfa6f35"].unchecked_into();
+}
+
+pub fn get_election_members() -> Vec<AccountId> {
+	return vec![];
+}
