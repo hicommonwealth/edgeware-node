@@ -73,7 +73,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 	let endowed_accounts = get_more_endowed();
 	let identity_verifiers = get_identity_verifiers();
 	// const ENDOWMENT: Balance = 1_000_000_000 * DOLLARS;
-	const ENDOWMENT: Balance = 1_000_000_000 * DOLLARS;
+	const ENDOWMENT: Balance = 10 * DOLLARS;
 	// randomize the session keys
 	let mut rng = thread_rng();
 	let extras = vec![
