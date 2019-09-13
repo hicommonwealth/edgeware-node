@@ -65,8 +65,6 @@ pub use staking::StakerStatus;
 
 use im_online::ed25519::{AuthorityId as ImOnlineId, AuthoritySignature as ImOnlineSignature};
 use authority_discovery_primitives::{AuthorityId as EncodedAuthorityId, Signature as EncodedSignature};
-use runtime_primitives::traits::{Convert, Saturating};
-use runtime_primitives::Fixed64;
 use core::convert::TryInto;
 use codec::{Encode, Decode};
 
@@ -156,7 +154,7 @@ impl indices::Trait for Runtime {
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
 	// Mainnet genesis tx fee
-	pub const TransferFee: Balance = 999999999 * DOLLARS;
+	pub const TransferFee: Balance = 9999999999 * DOLLARS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -305,7 +303,7 @@ parameter_types! {
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = (1 * MINUTES).try_into().unwrap();
+	pub const ElectionsVotingPeriod: BlockNumber = 14 * DAYS;
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -348,7 +346,7 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 999999999 * DOLLARS;
+	pub const ContractTransferFee: Balance = 9999999999 * DOLLARS;
 	pub const ContractCreationFee: Balance = 1 * CENTS;
 	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;

@@ -29,6 +29,10 @@ pub enum ChainSpec {
 	EdgewareTestnetV8,
 	/// Edgeware testnet configuration (intermediate build process)
 	EdgewareTestnetConfiguration,
+	/// Edgeware mainnet configuration (intermediate build process)
+	EdgewareMainnetConfiguration,
+	/// Edgeware Mainnet
+	EdgewareMainnet,
 }
 
 impl Default for ChainSpec {
@@ -41,6 +45,8 @@ impl Default for ChainSpec {
 impl ChainSpec {
 	pub(crate) fn load(self) -> Result<service::chain_spec::ChainSpec, String> {
 		Ok(match self {
+			ChainSpec::EdgewareMainnet => service::chain_spec::edgeware_mainnet(),
+			ChainSpec::EdgewareMainnetConfiguration => service::chain_spec::edgeware_mainnet_config()?,
 			ChainSpec::EdgewareTestnetConfiguration => service::chain_spec::edgeware_testnet_config()?,
 			ChainSpec::EdgewareTestnetV8 => service::chain_spec::edgeware_testnet_v8_config(),
 			ChainSpec::EdgewareTestnetV9 => service::chain_spec::edgeware_testnet_v9_config(),
@@ -53,7 +59,9 @@ impl ChainSpec {
 		match s {
 			"dev" => Some(ChainSpec::Development),
 			"local" => Some(ChainSpec::LocalTestnet),
-			"edge" => Some(ChainSpec::EdgewareTestnetConfiguration),
+			"edgeware-mainnet-conf" => Some(ChainSpec::EdgewareMainnetConfiguration),
+			"edgeware" => Some(ChainSpec::EdgewareMainnet),
+			"edgeware-testnet-conf" => Some(ChainSpec::EdgewareTestnetConfiguration),
 			"edgeware-testnet-v9" => Some(ChainSpec::EdgewareTestnetV9),
 			"edgeware-testnet-v8" => Some(ChainSpec::EdgewareTestnetV8),
 			"" => Some(ChainSpec::default()),

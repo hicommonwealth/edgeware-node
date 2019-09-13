@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-service"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
