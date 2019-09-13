@@ -670,7 +670,7 @@ dependencies = [
 
 [[package]]
 name = "edge-signaling"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "edge-voting 1.0.0",
  "parity-scale-codec 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -853,7 +853,7 @@ name = "edgeware-runtime"
 version = "1.0.0"
 dependencies = [
  "edge-identity 1.0.0",
- "edge-signaling 0.1.0",
+ "edge-signaling 1.0.0",
  "edge-treasury-reward 1.0.0",
  "edge-voting 1.0.0",
  "edgeware-primitives 1.0.0",

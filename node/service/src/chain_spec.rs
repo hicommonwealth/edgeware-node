@@ -54,13 +54,6 @@ pub fn edgeware_testnet_v8_config() -> ChainSpec {
 	}
 }
 
-pub fn edgeware_testnet_v9_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.9.0/edgeware.json")) {
-		Ok(spec) => spec,
-		Err(e) => panic!(e),
-	}
-}
-
 /// The generation script for the recommended mainnet genesis configuration
 pub fn edgeware_mainnet_config_gensis() -> GenesisConfig {
 	// commonwealth founder allocation
