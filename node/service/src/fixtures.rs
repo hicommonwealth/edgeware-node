@@ -16,7 +16,7 @@ struct Allocation {
     validators: Vec<(String, String, String, String)>,
 }
 
-pub fn get_allocation() 
+pub fn get_spec_allocation() 
 	-> Result<(
 		Vec<(AccountId, Balance)>,
 		Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,

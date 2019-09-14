@@ -492,7 +492,6 @@ construct_runtime!(
 		Contracts: contracts,
 		Sudo: sudo,
 		ImOnline: im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
-		AuthorityDiscovery: authority_discovery::{Module, Call, Config<T>},
 		Offences: offences::{Module, Call, Storage, Event},
 		AuthorityDiscovery: authority_discovery::{Module, Call, Config<T>},
 		Identity: identity::{Module, Call, Storage, Config<T>, Event<T>},

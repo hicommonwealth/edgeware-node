@@ -337,16 +337,16 @@ pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 /// Edgeware mainnet generator
 pub fn edgeware_mainnet_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![
-		"/ip4/108.61.209.73/tcp/30333/p2p/QmeufKtv4KgAQUAUcWvagyFy7skrmSavKYNWYsP1MkJg2N".to_string(),
-		"/ip4/45.77.93.189/tcp/30333/p2p/QmZh6bVocFNJznraiETnjDVXvmiBDwhMRjc36Ej677L3sf".to_string(),
-		"/ip4/45.76.17.97/tcp/30333/p2p/QmdcteLq4pnzxikcGUrTNrdZT4cepMMBb8r4CBtwC7q9ZK".to_string(),
-		"/ip4/44.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
-		"/ip4/96.30.192.236/tcp/30333/p2p/QmUkAMzwRrxD3gzMWSXgoGxPkWbnLk72KoTmENVVbBneZB".to_string(),
-		"/ip4/45.77.78.68/tcp/30333/p2p/QmeFzPbhp6HZEZkwnkAyoiUFN7Kr3NcDdD3HEPWq5XSNH3".to_string(),
-		"/ip4/45.32.139.96/tcp/30333/p2p/QmNmmJGNah4RCNaiwPuv19T4haJGLcbKnU3Rx6phJHq5c6".to_string(),
-		"/ip4/66.42.79.81/tcp/30333/p2p/QmW9PtASCawTG2SzsTnqEasaAv1FVjM7HJ56dZFyBKBuiC".to_string(),
-		"/ip4/45.77.108.5/tcp/30333/p2p/QmT1LLofb3p8LJBwMmenzoDgvUzs18hnciXEvTsEi71AQn".to_string(),
-		"/ip4/144.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
+		"/ip4/144.202.61.115/tcp/30333/p2p/QmXTb6R2AvA6FrvD4w2YRD2oj9WQk2f9Dg1dTqGsdxgwuD".to_string(),
+		"/ip4/107.191.48.39/tcp/30333/p2p/QmdFq4WXvgokUi5MAcGvzcV4PZmo6fZN2fxcEbcPQioGcK".to_string(),
+		"/ip4/66.42.113.164/tcp/30333/p2p/Qmawkfqh4y4vnPWiy87pBnWpgsyy8QrQmUFprDTktgatSm".to_string(),
+		"/ip4/144.202.58.79/tcp/30333/p2p/QmXWhRta7P3xW43WbJ6CDH9ZsHwVxFhLJNjpBa6J3jaAqj".to_string(),
+		"/ip4/207.148.13.203/tcp/30333/p2p/QmRgKnmZNYVCznVd4ao5UHCHGWieT3sePB5g8v7PSGofD2".to_string(),
+		"/ip4/207.148.11.222/tcp/30333/p2p/QmbzrqjbDcwhhX1oiKndxTjK1ULjqVw36QvrEuRKSZjgLY".to_string(),
+		"/ip4/149.28.120.45/tcp/30333/p2p/QmfB4F7TeUcuZZ4AMT3nvvfPVME4eWyJUUdWkXeus3AThe".to_string(),
+		"/ip4/149.28.115.253/tcp/30333/p2p/QmQvAPW1bBpx5N7YJLcBhHNqANw4dxVmBTiJNeuC8FoYeR".to_string(),
+		"/ip4/66.42.116.197/tcp/30333/p2p/QmU1g7NFj1cd46T69ZXig9c7Xc6RLGwjZm4Ur6d4JPBDh2".to_string(),
+		"/ip4/104.207.139.151/tcp/30333/p2p/QmPuU4VY2nckAodyWXv3VyCwavk5FF9yqVWB4G1LtNf9v9".to_string(),
 	];
 
 	let data = r#"
