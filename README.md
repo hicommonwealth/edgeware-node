@@ -183,6 +183,10 @@ Note: Later you can Bond Extra with. See https://github.com/paritytech/substrate
   ```
   /bin/edge -r edgeware -s <STASH_SEED> staking bondExtra <AMOUNT>
   ```
+Note: If you're getting slashed hard, and can't figure out why, try chilling:
+  ```
+  /bin/edge -r edgeware -s <CONTROLLER_SEED>//Controller staking chill
+  ```
 Note: Be sure to check case when entering <STASH_SEED> (i.e. //Stash or //stash)
 Note: You can recover key information with `subkey inspect...`
 Note: <CONTROLLER_B58_ADDRESS> should actually be the Controller public key (hex)m, not 5...
@@ -287,6 +291,7 @@ Note: If you setup a password with `subkey`, then create a keystore password fil
 
 ### Check Validator Status
 
+
 * Check you're validator node is healthy and sending online ping events to the network each session to prevent slashing at https://polkascan.io/pre/edgeware-testnet/event, then for the recent sessions imonline heartbeat events. Check to see if one of them shows your "imon" session key's public key. You first need to be bonded, and a validator in the current session, otherwise your node is just passive.
   * Alternatively, uou could just send a transaction, and even if it fails, you know you're connected if it shows as a failed tx.
 
@@ -299,7 +304,7 @@ du -hs /root/edgeware-node
 * Check bonded amount https://polkascan.io/pre/edgeware-testnet/session/validator
 * Watch the logs and check if you get slashed or not https://polkascan.io/pre/edgeware-testnet/session/validator/8461-12
 * Check slashed amount https://polkascan.io/pre/edgeware-testnet/event/35350-1 
-* Check available Staking commands via CLI `./bin/edge -r edgeware staking list`. View Storage methods for different SRML modules here: https://polkadot.js.org/api/METHODS_STORAGE.html
+* Check available Staking commands via CLI `./bin/edge -r edgeware staking list`. View Storage methods for different SRML modules here: https://polkadot.js.org/api/METHODS_STORAGE.html. Note that Edgeware CLI commands wrap around the Substrate interface.
 * Check if listed in Telemetry when running node before disabling Telemetry when run validator https://telemetry.polkadot.io/#list/Edgeware%20Testnet
 * Check if the displayed "Aura Key" shown in the keygen output matches the Telemetry output
 * Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
@@ -401,7 +406,7 @@ Creation of additional Edgeware Nodes should use a different `--base-path`, have
 
 ## Launch Date
 
-Edgeware launches 15th Sept 2019
+Edgeware launches 15th Sept 2019. 00:00 UTC Sept 15. (8PM Sept 14 EDT)
 
 ## Session Key Setup
 If you plan to validate on Edgeware or a testnet with any non-default keys, then you will need to store the keys so that the node has access to them, for signing transactions and authoring new blocks. Keys in Edgeware are stored in the keystore in the file system. To store keys into this keystore, you need to use one of the two provided RPC calls. If your keys are encrypted or should be encrypted by the keystore, you need to provide the key using one of the cli arguments --password, --password-interactive or --password-filename.
@@ -476,6 +481,19 @@ Unless Cargo.lock already updated to use the fixed code in the substrate-telemet
 * If it's crashing when you're running with `--validator` then make sure you've turned off Telemetry with `--no-telemetry` (since it's not so efficient with memory and occasionally uses up too much CPU, and use Polkascan instead to check you're node is sending online ping events to the network each session to prevent slashing)
 
 * If you get an `InvalidAuthoritiesSet` related error, then don't use the flag `--execution "both"`
+
+* Why am I getting slashed to 0 beyond my staked bond?
+
+11 Sept 2019. This is a bug that's being looked into. The reason validators are being slashed to 0 beyond their stake bond is that the slash is dependent on the bonded stake amount, but slashing doesn't reduce/update the network's value of your bonded stake. So your slash will be deducted from your stash account, but the bonded stake is not reduced -- so the values diverge.   This means your bonded stake becomes much larger than your stash and as the stash is slashed based on the larger bonded stake value, it will be  dropped to 0 regardless of the initial balance eventually. This is a bug that the Edgeware team have been notified about and is a major reason slashing will be set to 0 for the launch.  It causes you to get slashed beyond the amount you had locked in the bond, which should cap your exposure.
+
+Slashing occurs when you do not notify the network each session that you're online.  A session is only about 90 second, so if your validator is unresponsive for more than 90 seconds you will be slashed.  The validators have some resource utilization issues (both CPU and memory) that seems to cause them to lock up, sometimes permanently until restarted, and sometimes temporarily.   The slashing issue seems mainly caused by the CPU slamming to 100% utilization and locking up making the node not send a heartbeat and get slashed.
+
+It'll earn rewards quickly due to the bug that gave exponential rewards, then eventually will start to get slashed, while also earning rewards as the stash and bonded value grows from rewards, the slashes become bigger the node can run forever, even after the account is reaped took me 3 tries to get one stable, but even it's been slashed for about 4/5 of its rewards the first two (last week) were slashed to 0 like yours
+in any event, the mainnet will have  0 slashing for these reasons.
+
+Starting with a few tokens is what keeps the slashes small initially the rewards will be billions of EDG while you have 1 token bonded, it's unnoticeable that was my experience you can also go back to see where you were slashed, but polkascan is hard to go back in time, so easier to watch session by session in real time that's how I figured out what was going on there also appears to be a delay from when you're first online, even if no heartbeat, and when you get slashed.
+
+The combination of the slashing being based on the bonded stake (5% or 10% of total bonded), but slashing not deducting from bonded stake (only slash), and the node instability with sending heartbeats, that makes keeping a node online very hard but 5-10% of the total every 90 seconds means you can get wrecked very quickly and not see it happen.
 
 * What do to after being slashed?
 
