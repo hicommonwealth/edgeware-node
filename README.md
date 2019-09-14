@@ -93,9 +93,9 @@ Ensure you have a fresh start if updating from another version:
 ```
 ./scripts/purge-chain.sh
 ```
-To start up the Edgeware node and connect to the mainnet, run:
+To start up the Edgeware node and connect to the mainnet (starts on September 15th UTC 0:00), run:
 ```
-./target/release/edgeware --chain=edgeware-testnet-v8 --name <INSERT_NAME>
+./target/release/edgeware --chain=edgeware --name <INSERT_NAME>
 ```
 To start up the Edgeware node and connect to a testnet, run:
 ```
