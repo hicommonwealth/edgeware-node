@@ -9,4 +9,4 @@
 
 # Node script
 run_node.sh
-setkeys.sh
+testnets/testing*.json

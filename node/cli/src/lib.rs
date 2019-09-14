@@ -119,7 +119,6 @@ impl AugmentClap for FactoryCmd {
 		FactoryCmd::augment_clap(app)
 	}
 }
-
 fn load_spec(id: &str) -> Result<Option<service::chain_spec::ChainSpec>, String> {
 	Ok(match ChainSpec::from(id) {
 		Some(spec) => Some(spec.load()?),

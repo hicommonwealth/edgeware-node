@@ -33,8 +33,6 @@ use sr_primitives::{
 	traits::{One},
 };
 use core::convert::TryInto;
-use rand::{thread_rng};
-
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
 const DEFAULT_PROTOCOL_ID: &str = "edg";
@@ -42,11 +40,11 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
-pub fn edgeware_testnet_v7_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.7.0/edgeware.json")) {
+pub fn edgeware_mainnet() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("mainnet/genesis.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
-	}
+	}	
 }
 
 pub fn edgeware_testnet_v8_config() -> ChainSpec {
@@ -56,28 +54,162 @@ pub fn edgeware_testnet_v8_config() -> ChainSpec {
 	}
 }
 
+/// The generation script for the recommended mainnet genesis configuration
+pub fn edgeware_mainnet_config_gensis() -> GenesisConfig {
+	// commonwealth founder allocation
+	let cw_allocation: Vec<(AccountId, Balance)> = get_commonwealth_allocation();
+	// commonwealth authorities for mainnet
+	let cw_authorities: Vec<(
+		AccountId,
+		AccountId,
+		AuraId,
+		Balance,
+		GrandpaId,
+		ImOnlineId
+	)> = get_cw_mainnet_validators();
+	// initial chosen genesis validators from lockdrop/testnet participants
+	let initial_lockdrop_authorities: Vec<(
+		AccountId,
+		AccountId,
+		AuraId,
+		Balance,
+		GrandpaId,
+		ImOnlineId
+	)> = get_lockdrop_mainnet_validators();
+	// lockdrop spec
+	let spec = get_spec_allocation().unwrap();
+	let lockdrop_balances = spec.0;
+	let lockdrop_vesting = spec.1;
+	// commonwealth root key
+	let root_key = get_mainnet_root_key();
+	// commonwealth identity verifiers
+	let identity_verifiers = get_mainnet_identity_verifiers();
+	// initial election members, should only have 1 commonwealth account at start
+	let election_members = get_mainnet_election_members();
+	// session keys contain cw authorities and initial lockdrop validators from testnet
+	let session_keys = cw_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
+		.chain(initial_lockdrop_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+		.collect::<Vec<_>>();
+
+	GenesisConfig {
+		system: Some(SystemConfig {
+			code: WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		balances: Some(BalancesConfig {
+			balances: cw_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
+				.chain(cw_authorities.iter().map(|x| (x.0.clone(), x.3.clone()))) // stash accounts
+				.chain(cw_authorities.iter().map(|x| (x.1.clone(), CONTROLLER_ENDOWMENT))) // controller accounts
+				.chain(lockdrop_balances.iter().map(|x| (x.0.clone(), x.1.clone()))) // lockdrop accounts
+				.collect(),
+			vesting: lockdrop_vesting,
+		}),
+		indices: Some(IndicesConfig {
+			ids: cw_allocation.iter().map(|x| x.0.clone())
+				.chain(cw_authorities.iter().map(|x| x.0.clone()))
+				.chain(cw_authorities.iter().map(|x| x.1.clone()))
+				.chain(lockdrop_balances.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
+		}),
+		session: Some(SessionConfig {
+			keys: session_keys,
+		}),
+		staking: Some(StakingConfig {
+			current_era: 0,
+			validator_count: 60,
+			minimum_validator_count: 0,
+			stakers: cw_authorities.iter().map(|x| (
+				x.0.clone(),
+				x.1.clone(),
+				// Ensure stakers have some non-bonded balance
+				x.3.clone() - 10000000000000000000,
+				StakerStatus::Validator
+			)).chain(initial_lockdrop_authorities.iter().map(|x| (
+				x.0.clone(),
+				x.1.clone(),
+				x.3.clone() - 10000000000000000000,
+				StakerStatus::Validator
+			))).collect(),
+			invulnerables: vec![],
+			slash_reward_fraction: Perbill::from_percent(0),
+			.. Default::default()
+		}),
+		democracy: Some(DemocracyConfig::default()),
+		collective_Instance1: Some(CouncilConfig {
+			members: election_members.iter().map(|x| x.clone()).collect(),
+			phantom: Default::default(),
+		}),
+		elections: Some(ElectionsConfig {
+			members: election_members.iter().map(|x| (x.clone(), 6 * 28 * DAYS)).collect(),
+			desired_seats: 6,
+			presentation_duration: (3 * DAYS).try_into().unwrap(),
+			term_duration: (6 * 28 * DAYS).try_into().unwrap(),
+		}),
+		contracts: Some(ContractsConfig {
+			current_schedule: Default::default(),
+			gas_price: 1 * MILLICENTS,
+		}),
+		sudo: Some(SudoConfig {
+			key: root_key,
+		}),
+		im_online: Some(ImOnlineConfig {
+			keys: vec![],
+		}),
+		aura: Some(AuraConfig {
+			authorities: vec![],
+		}),
+		grandpa: Some(GrandpaConfig {
+			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
+		}),
+		identity: Some(IdentityConfig {
+			verifiers: identity_verifiers,
+			expiration_length: (7 * DAYS).try_into().unwrap(),
+			registration_bond: 1 * DOLLARS,
+		}),
+		signaling: Some(SignalingConfig {
+			voting_length: (14 * DAYS).try_into().unwrap(),
+			proposal_creation_bond: 100 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
+			minting_interval: One::one(),
+		}),
+	}
+}
+
 pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
-	let commonwealth_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_commonwealth_validators();
-	let allocation = get_allocation().unwrap();
-	let lockdrop_balances = allocation.0;
-	let lockdrop_vesting = allocation.1;
-	let lockdrop_validators = allocation.2;
-	let root_key = get_root_key();
+	let commonwealth_authorities: Vec<(
+		AccountId,
+		AccountId,
+		AuraId,
+		Balance,
+		GrandpaId,
+		ImOnlineId
+	)> = get_testnet_commonwealth_validators();
+	let spec = get_spec_allocation().unwrap();
+	let lockdrop_balances = spec.0;
+	let lockdrop_vesting = spec.1;
+	let root_key = get_testnet_root_key();
 	// Add controller accounts to endowed accounts
 	let endowed_accounts = get_more_endowed();
-	let identity_verifiers = get_identity_verifiers();
+	let identity_verifiers = get_testnet_identity_verifiers();
+	// const ENDOWMENT: Balance = 1_000_000_000 * DOLLARS;
 	const ENDOWMENT: Balance = 10 * DOLLARS;
-	// randomize the session keys
-	let mut rng = thread_rng();
+	const EXTRAS_ENDOWMENT: Balance = 3_000_000_000 * DOLLARS;
+	let extras = vec![
+		get_authority_keys_from_seed("Alice"),
+		get_authority_keys_from_seed("Bob"),
+		get_authority_keys_from_seed("Charlie"),
+		get_authority_keys_from_seed("Dave"),
+		get_authority_keys_from_seed("Eve"),
+		get_authority_keys_from_seed("Ferdie"),
+	];
 
-	let mut session_keys = commonwealth_authorities.iter()
-		.map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
-		// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone()))))
+	let session_keys = extras.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone())))
 		.collect::<Vec<_>>();
-	// session_keys.shuffle(&mut rng);
-
-
-
 	GenesisConfig {
 		system: Some(SystemConfig {
 			code: WASM_BINARY.to_vec(),
@@ -86,6 +218,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned()
 				.map(|k| (k, ENDOWMENT))
+				.chain(extras.iter().map(|x| (x.0.clone(), EXTRAS_ENDOWMENT)))
 				// give authorities their balances
 				.chain(commonwealth_authorities.iter().map(|x| (x.0.clone(), x.3.clone())))
 				// give controllers an endowment
@@ -107,27 +240,26 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: 25,
+			validator_count: 6,
 			minimum_validator_count: 0,
-			stakers: commonwealth_authorities.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator))
-				// .chain(lockdrop_validators.iter().map(|x| (x.0.clone(), x.1.clone(), x.3.clone(), StakerStatus::Validator)))
-				.collect(),
-			invulnerables: commonwealth_authorities.iter().map(|x| x.0.clone())
-				// .chain(lockdrop_validators.iter().map(|x| x.0.clone()))
-				.collect(),
-			slash_reward_fraction: Perbill::from_percent(10),
+			stakers: extras.iter().map(|x| (
+				x.0.clone(),
+				x.1.clone(),
+				EXTRAS_ENDOWMENT - 10000000000000000000,
+				StakerStatus::Validator
+			)).collect(),
+			invulnerables: vec![],
+			slash_reward_fraction: Perbill::from_percent(0),
 			.. Default::default()
 		}),
 		democracy: Some(DemocracyConfig::default()),
 		collective_Instance1: Some(CouncilConfig {
-			members: commonwealth_authorities.iter().map(|x| x.1.clone())
-				.chain(endowed_accounts.iter().map(|x| x.clone()))
+			members: extras.iter().map(|x| x.1.clone())
 				.collect(),
 			phantom: Default::default(),
 		}),
 		elections: Some(ElectionsConfig {
-			members: commonwealth_authorities.iter().map(|x| (x.1.clone(), 1000000))
-				.chain(endowed_accounts.iter().map(|x| (x.clone(), 1000000)))
+			members: extras.iter().map(|x| (x.1.clone(), 1000000))
 				.collect(),
 			desired_seats: 13,
 			presentation_duration: (2 * DAYS).try_into().unwrap(),
@@ -162,6 +294,7 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		}),
 	}
@@ -170,11 +303,24 @@ pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
 /// Edgeware testnet generator
 pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 	let boot_nodes = vec![
-		"/ip4/157.230.218.41/tcp/30333/p2p/QmNYiKrVuztYuL42gs5kHLTqvKsmEnE3GvJQ8ewcvwtSVF".to_string(),
-		"/ip4/18.223.143.102/tcp/30333/p2p/QmdHoon1jbjeJfTdifknGefGrJHUNYgDDpnJBLLW1Pdt13".to_string(),
-		"/ip4/206.189.33.216/tcp/30333/p2p/QmNc7rakvWY1QL6LL9ssTfKTWUhHUfzMvygYdyMLpLQCR7".to_string(),
-		"/ip4/157.230.125.18/tcp/30333/p2p/QmTqM3sPbeaE7R2WaveJNg1Ma86dSFPTBHXxYSNjwcii1x".to_string(),
+		// "/ip4/108.61.209.73/tcp/30333/p2p/QmeufKtv4KgAQUAUcWvagyFy7skrmSavKYNWYsP1MkJg2N".to_string(),
+		// "/ip4/45.77.93.189/tcp/30333/p2p/QmZh6bVocFNJznraiETnjDVXvmiBDwhMRjc36Ej677L3sf".to_string(),
+		// "/ip4/45.76.17.97/tcp/30333/p2p/QmdcteLq4pnzxikcGUrTNrdZT4cepMMBb8r4CBtwC7q9ZK".to_string(),
+		// "/ip4/44.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
+		// "/ip4/96.30.192.236/tcp/30333/p2p/QmUkAMzwRrxD3gzMWSXgoGxPkWbnLk72KoTmENVVbBneZB".to_string(),
+		// "/ip4/45.77.78.68/tcp/30333/p2p/QmeFzPbhp6HZEZkwnkAyoiUFN7Kr3NcDdD3HEPWq5XSNH3".to_string(),
+		// "/ip4/45.32.139.96/tcp/30333/p2p/QmNmmJGNah4RCNaiwPuv19T4haJGLcbKnU3Rx6phJHq5c6".to_string(),
+		// "/ip4/66.42.79.81/tcp/30333/p2p/QmW9PtASCawTG2SzsTnqEasaAv1FVjM7HJ56dZFyBKBuiC".to_string(),
+		// "/ip4/45.77.108.5/tcp/30333/p2p/QmT1LLofb3p8LJBwMmenzoDgvUzs18hnciXEvTsEi71AQn".to_string(),
+		// "/ip4/144.202.84.209/tcp/30333/p2p/QmRuqvRv3Uudf81vXtSmVfD6bwWTgmjwLd4PG6PSh2Q2oP".to_string(),
 	];
+
+	let data = r#"
+		{
+			"tokenDecimals": 18,
+			"tokenSymbol": "EDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
 
 	Ok(ChainSpec::from_genesis(
 		"Edgeware Testnet",
@@ -184,9 +330,45 @@ pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
 		Some(DEFAULT_PROTOCOL_ID),
 		None,
-		None
+		properties
 	))
 }
+
+/// Edgeware mainnet generator
+pub fn edgeware_mainnet_config() -> Result<ChainSpec, String> {
+	let boot_nodes = vec![
+		"/ip4/144.202.61.115/tcp/30333/p2p/QmXTb6R2AvA6FrvD4w2YRD2oj9WQk2f9Dg1dTqGsdxgwuD".to_string(),
+		"/ip4/107.191.48.39/tcp/30333/p2p/QmdFq4WXvgokUi5MAcGvzcV4PZmo6fZN2fxcEbcPQioGcK".to_string(),
+		"/ip4/66.42.113.164/tcp/30333/p2p/Qmawkfqh4y4vnPWiy87pBnWpgsyy8QrQmUFprDTktgatSm".to_string(),
+		"/ip4/144.202.58.79/tcp/30333/p2p/QmXWhRta7P3xW43WbJ6CDH9ZsHwVxFhLJNjpBa6J3jaAqj".to_string(),
+		"/ip4/207.148.13.203/tcp/30333/p2p/QmRgKnmZNYVCznVd4ao5UHCHGWieT3sePB5g8v7PSGofD2".to_string(),
+		"/ip4/207.148.11.222/tcp/30333/p2p/QmbzrqjbDcwhhX1oiKndxTjK1ULjqVw36QvrEuRKSZjgLY".to_string(),
+		"/ip4/149.28.120.45/tcp/30333/p2p/QmfB4F7TeUcuZZ4AMT3nvvfPVME4eWyJUUdWkXeus3AThe".to_string(),
+		"/ip4/149.28.115.253/tcp/30333/p2p/QmQvAPW1bBpx5N7YJLcBhHNqANw4dxVmBTiJNeuC8FoYeR".to_string(),
+		"/ip4/66.42.116.197/tcp/30333/p2p/QmU1g7NFj1cd46T69ZXig9c7Xc6RLGwjZm4Ur6d4JPBDh2".to_string(),
+		"/ip4/104.207.139.151/tcp/30333/p2p/QmPuU4VY2nckAodyWXv3VyCwavk5FF9yqVWB4G1LtNf9v9".to_string(),
+	];
+
+	let data = r#"
+		{
+			"tokenDecimals": 18,
+			"tokenSymbol": "EDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+
+	Ok(ChainSpec::from_genesis(
+		"Edgeware",
+		"edgeware",
+		edgeware_mainnet_config_gensis,
+		boot_nodes,
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		Some(DEFAULT_PROTOCOL_ID),
+		None,
+		properties,
+	))
+}
+
+
 
 fn session_keys(aura: AuraId, grandpa: GrandpaId, im_online: ImOnlineId) -> SessionKeys {
 	SessionKeys { aura, grandpa, im_online }
@@ -310,6 +492,7 @@ pub fn development_genesis(
 			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 158 * DOLLARS,
 			minting_interval: One::one(),
 		}),
 	}
