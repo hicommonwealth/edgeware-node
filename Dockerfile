@@ -16,6 +16,7 @@ LABEL description="This is the 2nd stage: a very small image where we copy the E
 ARG PROFILE=release
 COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
 COPY --from=builder /edgeware/testnets /usr/local/bin/testnets
+COPY --from=builder /edgeware/mainnet /usr/local/bin/mainnet
 
 RUN rm -rf /usr/lib/python* && \
 	mkdir -p /root/.local/share && \
