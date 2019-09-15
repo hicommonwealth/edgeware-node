@@ -139,6 +139,7 @@ Note:
 * Switch between screens CTRL+A
 * Exit a screen with CTRL+A+D (MacOS)
 Reference: https://linuxize.com/post/how-to-use-linux-screen/
+https://www.cyberciti.biz/tips/linux-screen-command-howto.html
 
 ### Access the Docker Container in the Linode Instance
 
@@ -234,6 +235,15 @@ yarn run build
 ```
 
 Check the list of validators, your account balance:
+Note: freeBalance returns a 32-bit hex string. Since the EDG token is 18-decimal places,
+calculate EDG value using Node.js console:
+```
+$ node
+> parseInt("0x000000000001111d3762d881c9a13fb", 16) / 1000000000000000000;
+80609.06227448891
+```
+
+Note: Connect to remote node with ` -r ws://mainnet1.edgewa.re:9944`
 
 ~/edgeware-cli/bin/edge session validators
 ~/edgeware-cli/bin/edge balances freeBalance <ACCOUNT_PUBLIC_KEY_SS58>
@@ -268,7 +278,7 @@ Note: In lockdrop there was only one "hot" session key called "authority", but n
 
 ```
 ~/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate <UNSTAKE_THRESHOLD> <VALIDATOR_PAYMENT>
-~/edgeware-cli/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate 3 0
+~/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate 3 0
 ```
 Note: If it worked it should output:
 ```
@@ -281,6 +291,8 @@ Events:
 	 {"ApplyExtrinsic":2} : system.ExtrinsicSuccess []
 ```
 
+Note: If you get error `Failed:  Error: submitAndWatchExtrinsic (extrinsic: Extrinsic): ExtrinsicStatus:: 1010: Invalid Transaction (Payment)` when you run `session setKeys` below, then it's because you have insufficient funds in your Controller account (i.e. 0.07 EDG is ok, buy 0.02 EDG is insufficient!)
+SOLUTION: Use your Stash as your Controller too! (this is stupid and risky since we're exposing cold wallet so its warm, but since we can't transfer so we have more funds to cover transaction fees we don't have any choice but to shoot ourselves in the feet security-wise - i'm with stupid)
 
 ```
 ~/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
@@ -318,9 +330,6 @@ edgeware --validator \
   --base-path "/root/edgeware" \
   --chain "edgeware" \
   --keystore-path "/root/edgeware/keys" \
-  --port 30333 \
-  --rpc-port 9933 \
-  --ws-port 9944 \
   --no-telemetry
 ```
 
@@ -331,11 +340,17 @@ Note that you need to access the Docker Container again to do this with the foll
 ```
 docker exec -it $(docker ps -q) bash;
 
-curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["aura", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
-curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["gran", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
-curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["imon", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
+curl -vH 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["aura", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
+curl -vH 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["gran", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
+curl -vH 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"author_insertKey", "params":["imon", "<mnemonic>//<derivation_path>", "<public_key>"],"id":1 }' localhost:9933
 ```
-The output from each curl request should be: `{"jsonrpc":"2.0","result":"0x...","id":1}`
+The output from each curl request should be: `{"jsonrpc":"2.0","result":"0x...","id":1}`.
+If the "result" value is `null` then may not have worked, but check the following first: Another way to check (thanks [HashQuark] ZLH), is to go to the following folder, and check that there are 3x files/keys:
+* ~/.local/share/edgeware/chains/edgeware/keystore OR
+* /root/edgeware/keys
+
+And you can also check it on https://polkadot.js.org/apps/#/staking/actions
+
 CTRL+D to Exit
 Then enter `screen -r` to switch back to the validator logs.
 
@@ -388,6 +403,14 @@ du -hs /root/edgeware-node
       wss://testnet1.edgewa.re
       ```
   * Add Custom Edgware Types by going to https://polkadot.js.org/apps/#/settings/developer and replacing `{}` with the contents of this Gist: https://gist.github.com/drewstone/cee02c503107d06badbdc49bea35c526
+  * Import the Stash, Controller, Session accounts by going to https://polkadot.js.org/apps/#/accounts
+  * Choose "Add Account"
+  * Enter a name (i.e. "Luke_Stash")
+  * Enter your "private key mnemonic seed" 
+  * Enter a "password" (which will be used for signing transactions using polkadot.js.org/apps, and to restore the JSON backup file that'll be downloaded and encrypted with that password).
+  * Enter for "keypair type": Use Schnorkell for Stash/Controller or Edwards for Session (see https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-validate/#set-the-session-key)
+  * Enter for "secret derivation path" the derivation that you used (if any) (i.e. `//stash` or `//Stash` that you would put after your private key mnemonic).
+  * Note: When you enter your "private key mnemonic", or your "secret derivation path" you'll notice that it will automatically update your Public Key BS58. Check that this BS58 Public Key matches what you were provided with by Subkey!
 
 * Edgeware CLI - https://github.com/hicommonwealth/edgeware-cli
 
