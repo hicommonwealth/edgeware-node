@@ -245,6 +245,7 @@ $ node
 
 Note: Connect to remote node with ` -r ws://mainnet1.edgewa.re:9944`
 
+```
 ~/edgeware-cli/bin/edge session validators
 ~/edgeware-cli/bin/edge balances freeBalance <ACCOUNT_PUBLIC_KEY_SS58>
 ~/edgeware-cli/bin/edge -s <STASH_SEED> staking bond <CONTROLLER_PUBLIC_KEY_HEX> <AMOUNT> <REWARD_DESTINATION>
@@ -310,8 +311,8 @@ Transfer status: Finalized
 Completed at block hash <HASH>
 Events:
 	 {"ApplyExtrinsic":2} : system.ExtrinsicSuccess []
-
 ```
+
 * Definitions
   * Grandpa - finalising
   * Aura - authoring
