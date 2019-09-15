@@ -1,4 +1,6 @@
-FROM phusion/baseimage:0.11 AS builder
+# use Debian 10 instead of phusion/baseimage:0.11 otherwise it installs Debian 4 and cannot install
+# latest Node.js 12 (only Node.js 8)
+FROM debian:buster AS builder
 LABEL maintainer="jake@commonwealth.im"
 LABEL description="This is the build stage. Here we create the binary."
 
@@ -12,7 +14,7 @@ COPY . /edgeware
 
 RUN apt-get update && \
 	apt-get install -y build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev && \
-	apt-get install -y vim unzip screen sudo && \
+	apt-get install -y curl vim unzip screen sudo && \
 	# wget -O - https://sh.rustup.rs | sh -s -- -y --default-toolchain nightly-2019-06-30
 	curl https://sh.rustup.rs -sSf | sh -s -- -y && \
 	# source $HOME/.cargo/env && \
@@ -51,16 +53,26 @@ RUN apt-get update && \
 
 # ===== SECOND STAGE ======
 
-FROM phusion/baseimage:0.11
+FROM debian:buster
 LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
+# https://github.com/phusion/baseimage-docker/issues/319
+ENV DEBIAN_FRONTEND noninteractive
 ARG PROFILE=release
 COPY --from=builder /edgeware/target/$PROFILE/edgeware /usr/local/bin
+COPY --from=builder /edgeware/mainnet /usr/local/bin/mainnet
 COPY --from=builder /edgeware/testnets /usr/local/bin/testnets
-
+# latest Node.js 12.x https://github.com/nodesource/distributions#installation-instructions
 RUN rm -rf /usr/lib/python* && \
 	mkdir -p /root/.local/share && \
-	ln -s /root/.local/share /data
+	ln -s /root/.local/share /data \
+	cd /usr/local/bin && \
+	apt-get update && \
+	apt-get install -y cmake && \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils && \
+	apt-get install -y curl screen && \
+	curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+	apt-get install -y nodejs npm
 
 EXPOSE 30333 30344 9933 9944
 VOLUME ["/data"]
@@ -68,3 +80,4 @@ VOLUME ["/data"]
 WORKDIR /usr/local/bin
 
 RUN echo $PWD
+ENV DEBIAN_FRONTEND teletype

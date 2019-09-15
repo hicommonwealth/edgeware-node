@@ -7,7 +7,7 @@ If you're a visitor to this repo, please refer to the original repo too first so
 
 * Subkey supports password-protecting the keys now https://substrate.dev/docs/en/next/ecosystem/subkey#password-protected-keys, which wasn't available a few months ago, so early adopters of Edgware keys may wish to transfer their funds to another account that has password protection after Edgeware activates of token transfers- https://substrate.dev/docs/en/next/ecosystem/subkey 
 * Unlock tool to unlock your locked ETH https://commonwealth.im/#!/unlock
-* Blogpost on how to be an Edgeware beta-net and mainnet Validator https://commonwealth.im/#!/edgeware-testnet/proposal/discussion/20
+* Blogpost on how to be an Edgeware beta-net and mainnet Validator https://commonwealth.im/#!/edgeware/proposal/discussion/20
 
 ## Setup Validator
 
@@ -92,6 +92,23 @@ ssh root@<INSERT_IP_ADDRESS_LINODE_INSTANCE_SUBSTRATE> 'bash -s' < ./scripts/set
 
 * Copy the cloned Edgeware directory to the Linode instance
 
+  * Note: Instead of using `rsync` after the initial rsync, retrieve latest changes from within the VPS as soon as you SSH into it in the next step as follows:
+    ```
+    cd edgeware-node; 
+    git checkout master;
+    git pull --rebase upstream master;
+    git checkout luke-validator;
+    git merge master;
+    git add .
+    git commit -m "merged latest upstream"
+    ```
+  * Note: If Edgeware upstream repo has changed, then delete all the Docker containers in the next step before creating them again as follows:
+    ```
+    cd edgeware-node/scripts;
+    bash docker-destroy.sh;
+    cd ..
+    ```
+
 ```
 rsync -az --verbose --progress --stats ~/code/src/ltfschoen/edgeware-node root@<IP_ADDRESS>:/root;
 ```
@@ -133,18 +150,19 @@ docker exec -it $(docker ps -q) bash;
 
 * Create root screen (`apt-get update; apt-get install screen -y`)
 ```
-apt-get update; apt-get install screen -y;
-screen -S root
+apt-get update; apt-get install screen -y; screen -S root
 ```
 
 * Sync to the latest block. Ensure that you sync without using the `--validator` flag.
 Switch out of screen with CTRL+A+D
 
+* Note: For testnet use `edgware-testnet-v8`
+
 ```
 cd /usr/local/bin;
 
 edgeware --base-path "/root/edgeware" \
-  --chain "edgeware-testnet-v8" \
+  --chain "edgeware" \
   --keystore-path "/root/edgeware/keys" \
   --name "Luke MXC 🔥🔥🔥" \
   --port 30333 \
@@ -160,31 +178,77 @@ Luke's notes when following the Validating on Edgeware v0.8.0 Guide https://gith
 Note: The stash of validators from the lockdrop should already be bonded in https://github.com/hicommonwealth/edgeware-node/blob/master/node/service/src/genesis.json
 
 * Prerequisites
-  * https://github.com/hicommonwealth/edgeware-node/wiki/Validating-on-Edgeware-v0.8.0#pre-requisites
+  * https://github.com/hicommonwealth/edgeware-node/wiki/Validating-on-Edgeware
 
-Note: Testnet v0.8.0 isn't auto-bonded, you have to use the edgeware-cli. Its permissionless. The stash balances are there, just not bonded/staked
+Note: Testnet v0.8.0 and Mainnet/Betanet isn't auto-bonded, you have to use the edgeware-cli. Its permissionless. The stash balances are there, just not bonded/staked
 Note: You need EDG to be in your stash, and your controller will have existential balance to make the required transactions that include: bonding your stash to your controller, and using your controller to set the session keys and validator settings, and then load the sessions keys into the node's keystore, and you're off to the races.
 
 * Bond the stash
 
 Note that you need to access the Docker Container again to do this with the following first:
+
 ```
 docker exec -it $(docker ps -q) bash;
+```
 
-apt-get install -y nodejs npm && \
-npm install edgeware-cli
-/bin/edge -r edgeware -s <STASH_SEED> staking bond <CONTROLLER_PUBLIC_KEY_HEX> <AMOUNT> <REWARD_DESTINATION>
-/usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s "some words here some words here"//Stash staking bond 0x... 1000000000000000000 stash
+Update to latest Python (maybe this wasn't required): https://www.digitalocean.com/community/tutorials/how-to-install-python-3-and-set-up-a-programming-environment-on-debian-10
+
+Check you are using Node.js v12.10.0 (installed via Docker), and NOT v8 (see minimum requirements in the edgeware-cli repo)
+```
+node --version
+```
+
+DO NOT install edgeware-cli by installing it from NPM package with `npm install edgeware-cli` (i.e. so it won't be installed in a node_modules/ subfolder).
+Instead just clone the Github repo and build it from source
+
+```
+apt update && \
+apt-get install -y git cmake
+```
+
+Generate Github keypairs. Copy the output of `cat id_rsa.pub`, and create a new SSH Key at https://github.com/settings/keys, and paste it there. (see https://stackoverflow.com/a/2643584/3208553)
+```
+cd ~/.ssh && ssh-keygen && \
+cat id_rsa.pub
+```
+
+```
+cd ~ && \
+git clone git@github.com:hicommonwealth/edgeware-cli.git && \
+cd edgeware-cli
+```
+
+Install Yarn v1.17.3 (NOT v0.27.0). See https://github.com/yarnpkg/yarn/issues/2821#issuecomment-284181365
+
+```
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - && \
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list && \
+apt install -y yarn && \
+yarn --version
+```
+
+Install dependencies for edgeware-cli
+```
+yarn && \
+yarn run build
+```
+
+Check the list of validators, your account balance:
+
+~/edgeware-cli/bin/edge session validators
+~/edgeware-cli/bin/edge balances freeBalance <ACCOUNT_PUBLIC_KEY_SS58>
+~/edgeware-cli/bin/edge -s <STASH_SEED> staking bond <CONTROLLER_PUBLIC_KEY_HEX> <AMOUNT> <REWARD_DESTINATION>
+~/edgeware-cli/bin/edge -s "some words here some words here"//Stash staking bond 0x... 1000000000000000000 stash
 ```
 
 Note: 1000000000000000000 is equivalent to 1 testEDG (testnet EDG token)
 Note: Later you can Bond Extra with. See https://github.com/paritytech/substrate/blob/master/srml/staking/src/lib.rs#L744:
   ```
-  /bin/edge -r edgeware -s <STASH_SEED> staking bondExtra <AMOUNT>
+  ~/edgeware-cli/bin/edge -s <STASH_SEED> staking bondExtra <AMOUNT>
   ```
 Note: If you're getting slashed hard, and can't figure out why, try chilling:
   ```
-  /bin/edge -r edgeware -s <CONTROLLER_SEED>//Controller staking chill
+  ~/edgeware-cli/bin/edge -s <CONTROLLER_SEED>//Controller staking chill
   ```
 Note: Be sure to check case when entering <STASH_SEED> (i.e. //Stash or //stash)
 Note: You can recover key information with `subkey inspect...`
@@ -203,8 +267,8 @@ Note: You need to set a controller for bonding tokens on-chain
 Note: In lockdrop there was only one "hot" session key called "authority", but now there are three "hot" session keys that you need to be a validator "aura", "grandpa", and "imonline", so you need to generate them.
 
 ```
-/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate <UNSTAKE_THRESHOLD> <VALIDATOR_PAYMENT>
-/usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate 3 0
+~/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate <UNSTAKE_THRESHOLD> <VALIDATOR_PAYMENT>
+~/edgeware-cli/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> staking validate 3 0
 ```
 Note: If it worked it should output:
 ```
@@ -219,8 +283,8 @@ Events:
 
 
 ```
-/bin/edge -r edgeware -s <CONTROLLER_SEED> session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
-/usr/local/bin/node_modules/edgeware-cli/bin/edge -r edgeware -s "..."//Controller session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
+~/edgeware-cli/bin/edge -r edgeware -s <CONTROLLER_SEED> session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
+~/edgeware-cli/bin/edge -r edgeware -s "..."//Controller session setKeys <SESSION_PUBLIC_KEY1>,<SESSION_PUBLIC_KEY2>,<SESSION_PUBLIC_KEY3>
 ```
 Note: If it works it should output the associated addresses of your aura, gran, and imon session keys (hot keys) as follows:
 ```
@@ -248,10 +312,11 @@ If Edgware node is already running and synced to latest block but you can't acce
 ### Run Validator
 
 * Must use `--no-telemetry` otherwise it kills itself
+* Rename below for Mainnet (edgeware) OR Testnet (edgeware-test)
 ```
 edgeware --validator \
   --base-path "/root/edgeware" \
-  --chain "edgeware-testnet-v8" \
+  --chain "edgeware" \
   --keystore-path "/root/edgeware/keys" \
   --port 30333 \
   --rpc-port 9933 \
@@ -291,31 +356,37 @@ Note: If you setup a password with `subkey`, then create a keystore password fil
 ### Check Validator Status
 
 
-* Check you're validator node is healthy and sending online ping events to the network each session to prevent slashing at https://polkascan.io/pre/edgeware-testnet/event, then for the recent sessions imonline heartbeat events. Check to see if one of them shows your "imon" session key's public key. You first need to be bonded, and a validator in the current session, otherwise your node is just passive.
+* Check you're validator node is healthy and sending online ping events to the network each session to prevent slashing at - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/event, then for the recent sessions imonline heartbeat events. Check to see if one of them shows your "imon" session key's public key. You first need to be bonded, and a validator in the current session, otherwise your node is just passive.
   * Alternatively, uou could just send a transaction, and even if it fails, you know you're connected if it shows as a failed tx.
 
 * Check disk spaced used by chain
 ```
 du -hs /root/edgeware-node
 ```
-* Note: New validators are entered every 10 blocks. See them here https://polkascan.io/pre/edgeware-testnet/session/session. Initially the only validators listed appeared to be Edgeware-owned because they were auto-bonded. there's no staking/bond transactions associated with them, as one that was bonded did the set keys/validate setting transactions in the reverse order of the documentation (i.e. https://polkascan.io/pre/edgeware-testnet/account/5G9UbiviqfuShqjmVqFAUr4BAxWk8KZh4ho9RW2ZoE1rZZnE). All of the validators have "validatorPayment": 0, which is based on the amount you choose to give to nominators. Validator's cannot be auto-bonded unless it's sure they're online at genesis or else the network stalls
+* Note: New validators are entered every 10 blocks. See them here - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/session/session. Initially the only validators listed appeared to be Edgeware-owned because they were auto-bonded. there's no staking/bond transactions associated with them, as one that was bonded did the set keys/validate setting transactions in the reverse order of the documentation (i.e. https://polkascan.io/pre/edgeware-testnet/account/5G9UbiviqfuShqjmVqFAUr4BAxWk8KZh4ho9RW2ZoE1rZZnE). All of the validators have "validatorPayment": 0, which is based on the amount you choose to give to nominators. Validator's cannot be auto-bonded unless it's sure they're online at genesis or else the network stalls
 * Check the bond shows up on Polkascan
-* Check bonded amount https://polkascan.io/pre/edgeware-testnet/session/validator
-* Watch the logs and check if you get slashed or not https://polkascan.io/pre/edgeware-testnet/session/validator/8461-12
-* Check slashed amount https://polkascan.io/pre/edgeware-testnet/event/35350-1 
+* Check bonded amount Testnet -  - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/session/validator
+* Watch the logs and check if you get slashed or not - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/session/validator/8461-12
+* Check slashed amount - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/event/35350-1
 * Check available Staking commands via CLI `./bin/edge -r edgeware staking list`. View Storage methods for different SRML modules here: https://polkadot.js.org/api/METHODS_STORAGE.html. Note that Edgeware CLI commands wrap around the Substrate interface.
 * Check if listed in Telemetry when running node before disabling Telemetry when run validator https://telemetry.polkadot.io/#list/Edgeware%20Testnet
 * Check if the displayed "Aura Key" shown in the keygen output matches the Telemetry output
-* Check if listed on Polkascan and that stash is bonded https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
-* Check account balance, e.g. https://polkascan.io/pre/edgeware-testnet/account/5DP33MYJsMJi8FNfKHRMAPoGJ4rvNLt5o7CA4MumJPE1GDVE
+* Check if listed on Polkascan and that stash is bonded - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/session/validator since it should be automatically bonded from genesis if you're in the validator set, and check that your correct session account is shown there too. Click on details next to a validator
+* Check account balance,  - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) e.g. https://polkascan.io/pre/edgeware-testnet/account/5DP33MYJsMJi8FNfKHRMAPoGJ4rvNLt5o7CA4MumJPE1GDVE
 * Check that you're earning staking rewards when running session keyed validator. See what's shown under "Additional bonded by nominators" or "Commission"
 
 ### Interact with Edgeware Node
 
-* Edgeare UI - Use Edgeware's polkadot.js.org Apps equivalent
+* Edgeware UI - Use Edgeware's polkadot.js.org Apps equivalent
   * Go to https://polkadot.js.org/apps/#/settings
   * Toggle Custom Endpoint button
-  * Enter wss://testnet1.edgewa.re, and choose Substrate Address prefix, and then click "Save & Reload"?
+  * Enter depending on network for Substrate Address prefix, and then click "Save & Reload"? Get it from "NodeInfo" at https://commonwealth.im/#!/settings
+    * Mainnet:
+      ```
+      wss://mainnet1.edgewa.re
+      wss://mainnet2.edgewa.re
+      wss://testnet1.edgewa.re
+      ```
   * Add Custom Edgware Types by going to https://polkadot.js.org/apps/#/settings/developer and replacing `{}` with the contents of this Gist: https://gist.github.com/drewstone/cee02c503107d06badbdc49bea35c526
 
 * Edgeware CLI - https://github.com/hicommonwealth/edgeware-cli
@@ -329,7 +400,7 @@ du -hs /root/edgeware-node
 * Relevant Substrate interfaces values you'd use to calculate it include, SessionsPerEra from the Staking, EpochDuration from Babe, SlotDuration from Aura
 * Latest metadata from Substrate that's used for the front-end https://github.com/polkadot-js/api/blob/master/packages/types/src/Metadata/v7/static-substrate.json. Shown under "Substrate interfaces" in the API Reference docs https://polkadot.js.org/api/api/#api-selection
 https://substrate.dev/docs/en/overview/glossary#transaction-era
-* Polkascan here https://polkascan.io/pre/edgeware-testnet/session/session shows the Session ID associated with each Block Number, and then click the "Details" button for a specific Block Number, and the "Details" page will include the associated Era
+* Polkascan here  - Rename for either Mainnet (edgeware) OR Testnet (edgeware-test) https://polkascan.io/pre/edgeware-testnet/session/session shows the Session ID associated with each Block Number, and then click the "Details" button for a specific Block Number, and the "Details" page will include the associated Era
 
 ### Consider setting up an IP Failover solution
 
@@ -430,7 +501,7 @@ curl -H 'Content-Type: application/json' --data '{ "jsonrpc":"2.0", "method":"au
 INCOMPLETE, ask @gnossienli for help. More info https://wiki.polkadot.network/en/latest/polkadot/node/guides/how-to-systemd/
 
 * Systemd Process Setup. Run `systemctl status edgeware.service`, `sudo journalctl -f -u edgeware` after setup with:
-
+* Rename for either Mainnet (edgeware) OR Testnet (edgeware-test)
 ```
 [Unit]
 Description=edgeware Node
@@ -549,4 +620,5 @@ Note: Using 1GB RAM on VPS is insufficient, it'll become unresponsive or crash
   * https://github.com/ltfschoen/polkadot-linode
   * https://github.com/luboremo/Edgeware-seed-generating-script-SSSS
   * https://wiki.polkadot.network/en/latest/polkadot/node/node-operator/#security-key-management
-  * Validating discussion https://commonwealth.im/#!/edgeware-testnet/proposal/discussion/20
+  * Validating discussion https://commonwealth.im/#!/edgeware/proposal/discussion/20
+     * Rename link for either Mainnet (edgeware) OR Testnet (edgeware-test)
