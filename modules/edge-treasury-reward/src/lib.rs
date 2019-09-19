@@ -25,7 +25,6 @@ extern crate serde;
 #[cfg(feature = "std")]
 extern crate serde_derive;
 
-use srml_system as system;
 pub mod treasury_reward;
 pub use treasury_reward::{Module, Trait, RawEvent, Event};
 
@@ -34,9 +33,9 @@ mod tests {
 	#[cfg(feature = "std")]
 	use std::{collections::HashSet, cell::RefCell};
 	use sr_io::with_externalities;
-	
-	
-	
+
+
+
 	use super::*;
 	// The testing primitives are very useful for avoiding having to work with signatures
 	// or public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
@@ -45,7 +44,7 @@ mod tests {
 		traits::{BlakeTwo256, IdentityLookup, OpaqueKeys, One, OnFinalize},
 		testing::{Header, UintAuthorityId}
 	};
-	
+
 	/// The AccountId alias in this test module.
 	pub type AccountId = u64;
 	pub type Balance = u64;
@@ -92,7 +91,7 @@ mod tests {
 	srml_support::impl_outer_origin! {
 		pub enum Origin for Test {}
 	}
-	
+
 	#[derive(Clone, PartialEq, Eq, Debug)]
 	pub struct Test;
 
