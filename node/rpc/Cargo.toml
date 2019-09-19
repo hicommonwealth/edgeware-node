@@ -5,18 +5,18 @@ authors = ["drewstone <drewstone329@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git" }
+client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 jsonrpc-core = "13.0.0"
 jsonrpc-core-client = "13.0.0"
 jsonrpc-derive = "13.0.0"
 jsonrpc-pubsub = "13.0.0"
-keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git" }
+keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 log = "0.4"
 codec = { package = "parity-scale-codec", version = "1.0.0" }
 serde = { version = "1.0", features = ["derive"] }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git" }
-transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate.git" }
+sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 edgeware-primitives = { path = "../primitives" }
 
 [dev-dependencies]
