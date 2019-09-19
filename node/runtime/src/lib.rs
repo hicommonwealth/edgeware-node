@@ -217,7 +217,8 @@ impl_opaque_keys! {
 // should be easy, since OneSessionHandler trait provides the `Key` as an associated type. #2858
 
 parameter_types! {
-	pub const Period: BlockNumber = 60 * MINUTES;
+	// pub const Period: BlockNumber = 60 * MINUTES;
+	pub const Period: BlockNumber = 10;
 	pub const Offset: BlockNumber = 0;
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 }
@@ -240,7 +241,7 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 10;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 3;
 	// Mainnet genesis bonding duration - number of eras to bond where eras are 1 hour long
 	pub const BondingDuration: staking::EraIndex = 24 * 21;
 }
