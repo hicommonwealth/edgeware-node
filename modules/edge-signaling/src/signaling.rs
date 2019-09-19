@@ -28,7 +28,7 @@ extern crate edge_voting as voting;
 use rstd::prelude::*;
 use srml_support::traits::{Currency, ReservableCurrency};
 use system::ensure_signed;
-use runtime_support::{StorageValue, StorageMap};
+use runtime_support::{StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::{Hash};
 use codec::{Encode, Decode};
@@ -120,7 +120,7 @@ decl_module! {
 			ensure!(record.author == _sender, "Proposal must be advanced by author");
 			ensure!(record.stage == VoteStage::PreVoting
 				|| record.stage == VoteStage::Commit, "Proposal not in pre-voting or commit stage");
-			
+
 			// prevoting -> voting or commit
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
 			if let Some(vote_record) = <voting::Module<T>>::get_vote_record(record.vote_id) {
@@ -155,7 +155,7 @@ decl_module! {
 			let (finished, mut active): (Vec<_>, _) = <ActiveProposals<T>>::get()
 				.into_iter()
 				.partition(|(_, exp)| _n > *exp);
-			
+
 			let (completed, mut pending): (Vec<_>, _) = <CompletedProposals<T>>::get()
 				.into_iter()
 				.partition(|(_, exp)| _n > *exp);
@@ -178,7 +178,7 @@ decl_module! {
 								T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
 								// add these completed proposals, to the pending "deletion" collection
 								pending.push((finished_hash, transition_time.clone()));
-								Self::deposit_event(RawEvent::VotingCompleted(finished_hash, vote_id)); 
+								Self::deposit_event(RawEvent::VotingCompleted(finished_hash, vote_id));
 							} else {
 								// add the vote record identifier back into the collection
 								active.push((finished_hash, transition_time));
@@ -190,7 +190,7 @@ decl_module! {
 								transition_time: transition_time,
 								..record
 							});
-						}                       
+						}
 					},
 					None => {}
 				}
@@ -247,7 +247,7 @@ decl_storage! {
 		pub CompletedProposals get(completed_proposals): Vec<(T::Hash, T::BlockNumber)>;
 		/// Amount of time a proposal remains in "Voting" stage.
 		pub VotingLength get(voting_length) config(): T::BlockNumber;
-		/// Map for retrieving the information about any proposal from its hash. 
+		/// Map for retrieving the information about any proposal from its hash.
 		pub ProposalOf get(proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
 		pub ProposalCreationBond get(proposal_creation_bond) config(): BalanceOf<T>;

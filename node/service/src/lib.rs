@@ -66,7 +66,7 @@ macro_rules! new_full_start {
 					.ok_or_else(|| substrate_service::Error::SelectChainRequired)?;
 				let (block_import, link_half) =
 					grandpa::block_import::<_, _, _, edgeware_runtime::RuntimeApi, _, _>(
-						client.clone(), client.clone(), select_chain
+						client.clone(), &*client, select_chain
 					)?;
 				let justification_import = block_import.clone();
 

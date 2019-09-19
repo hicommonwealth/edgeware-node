@@ -32,18 +32,19 @@ use support::{
 use substrate_primitives::u32_trait::{_1, _2, _3, _4};
 use edgeware_primitives::{
 	AccountId, AccountIndex, AuraId, Balance, BlockNumber, Hash, Index,
-	Moment, Signature,
+	Moment, Signature
 };
-use grandpa::fg_primitives::{self, ScheduledChange};
+use grandpa::fg_primitives::{self};
 use client::{
 	block_builder::api::{self as block_builder_api, InherentData, CheckInherentsResult},
 	runtime_api as client_api, impl_runtime_apis
 };
 use runtime_primitives::{ApplyResult, impl_opaque_keys, generic, create_runtime_str, key_types};
+use runtime_primitives::curve::PiecewiseLinear;
 use runtime_primitives::transaction_validity::{InvalidTransaction, TransactionValidity, TransactionValidityError};
 use runtime_primitives::weights::{Weight, DispatchInfo};
 use runtime_primitives::traits::{
-	self, BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup, SignedExtension,
+	self, BlakeTwo256, Block as BlockT, NumberFor, StaticLookup, SignedExtension,
 };
 use version::RuntimeVersion;
 use elections::VoteIndex;
@@ -277,6 +278,16 @@ parameter_types! {
 	// Mainnet genesis bonding duration - number of eras to bond where eras are 1 hour long
 	pub const BondingDuration: staking::EraIndex = 24 * 21;
 }
+srml_staking_reward_curve::build! {
+        const I_NPOS: PiecewiseLinear<'static> = curve!(
+                min_inflation: 0_025_000,
+                max_inflation: 0_100_000,
+                ideal_stake: 0_800_000,
+                falloff: 0_050_000,
+                max_piece_count: 40,
+                test_precision: 0_005_000,
+        );
+}
 
 impl staking::Trait for Runtime {
 	type Currency = Balances;
@@ -289,6 +300,7 @@ impl staking::Trait for Runtime {
 	type SessionsPerEra = SessionsPerEra;
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
+        type RewardCurve = RewardCurve;
 }
 
 parameter_types! {
@@ -298,6 +310,7 @@ parameter_types! {
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+        pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 }
 
 impl democracy::Trait for Runtime {
@@ -410,11 +423,11 @@ impl contracts::Trait for Runtime {
 	type SurchargeReward = SurchargeReward;
 	type TransferFee = ContractTransferFee;
 	type CreationFee = ContractCreationFee;
+        type InstantiateBaseFee = contracts::DefaultInstantiateBaseFee;
 	type TransactionBaseFee = ContractTransactionBaseFee;
 	type TransactionByteFee = ContractTransactionByteFee;
 	type ContractFee = ContractFee;
 	type CallBaseFee = contracts::DefaultCallBaseFee;
-	type CreateBaseFee = contracts::DefaultCreateBaseFee;
 	type MaxDepth = contracts::DefaultMaxDepth;
 	type MaxValueSize = contracts::DefaultMaxValueSize;
 	type BlockGasLimit = contracts::DefaultBlockGasLimit;
@@ -625,18 +638,6 @@ impl_runtime_apis! {
 	}
 
 	impl fg_primitives::GrandpaApi<Block> for Runtime {
-		fn grandpa_pending_change(digest: &DigestFor<Block>)
-			-> Option<ScheduledChange<NumberFor<Block>>>
-		{
-			Grandpa::pending_change(digest)
-		}
-
-		fn grandpa_forced_change(digest: &DigestFor<Block>)
-			-> Option<(NumberFor<Block>, ScheduledChange<NumberFor<Block>>)>
-		{
-			Grandpa::forced_change(digest)
-		}
-
 		fn grandpa_authorities() -> Vec<(GrandpaId, GrandpaWeight)> {
 			Grandpa::grandpa_authorities()
 		}

@@ -37,7 +37,7 @@ use srml_support::traits::{Currency, ReservableCurrency};
 use rstd::prelude::*;
 use runtime_primitives::traits::{Zero, Hash};
 use runtime_support::dispatch::Result;
-use runtime_support::{StorageMap, StorageValue};
+use runtime_support::{StorageMap};
 use system::ensure_signed;
 use codec::{Encode, Decode};
 
@@ -125,7 +125,7 @@ decl_module! {
         }
 
         /// A function that verifies an identity attestation.
-        /// 
+        ///
         /// The verification is handled by a set of seeded verifiers who run
         /// the off-chain worker node to verify attestations.
         pub fn verify(origin, identity_hash: T::Hash, verifier_index: u32) -> Result {
@@ -136,7 +136,7 @@ decl_module! {
         }
 
         /// A function that denies an identity attestation.
-        /// 
+        ///
         /// The verification is handled by a set of seeded verifiers who run
         /// the off-chain worker node to verify attestations.
         pub fn deny(origin, identity_hash: T::Hash, verifier_index: u32) -> Result {
@@ -151,7 +151,7 @@ decl_module! {
             let _sender = ensure_signed(origin)?;
             ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
             ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
-            
+
             for i in 0..identity_hashes.len() {
                 Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], true)?;
             }
@@ -164,7 +164,7 @@ decl_module! {
             let _sender = ensure_signed(origin)?;
             ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
             ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
-            
+
             for i in 0..identity_hashes.len() {
                 Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], false)?;
             }

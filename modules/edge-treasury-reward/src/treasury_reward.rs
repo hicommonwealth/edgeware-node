@@ -26,7 +26,7 @@ use runtime_primitives::{traits::{Zero}};
 
 use rstd::prelude::*;
 use srml_support::{
-	StorageValue, decl_module, decl_event,
+	decl_module, decl_event,
 	decl_storage, traits::{
 		Currency
 	}
