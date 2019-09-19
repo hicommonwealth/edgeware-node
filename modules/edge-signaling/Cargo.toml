@@ -9,14 +9,14 @@ serde = { version = "1.0", default-features = false, optional = true }
 serde_derive = { version = "1.0", optional = true }
 safe-mix = { version = "1.0", default-features = false }
 parity-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false, features = ["derive"] }
-substrate-keyring = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
-substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sr-std = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sr-io = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-srml-support = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-srml-system = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-srml-balances = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+substrate-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
+substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+sr-std = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+sr-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+srml-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+srml-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+srml-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 edge-voting = { path = "../edge-voting", default-features = false }
 
 [features]
