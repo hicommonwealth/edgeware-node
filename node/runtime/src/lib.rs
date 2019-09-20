@@ -40,10 +40,10 @@ use client::{
 	runtime_api as client_api, impl_runtime_apis
 };
 use runtime_primitives::{ApplyResult, impl_opaque_keys, generic, create_runtime_str, key_types};
-use runtime_primitives::transaction_validity::TransactionValidity;
-use runtime_primitives::weights::Weight;
+use runtime_primitives::transaction_validity::{InvalidTransaction, TransactionValidity, TransactionValidityError};
+use runtime_primitives::weights::{Weight, DispatchInfo};
 use runtime_primitives::traits::{
-	self, BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup,
+	self, BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup, SignedExtension,
 };
 use version::RuntimeVersion;
 use elections::VoteIndex;
@@ -101,6 +101,39 @@ pub fn native_version() -> NativeVersion {
 	NativeVersion {
 		runtime_version: VERSION,
 		can_author_with: Default::default(),
+	}
+}
+
+/// Custom validity error for turning transfers off
+enum ValidityError {
+	InvalidWhileTransfersOff = 9999,
+}
+
+impl From<ValidityError> for u8 {
+	fn from(err: ValidityError) -> Self {
+		err as u8
+	}
+}
+
+/// Disable transactions for balances and contracts.
+/// To be removed by governance runtime upgrade when the chain is stable.
+#[derive(Default, Encode, Decode, Clone, Eq, PartialEq)]
+#[cfg_attr(feature = "std", derive(Debug))]
+pub struct TransfersOff;
+impl SignedExtension for TransfersOff {
+	type AccountId = AccountId;
+	type Call = Call;
+	type AdditionalSigned = ();
+	type Pre = ();
+	fn additional_signed(&self) -> rstd::result::Result<(), TransactionValidityError> { Ok(()) }
+	fn validate(&self, _: &Self::AccountId, call: &Self::Call, _: DispatchInfo, _: usize)
+		-> TransactionValidity
+	{
+		match call {
+			Call::Balances(_) | Call::Contracts(_) =>
+				Err(InvalidTransaction::Custom(ValidityError::InvalidWhileTransfersOff.into()).into()),
+			_ => Ok(Default::default()),
+		}
 	}
 }
 
@@ -457,6 +490,7 @@ impl system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for Runtim
 		let current_block = System::block_number();
 		let tip = 0;
 		let extra: SignedExtra = (
+			Default::default(),
 			system::CheckVersion::<Runtime>::new(),
 			system::CheckGenesis::<Runtime>::new(),
 			system::CheckEra::<Runtime>::from(generic::Era::mortal(period, current_block as u64)),
@@ -505,6 +539,7 @@ construct_runtime!(
 	}
 );
 
+
 /// The address format for describing accounts.
 pub type Address = <Indices as StaticLookup>::Source;
 /// Block header type as expected by this runtime.
@@ -517,6 +552,7 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
 pub type SignedExtra = (
+	TransfersOff,
 	system::CheckVersion<Runtime>,
 	system::CheckGenesis<Runtime>,
 	system::CheckEra<Runtime>,
