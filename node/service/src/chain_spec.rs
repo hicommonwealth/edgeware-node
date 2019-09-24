@@ -40,22 +40,8 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 /// Specialised `ChainSpec`.
 pub type ChainSpec = substrate_service::ChainSpec<GenesisConfig>;
 
-pub fn edgeware_mainnet() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("mainnet/genesis.json")) {
-		Ok(spec) => spec,
-		Err(e) => panic!(e),
-	}	
-}
-
-pub fn edgeware_testnet_v8_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("testnets/v0.8.0/edgeware.json")) {
-		Ok(spec) => spec,
-		Err(e) => panic!(e),
-	}
-}
-
 /// The generation script for the recommended mainnet genesis configuration
-pub fn edgeware_mainnet_config_gensis() -> GenesisConfig {
+pub fn edgeware_mainnet_config_genesis() -> GenesisConfig {
 	// commonwealth founder allocation
 	let cw_allocation: Vec<(AccountId, Balance)> = get_commonwealth_allocation();
 	// commonwealth authorities for mainnet
@@ -180,7 +166,7 @@ pub fn edgeware_mainnet_config_gensis() -> GenesisConfig {
 	}
 }
 
-pub fn edgeware_testnet_config_gensis() -> GenesisConfig {
+pub fn edgeware_testnet_config_genesis() -> GenesisConfig {
 	let commonwealth_authorities: Vec<(
 		AccountId,
 		AccountId,
@@ -325,7 +311,7 @@ pub fn edgeware_testnet_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::from_genesis(
 		"Edgeware Testnet",
 		"edgeware_testnet",
-		edgeware_testnet_config_gensis,
+		edgeware_testnet_config_genesis,
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
 		Some(DEFAULT_PROTOCOL_ID),
@@ -359,7 +345,7 @@ pub fn edgeware_mainnet_config() -> Result<ChainSpec, String> {
 	Ok(ChainSpec::from_genesis(
 		"Edgeware",
 		"edgeware",
-		edgeware_mainnet_config_gensis,
+		edgeware_mainnet_config_genesis,
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
 		Some(DEFAULT_PROTOCOL_ID),
