@@ -16,12 +16,12 @@ struct Allocation {
     validators: Vec<(String, String, String, String)>,
 }
 
-pub fn get_spec_allocation() 
+pub fn get_spec_allocation()
 	-> Result<(
 		Vec<(AccountId, Balance)>,
 		Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	)> {
-    let mut file = File::open("node/service/src/genesis.json").unwrap();
+    let mut file = File::open("lockdrop_allocations.json").unwrap();
     let mut data = String::new();
     file.read_to_string(&mut data).unwrap();
 
@@ -183,7 +183,7 @@ pub fn get_commonwealth_allocation() -> Vec<(AccountId, Balance)> {
 /// We give each of these 9999990000000000000000000 balance, which
 /// is 1e19 less than 1e25, so that we reserve 1e19 for the controllers
 /// of these accounts (enough balance for txs and existential balance)
-/// 
+///
 /// The total of the Commonwealth Mainnet validators balances is thus 1e26 or 20%
 /// i.e 10 * ((1e25 - 1e19) + 1e19) = 1e26 or 20% of 5e26
 pub const CONTROLLER_ENDOWMENT: Balance = 10000000000000000000;
