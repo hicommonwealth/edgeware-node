@@ -34,7 +34,8 @@ use network::construct_simple_protocol;
 use aura_primitives::ed25519::AuthorityPair as AuraAuthorityPair;
 
 pub mod chain_spec;
-pub mod fixtures;
+pub mod mainnet_fixtures;
+pub mod testnet_fixtures;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -91,7 +92,7 @@ macro_rules! new_full_start {
 				);
 				io
 			})?;
-		
+
 		(builder, import_setup, inherent_data_providers)
 	}}
 }

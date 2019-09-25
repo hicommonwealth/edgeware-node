@@ -24,9 +24,9 @@ pub enum ChainSpec {
 	/// Whatever the current runtime is, with simple Alice/Bob auths.
 	LocalTestnet,
 	/// Edgeware testnet configuration
-	Testnet,
+	RemoteTestnet,
 	/// Edgeware mainnet configuration
-	Mainnet,
+	Edgeware,
 }
 
 impl Default for ChainSpec {
@@ -39,10 +39,10 @@ impl Default for ChainSpec {
 impl ChainSpec {
 	pub(crate) fn load(self) -> Result<service::chain_spec::ChainSpec, String> {
 		Ok(match self {
-			ChainSpec::Development => service::chain_spec::development_config(),
-			ChainSpec::LocalTestnet => service::chain_spec::local_testnet_config(),
-			ChainSpec::Testnet => service::chain_spec::edgeware_testnet_config()?,
-			ChainSpec::Mainnet => service::chain_spec::edgeware_mainnet_config()?,
+			ChainSpec::Development => service::chain_spec::development_chainspec(),
+			ChainSpec::LocalTestnet => service::chain_spec::local_testnet_chainspec(),
+			ChainSpec::RemoteTestnet => service::chain_spec::remote_testnet_chainspec(),
+			ChainSpec::Edgeware => service::chain_spec::edgeware_chainspec(),
 		})
 	}
 
@@ -50,8 +50,8 @@ impl ChainSpec {
 		match s {
 			"dev" => Some(ChainSpec::Development),
 			"local" => Some(ChainSpec::LocalTestnet),
-			"test" => Some(ChainSpec::Testnet),
-			"mainnet" => Some(ChainSpec::Mainnet),
+			"test" => Some(ChainSpec::RemoteTestnet),
+			"edgeware-v0.9.0" => Some(ChainSpec::Edgeware),
 			"" => Some(ChainSpec::default()),
 			_ => None,
 		}
