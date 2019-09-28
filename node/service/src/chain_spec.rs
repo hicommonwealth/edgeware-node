@@ -127,31 +127,18 @@ pub fn remote_testnet_chainspec() -> ChainSpec {
 }
 
 /// Edgeware public network config (mainnet and public testnets)
-pub fn edgeware_chainspec() -> ChainSpec {
-	let boot_nodes = vec![
-		"/ip4/144.202.61.115/tcp/30333/p2p/QmXTb6R2AvA6FrvD4w2YRD2oj9WQk2f9Dg1dTqGsdxgwuD".to_string(),
-		"/ip4/107.191.48.39/tcp/30333/p2p/QmdFq4WXvgokUi5MAcGvzcV4PZmo6fZN2fxcEbcPQioGcK".to_string(),
-		"/ip4/66.42.113.164/tcp/30333/p2p/Qmawkfqh4y4vnPWiy87pBnWpgsyy8QrQmUFprDTktgatSm".to_string(),
-		"/ip4/144.202.58.79/tcp/30333/p2p/QmXWhRta7P3xW43WbJ6CDH9ZsHwVxFhLJNjpBa6J3jaAqj".to_string(),
-		"/ip4/207.148.13.203/tcp/30333/p2p/QmRgKnmZNYVCznVd4ao5UHCHGWieT3sePB5g8v7PSGofD2".to_string(),
-		"/ip4/207.148.11.222/tcp/30333/p2p/QmbzrqjbDcwhhX1oiKndxTjK1ULjqVw36QvrEuRKSZjgLY".to_string(),
-		"/ip4/149.28.120.45/tcp/30333/p2p/QmfB4F7TeUcuZZ4AMT3nvvfPVME4eWyJUUdWkXeus3AThe".to_string(),
-		"/ip4/149.28.115.253/tcp/30333/p2p/QmQvAPW1bBpx5N7YJLcBhHNqANw4dxVmBTiJNeuC8FoYeR".to_string(),
-		"/ip4/66.42.116.197/tcp/30333/p2p/QmU1g7NFj1cd46T69ZXig9c7Xc6RLGwjZm4Ur6d4JPBDh2".to_string(),
-		"/ip4/104.207.139.151/tcp/30333/p2p/QmPuU4VY2nckAodyWXv3VyCwavk5FF9yqVWB4G1LtNf9v9".to_string(),
-	];
-
+pub fn edgeware_chainspec(is_testnet: bool) -> ChainSpec {
+	let boot_nodes = if is_testnet { get_testnet_bootnodes() } else { get_mainnet_bootnodes() };
 	let data = r#"
 		{
 			"tokenDecimals": 18,
 			"tokenSymbol": "EDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
-
 	ChainSpec::from_genesis(
 		"Edgeware",
 		"edgeware",
-		edgeware_genesis_config,
+		if is_testnet { edgeware_testnet_config } else { edgeware_mainnet_config },
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
 		Some(DEFAULT_PROTOCOL_ID),
@@ -255,7 +242,110 @@ pub fn development_genesis_config(
 }
 
 /// Helper function to create GenesisConfig for public networks
-pub fn edgeware_genesis_config() -> GenesisConfig {
+pub fn edgeware_testnet_config() -> GenesisConfig {
+	// validators
+	let cw_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_cw_testnet_validators();
+
+	let session_keys = cw_authorities.iter().map(|x| (x.0.clone(), session_keys(x.2.clone(), x.4.clone(), x.5.clone())))
+		.collect::<Vec<_>>();
+
+	// balances
+	let cw_allocation: Vec<(AccountId, Balance)> = get_commonwealth_allocation();
+	let lockdrop_allocation = get_lockdrop_participants_allocation(true).unwrap();
+	let lockdrop_balances = lockdrop_allocation.0;
+	let lockdrop_vesting = lockdrop_allocation.1;
+
+	// other configuration items
+	let root_key = get_testnet_root_key();
+	let identity_verifiers = get_testnet_identity_verifiers();
+	let election_members = get_testnet_election_members();
+
+	GenesisConfig {
+		system: Some(SystemConfig {
+			code: WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		balances: Some(BalancesConfig {
+			balances: cw_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
+				.chain(cw_authorities.iter().map(|x| (x.0.clone(), x.3.clone()))) // stash accounts
+				.chain(cw_authorities.iter().map(|x| (x.1.clone(), CONTROLLER_ENDOWMENT))) // controller accounts
+				.chain(lockdrop_balances.iter().map(|x| (x.0.clone(), x.1.clone()))) // lockdrop accounts
+				.collect(),
+			vesting: lockdrop_vesting,
+		}),
+		indices: Some(IndicesConfig {
+			ids: cw_allocation.iter().map(|x| x.0.clone())
+				.chain(cw_authorities.iter().map(|x| x.0.clone()))
+				.chain(cw_authorities.iter().map(|x| x.1.clone()))
+				.chain(lockdrop_balances.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
+		}),
+		session: Some(SessionConfig {
+			keys: session_keys,
+		}),
+		staking: Some(StakingConfig {
+			current_era: 0,
+			validator_count: 60,
+			minimum_validator_count: 0,
+			stakers: cw_authorities.iter().map(|x| (
+				x.0.clone(),
+				x.1.clone(),
+				// Ensure stakers have some non-bonded balance
+				x.3.clone() - 10000000000000000000,
+				StakerStatus::Validator
+			)).collect(),
+			invulnerables: vec![],
+			slash_reward_fraction: Perbill::from_percent(0),
+			.. Default::default()
+		}),
+		democracy: Some(DemocracyConfig::default()),
+		collective_Instance1: Some(CouncilConfig {
+			members: election_members.iter().map(|x| x.clone()).collect(),
+			phantom: Default::default(),
+		}),
+		elections: Some(ElectionsConfig {
+			members: election_members.iter().map(|x| (x.clone(), 6 * 28 * DAYS)).collect(),
+			desired_seats: 4,
+			presentation_duration: (1 * DAYS).try_into().unwrap(),
+			term_duration: (30 * DAYS).try_into().unwrap(),
+		}),
+		contracts: Some(ContractsConfig {
+			current_schedule: Default::default(),
+			gas_price: 1 * MILLICENTS,
+		}),
+		sudo: Some(SudoConfig {
+			key: root_key,
+		}),
+		im_online: Some(ImOnlineConfig {
+			keys: vec![],
+		}),
+		aura: Some(AuraConfig {
+			authorities: vec![],
+		}),
+		grandpa: Some(GrandpaConfig {
+			authorities: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig{
+			keys: vec![],
+		}),
+		identity: Some(IdentityConfig {
+			verifiers: identity_verifiers,
+			expiration_length: (7 * DAYS).try_into().unwrap(),
+			registration_bond: 1 * DOLLARS,
+		}),
+		signaling: Some(SignalingConfig {
+			voting_length: (14 * DAYS).try_into().unwrap(),
+			proposal_creation_bond: 100 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
+			minting_interval: One::one(),
+		}),
+	}
+}
+
+/// Helper function to create GenesisConfig for public networks
+pub fn edgeware_mainnet_config() -> GenesisConfig {
 	// validators
 	let cw_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_cw_mainnet_validators();
 	let initial_lockdrop_authorities: Vec<(AccountId, AccountId, AuraId, Balance, GrandpaId, ImOnlineId)> = get_lockdrop_mainnet_validators();
@@ -324,9 +414,9 @@ pub fn edgeware_genesis_config() -> GenesisConfig {
 		}),
 		elections: Some(ElectionsConfig {
 			members: election_members.iter().map(|x| (x.clone(), 6 * 28 * DAYS)).collect(),
-			desired_seats: 6,
+			desired_seats: 11,
 			presentation_duration: (3 * DAYS).try_into().unwrap(),
-			term_duration: (6 * 28 * DAYS).try_into().unwrap(),
+			term_duration: (180 * DAYS).try_into().unwrap(),
 		}),
 		contracts: Some(ContractsConfig {
 			current_schedule: Default::default(),
