@@ -658,14 +658,14 @@ dependencies = [
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -677,14 +677,14 @@ dependencies = [
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -695,19 +695,19 @@ dependencies = [
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -718,14 +718,14 @@ dependencies = [
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -755,32 +755,32 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "structopt 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-basic-authorship 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-cli 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-finality-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-basic-authorship 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-cli 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-finality-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "transaction-factory 0.0.1 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "transaction-factory 0.0.1 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -790,24 +790,24 @@ dependencies = [
  "edgeware-primitives 1.0.0",
  "edgeware-runtime 1.0.0",
  "parity-codec 4.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-test-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-test-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "trie-root 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wabt 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -819,12 +819,12 @@ dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-serializer 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-serializer 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -841,11 +841,11 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -862,40 +862,40 @@ dependencies = [
  "rustc-hex 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-authority-discovery 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-authorship 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-collective 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-democracy 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-elections 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-executive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-offences 1.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-authority-discovery 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-authorship 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-collective 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-democracy 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-elections 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-executive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-offences 1.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "srml-staking-reward-curve 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-sudo 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-offchain-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-wasm-builder-runner 1.0.3 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "srml-sudo 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-offchain-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-wasm-builder-runner 1.0.3 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -917,33 +917,33 @@ dependencies = [
  "rand_chacha 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "structopt 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-basic-authorship 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-finality-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-rpc 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-service-test 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-basic-authorship 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-finality-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-rpc 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-service-test 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
- "transaction-factory 0.0.1 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "transaction-factory 0.0.1 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -1100,7 +1100,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "fork-tree"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -3537,7 +3537,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 [[package]]
 name = "sr-api-macros"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "blake2-rfc 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)",
  "proc-macro-crate 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3549,24 +3549,24 @@ dependencies = [
 [[package]]
 name = "sr-io"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "environmental 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "hash-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "libsecp256k1 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_version 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tiny-keccak 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "sr-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "integer-sqrt 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3576,38 +3576,38 @@ dependencies = [
  "paste 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "sr-sandbox"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc_version 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "wasmi 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "sr-staking-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "sr-std"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "rustc_version 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -3615,296 +3615,296 @@ dependencies = [
 [[package]]
 name = "sr-version"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-serde 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-aura"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-authority-discovery"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-authorship"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-balances"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-collective"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-contracts"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-wasm 0.40.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "pwasm-utils 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-sandbox 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-sandbox 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "wasmi-validation 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "srml-democracy"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-elections"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-executive"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-finality-tracker"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-grandpa"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-im-online"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-indices"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-metadata"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-offences"
 version = "1.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-session"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-staking"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-authorship 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-phragmen 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-authorship 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-phragmen 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -3921,21 +3921,21 @@ dependencies = [
 [[package]]
 name = "srml-sudo"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-support"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "bitmask 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3943,43 +3943,43 @@ dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "paste 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-metadata 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support-procedural 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-metadata 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support-procedural 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-support-procedural"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "proc-macro2 0.4.30 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-api-macros 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support-procedural-tools 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-api-macros 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support-procedural-tools 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "syn 0.15.44 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "srml-support-procedural-tools"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "proc-macro-crate 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "proc-macro2 0.4.30 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)",
- "srml-support-procedural-tools-derive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "srml-support-procedural-tools-derive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "syn 0.15.44 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "srml-support-procedural-tools-derive"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "proc-macro2 0.4.30 (registry+https://github.com/rust-lang/crates.io-index)",
  "quote 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -3989,47 +3989,47 @@ dependencies = [
 [[package]]
 name = "srml-system"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "safe-mix 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-timestamp"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "impl-trait-for-tuples 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "srml-treasury"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -4107,19 +4107,19 @@ dependencies = [
 [[package]]
 name = "substrate-application-crypto"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-authority-discovery"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4130,40 +4130,40 @@ dependencies = [
  "prost 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "prost-build 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tokio-timer 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "substrate-authority-discovery-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-basic-authorship"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -4180,7 +4180,7 @@ dependencies = [
 [[package]]
 name = "substrate-cli"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "ansi_term 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "app_dirs 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4198,16 +4198,16 @@ dependencies = [
  "regex 1.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "rpassword 3.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "structopt 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "time 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -4215,7 +4215,7 @@ dependencies = [
 [[package]]
 name = "substrate-client"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4227,24 +4227,24 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-api-macros 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-api-macros 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-client-db"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "hash-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "kvdb 0.1.0 (git+https://github.com/paritytech/parity-common?rev=b0317f649ab2c665b7987b8475878fc4d2e1f81d)",
@@ -4254,20 +4254,20 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-consensus-aura"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4275,52 +4275,52 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-slots 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-slots 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-consensus-aura-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-consensus-babe-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "schnorrkel 0.8.5 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-slots 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-slots 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-consensus-common"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4329,35 +4329,35 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-consensus-slots"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-timer 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-executor"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4366,13 +4366,13 @@ dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-wasm 0.40.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-serializer 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-wasm-interface 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-serializer 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-wasm-interface 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tiny-keccak 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasmi 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -4380,10 +4380,10 @@ dependencies = [
 [[package]]
 name = "substrate-finality-grandpa"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "finality-grandpa 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "fork-tree 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "fork-tree 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4391,16 +4391,16 @@ dependencies = [
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tokio-executor 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-timer 0.2.11 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -4408,58 +4408,58 @@ dependencies = [
 [[package]]
 name = "substrate-finality-grandpa-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-inherents"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-keyring"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "strum 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "strum_macros 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-keystore"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "subtle 2.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "substrate-network"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "bitflags 1.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4467,7 +4467,7 @@ dependencies = [
  "either 1.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "erased-serde 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "fork-tree 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "fork-tree 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-timer 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4485,12 +4485,12 @@ dependencies = [
  "slog 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "slog_derive 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "smallvec 0.6.10 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-babe-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-peerset 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-babe-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-peerset 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tokio-io 0.1.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "unsigned-varint 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "void 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4500,7 +4500,7 @@ dependencies = [
 [[package]]
 name = "substrate-offchain"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4513,28 +4513,28 @@ dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-offchain-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-offchain-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-offchain-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-panic-handler"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "backtrace 0.3.38 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4543,7 +4543,7 @@ dependencies = [
 [[package]]
 name = "substrate-peerset"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "libp2p 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4556,16 +4556,16 @@ dependencies = [
 [[package]]
 name = "substrate-phragmen"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "base58 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "blake2-rfc 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4587,7 +4587,7 @@ dependencies = [
  "schnorrkel 0.8.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "sha2 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "substrate-bip39 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "tiny-bip39 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "twox-hash 1.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4598,7 +4598,7 @@ dependencies = [
 [[package]]
 name = "substrate-rpc"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "hash-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4607,23 +4607,23 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-rpc-api 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-rpc-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-rpc-api 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-rpc-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-rpc-api"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4636,25 +4636,25 @@ dependencies = [
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-rpc-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-graph 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-rpc-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-graph 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-rpc-primitives"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-rpc-servers"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "jsonrpc-core 13.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonrpc-http-server 13.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4663,13 +4663,13 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-serializer"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4678,7 +4678,7 @@ dependencies = [
 [[package]]
 name = "substrate-service"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "exit-future 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4692,24 +4692,24 @@ dependencies = [
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "slog 2.5.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-authority-discovery 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-offchain 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-rpc 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-rpc-servers 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-authority-discovery 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-offchain 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-rpc 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-rpc-servers 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "sysinfo 0.9.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "target_info 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-executor 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4719,18 +4719,18 @@ dependencies = [
 [[package]]
 name = "substrate-service-test"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "env_logger 0.6.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "fdlimit 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "tempdir 0.3.7 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -4738,29 +4738,29 @@ dependencies = [
 [[package]]
 name = "substrate-session"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-state-db"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-state-machine"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "hash-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4768,9 +4768,9 @@ dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "trie-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "trie-root 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -4778,7 +4778,7 @@ dependencies = [
 [[package]]
 name = "substrate-telemetry"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -4800,60 +4800,60 @@ dependencies = [
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "hash-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-transaction-graph"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-preview 0.3.0-alpha.19 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-transaction-pool"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "derive_more 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.9.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-transaction-graph 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-transaction-graph 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
 name = "substrate-trie"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "hash-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "memory-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
  "trie-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "trie-root 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -4861,12 +4861,12 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder-runner"
 version = "1.0.3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 
 [[package]]
 name = "substrate-wasm-interface"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "wasmi 0.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -5226,16 +5226,16 @@ dependencies = [
 [[package]]
 name = "transaction-factory"
 version = "0.0.1"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0#664e6d97a81713de0f5760e79ccdbe1a8ec19eab"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2#39ff177154b7ff985e00da1a46cadf3650d0de61"
 dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-cli 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
- "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)",
+ "sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-cli 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
+ "substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)",
 ]
 
 [[package]]
@@ -5825,7 +5825,7 @@ dependencies = [
 "checksum fnv 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "2fad85553e09a6f881f739c29f0b00b0f01357c743266d478b68951ce23285f3"
 "checksum foreign-types 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)" = "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1"
 "checksum foreign-types-shared 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
-"checksum fork-tree 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
+"checksum fork-tree 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
 "checksum fs-swap 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "921d332c89b3b61a826de38c61ee5b6e02c56806cade1b0e5d81bd71f57a71bb"
 "checksum fuchsia-cprng 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "a06f77d526c1a601b7c4cdd98f54b5eaabffc14d5f2f0296febdc7f357c6d3ba"
 "checksum fuchsia-zircon 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2e9763c69ebaae630ba35f74888db465e49e259ba1bc0eda7d06f4a067615d82"
@@ -6073,39 +6073,39 @@ dependencies = [
 "checksum soketto 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "bceb1a3a15232d013d9a3b7cac9e5ce8e2313f348f01d4bc1097e5e53aa07095"
 "checksum sourcefile 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)" = "4bf77cb82ba8453b42b6ae1d692e4cdc92f9a47beaf89a847c8be83f4e328ad3"
 "checksum spin 0.5.2 (registry+https://github.com/rust-lang/crates.io-index)" = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
-"checksum sr-api-macros 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum sr-sandbox 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-authority-discovery 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-authorship 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-collective 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-democracy 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-elections 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-executive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-metadata 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-offences 1.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
+"checksum sr-api-macros 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum sr-io 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum sr-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum sr-sandbox 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum sr-staking-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum sr-std 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum sr-version 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-authority-discovery 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-authorship 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-balances 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-collective 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-contracts 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-democracy 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-elections 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-executive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-finality-tracker 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-im-online 0.1.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-indices 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-metadata 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-offences 1.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-staking 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
 "checksum srml-staking-reward-curve 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-sudo 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-support-procedural 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-support-procedural-tools 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-support-procedural-tools-derive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
+"checksum srml-sudo 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-support 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-support-procedural 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-support-procedural-tools 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-support-procedural-tools-derive 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-system 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-timestamp 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum srml-treasury 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
 "checksum stable_deref_trait 1.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "dba1a27d3efae4351c8051072d619e3ade2820635c3958d826bfea39d59b54c8"
 "checksum static_assertions 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "c19be23126415861cb3a23e501d34a708f7f9b2183c5252d690941c2e69199d5"
 "checksum static_slice 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)" = "92a7e0c5e3dfb52e8fbe0e63a1b947bbb17b4036408b151353c4491374931362"
@@ -6116,49 +6116,49 @@ dependencies = [
 "checksum structopt-derive 0.2.18 (registry+https://github.com/rust-lang/crates.io-index)" = "53010261a84b37689f9ed7d395165029f9cc7abb9f56bbfe86bee2597ed25107"
 "checksum strum 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e5d1c33039533f051704951680f1adfd468fd37ac46816ded0d9ee068e60f05f"
 "checksum strum_macros 0.15.0 (registry+https://github.com/rust-lang/crates.io-index)" = "47cd23f5c7dee395a00fa20135e2ec0fffcdfa151c56182966d7a3261343432e"
-"checksum substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-authority-discovery 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-basic-authorship 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
+"checksum substrate-application-crypto 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-authority-discovery 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-authority-discovery-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-basic-authorship 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
 "checksum substrate-bip39 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "3be511be555a3633e71739a79e4ddff6a6aaa6579fa6114182a51d72c3eb93c5"
-"checksum substrate-cli 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-client-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-consensus-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-consensus-babe-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-consensus-slots 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-finality-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-offchain 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-offchain-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-peerset 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-phragmen 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-rpc 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-rpc-api 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-rpc-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-rpc-servers 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-serializer 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-service-test 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-state-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-test-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-transaction-graph 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-wasm-builder-runner 1.0.3 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
-"checksum substrate-wasm-interface 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
+"checksum substrate-cli 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-client-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-consensus-aura 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-consensus-aura-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-consensus-babe-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-consensus-common 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-consensus-slots 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-executor 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-finality-grandpa 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-finality-grandpa-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-inherents 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-keyring 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-keystore 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-network 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-offchain 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-offchain-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-panic-handler 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-peerset 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-phragmen 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-rpc 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-rpc-api 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-rpc-primitives 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-rpc-servers 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-serializer 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-service 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-service-test 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-session 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-state-db 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-state-machine 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-telemetry 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-test-client 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-transaction-graph 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-transaction-pool 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-trie 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-wasm-builder-runner 1.0.3 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
+"checksum substrate-wasm-interface 2.0.0 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
 "checksum subtle 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "2d67a5a62ba6e01cb2192ff309324cb4875d0c451d55fe2319433abe7a05a8ee"
 "checksum subtle 2.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "ab3af2eb31c42e8f0ccf43548232556c42737e01a96db6e1777b0be108e79799"
 "checksum syn 0.15.44 (registry+https://github.com/rust-lang/crates.io-index)" = "9ca4b3b69a77cbe1ffc9e198781b7acb0c7365a883670e8f1c1bc66fba79a5c5"
@@ -6192,7 +6192,7 @@ dependencies = [
 "checksum tokio-udp 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "f02298505547f73e60f568359ef0d016d5acd6e830ab9bc7c4a5b3403440121b"
 "checksum tokio-uds 0.2.5 (registry+https://github.com/rust-lang/crates.io-index)" = "037ffc3ba0e12a0ab4aca92e5234e0dedeb48fddf6ccd260f1f150a36a9f2445"
 "checksum toml 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)" = "c7aabe75941d914b72bf3e5d3932ed92ce0664d49d8432305a8b547c37227724"
-"checksum transaction-factory 0.0.1 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.0)" = "<none>"
+"checksum transaction-factory 0.0.1 (git+https://github.com/hicommonwealth/substrate.git?branch=testnet-v0.9.2)" = "<none>"
 "checksum trie-db 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d0b62d27e8aa1c07414549ac872480ac82380bab39e730242ab08d82d7cc098a"
 "checksum trie-root 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)" = "226f4b2e7bc6a71172ffe7f137385cf63833de7c684059dde7520ddbf1fb04f4"
 "checksum trie-root 0.15.2 (registry+https://github.com/rust-lang/crates.io-index)" = "0b779f7c1c8fe9276365d9d5be5c4b5adeacf545117bb3f64c974305789c5c0b"
