@@ -51,7 +51,6 @@ type Number = <<edgeware_primitives::Block as BlockT>::Header as HeaderT>::Numbe
 impl<Number> FactoryState<Number> {
 	fn build_extra(index: edgeware_primitives::Index, phase: u64) -> edgeware_runtime::SignedExtra {
 		(
-			Default::default(),
 			system::CheckVersion::new(),
 			system::CheckGenesis::new(),
 			system::CheckEra::from(Era::mortal(256, phase)),
@@ -149,7 +148,7 @@ impl RuntimeAdapter for FactoryState<Number> {
 					(*amount).into()
 				)
 			)
-		}, key, ((), version, genesis_hash.clone(), prior_block_hash.clone(), (), (), (), ()))
+		}, key, (version, genesis_hash.clone(), prior_block_hash.clone(), (), (), (), ()))
 	}
 
 	fn inherent_extrinsics(&self) -> InherentData {
