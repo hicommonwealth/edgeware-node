@@ -91,8 +91,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 20,
-	impl_version: 20,
+	spec_version: 22,
+	impl_version: 22,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -188,7 +188,7 @@ impl indices::Trait for Runtime {
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
 	// Mainnet genesis tx fee
-	pub const TransferFee: Balance = 9999999999 * DOLLARS;
+	pub const TransferFee: Balance = 1 * CENTS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -251,7 +251,7 @@ impl_opaque_keys! {
 // should be easy, since OneSessionHandler trait provides the `Key` as an associated type. #2858
 
 parameter_types! {
-	pub const Period: BlockNumber = 60 * MINUTES;
+	pub const Period: BlockNumber = 10 * MINUTES;
 	pub const Offset: BlockNumber = 0;
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 }
@@ -274,9 +274,9 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 10;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 3;
 	// Mainnet genesis bonding duration - number of eras to bond where eras are 1 hour long
-	pub const BondingDuration: staking::EraIndex = 24 * 21;
+	pub const BondingDuration: staking::EraIndex = 2;
 }
 srml_staking_reward_curve::build! {
         const I_NPOS: PiecewiseLinear<'static> = curve!(
@@ -304,11 +304,11 @@ impl staking::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const EmergencyVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
         pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 }
@@ -352,7 +352,7 @@ parameter_types! {
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = 14 * DAYS;
+	pub const ElectionsVotingPeriod: BlockNumber = 3 * DAYS;
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -378,7 +378,7 @@ impl elections::Trait for Runtime {
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	pub const SpendPeriod: BlockNumber = 3 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(0);
 }
 
@@ -396,7 +396,7 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 9999999999 * DOLLARS;
+	pub const ContractTransferFee: Balance = 1 * CENTS;
 	pub const ContractCreationFee: Balance = 1 * CENTS;
 	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;

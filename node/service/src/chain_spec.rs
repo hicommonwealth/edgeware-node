@@ -91,41 +91,6 @@ pub fn local_testnet_chainspec() -> ChainSpec {
 		None)
 }
 
-/// Remote testnet config (multivalidator x6)
-pub fn remote_testnet_chainspec() -> ChainSpec {
-	let boot_nodes = vec![
-		"/ip4/165.22.153.152/tcp/30333/p2p/QmRpheLN4JWdAnY7HGJfWFNbfkQCb6tFf4vvA6hgjMZKrR".to_string(),
-	];
-
-	let data = r#"
-		{
-			"tokenDecimals": 18,
-			"tokenSymbol": "EDG"
-		}"#;
-	let properties = serde_json::from_str(data).unwrap();
-
-	ChainSpec::from_genesis(
-		"Remote Testnet",
-		"remote_testnet",
-		|| { development_genesis_config(
-			vec![
-				get_authority_keys_from_seed("Alice"),
-				get_authority_keys_from_seed("Bob"),
-				get_authority_keys_from_seed("Charlie"),
-				get_authority_keys_from_seed("Dave"),
-				get_authority_keys_from_seed("Eve"),
-				get_authority_keys_from_seed("Ferdie"),
-			],
-			get_authority_keys_from_seed("Alice").0,
-		) },
-		boot_nodes,
-		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
-		Some(DEFAULT_PROTOCOL_ID),
-		None,
-		properties
-	)
-}
-
 /// Edgeware public network config (mainnet and public testnets)
 pub fn edgeware_chainspec(is_testnet: bool) -> ChainSpec {
 	let boot_nodes = if is_testnet { get_testnet_bootnodes() } else { get_mainnet_bootnodes() };
@@ -136,8 +101,8 @@ pub fn edgeware_chainspec(is_testnet: bool) -> ChainSpec {
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
-		"Edgeware",
-		"edgeware",
+		if is_testnet { "Edgeware Testnet" } else { "Edgeware" },
+		if is_testnet { "edgeware-testnet" } else { "edgeware" },
 		if is_testnet { edgeware_testnet_config } else { edgeware_mainnet_config },
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
