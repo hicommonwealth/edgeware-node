@@ -5,7 +5,20 @@
 - Proof-of-Stake (PoS) Blockchain
 - with a WASM Runtime.
 
-Documentation can be found at our [Github Wiki](https://github.com/hicommonwealth/edgeware-node/wiki). For more details about the project, visit the Edgeware website, or check the [blog](blog.edgewa.re) or [Twitter](http://twitter.com/heyedgeware) for the latest. Finally, for discussion and governance, you can use [Commonwealth.im](https://commonwealth.im).
+## For node operators, validators, and other users
+
+A getting started guide can be found at our [Github
+Wiki](https://github.com/hicommonwealth/edgeware-node/wiki), including
+guides for running a node, validating, and setting up basic monitoring
+tools to keep your node online.
+
+For more details about the project, visit the Edgeware website, or
+check out the [blog](https://blog.edgewa.re) or
+[Twitter](https://twitter.com/heyedgeware). Finally, for discussion and
+governance, campaigns and proposals can be found on
+[Commonwealth](https://commonwealth.im).
+
+## For developers
 
 ### Quickstart
 
@@ -17,6 +30,8 @@ script for an automated setup:
 ```
 
 Otherwise, proceed with the full instructions below.
+
+### Manual setup
 
 Install system dependencies:
 
