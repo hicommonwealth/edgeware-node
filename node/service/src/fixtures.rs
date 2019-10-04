@@ -553,13 +553,6 @@ pub fn get_lockdrop_mainnet_validators() -> Vec<(AccountId, AccountId, AuraId, B
 		71788446170493484580155,
 		hex!["21ca647f9356e2f28d182617c00c15ddf20ffcf74324b21eb8ecf0abd1ddf737"].unchecked_into(),
 		hex!["21ca647f9356e2f28d182617c00c15ddf20ffcf74324b21eb8ecf0abd1ddf737"].unchecked_into(),
-	), (
-		hex!["10828f7a486a872aca416a1219525029c5da30d5bef07fd89d13bcde11722a34"].unchecked_into(),
-		hex!["cee9d119da785c1a30db345038086a6fbe0a030dbf30f4f9bc35732467eb237b"].unchecked_into(),
-		hex!["ad686645d12ec43d3fd868881caa2deb9ed0dd31263f537a16829731f6a59763"].unchecked_into(),
-		28091051948247047867530,
-		hex!["ad686645d12ec43d3fd868881caa2deb9ed0dd31263f537a16829731f6a59763"].unchecked_into(),
-		hex!["ad686645d12ec43d3fd868881caa2deb9ed0dd31263f537a16829731f6a59763"].unchecked_into(),
 	)];
 }
 
