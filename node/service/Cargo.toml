@@ -11,33 +11,33 @@ futures = "0.1"
 exit-future = "0.1"
 jsonrpc-core = "13.1.0"
 parity-codec = { version = "4.1.1" }
-sr-io = { git = "https://github.com/hicommonwealth/substrate.git" }
-client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-rpc = { package = "substrate-rpc", git = "https://github.com/hicommonwealth/substrate.git" }
-primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate.git" }
-inherents = { package = "substrate-inherents", git = "https://github.com/hicommonwealth/substrate.git" }
+sr-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+substrate-rpc = { package = "substrate-rpc", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+primitives = { package = "substrate-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+inherents = { package = "substrate-inherents", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
 hex-literal = "0.2"
-substrate-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-service = { git = "https://github.com/hicommonwealth/substrate.git" }
-transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate.git" }
-network = { package = "substrate-network", git = "https://github.com/hicommonwealth/substrate.git" }
-aura = { package = "substrate-consensus-aura", git = "https://github.com/hicommonwealth/substrate.git" }
-aura_primitives = { package = "substrate-consensus-aura-primitives", git = "https://github.com/hicommonwealth/substrate.git" }
-grandpa = { package = "substrate-finality-grandpa", git = "https://github.com/hicommonwealth/substrate.git" }
-grandpa_primitives = { package = "substrate-finality-grandpa-primitives", git = "https://github.com/hicommonwealth/substrate.git" }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-keystore = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-telemetry = { package = "substrate-telemetry", git = "https://github.com/hicommonwealth/substrate.git" }
+substrate-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+substrate-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+network = { package = "substrate-network", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+aura = { package = "substrate-consensus-aura", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+aura_primitives = { package = "substrate-consensus-aura-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+grandpa = { package = "substrate-finality-grandpa", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+grandpa_primitives = { package = "substrate-finality-grandpa-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+substrate-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+substrate-telemetry = { package = "substrate-telemetry", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
 structopt = "0.2"
-transaction-factory = { git = "https://github.com/hicommonwealth/substrate.git" }
-keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git" }
-indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git" }
-im-online = { package = "srml-im-online", git = "https://github.com/hicommonwealth/substrate.git" }
-timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+transaction-factory = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+im-online = { package = "srml-im-online", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
 rand = "0.6"
 rand_chacha = "0.2.1"
-finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git" }
+finality_tracker = { package = "srml-finality-tracker", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
+contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 edgeware-executor = { path = "../executor" }
@@ -47,5 +47,5 @@ serde = { version = "1.0", features = ["derive"] }
 hex = "0.3.2"
 
 [dev-dependencies]
-substrate-consensus-common = { git = "https://github.com/hicommonwealth/substrate.git" }
-service-test = { package = "substrate-service-test", git = "https://github.com/hicommonwealth/substrate.git" }
+substrate-consensus-common = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+service-test = { package = "substrate-service-test", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }

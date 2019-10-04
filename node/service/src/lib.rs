@@ -34,7 +34,8 @@ use network::construct_simple_protocol;
 use aura_primitives::ed25519::AuthorityPair as AuraAuthorityPair;
 
 pub mod chain_spec;
-pub mod fixtures;
+pub mod mainnet_fixtures;
+pub mod testnet_fixtures;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -65,7 +66,7 @@ macro_rules! new_full_start {
 					.ok_or_else(|| substrate_service::Error::SelectChainRequired)?;
 				let (block_import, link_half) =
 					grandpa::block_import::<_, _, _, edgeware_runtime::RuntimeApi, _, _>(
-						client.clone(), client.clone(), select_chain
+						client.clone(), &*client, select_chain
 					)?;
 				let justification_import = block_import.clone();
 
@@ -91,7 +92,7 @@ macro_rules! new_full_start {
 				);
 				io
 			})?;
-		
+
 		(builder, import_setup, inherent_data_providers)
 	}}
 }

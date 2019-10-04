@@ -32,18 +32,19 @@ use support::{
 use substrate_primitives::u32_trait::{_1, _2, _3, _4};
 use edgeware_primitives::{
 	AccountId, AccountIndex, AuraId, Balance, BlockNumber, Hash, Index,
-	Moment, Signature,
+	Moment, Signature
 };
-use grandpa::fg_primitives::{self, ScheduledChange};
+use grandpa::fg_primitives::{self};
 use client::{
 	block_builder::api::{self as block_builder_api, InherentData, CheckInherentsResult},
 	runtime_api as client_api, impl_runtime_apis
 };
 use runtime_primitives::{ApplyResult, impl_opaque_keys, generic, create_runtime_str, key_types};
-use runtime_primitives::transaction_validity::TransactionValidity;
-use runtime_primitives::weights::Weight;
+use runtime_primitives::curve::PiecewiseLinear;
+use runtime_primitives::transaction_validity::{InvalidTransaction, TransactionValidity, TransactionValidityError};
+use runtime_primitives::weights::{Weight, DispatchInfo};
 use runtime_primitives::traits::{
-	self, BlakeTwo256, Block as BlockT, DigestFor, NumberFor, StaticLookup,
+	self, BlakeTwo256, Block as BlockT, NumberFor, StaticLookup
 };
 use version::RuntimeVersion;
 use elections::VoteIndex;
@@ -90,8 +91,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// Per convention: if the runtime behavior changes, increment spec_version and set impl_version
 	// to equal spec_version. If only runtime implementation changes and behavior does not, then
 	// leave spec_version as is and increment impl_version.
-	spec_version: 20,
-	impl_version: 20,
+	spec_version: 24,
+	impl_version: 24,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -154,7 +155,7 @@ impl indices::Trait for Runtime {
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 10 * MILLICENTS;
 	// Mainnet genesis tx fee
-	pub const TransferFee: Balance = 9999999999 * DOLLARS;
+	pub const TransferFee: Balance = 1 * CENTS;
 	pub const CreationFee: Balance = 1 * CENTS;
 	pub const TransactionBaseFee: Balance = 1 * CENTS;
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
@@ -217,8 +218,9 @@ impl_opaque_keys! {
 // should be easy, since OneSessionHandler trait provides the `Key` as an associated type. #2858
 
 parameter_types! {
-	pub const Period: BlockNumber = 60 * MINUTES;
+	pub const Period: BlockNumber = 10 * MINUTES;
 	pub const Offset: BlockNumber = 0;
+	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 }
 
 impl session::Trait for Runtime {
@@ -230,6 +232,7 @@ impl session::Trait for Runtime {
 	type ValidatorId = AccountId;
 	type ValidatorIdOf = staking::StashOf<Self>;
 	type SelectInitialValidators = Staking;
+	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
 }
 
 impl session::historical::Trait for Runtime {
@@ -238,9 +241,19 @@ impl session::historical::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 10;
+	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 3;
 	// Mainnet genesis bonding duration - number of eras to bond where eras are 1 hour long
-	pub const BondingDuration: staking::EraIndex = 24 * 21;
+	pub const BondingDuration: staking::EraIndex = 2;
+}
+srml_staking_reward_curve::build! {
+        const I_NPOS: PiecewiseLinear<'static> = curve!(
+                min_inflation: 0_025_000,
+                max_inflation: 0_100_000,
+                ideal_stake: 0_800_000,
+                falloff: 0_050_000,
+                max_piece_count: 40,
+                test_precision: 0_005_000,
+        );
 }
 
 impl staking::Trait for Runtime {
@@ -254,15 +267,17 @@ impl staking::Trait for Runtime {
 	type SessionsPerEra = SessionsPerEra;
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
+        type RewardCurve = RewardCurve;
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
-	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const EmergencyVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 28 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+        pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 }
 
 impl democracy::Trait for Runtime {
@@ -299,11 +314,12 @@ parameter_types! {
 	pub const CandidacyBond: Balance = 500 * DOLLARS;
 	pub const VotingBond: Balance = 50 * DOLLARS;
 	pub const VotingFee: Balance = 1 * DOLLARS;
+	pub const MinimumVotingLock: Balance = 1 * DOLLARS;
 	pub const PresentSlashPerVoter: Balance = 1 * DOLLARS;
 	pub const CarryCount: u32 = 6;
 	// one additional vote should go by before an inactive voter can be reaped.
 	pub const InactiveGracePeriod: VoteIndex = 1;
-	pub const ElectionsVotingPeriod: BlockNumber = 14 * DAYS;
+	pub const ElectionsVotingPeriod: BlockNumber = 3 * DAYS;
 	pub const DecayRatio: u32 = 0;
 }
 
@@ -318,6 +334,7 @@ impl elections::Trait for Runtime {
 	type CandidacyBond = CandidacyBond;
 	type VotingBond = VotingBond;
 	type VotingFee = VotingFee;
+	type MinimumVotingLock = MinimumVotingLock;
 	type PresentSlashPerVoter = PresentSlashPerVoter;
 	type CarryCount = CarryCount;
 	type InactiveGracePeriod = InactiveGracePeriod;
@@ -328,7 +345,7 @@ impl elections::Trait for Runtime {
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(2);
 	pub const ProposalBondMinimum: Balance = 50 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	pub const SpendPeriod: BlockNumber = 3 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(0);
 }
 
@@ -346,7 +363,7 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 9999999999 * DOLLARS;
+	pub const ContractTransferFee: Balance = 1 * CENTS;
 	pub const ContractCreationFee: Balance = 1 * CENTS;
 	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;
@@ -373,11 +390,11 @@ impl contracts::Trait for Runtime {
 	type SurchargeReward = SurchargeReward;
 	type TransferFee = ContractTransferFee;
 	type CreationFee = ContractCreationFee;
+        type InstantiateBaseFee = contracts::DefaultInstantiateBaseFee;
 	type TransactionBaseFee = ContractTransactionBaseFee;
 	type TransactionByteFee = ContractTransactionByteFee;
 	type ContractFee = ContractFee;
 	type CallBaseFee = contracts::DefaultCallBaseFee;
-	type CreateBaseFee = contracts::DefaultCreateBaseFee;
 	type MaxDepth = contracts::DefaultMaxDepth;
 	type MaxValueSize = contracts::DefaultMaxValueSize;
 	type BlockGasLimit = contracts::DefaultBlockGasLimit;
@@ -396,7 +413,6 @@ impl im_online::Trait for Runtime {
 	type Event = Event;
 	type SubmitTransaction = SubmitTransaction;
 	type ReportUnresponsiveness = Offences;
-	type CurrentElectedSet = staking::CurrentElectedStashAccounts<Runtime>;
 }
 
 impl offences::Trait for Runtime {
@@ -586,18 +602,6 @@ impl_runtime_apis! {
 	}
 
 	impl fg_primitives::GrandpaApi<Block> for Runtime {
-		fn grandpa_pending_change(digest: &DigestFor<Block>)
-			-> Option<ScheduledChange<NumberFor<Block>>>
-		{
-			Grandpa::pending_change(digest)
-		}
-
-		fn grandpa_forced_change(digest: &DigestFor<Block>)
-			-> Option<(NumberFor<Block>, ScheduledChange<NumberFor<Block>>)>
-		{
-			Grandpa::forced_change(digest)
-		}
-
 		fn grandpa_authorities() -> Vec<(GrandpaId, GrandpaWeight)> {
 			Grandpa::grandpa_authorities()
 		}

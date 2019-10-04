@@ -32,7 +32,6 @@ extern crate srml_system as system;
 use rstd::prelude::*;
 use rstd::result;
 use system::ensure_signed;
-use runtime_support::{StorageValue, StorageMap};
 use runtime_support::dispatch::Result;
 use runtime_primitives::traits::Hash;
 
@@ -252,7 +251,7 @@ impl<T: Trait> Module<T> {
 				if vote[i] == outcomes[i] { continue; }
 				else { return false }
 			}
-			
+
 			true
 		} else {
 			false
