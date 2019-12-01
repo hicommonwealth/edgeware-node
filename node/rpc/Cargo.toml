@@ -1,24 +1,16 @@
 [package]
 name = "edgeware-rpc"
-version = "1.0.0"
-authors = ["drewstone <drewstone329@gmail.com>"]
+version = "2.0.0"
+authors = ["Parity Technologies <admin@parity.io>"]
 edition = "2018"
 
 [dependencies]
-client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
-jsonrpc-core = "13.0.0"
-jsonrpc-core-client = "13.0.0"
-jsonrpc-derive = "13.0.0"
-jsonrpc-pubsub = "13.0.0"
-keyring = { package = "substrate-keyring", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
-log = "0.4"
-codec = { package = "parity-scale-codec", version = "1.0.0" }
-serde = { version = "1.0", features = ["derive"] }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
-substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
-transaction_pool = { package = "substrate-transaction-pool", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+client = { package = "substrate-client", git = "https://github.com/paritytech/substrate.git" }
+jsonrpc-core = "14.0.3"
 edgeware-primitives = { path = "../primitives" }
-
-[dev-dependencies]
 edgeware-runtime = { path = "../runtime" }
-env_logger = "0.6"
+sr-primitives = { git = "https://github.com/paritytech/substrate.git" }
+pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git" }
+pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git" }
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git" }
+txpool-api = { package = "sp-transaction-pool-api", git = "https://github.com/paritytech/substrate.git" }

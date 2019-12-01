@@ -6,40 +6,35 @@ edition = "2018"
 
 [dependencies]
 serde = { version = "1.0", default-features = false, optional = true }
-serde_derive = { version = "1.0", optional = true }
 safe-mix = { version = "1.0", default-features = false }
-parity-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false, features = ["derive"] }
-substrate-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", optional = true }
-substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-staking-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-std = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-treasury = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
+codec = { package = "parity-scale-codec", version = "1.0.6", default-features = false, features = ["derive"] }
+rstd = { package = "sr-std", git = "https://github.com/paritytech/substrate.git", default-features = false }
+sr-primitives = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+support = { package = "frame-support", git = "https://github.com/paritytech/substrate.git", default-features = false }
+system = { package = "frame-system", git = "https://github.com/paritytech/substrate.git", default-features = false }
+staking = { package = "pallet-staking", git = "https://github.com/paritytech/substrate.git", default-features = false }
+balances = { package = "pallet-balances", git = "https://github.com/paritytech/substrate.git", default-features = false }
+treasury = { package = "pallet-treasury", git = "https://github.com/paritytech/substrate.git", default-features = false }
+
+[dev-dependencies]
+sr-io = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+sr-staking-primitives = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+substrate-primitives = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+staking-reward-curve = { package = "pallet-staking-reward-curve", git = "https://github.com/paritytech/substrate.git", default-features = false }
+session = { package = "pallet-session", git = "https://github.com/paritytech/substrate.git", default-features = false }
+timestamp = { package = "pallet-timestamp", git = "https://github.com/paritytech/substrate.git", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-	"serde/std",
-	"serde_derive",
+	"serde",
 	"safe-mix/std",
-	"parity-codec/std",
-	"substrate-primitives/std",
-	"sr-std/std",
-	"sr-io/std",
-	"srml-support/std",
-	"srml-system/std",
-	"srml-staking/std",
-	"srml-session/std",
+	"codec/std",
+	"rstd/std",
 	"sr-primitives/std",
-	"srml-treasury/std",
-	"srml-balances/std",
-	"srml-timestamp/std",
-	"sr-staking-primitives/std",
+	"balances/std",
+	"support/std",
+	"system/std",
+	"staking/std",
+	"treasury/std",
 ]
