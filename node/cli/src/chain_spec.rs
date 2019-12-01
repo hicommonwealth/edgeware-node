@@ -271,13 +271,14 @@ pub fn testnet_genesis(
 		balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned().map(|k| (k, ENDOWMENT))
 				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
-				.chain(balances)
+				.chain(balances.clone())
 				.collect(),
 			vesting: vesting,
 		}),
 		indices: Some(IndicesConfig {
 			ids: endowed_accounts.iter().cloned()
 				.chain(initial_authorities.iter().map(|x| x.0.clone()))
+				.chain(balances.iter().map(|x| x.0.clone()))
 				.collect::<Vec<_>>(),
 		}),
 		session: Some(SessionConfig {
