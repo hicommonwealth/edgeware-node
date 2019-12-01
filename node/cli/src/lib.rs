@@ -86,7 +86,7 @@ impl ChainSpec {
 			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
 			// "edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
 			"edg-0.9.0" => Some(ChainSpec::EDGTestnet090),
-				"edg-0.9.5" => Some(ChainSpec::EDGTestnet095),
+			"edg-0.9.5" => Some(ChainSpec::EDGTestnet095),
 			_ => None,
 		}
 	}

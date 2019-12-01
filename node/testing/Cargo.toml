@@ -1,7 +1,7 @@
 [package]
 name = "edgeware-testing"
 version = "2.0.0"
-authors = ["Parity Technologies <admin@parity.io>"]
+authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Test utilities for Edgeware."
 edition = "2018"
 

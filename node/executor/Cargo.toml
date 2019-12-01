@@ -1,8 +1,8 @@
 [package]
 name = "edgeware-executor"
 version = "2.0.0"
-authors = ["Parity Technologies <admin@parity.io>"]
-description = "Substrate node implementation in Rust."
+authors = ["Commonwealth Labs <hello@commonwealth.im>"]
+description = "Edgeware implementation using a substrate node."
 edition = "2018"
 
 [dependencies]
