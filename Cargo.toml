@@ -4,7 +4,6 @@ members = [
 	"modules/edge-identity",
 	"modules/edge-voting",
 	"modules/edge-treasury-reward",
-	"modules/edge-x",
 	"node/cli",
 	"node/executor",
 	"node/primitives",
