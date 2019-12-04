@@ -61,7 +61,7 @@ pub enum ChainSpec {
 	/// 0.9.0 Testnet configuration
 	EDGTestnet090,
 	/// 0.9.5 Testnet configuration
-	EDGTestnet095,
+	EDGTestnet099,
 	// /// Edgeware mainnet configuration
 	// EdgewareMainnetConfig,
 }
@@ -75,7 +75,7 @@ impl ChainSpec {
 			ChainSpec::StagingTestnet => chain_spec::staging_testnet_config(),
 			ChainSpec::EdgewareTestnetConfig => chain_spec::edgeware_testnet_config(),
 			ChainSpec::EDGTestnet090 => chain_spec::edgeware_testnet_v090_config(),
-			ChainSpec::EDGTestnet095 => chain_spec::edgeware_testnet_v095_config(),
+			ChainSpec::EDGTestnet099 => chain_spec::edgeware_testnet_v099_config(),
 			// ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_chainspec(false),
 		})
 	}
@@ -88,7 +88,7 @@ impl ChainSpec {
 			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
 			// "edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
 			"edg-0.9.0" => Some(ChainSpec::EDGTestnet090),
-			"edg-0.9.5" => Some(ChainSpec::EDGTestnet095),
+			"edg-0.9.5" => Some(ChainSpec::EDGTestnet099),
 			_ => None,
 		}
 	}

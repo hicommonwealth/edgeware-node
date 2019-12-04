@@ -91,8 +91,8 @@ pub fn edgeware_testnet_v090_config() -> ChainSpec {
 }
 
 /// 0.9.5 Testnet configuration
-pub fn edgeware_testnet_v095_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/testnet-0.9.5.chainspec.json")) {
+pub fn edgeware_testnet_v099_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/testnet-0.9.9.chainspec.json")) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}
