@@ -5,12 +5,11 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
-primitives = { package = "substrate-primitives", git = "https://github.com/paritytech/substrate.git", default-features = false }
-sr-primitives = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-aura-primitives = { package = "substrate-consensus-aura-primitives", git = "https://github.com/paritytech/substrate.git", default_features = false }
+primitives = { package = "sp-core", git = "https://github.com/drewstone/substrate.git", default-features = false }
+sr-primitives = { package = "sp-runtime", git = "https://github.com/drewstone/substrate.git", default-features = false }
 
 [dev-dependencies]
-substrate-serializer = { git = "https://github.com/paritytech/substrate.git" }
+substrate-serializer = { package = "sp-serializer", git = "https://github.com/drewstone/substrate.git" }
 pretty_assertions = "0.6.1"
 
 [features]
@@ -18,5 +17,4 @@ default = ["std"]
 std = [
 	"primitives/std",
 	"sr-primitives/std",
-	"aura-primitives/std",
 ]

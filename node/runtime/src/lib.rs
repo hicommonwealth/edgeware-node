@@ -27,11 +27,11 @@ use support::{
 use primitives::u32_trait::{_1, _2, _3, _4};
 use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature};
 use sr_api::impl_runtime_apis;
-use sr_primitives::{Permill, Perbill, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
-use sr_primitives::curve::PiecewiseLinear;
-use sr_primitives::transaction_validity::TransactionValidity;
+use sp_runtime::{Permill, Perbill, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
+use sp_runtime::curve::PiecewiseLinear;
+use sp_runtime::transaction_validity::TransactionValidity;
 use support::weights::Weight;
-use sr_primitives::traits::{
+use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, NumberFor, StaticLookup, SaturatedConversion,
 	OpaqueKeys,
 };
@@ -50,7 +50,7 @@ use system::offchain::TransactionSubmitter;
 
 
 #[cfg(any(feature = "std", test))]
-pub use sr_primitives::BuildStorage;
+pub use sp_runtime::BuildStorage;
 pub use timestamp::Call as TimestampCall;
 pub use balances::Call as BalancesCall;
 pub use contracts::Gas;
@@ -737,7 +737,7 @@ mod tests {
 
 	#[test]
 	fn block_hooks_weight_should_not_exceed_limits() {
-		use sr_primitives::weights::WeighBlock;
+		use sp_runtime::weights::WeighBlock;
 		let check_for_block = |b| {
 			let block_hooks_weight =
 				<AllModules as WeighBlock<BlockNumber>>::on_initialize(b) +

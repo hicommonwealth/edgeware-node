@@ -5,12 +5,12 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
-client = { package = "substrate-client", git = "https://github.com/paritytech/substrate.git" }
+client = { package = "sc-client", git = "https://github.com/drewstone/substrate.git" }
 jsonrpc-core = "14.0.3"
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
-sr-primitives = { git = "https://github.com/paritytech/substrate.git" }
-pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git" }
-pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git" }
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git" }
-txpool-api = { package = "sp-transaction-pool-api", git = "https://github.com/paritytech/substrate.git" }
+sr-primitives = { package = "sp-runtime", git = "https://github.com/drewstone/substrate.git" }
+pallet-contracts-rpc = { git = "https://github.com/drewstone/substrate.git" }
+pallet-transaction-payment-rpc = { git = "https://github.com/drewstone/substrate.git" }
+substrate-frame-rpc-system = { git = "https://github.com/drewstone/substrate.git" }
+txpool-api = { package = "sp-transaction-pool-api", git = "https://github.com/drewstone/substrate.git" }

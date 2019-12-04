@@ -18,8 +18,8 @@
 
 use edgeware_primitives::Balance;
 use support::weights::Weight;
-use sr_primitives::traits::{Convert, Saturating};
-use sr_primitives::{Fixed64, Perbill};
+use sp_runtime::traits::{Convert, Saturating};
+use sp_runtime::{Fixed64, Perbill};
 use support::traits::{OnUnbalanced, Currency, Get};
 use crate::{Balances, System, Authorship, MaximumBlockWeight, NegativeImbalance};
 
@@ -116,8 +116,8 @@ impl<T: Get<Perbill>> Convert<Fixed64, Fixed64> for TargetedFeeAdjustment<T> {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use sr_primitives::weights::Weight;
-	use sr_primitives::assert_eq_error_rate;
+	use sp_runtime::weights::Weight;
+	use sp_runtime::assert_eq_error_rate;
 	use crate::{MaximumBlockWeight, AvailableBlockRatio, Runtime};
 	use crate::{constants::currency::*, TransactionPayment, TargetBlockFullness};
 
