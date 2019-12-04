@@ -40,6 +40,8 @@ mod cli;
 #[cfg(feature = "cli")]
 mod factory_impl;
 
+mod testnet_fixtures;
+
 #[cfg(feature = "browser")]
 pub use browser::*;
 #[cfg(feature = "cli")]
