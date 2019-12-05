@@ -17,7 +17,7 @@ balances = { package = "pallet-balances", git = "https://github.com/drewstone/su
 treasury = { package = "pallet-treasury", git = "https://github.com/drewstone/substrate.git", default-features = false }
 
 [dev-dependencies]
-sp-io = { git = "https://github.com/drewstone/substrate.git", default-features = false }
+sr-io = { package = "sp-io", git = "https://github.com/drewstone/substrate.git", default-features = false }
 sr-staking-primitives = { package = "sp-staking", git = "https://github.com/drewstone/substrate.git", default-features = false }
 substrate-primitives = { package = "sp-core", git = "https://github.com/drewstone/substrate.git", default-features = false }
 staking-reward-curve = { package = "pallet-staking-reward-curve", git = "https://github.com/drewstone/substrate.git", default-features = false }
