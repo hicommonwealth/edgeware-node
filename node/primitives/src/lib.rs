@@ -20,28 +20,22 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use runtime_primitives::{
-	generic, traits::{Verify, BlakeTwo256}, OpaqueExtrinsic, AnySignature
+use sr_primitives::{
+	generic, traits::{Verify, BlakeTwo256, IdentifyAccount}, OpaqueExtrinsic, MultiSignature
 };
 
 /// An index to a block.
 pub type BlockNumber = u32;
 
-/// An accounts nonce
-pub type Nonce = u32;
-
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = AnySignature;
+pub type Signature = MultiSignature;
 
-/// The type used by authorities to prove their ID.
-pub type AccountSignature = primitives::ed25519::Signature;
+/// Some way of identifying an account on the chain. We intentionally make it equivalent
+/// to the public key of our transaction signing scheme.
+pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
 
-/// Alias to pubkey that identifies an account on the chain.
-pub type AccountId = <Signature as Verify>::Signer;
-
-/// The type for looking up accounts. We don't expect more than 4 billion of them, but you
-/// never know...
-pub type AccountIndex = Nonce;
+/// The type for looking up accounts. We don't expect more than 4 billion of them.
+pub type AccountIndex = u32;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -49,18 +43,8 @@ pub type Balance = u128;
 /// Type used for expressing timestamp.
 pub type Moment = u64;
 
-/// The aura crypto scheme defined via the keypair type.
-#[cfg(feature = "std")]
-pub type AuraPair = consensus_aura::ed25519::AuthorityPair;
-
-/// The Ed25519 pub key of an session that belongs to an Aura authority of the chain.
-pub type AuraId = consensus_aura::ed25519::AuthorityId;
-
-/// Alias to the signature scheme used for Aura authority signatures.
-pub type AuraSignature = consensus_aura::ed25519::AuthoritySignature;
-
 /// Index of a transaction in the chain.
-pub type Index = Nonce;
+pub type Index = u32;
 
 /// A hash of some data used by the chain.
 pub type Hash = primitives::H256;
@@ -75,17 +59,6 @@ pub type DigestItem = generic::DigestItem<Hash>;
 /// Header type.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type.
-pub type Block = generic::Block<Header, UncheckedExtrinsic>;
+pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
-
-/// Opaque, encoded, unchecked extrinsic.
-pub type UncheckedExtrinsic = OpaqueExtrinsic;
-
-client::decl_runtime_apis! {
-	/// The API to query account account nonce (aka index).
-	pub trait AccountNonceApi {
-		/// Get current account nonce of given `AccountId`.
-		fn account_nonce(account: AccountId) -> Index;
-	}
-}

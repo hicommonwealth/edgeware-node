@@ -14,920 +14,338 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+#![recursion_limit="128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-#[cfg(feature = "std")]
-extern crate serde;
-
-// Needed for deriving `Serialize` and `Deserialize` for various types.
-// We only implement the serde traits for std builds - they're unneeded
-// in the wasm runtime.
-#[cfg(feature = "std")]
-extern crate serde_derive;
-#[macro_use]
-extern crate srml_support;
-
-extern crate parity_codec as codec;
-extern crate sr_io as runtime_io;
-extern crate sr_primitives as runtime_primitives;
-extern crate sr_std as rstd;
-extern crate srml_support as runtime_support;
-extern crate substrate_primitives as primitives;
-
-extern crate srml_system as system;
-extern crate srml_balances as balances;
-
-pub mod identity;
-pub use identity::{
-	Event, Module, RawEvent, Trait,
-	IdentityStage, MetadataRecord, IdentityRecord
-};
-
-// Tests for Identity Module
 #[cfg(test)]
-mod tests {
-	use super::*;
-	use codec::Encode;
-	use primitives::{Blake2Hasher, H256, Hasher};
-	use rstd::prelude::*;
-	use runtime_io::with_externalities;
-	use runtime_support::dispatch::Result;
-	use system::{EventRecord, Phase};
-	// The testing primitives are very useful for avoiding having to work with
-	// public keys. `u64` is used as the `AccountId` and no `Signature`s are requried.
-	use runtime_primitives::{
-		Perbill,
-		testing::{Header},
-		traits::{BlakeTwo256, OnFinalize, IdentityLookup},
-	};
-
-	impl_outer_origin! {
-		pub enum Origin for Test {}
-	}
-
-	impl_outer_event! {
-		pub enum Event for Test {
-			identity<T>, balances<T>,
-		}
-	}
-
-	#[derive(Clone, PartialEq, Eq, Debug)]
-	pub struct Test;
-
-	parameter_types! {
-		pub const BlockHashCount: u64 = 250;
-		pub const MaximumBlockWeight: u32 = 1024;
-		pub const MaximumBlockLength: u32 = 2 * 1024;
-		pub const AvailableBlockRatio: Perbill = Perbill::one();
-	}
-
-	impl system::Trait for Test {
-		type Origin = Origin;
-		type Call = ();
-		type Index = u64;
-		type BlockNumber = u64;
-		type Hash = H256;
-		type Hashing = BlakeTwo256;
-		type AccountId = u64;
-		type Lookup = IdentityLookup<Self::AccountId>;
-		type Header = Header;
-		type Event = Event;
-		type WeightMultiplierUpdate = ();
-		type BlockHashCount = BlockHashCount;
-		type MaximumBlockWeight = MaximumBlockWeight;
-		type MaximumBlockLength = MaximumBlockLength;
-		type AvailableBlockRatio = AvailableBlockRatio;
-		type Version = ();
-	}
-
-	parameter_types! {
-		pub const ExistentialDeposit: u64 = 0;
-		pub const TransferFee: u64 = 0;
-		pub const CreationFee: u64 = 0;
-		pub const TransactionBaseFee: u64 = 0;
-		pub const TransactionByteFee: u64 = 0;
-	}
-	impl balances::Trait for Test {
-		type Balance = u64;
-		type OnNewAccount = ();
-		type OnFreeBalanceZero = ();
-		type Event = Event;
-		type TransactionPayment = ();
-		type TransferPayment = ();
-		type DustRemoval = ();
-		type ExistentialDeposit = ExistentialDeposit;
-		type TransferFee = TransferFee;
-		type CreationFee = CreationFee;
-		type TransactionBaseFee = TransactionBaseFee;
-		type TransactionByteFee = TransactionByteFee;
-		type WeightToFee = ();
-	}
-
-	impl Trait for Test {
-		type Event = Event;
-		type Currency = balances::Module<Self>;
-	}
-
-	type Balances = balances::Module<Test>;
-	type System = system::Module<Test>;
-	type Identity = Module<Test>;
-
-	const BOND: u64 = 10;
-	// This function basically just builds a genesis storage key/value store according to
-	// our desired mockup.
-	fn new_test_ext() -> sr_io::TestExternalities<Blake2Hasher> {
-		let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
-		// We use default for brevity, but you can configure as desired if needed.
-		t.0.extend(
-			identity::GenesisConfig::<Test> {
-				expiration_length: 10000,
-				verifiers: vec![1_u64],
-				registration_bond: BOND,
-			}.build_storage().unwrap().0,
-		);
-		t.0.extend(
-			balances::GenesisConfig::<Test> {
-				balances: vec![
-					(1, 100),
-					(2, 100),
-					(3, 100),
-					(4, 100),
-				],
-				vesting: vec![],
-			}.build_storage().unwrap().0,
-		);
-		t.into()
-	}
-
-	fn register_identity(who: u64, identity_type: &[u8], identity: &[u8]) -> Result {
-		Identity::register(Origin::signed(who), identity_type.to_vec(), identity.to_vec())
-	}
-
-	fn attest_to_identity(who: u64, identity_hash: H256, attestation: &[u8]) -> Result {
-		Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
-	}
-
-	fn register_and_attest(who: u64, identity_type: &[u8], identity: &[u8], attestation: &[u8]) -> Result {
-		Identity::register_and_attest(Origin::signed(who), identity_type.to_vec(), identity.to_vec(), attestation.to_vec())
-	}
-
-	fn verify_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
-		Identity::verify(Origin::signed(who), identity_hash, verifier_index)
-	}
-
-	fn deny_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
-		Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
-	}
-
-	fn revoke(who: u64, identity_hash: H256) -> Result {
-		Identity::revoke(Origin::signed(who), identity_hash)
-	}
-
-	fn add_metadata_to_account(
-		who: u64,
-		identity_hash: H256,
-		avatar: &[u8],
-		display_name: &[u8],
-		tagline: &[u8],
-	) -> Result {
-		Identity::add_metadata(
-			Origin::signed(who),
-			identity_hash,
-			avatar.to_vec(),
-			display_name.to_vec(),
-			tagline.to_vec(),
-		)
-	}
-
-	fn default_identity_record(public: u64, identity_type: &[u8], identity: &[u8]) -> IdentityRecord<u64, u64> {
-		IdentityRecord {
-			account: public,
-			identity_type: identity_type.to_vec(),
-			identity: identity.to_vec(),
-			stage: IdentityStage::Registered,
-			expiration_length: 10001,
-			proof: None,
-			metadata: None
-		}
-	}
-
-	fn build_identity_hash(identity_type: &[u8], identity: &[u8]) -> H256 {
-			let mut buf = Vec::new();
-			buf.extend_from_slice(&identity_type.to_vec().encode());
-			buf.extend_from_slice(&identity.to_vec().encode());
-			return Blake2Hasher::hash(&buf[..]);
-	}
-
-	#[test]
-	fn register_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			let expiration_length = Identity::expiration_length();
-			let now = System::block_number();
-			let expires_at = now + expiration_length;
-
-			let balance = Balances::free_balance(public);
-			assert_ok!(register_identity(public, identity_type, identity));
-			let after_register_balance = Balances::free_balance(public);
-			assert_eq!(balance - BOND, after_register_balance);
-
-			assert_eq!(
-				System::events(),
-				vec![EventRecord {
-					phase: Phase::ApplyExtrinsic(0),
-					event: Event::identity(RawEvent::Register(identity_hash, public, expires_at)),
-					topics: vec![],
-				}]
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-		});
-	}
-
-	#[test]
-	fn register_twice_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-			assert_err!(
-				register_identity(public, identity_type, identity),
-				"Identity type already used"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-		});
-	}
-
-	#[test]
-	fn register_existing_identity_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			let public2 = 2_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-			assert_err!(
-				register_identity(public2, identity_type, identity),
-				"Identity already exists"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-		});
-	}
-
-	#[test]
-	fn register_same_type_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-
-			let new_github: &[u8] = b"drstone";
-			assert_err!(
-				register_identity(public, identity_type, new_github),
-				"Identity type already used"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-		});
-	}
-
-	#[test]
-	fn register_and_attest_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-
-			let mut expiration_length = Identity::expiration_length();
-			let mut now = System::block_number();
-			let register_expires_at = now + expiration_length;
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			expiration_length = Identity::expiration_length();
-			now = System::block_number();
-			let _attest_expires_at = now + expiration_length;
-
-			assert_eq!(
-				System::events(),
-				vec![
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
-						topics: vec![],
-					},
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
-						topics: vec![],
-					}
-				]
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Attested,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-		});
-	}
-
-
-	#[test]
-	fn register_and_attest_as_one_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			let mut expiration_length = Identity::expiration_length();
-			let mut now = System::block_number();
-			let register_expires_at = now + expiration_length;
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(register_and_attest(public, identity_type, identity, attestation));
-
-			expiration_length = Identity::expiration_length();
-			now = System::block_number();
-			let _attest_expires_at = now + expiration_length;
-
-			assert_eq!(
-				System::events(),
-				vec![
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
-						topics: vec![],
-					},
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
-						topics: vec![],
-					}
-				]
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Attested,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn attest_without_register_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_err!(
-				attest_to_identity(public, identity_hash, attestation),
-				"Identity does not exist"
-			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(Identity::identity_of(identity_hash), None);
-		});
-	}
-
-	#[test]
-	fn attest_from_different_account_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			let other_pub = 2_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_err!(
-				attest_to_identity(other_pub, identity_hash, attestation),
-				"Stored identity does not match sender"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-		});
-	}
-
-	#[test]
-	fn register_attest_and_verify_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			let balance = Balances::free_balance(public);
-			assert_ok!(register_identity(public, identity_type, identity));
-			let after_register_balance = Balances::free_balance(public);
-			assert_eq!(balance - BOND, after_register_balance);
-
-			let mut expiration_length = Identity::expiration_length();
-			let mut now = System::block_number();
-			let register_expires_at = now + expiration_length;
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			expiration_length = Identity::expiration_length();
-			now = System::block_number();
-			let _attest_expires_at = now + expiration_length;
-
-			System::set_block_number(2);
-			let verifier = 1_u64;
-			assert_ok!(verify_identity(verifier, identity_hash, 0));
-			let balance_after_verify = Balances::free_balance(public);
-			assert_eq!(balance, balance_after_verify);
-
-			assert_eq!(
-				System::events(),
-				vec![
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, register_expires_at)),
-						topics: vec![],
-					},
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Attest(attestation.to_vec(), identity_hash, public, identity_type.to_vec(), identity.to_vec())),
-						topics: vec![],
-					},
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Verify(identity_hash, verifier, identity_type.encode().to_vec(), identity.encode().to_vec())),
-						topics: vec![],
-					}
-				]
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Verified,
-					expiration_length: 0,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn deny_many_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let mut id_hashes = vec![];
-			let test_id_type: &[u8] = b"github";
-			let test_id: Vec<u8> = "drewstone 4".as_bytes().to_vec();
-			for i in 1..5 {
-				let identity_type: &[u8] = b"github";
-				let identity: Vec<u8> = format!("drewstone {}", i).as_bytes().to_vec();
-				let identity_hash = build_identity_hash(identity_type, &identity);	
-				assert_ok!(register_identity(i as u64, identity_type, &identity));
-				let attestation: &[u8] = b"this_is_a_fake_attestation";
-				assert_ok!(attest_to_identity(i as u64, identity_hash, attestation));
-				id_hashes.push(identity_hash);
-			}
-
-			let verifier = 1_u64;
-			assert_ok!(deny_many(verifier, &id_hashes, 0));
-			let events = System::events();
-			assert_eq!(
-				events[events.len() - 1],
-				EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Denied(id_hashes[id_hashes.len() - 1], verifier, test_id_type.encode().to_vec(), test_id.encode())),
-						topics: vec![],
-				}
-			);
-		});
-	}
-
-	#[test]
-	fn attest_after_verify_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			let verifier = 1_u64;
-			assert_ok!(verify_identity(verifier, identity_hash, 0));
-			assert_err!(
-				attest_to_identity(public, identity_hash, attestation),
-				"Already verified"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Verified,
-					expiration_length: 0,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn verify_from_nonverifier_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 2_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			assert_err!(
-				verify_identity(public, identity_hash, 0),
-				"Sender is not a verifier"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Attested,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn verify_from_wrong_index_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			assert_err!(
-				verify_identity(public, identity_hash, 1),
-				"Verifier index out of bounds"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Attested,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn register_should_expire() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-
-			let expiration_length = Identity::expiration_length();
-			let now = System::block_number();
-			let expires_at = now + expiration_length;
-
-			System::set_block_number(10002);
-			<Identity as OnFinalize<u64>>::on_finalize(10002);
-			System::set_block_number(10003);
-
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_err!(
-				attest_to_identity(public, identity_hash, attestation),
-				"Identity does not exist"
-			);
-
-			assert_eq!(
-				System::events(),
-				vec![
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Register(identity_hash, public, expires_at)),
-						topics: vec![],
-					},
-					EventRecord {
-						phase: Phase::ApplyExtrinsic(0),
-						event: Event::identity(RawEvent::Expired(identity_hash)),
-						topics: vec![],
-					},
-				]
-			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(Identity::identity_of(identity_hash), None);
-		});
-	}
-
-	#[test]
-	fn add_metadata_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
-			let display_name: &[u8] = b"drewstone";
-			let tagline: &[u8] = b"hello world!";
-
-			assert_ok!(register_identity(public, identity_type, identity));
-			assert_ok!(add_metadata_to_account(
-				public,
-				identity_hash,
-				avatar,
-				display_name,
-				tagline
-			));
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			let default_record = default_identity_record(public, identity_type, identity);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					metadata: Some(MetadataRecord {
-					avatar: avatar.to_vec(),
-					display_name: display_name.to_vec(),
-					tagline: tagline.to_vec(),
-					}),
-					..default_record
-				})
-			);
-		});
-	}
-
-	#[test]
-	fn add_metadata_without_register_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-
-			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
-			let display_name: &[u8] = b"drewstone";
-			let tagline: &[u8] = b"hello world!";
-			assert_err!(
-				add_metadata_to_account(public, identity_hash, avatar, display_name, tagline),
-				"Identity does not exist"
-			);
-			assert_eq!(Identity::identities(), vec![]);
-			assert_eq!(Identity::identities_pending(), vec![]);
-			assert_eq!(Identity::identity_of(identity_hash), None);
-		});
-	}
-
-	#[test]
-	fn add_metadata_from_different_account_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			let other_pub = 2_u64;
-
-			let avatar: &[u8] = b"avatars3.githubusercontent.com/u/13153687";
-			let display_name: &[u8] = b"drewstone";
-			let tagline: &[u8] = b"hello world!";
-
-			assert_ok!(register_identity(public, identity_type, identity));
-			assert_err!(
-				add_metadata_to_account(other_pub, identity_hash, avatar, display_name, tagline),
-				"Stored identity does not match sender"
-			);
-			assert_eq!(Identity::identities(), vec![identity_hash]);
-			assert_eq!(Identity::identities_pending(), vec![(identity_hash, 10001)]);
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-		});
-	}
-
-	#[test]
-	fn revoke_verified_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			// Register
-			assert_ok!(register_identity(public, identity_type, identity));
-			// Attest
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			System::set_block_number(2);
-			let verifier = 1_u64;
-			assert_ok!(verify_identity(verifier, identity_hash, 0));
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Verified,
-					expiration_length: 0,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-			assert_ok!(revoke(public, identity_hash));
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				None,
-			);
-		});
-	}
-
-	#[test]
-	fn revoke_from_wrong_sender_should_not_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			// Register
-			assert_ok!(register_identity(public, identity_type, identity));
-			// Attest
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-
-			System::set_block_number(2);
-			let verifier = 1_u64;
-			assert_ok!(verify_identity(verifier, identity_hash, 0));
-			assert_err!(revoke(2_u64, identity_hash), "Stored identity does not match sender");
-		});
-	}
-
-	#[test]
-	fn revoke_at_registered_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			// Register
-			assert_ok!(register_identity(public, identity_type, identity));
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(default_identity_record(public, identity_type, identity))
-			);
-			assert_ok!(revoke(public, identity_hash));
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				None,
-			);
-		});
-	}
-
-	#[test]
-	fn revoke_at_attested_should_work() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-			let public = 1_u64;
-			// Register
-			assert_ok!(register_identity(public, identity_type, identity));
-			// Attest
-			let attestation: &[u8] = b"www.proof.com/attest_of_extra_proof";
-			assert_ok!(attest_to_identity(public, identity_hash, attestation));
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				Some(IdentityRecord {
-					stage: IdentityStage::Attested,
-					proof: Some(attestation.to_vec()),
-					..default_identity_record(public, identity_type, identity)
-				})
-			);
-			assert_ok!(revoke(public, identity_hash));
-			assert_eq!(
-				Identity::identity_of(identity_hash),
-				None,
-			);
-		});
-	}
-
-	#[test]
-	fn register_should_expire_and_work_again() {
-		with_externalities(&mut new_test_ext(), || {
-			System::set_block_number(1);
-			let identity_type: &[u8] = b"github";
-			let identity: &[u8] = b"drewstone";
-			let identity_hash = build_identity_hash(identity_type, identity);
-
-			let public = 1_u64;
-
-			assert_ok!(register_identity(public, identity_type, identity));
-			System::set_block_number(10002);
-			<Identity as OnFinalize<u64>>::on_finalize(10002);
-			System::set_block_number(10003);
-			assert_eq!(Identity::identity_of(identity_hash), None);
-			assert_ok!(register_identity(public, identity_type, identity));
-		});
-	}
+mod tests;
+
+use support::traits::{Currency, ReservableCurrency};
+use rstd::prelude::*;
+
+use system::ensure_signed;
+use support::dispatch::Result;
+use codec::{Decode, Encode};
+
+use sr_primitives::RuntimeDebug;
+use sr_primitives::traits::{Hash, Zero};
+use support::{decl_event, decl_module, decl_storage, ensure, StorageMap};
+
+pub trait Trait: balances::Trait {
+    /// The overarching event type.
+    type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+    /// The account balance.
+    type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
+}
+
+pub type Attestation = Vec<u8>;
+pub type IdentityType = Vec<u8>;
+pub type Identity = Vec<u8>;
+type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
+
+#[derive(Encode, Decode, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
+pub struct MetadataRecord {
+    pub avatar: Vec<u8>,
+    pub display_name: Vec<u8>,
+    pub tagline: Vec<u8>,
+}
+
+#[derive(Encode, Decode, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
+pub enum IdentityStage {
+    Registered,
+    Attested,
+    Verified,
+}
+
+#[derive(Encode, Decode, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
+pub struct IdentityRecord<AccountId, BlockNumber> {
+    pub account: AccountId,
+    pub identity_type: IdentityType,
+    pub identity: Identity,
+    pub stage: IdentityStage,
+    pub expiration_length: BlockNumber,
+    pub proof: Option<Attestation>,
+    pub metadata: Option<MetadataRecord>,
+}
+
+decl_module! {
+    pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+        fn deposit_event() = default;
+
+        /// A function that registers an identity_type and identity for a user
+        ///
+        /// Checks whether the (identity_type, identity) pair exists and creates
+        /// the record if now. The record is indexed by the hash of the pair.
+        pub fn register(origin, identity_type: IdentityType, identity: Identity) {
+            let _sender = ensure_signed(origin)?;
+            // create hash
+            let mut buf = Vec::new();
+            buf.extend_from_slice(&identity_type.encode());
+            buf.extend_from_slice(&identity.encode());
+            let hash = T::Hashing::hash(&buf[..]);
+            return Self::do_register_identity(_sender, identity_type, identity, hash);
+        }
+
+        /// A function that creates an identity attestation
+        ///
+        /// Attestation is only valid if the identity is in the attestation phase
+        /// and is verified off-chain using an off-chain worker node. Current
+        /// implementation overwrites all proofs if safety checks pass.
+        pub fn attest(origin, identity_hash: T::Hash, attestation: Attestation) -> Result {
+            let _sender = ensure_signed(origin)?;
+            return Self::do_attest(_sender, identity_hash, attestation);
+        }
+
+        /// A function that registers and attests to an identity simultaneously.
+        ///
+        /// Allows more efficient registration and attestation processing since it
+        /// requires only 1 transaction.
+        pub fn register_and_attest(origin, identity_type: IdentityType, identity: Identity, attestation: Attestation) -> Result {
+            let _sender = ensure_signed(origin)?;
+            // create hash
+            let mut buf = Vec::new();
+            buf.extend_from_slice(&identity_type.encode());
+            buf.extend_from_slice(&identity.encode());
+            let hash = T::Hashing::hash(&buf[..]);
+            Self::do_register_identity(_sender.clone(), identity_type, identity, hash)?;
+            return Self::do_attest(_sender, hash, attestation);
+        }
+
+        /// A function that verifies an identity attestation.
+        ///
+        /// The verification is handled by a set of seeded verifiers who run
+        /// the off-chain worker node to verify attestations.
+        pub fn verify(origin, identity_hash: T::Hash, verifier_index: u32) -> Result {
+            let _sender = ensure_signed(origin)?;
+            ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+            ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+            return Self::verify_or_deny_identity(_sender, &identity_hash, true);
+        }
+
+        /// A function that denies an identity attestation.
+        ///
+        /// The verification is handled by a set of seeded verifiers who run
+        /// the off-chain worker node to verify attestations.
+        pub fn deny(origin, identity_hash: T::Hash, verifier_index: u32) -> Result {
+            let _sender = ensure_signed(origin)?;
+            ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+            ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+            return Self::verify_or_deny_identity(_sender, &identity_hash, false);
+        }
+
+        /// Verify many verification requests
+        pub fn verify_many(origin, identity_hashes: Vec<T::Hash>, verifier_index: u32) -> Result {
+            let _sender = ensure_signed(origin)?;
+            ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+            ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+
+            for i in 0..identity_hashes.len() {
+                Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], true)?;
+            }
+
+            Ok(())
+        }
+
+        /// Deny many verification requests
+        pub fn deny_many(origin, identity_hashes: Vec<T::Hash>, verifier_index: u32) -> Result {
+            let _sender = ensure_signed(origin)?;
+            ensure!((verifier_index as usize) < Self::verifiers().len(), "Verifier index out of bounds");
+            ensure!(Self::verifiers()[verifier_index as usize] == _sender.clone(), "Sender is not a verifier");
+
+            for i in 0..identity_hashes.len() {
+                Self::verify_or_deny_identity(_sender.clone(), &identity_hashes[i], false)?;
+            }
+
+            Ok(())
+        }
+
+        /// Add metadata to sender's account.
+        pub fn add_metadata(origin, identity_hash: T::Hash, avatar: Vec<u8>, display_name: Vec<u8>, tagline: Vec<u8>) -> Result {
+            let _sender = ensure_signed(origin)?;
+            let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+            // Check that original sender and current sender match
+            ensure!(record.account == _sender, "Stored identity does not match sender");
+            ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
+            // Replace all metadata
+            let mut new_record = record;
+            new_record.metadata = Some(MetadataRecord {
+                avatar: avatar,
+                display_name: display_name,
+                tagline: tagline,
+            });
+            <IdentityOf<T>>::insert(identity_hash, new_record);
+            Ok(())
+        }
+
+        /// Revoke an identity from the creator/sender of such an identity
+        pub fn revoke(origin, identity_hash: T::Hash) -> Result {
+            let _sender = ensure_signed(origin)?;
+            let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+            // Check that original sender and current sender match
+            ensure!(record.account == _sender, "Stored identity does not match sender");
+            Self::remove_pending_identity(&identity_hash);
+            Ok(())
+        }
+
+        /// Check all pending identities for expiration when each block is
+        /// finalised. Once an identity expires, it is deleted from storage.
+        fn on_finalize(_n: T::BlockNumber) {
+            let (expired, valid): (Vec<_>, _) = <IdentitiesPending<T>>::get()
+                .into_iter()
+                .partition(|(_, exp)| (_n > *exp) && (*exp > T::BlockNumber::zero()));
+
+            expired.into_iter().for_each(move |(exp_hash, _)| {
+                if let Some(id_record) = <IdentityOf<T>>::get(exp_hash) {
+                    let mut types = <UsedTypes<T>>::get(id_record.account.clone());
+                    types.retain(|t| *t != id_record.identity_type.clone());
+                    <UsedTypes<T>>::insert(id_record.account, types);
+                }
+
+                <Identities<T>>::mutate(|idents| idents.retain(|hash| hash != &exp_hash));
+                <IdentityOf<T>>::remove(exp_hash);
+                Self::deposit_event(RawEvent::Expired(exp_hash))
+            });
+            <IdentitiesPending<T>>::put(valid);
+        }
+    }
+}
+
+impl<T: Trait> Module<T> {
+    /// Removes all data about a pending identity given the hash of the record
+    pub fn remove_pending_identity(identity_hash: &T::Hash) {
+        <Identities<T>>::mutate(|idents| idents.retain(|hash| hash != identity_hash));
+        <IdentityOf<T>>::remove(identity_hash);
+        <IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
+    }
+
+    /// Helper function for executing the verification of identities
+    fn verify_or_deny_identity(sender: T::AccountId, identity_hash: &T::Hash, approve: bool) -> Result {
+        let record = <IdentityOf<T>>::get(identity_hash).ok_or("Identity does not exist")?;
+        ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
+        match record.stage {
+            IdentityStage::Registered => return Err("No attestation to verify"),
+            IdentityStage::Verified => return Err("Already verified"),
+            IdentityStage::Attested => ()
+        }
+
+        let id_type = record.identity_type.encode().clone();
+        let id = record.identity.encode().clone();
+        if approve {
+            // Add the registration bond amount on behalf of a successful verification
+            T::Currency::unreserve(&record.account, Self::registration_bond());
+            // Remove identity from list of pending identities
+            <IdentitiesPending<T>>::mutate(|idents| idents.retain(|(hash, _)| hash != identity_hash));
+            Self::deposit_event(RawEvent::Verify(*identity_hash, sender, id_type, id));
+            <IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+                stage: IdentityStage::Verified,
+                expiration_length: T::BlockNumber::zero(),
+                ..record
+            });
+        } else {
+            T::Currency::slash_reserved(&record.account, Self::registration_bond());
+            Self::remove_pending_identity(&identity_hash);
+            Self::deposit_event(RawEvent::Denied(*identity_hash, sender, id_type, id));
+        }
+
+        Ok(())
+    }
+
+    /// Helper function for executing the registration of identities
+    fn do_register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Identity, identity_hash: T::Hash) -> Result {
+        ensure!(!<UsedTypes<T>>::get(sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
+        ensure!(!<IdentityOf<T>>::exists(identity_hash), "Identity already exists");
+        // Reserve the registration bond amount
+        T::Currency::reserve(&sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
+        // reserve identity type
+        let mut types = <UsedTypes<T>>::get(sender.clone());
+        types.push(identity_type.clone());
+        <UsedTypes<T>>::insert(sender.clone(), types);
+
+        // Set expiration time of identity
+        let now = <system::Module<T>>::block_number();
+        let expiration = now + Self::expiration_length();
+        // Add identity record
+        <Identities<T>>::mutate(|idents| idents.push(identity_hash.clone()));
+        <IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+            account: sender.clone(),
+            identity_type: identity_type,
+            identity: identity,
+            stage: IdentityStage::Registered,
+            expiration_length: expiration.clone(),
+            proof: None,
+            metadata: None,
+        });
+        <IdentitiesPending<T>>::mutate(|idents| idents.push((identity_hash, expiration.clone())));
+        // Fire register event
+        Self::deposit_event(RawEvent::Register(identity_hash, sender.into(), expiration));
+        Ok(())
+    }
+
+    /// Helper function for executing the attestation of identities
+    fn do_attest(sender: T::AccountId, identity_hash: T::Hash, attestation: Attestation) -> Result {
+        let record = <IdentityOf<T>>::get(&identity_hash).ok_or("Identity does not exist")?;
+        // Ensure the record is not verified
+        ensure!(record.stage != IdentityStage::Verified, "Already verified");
+        // Ensure the record isn't expired if it still exists
+        ensure!(<system::Module<T>>::block_number() <= record.expiration_length, "Identity expired");
+        // Check that original sender and current sender match
+        ensure!(record.account == sender, "Stored identity does not match sender");
+
+        // update record
+        let id_type = record.identity_type.clone();
+        let identity = record.identity.clone();
+        let now = <system::Module<T>>::block_number();
+        let expiration = now + Self::expiration_length();
+        // Currently this implements no check against updating proof links
+        <IdentityOf<T>>::insert(identity_hash, IdentityRecord {
+            proof: Some(attestation.clone()),
+            stage: IdentityStage::Attested,
+            expiration_length: expiration.clone(),
+            ..record
+        });
+
+        <IdentitiesPending<T>>::mutate(|idents| {
+            idents.retain(|(hash, _)| hash != &identity_hash);
+            idents.push((identity_hash, expiration.clone()))
+        });
+
+        Self::deposit_event(RawEvent::Attest(attestation, identity_hash, sender.into(), id_type, identity));
+        Ok(())
+    }
+}
+
+decl_event!(
+    pub enum Event<T> where <T as system::Trait>::Hash,
+                            <T as system::Trait>::AccountId,
+                            <T as system::Trait>::BlockNumber {
+        /// (record_hash, creator, expiration) when an account is registered
+        Register(Hash, AccountId, BlockNumber),
+        /// (attestation, record_hash, creator, identity_type, identity) when an account creator submits an attestation
+        Attest(Attestation, Hash, AccountId, IdentityType, Identity),
+        /// (record_hash, verifier, id_type, identity) when a verifier approves an account
+        Verify(Hash, AccountId, IdentityType, Identity),
+        /// (record_hash) when an account is expired and deleted
+        Expired(Hash),
+        /// (identity_hash, verifier, id_type, identity) when a valid verifier denies a batch of registration/attestations
+        Denied(Hash, AccountId, IdentityType, Identity),
+    }
+);
+
+decl_storage! {
+    trait Store for Module<T: Trait> as Identity {
+        /// The hashed identities.
+        pub Identities get(fn identities): Vec<T::Hash>;
+        /// Actual identity for a given hash, if it's current.
+        pub IdentityOf get(fn identity_of): map T::Hash => Option<IdentityRecord<T::AccountId, T::BlockNumber>>;
+        /// List of identities awaiting attestation or verification and associated expirations
+        pub IdentitiesPending get(fn identities_pending): Vec<(T::Hash, T::BlockNumber)>;
+        /// Number of blocks allowed between register/attest or attest/verify.
+        pub ExpirationLength get(fn expiration_length) config(): T::BlockNumber;
+        /// Identity types of users
+        pub UsedTypes get(fn used_types): map T::AccountId => Vec<IdentityType>;
+        /// Verifier set
+        pub Verifiers get(fn verifiers) config(): Vec<T::AccountId>;
+        /// Registration bond
+        pub RegistrationBond get(fn registration_bond) config(): BalanceOf<T>;
+    }
 }

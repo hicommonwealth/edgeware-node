@@ -8,30 +8,29 @@ edition = "2018"
 serde = { version = "1.0", default-features = false, optional = true }
 serde_derive = { version = "1.0", optional = true }
 safe-mix = { version = "1.0", default-features = false }
-parity-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false, features = ["derive"] }
-substrate-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", optional = true }
-substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-std = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-edge-voting = { path = "../edge-voting", default-features = false }
+codec = { package = "parity-scale-codec", version = "1.0.6", default-features = false, features = ["derive"] }
+rstd = { package = "sp-std", git = "https://github.com/drewstone/substrate.git", default-features = false }
+sr-primitives = { package = "sp-runtime", git = "https://github.com/drewstone/substrate.git", default-features = false }
+support = { package ="frame-support", git = "https://github.com/drewstone/substrate.git", default-features = false }
+system = { package ="frame-system", git = "https://github.com/drewstone/substrate.git", default-features = false }
+balances = { package ="pallet-balances", git = "https://github.com/drewstone/substrate.git", default-features = false }
+voting = { package ="edge-voting", path = "../edge-voting", default-features = false }
+
+[dev-dependencies]
+sr-io = { package = "sp-io", git = "https://github.com/drewstone/substrate.git", default-features = false }
+substrate-primitives = { package = "sp-core", git = "https://github.com/drewstone/substrate.git", default-features = false }
 
 [features]
 default = ["std"]
 std = [
-	"serde/std",
+	"serde",
 	"serde_derive",
 	"safe-mix/std",
-	"parity-codec/std",
-	"substrate-primitives/std",
-	"sr-std/std",
-	"sr-io/std",
-	"srml-support/std",
+	"codec/std",
+	"rstd/std",
 	"sr-primitives/std",
-	"srml-system/std",
-	"srml-balances/std",
-	"edge-voting/std",
+	"balances/std",
+	"support/std",
+	"system/std",
+	"voting/std",
 ]

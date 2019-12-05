@@ -1,59 +1,517 @@
-// Copyright 2018 Commonwealth Labs, Inc.
-// This file is part of Edgeware.
+// Copyright 2018-2019 Parity Technologies (UK) Ltd.
+// This file is part of Substrate.
 
-// Edgeware is free software: you can redistribute it and/or modify
+// Substrate is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-// Edgeware is distributed in the hope that it will be useful,
+// Substrate is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
+// along with Substrate.  If not, see <http://www.gnu.org/licenses/>.
 
-use edgeware_service as service;
+//! Substrate chain configurations.
 
-/// The chain specification option.
-#[derive(Clone, Debug, PartialEq)]
-pub enum ChainSpec {
-	/// Whatever the current runtime is, with just Alice as an auth.
-	Development,
-	/// Whatever the current runtime is, with simple Alice/Bob auths.
-	LocalTestnet,
-	/// Edgeware testnet configuration
-	EdgewareTestnetConfig,
-	/// Edgeware mainnet configuration
-	EdgewareMainnetConfig,
+use chain_spec::ChainSpecExtension;
+use primitives::{Pair, Public, crypto::UncheckedInto, sr25519};
+use serde::{Serialize, Deserialize};
+use edgeware_runtime::{
+	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
+	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig,
+	SystemConfig, WASM_BINARY,
+	IdentityConfig, SignalingConfig, TreasuryRewardConfig,
+};
+use edgeware_runtime::Block;
+use edgeware_runtime::constants::currency::*;
+use substrate_service;
+use hex_literal::hex;
+use substrate_telemetry::TelemetryEndpoints;
+use grandpa_primitives::{AuthorityId as GrandpaId};
+use aura_primitives::ed25519::AuthorityId as AuraId;
+use im_online::ed25519::{AuthorityId as ImOnlineId};
+use authority_discovery_primitives::AuthorityId as AuthorityDiscoveryId;
+use sr_primitives::{Perbill, traits::{Verify, IdentifyAccount, One}};
+
+pub use edgeware_primitives::{AccountId, Balance, Signature, BlockNumber};
+pub use edgeware_runtime::GenesisConfig;
+pub use edgeware_runtime::constants::{time::*};
+
+use std::fs::File;
+use std::io::Read;
+use std::path::Path;
+use serde_json::{Result};
+use hex::FromHex;
+
+type AccountPublic = <Signature as Verify>::Signer;
+
+const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
+const DEFAULT_PROTOCOL_ID: &str = "edg";
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Allocation {
+    balances: Vec<(String, String)>,
+    vesting: Vec<(String, BlockNumber, BlockNumber, String)>,
 }
 
-impl Default for ChainSpec {
-	fn default() -> Self {
-		ChainSpec::Development
+fn get_lockdrop_participants_allocation() -> Result<Allocation>{
+	let path = Path::new("node/cli/lockdrop/lockdrop-allocation.json");
+	let mut file = File::open(&path).unwrap();
+	let mut data = String::new();
+	file.read_to_string(&mut data).unwrap();
+	let a: Allocation = serde_json::from_str(&data)?;
+	return Ok(a);
+}
+
+/// Node `ChainSpec` extensions.
+///
+/// Additional parameters for some Substrate core modules,
+/// customizable from the chain spec.
+#[derive(Default, Clone, Serialize, Deserialize, ChainSpecExtension)]
+pub struct Extensions {
+	/// Block numbers with known hashes.
+	pub fork_blocks: client::ForkBlocks<Block>,
+}
+
+/// Specialized `ChainSpec`.
+pub type ChainSpec = substrate_service::ChainSpec<
+	GenesisConfig,
+	Extensions,
+>;
+
+/// 0.9.0 Testnet configuration
+pub fn edgeware_testnet_v090_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/testnet-0.9.0.chainspec.json")) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
 	}
 }
 
-/// Get a chain config from a spec setting.
-impl ChainSpec {
-	pub(crate) fn load(self) -> Result<service::chain_spec::ChainSpec, String> {
-		Ok(match self {
-			ChainSpec::Development => service::chain_spec::development_chainspec(),
-			ChainSpec::LocalTestnet => service::chain_spec::local_testnet_chainspec(),
-			ChainSpec::EdgewareTestnetConfig => service::chain_spec::edgeware_chainspec(true),
-			ChainSpec::EdgewareMainnetConfig => service::chain_spec::edgeware_chainspec(false),
-		})
+/// 0.9.5 Testnet configuration
+pub fn edgeware_testnet_v099_config() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/testnet-0.9.9.chainspec.json")) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
+	}
+}
+
+fn session_keys(
+	grandpa: GrandpaId,
+	aura: AuraId,
+	im_online: ImOnlineId,
+	authority_discovery: AuthorityDiscoveryId,
+) -> SessionKeys {
+	SessionKeys { grandpa, aura, im_online, authority_discovery }
+}
+
+fn staging_testnet_config_genesis() -> GenesisConfig {
+	// stash, controller, session-key
+	// generated with secret:
+	// for i in 1 2 3 4 ; do for j in stash controller; do subkey inspect "$secret"/fir/$j/$i; done; done
+	// and
+	// for i in 1 2 3 4 ; do for j in session; do subkey --ed25519 inspect "$secret"//fir//$j//$i; done; done
+
+	let initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)> = vec![(
+		// 5Fbsd6WXDGiLTxunqeK5BATNiocfCqu9bS1yArVjCgeBLkVy
+		hex!["9c7a2ee14e565db0c69f78c7b4cd839fbf52b607d867e9e9c5a79042898a0d12"].into(),
+		// 5EnCiV7wSHeNhjW3FSUwiJNkcc2SBkPLn5Nj93FmbLtBjQUq
+		hex!["781ead1e2fa9ccb74b44c19d29cb2a7a4b5be3972927ae98cd3877523976a276"].into(),
+		// 5Fb9ayurnxnaXj56CjmyQLBiadfRCqUbL2VWNbbe1nZU6wiC
+		hex!["9becad03e6dcac03cee07edebca5475314861492cdfc96a2144a67bbe9699332"].unchecked_into(),
+		// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
+		hex!["6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106"].unchecked_into(),
+		// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
+		hex!["6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106"].unchecked_into(),
+		// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
+		hex!["6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106"].unchecked_into(),
+	),(
+		// 5ERawXCzCWkjVq3xz1W5KGNtVx2VdefvZ62Bw1FEuZW4Vny2
+		hex!["68655684472b743e456907b398d3a44c113f189e56d1bbfd55e889e295dfde78"].into(),
+		// 5Gc4vr42hH1uDZc93Nayk5G7i687bAQdHHc9unLuyeawHipF
+		hex!["c8dc79e36b29395413399edaec3e20fcca7205fb19776ed8ddb25d6f427ec40e"].into(),
+		// 5EockCXN6YkiNCDjpqqnbcqd4ad35nU4RmA1ikM4YeRN4WcE
+		hex!["7932cff431e748892fa48e10c63c17d30f80ca42e4de3921e641249cd7fa3c2f"].unchecked_into(),
+		// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
+		hex!["482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e"].unchecked_into(),
+		// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
+		hex!["482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e"].unchecked_into(),
+		// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
+		hex!["482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e"].unchecked_into(),
+	),(
+		// 5DyVtKWPidondEu8iHZgi6Ffv9yrJJ1NDNLom3X9cTDi98qp
+		hex!["547ff0ab649283a7ae01dbc2eb73932eba2fb09075e9485ff369082a2ff38d65"].into(),
+		// 5FeD54vGVNpFX3PndHPXJ2MDakc462vBCD5mgtWRnWYCpZU9
+		hex!["9e42241d7cd91d001773b0b616d523dd80e13c6c2cab860b1234ef1b9ffc1526"].into(),
+		// 5E1jLYfLdUQKrFrtqoKgFrRvxM3oQPMbf6DfcsrugZZ5Bn8d
+		hex!["5633b70b80a6c8bb16270f82cca6d56b27ed7b76c8fd5af2986a25a4788ce440"].unchecked_into(),
+		// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
+		hex!["482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a"].unchecked_into(),
+		// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
+		hex!["482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a"].unchecked_into(),
+		// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
+		hex!["482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a"].unchecked_into(),
+	),(
+		// 5HYZnKWe5FVZQ33ZRJK1rG3WaLMztxWrrNDb1JRwaHHVWyP9
+		hex!["f26cdb14b5aec7b2789fd5ca80f979cef3761897ae1f37ffb3e154cbcc1c2663"].into(),
+		// 5EPQdAQ39WQNLCRjWsCk5jErsCitHiY5ZmjfWzzbXDoAoYbn
+		hex!["66bc1e5d275da50b72b15de072a2468a5ad414919ca9054d2695767cf650012f"].into(),
+		// 5DMa31Hd5u1dwoRKgC4uvqyrdK45RHv3CpwvpUC1EzuwDit4
+		hex!["3919132b851ef0fd2dae42a7e734fe547af5a6b809006100f48944d7fae8e8ef"].unchecked_into(),
+		// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
+		hex!["00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378"].unchecked_into(),
+		// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
+		hex!["00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378"].unchecked_into(),
+		// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
+		hex!["00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378"].unchecked_into(),
+	)];
+
+	// generated with secret: subkey inspect "$secret"/fir
+	let root_key: AccountId = hex![
+		// 5Ff3iXP75ruzroPWRP2FYBHWnmGGBSb63857BgnzCoXNxfPo
+		"9ee5e5bdc0ec239eb164f865ecc345ce4c88e76ee002e0f7e318097347471809"
+	].into();
+
+	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
+
+	testnet_genesis(
+		initial_authorities,
+		root_key,
+		Some(endowed_accounts),
+		false,
+		vec![],
+		vec![]
+	)
+}
+
+/// Staging testnet config.
+pub fn staging_testnet_config() -> ChainSpec {
+	let boot_nodes = vec![];
+	ChainSpec::from_genesis(
+		"Staging Testnet",
+		"staging_testnet",
+		staging_testnet_config_genesis,
+		boot_nodes,
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		None,
+		None,
+		Default::default(),
+	)
+}
+
+/// Helper function to generate a crypto pair from seed
+pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
+	TPublic::Pair::from_string(&format!("//{}", seed), None)
+		.expect("static values are valid; qed")
+		.public()
+}
+
+/// Helper function to generate an account ID from seed
+pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>
+{
+	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
+}
+
+/// Helper function to generate stash, controller and session key from seed
+pub fn get_authority_keys_from_seed(seed: &str) -> (
+	AccountId,
+	AccountId,
+	GrandpaId,
+	AuraId,
+	ImOnlineId,
+	AuthorityDiscoveryId,
+) {
+	(
+		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
+		get_account_id_from_seed::<sr25519::Public>(seed),
+		get_from_seed::<GrandpaId>(seed),
+		get_from_seed::<AuraId>(seed),
+		get_from_seed::<ImOnlineId>(seed),
+		get_from_seed::<AuthorityDiscoveryId>(seed),
+	)
+}
+
+/// Helper function to create GenesisConfig for testing
+pub fn testnet_genesis(
+	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)>,
+	root_key: AccountId,
+	endowed_accounts: Option<Vec<AccountId>>,
+	enable_println: bool,
+	balances: Vec<(AccountId, Balance)>,
+	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
+) -> GenesisConfig {
+	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+		vec![
+			get_account_id_from_seed::<sr25519::Public>("Alice"),
+			get_account_id_from_seed::<sr25519::Public>("Bob"),
+			get_account_id_from_seed::<sr25519::Public>("Charlie"),
+			get_account_id_from_seed::<sr25519::Public>("Dave"),
+			get_account_id_from_seed::<sr25519::Public>("Eve"),
+			get_account_id_from_seed::<sr25519::Public>("Ferdie"),
+			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+		]
+	});
+
+	const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
+	const STASH: Balance = 100 * DOLLARS;
+
+	GenesisConfig {
+		system: Some(SystemConfig {
+			code: WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		balances: Some(BalancesConfig {
+			balances: endowed_accounts.iter().cloned().map(|k| (k, ENDOWMENT))
+				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
+				.chain(balances.clone())
+				.collect(),
+			vesting: vesting,
+		}),
+		indices: Some(IndicesConfig {
+			ids: endowed_accounts.iter().cloned()
+				.chain(initial_authorities.iter().map(|x| x.0.clone()))
+				.chain(balances.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
+		}),
+		session: Some(SessionConfig {
+			keys: initial_authorities.iter().map(|x| {
+				(x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()))
+			}).collect::<Vec<_>>(),
+		}),
+		staking: Some(StakingConfig {
+			current_era: 0,
+			validator_count: initial_authorities.len() as u32 * 2,
+			minimum_validator_count: initial_authorities.len() as u32,
+			stakers: initial_authorities.iter().map(|x| {
+				(x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)
+			}).collect(),
+			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
+		}),
+		democracy: Some(DemocracyConfig::default()),
+		collective_Instance1: Some(CouncilConfig {
+			members: vec![],
+			phantom: Default::default(),
+		}),
+		contracts: Some(ContractsConfig {
+			current_schedule: contracts::Schedule {
+				enable_println, // this should only be enabled on development chains
+				..Default::default()
+			},
+			gas_price: 1 * MILLICENTS,
+		}),
+		sudo: Some(SudoConfig {
+			key: root_key,
+		}),
+		aura: Some(AuraConfig {
+			authorities: vec![],
+		}),
+		im_online: Some(ImOnlineConfig {
+			keys: vec![],
+		}),
+		authority_discovery: Some(AuthorityDiscoveryConfig {
+			keys: vec![],
+		}),
+		grandpa: Some(GrandpaConfig {
+			authorities: vec![],
+		}),
+		treasury: Some(Default::default()),
+		identity: Some(IdentityConfig {
+			verifiers: crate::testnet_fixtures::get_testnet_identity_verifiers(),
+			expiration_length: 1 * DAYS,
+			registration_bond: 1 * DOLLARS,
+		}),
+		signaling: Some(SignalingConfig {
+			voting_length: 3 * DAYS,
+			proposal_creation_bond: 100 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
+			minting_interval: One::one(),
+		}),
+	}
+}
+
+fn edgeware_testnet_config_genesis() -> GenesisConfig {
+	let allocation = get_lockdrop_participants_allocation().unwrap();
+	let balances = allocation.balances.iter().map(|b| {
+		let balance = b.1.to_string().parse::<Balance>().unwrap();
+		return (
+			<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(),
+			balance,
+		);
+	})
+	.filter(|b| b.1 > 0)
+	.collect();
+	let vesting = allocation.vesting.iter().map(|b| {
+		let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
+		return (
+			(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
+			b.1,
+			b.2,
+			vesting_balance,
+		);
+	})
+	.filter(|b| b.3 > 0)
+	.collect();
+
+	let initial_authorities = crate::testnet_fixtures::get_testnet_initial_authorities();
+
+	testnet_genesis(
+		initial_authorities,
+		crate::testnet_fixtures::get_testnet_root_key(),
+		None,
+		true,
+		balances,
+		vesting,
+	)
+}
+
+/// Edgeware config (8 validators)
+pub fn edgeware_testnet_config() -> ChainSpec {
+	let data = r#"
+		{
+			"tokenDecimals": 18,
+			"tokenSymbol": "EDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+	let boot_nodes = crate::testnet_fixtures::get_testnet_bootnodes();
+	ChainSpec::from_genesis(
+		"Edgeware Testnet",
+		"edgeware_testnet",
+		edgeware_testnet_config_genesis,
+		boot_nodes,
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		Some(DEFAULT_PROTOCOL_ID),
+		None,
+		properties,
+	)
+}
+
+fn development_config_genesis() -> GenesisConfig {
+	testnet_genesis(
+		vec![
+			get_authority_keys_from_seed("Alice"),
+		],
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		None,
+		true,
+		vec![],
+		vec![],
+	)
+}
+
+/// Development config (single validator Alice)
+pub fn development_config() -> ChainSpec {
+	ChainSpec::from_genesis(
+		"Development",
+		"dev",
+		development_config_genesis,
+		vec![],
+		None,
+		None,
+		None,
+		Default::default(),
+	)
+}
+
+fn local_testnet_genesis() -> GenesisConfig {
+	testnet_genesis(
+		vec![
+			get_authority_keys_from_seed("Alice"),
+			get_authority_keys_from_seed("Bob"),
+		],
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		None,
+		false,
+		vec![],
+		vec![],
+	)
+}
+
+/// Local testnet config (multivalidator Alice + Bob)
+pub fn local_testnet_config() -> ChainSpec {
+	ChainSpec::from_genesis(
+		"Local Testnet",
+		"local_testnet",
+		local_testnet_genesis,
+		vec![],
+		None,
+		None,
+		None,
+		Default::default(),
+	)
+}
+
+#[cfg(test)]
+pub(crate) mod tests {
+	use super::*;
+	use crate::service::new_full;
+	use substrate_service::Roles;
+	use service_test;
+
+	fn local_testnet_genesis_instant_single() -> GenesisConfig {
+		testnet_genesis(
+			vec![
+				get_authority_keys_from_seed("Alice"),
+			],
+			get_account_id_from_seed::<sr25519::Public>("Alice"),
+			None,
+			false,
+			vec![],
+			vec![],
+		)
 	}
 
-	pub(crate) fn from(s: &str) -> Option<Self> {
-		match s {
-			"dev" => Some(ChainSpec::Development),
-			"local" => Some(ChainSpec::LocalTestnet),
-			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
-			"edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
-			"" => Some(ChainSpec::default()),
-			_ => None,
-		}
+	/// Local testnet config (single validator - Alice)
+	pub fn integration_test_config_with_single_authority() -> ChainSpec {
+		ChainSpec::from_genesis(
+			"Integration Test",
+			"test",
+			local_testnet_genesis_instant_single,
+			vec![],
+			None,
+			None,
+			None,
+			Default::default(),
+		)
+	}
+
+	/// Local testnet config (multivalidator Alice + Bob)
+	pub fn integration_test_config_with_two_authorities() -> ChainSpec {
+		ChainSpec::from_genesis(
+			"Integration Test",
+			"test",
+			local_testnet_genesis,
+			vec![],
+			None,
+			None,
+			None,
+			Default::default(),
+		)
+	}
+
+	#[test]
+	#[ignore]
+	fn test_connectivity() {
+		service_test::connectivity(
+			integration_test_config_with_two_authorities(),
+			|config| new_full(config),
+			|mut config| {
+				// light nodes are unsupported
+				config.roles = Roles::FULL;
+				new_full(config)
+			},
+			true,
+		);
 	}
 }

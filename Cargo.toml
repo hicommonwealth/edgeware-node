@@ -1,43 +1,16 @@
-[package]
-name = "edgeware"
-version = "1.0.0"
-authors = ["Commonwealth Labs <hello@commonwealth.im>"]
-build = "build.rs"
-edition = "2018"
-
-[[bin]]
-name = "edgeware"
-path = "node/src/main.rs"
-
-[dependencies]
-error-chain = "0.12"
-edgeware-cli = { path = "node/cli" }
-futures = "0.1"
-ctrlc = { version = "3.0", features = ["termination"] }
-
-[build-dependencies]
-vergen = "3"
-
 [workspace]
 members = [
-	"node/runtime",
-	"node/cli",
-	"node/executor",
-	"node/primitives",
-	"node/service",
-	"node/rpc",
 	"modules/edge-signaling",
 	"modules/edge-identity",
 	"modules/edge-voting",
 	"modules/edge-treasury-reward",
+	"node/cli",
+	"node/executor",
+	"node/primitives",
+	"node/rpc",
+	"node/runtime",
 ]
 
-[badges]
-travis-ci = { repository = "paritytech/substrate", branch = "master" }
-maintenance = { status = "actively-developed" }
-is-it-maintained-issue-resolution = { repository = "paritytech/substrate" }
-is-it-maintained-open-issues = { repository = "paritytech/substrate" }
-
 [profile.release]
-# Substrate runtime requires unwinding.
+# Edgeware runtime requires unwinding.
 panic = "unwind"

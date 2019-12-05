@@ -1,101 +1,131 @@
 [package]
 name = "edgeware-runtime"
-version = "1.0.0"
+version = "2.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
 
 [dependencies]
+# third-party dependencies
+codec = { package = "parity-scale-codec", version = "1.0.6", default-features = false, features = ["derive"] }
 integer-sqrt = { version = "0.1.2" }
 safe-mix = { version = "1.0", default-features = false }
-parity-codec = { package = "parity-scale-codec", version = "1.0.0", default-features = false, features = ["derive"] }
-substrate-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-client = { package = "substrate-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-rstd = { package = "sr-std", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-runtime_primitives = { package = "sr-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-offchain-primitives = { package = "substrate-offchain-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-authority-discovery-primitives = { package = "substrate-authority-discovery-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sr-staking-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-version = { package = "sr-version", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-support = { package = "srml-support", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-aura = { package = "srml-aura", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-authorship = { package = "srml-authorship", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-balances = { package = "srml-balances", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-contracts = { package = "srml-contracts", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-collective = { package = "srml-collective", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-offences = { package = "srml-offences", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-democracy = { package = "srml-democracy", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-elections = { package = "srml-elections", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-executive = { package = "srml-executive", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-finality-tracker = { package = "srml-finality-tracker", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-grandpa = { package = "srml-grandpa", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-indices = { package = "srml-indices", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-session = { package = "srml-session", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false, features = ["historical"] }
-staking = { package = "srml-staking", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-srml-staking-reward-curve = { package = "srml-staking-reward-curve", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.0", default-features = false }
-system = { package = "srml-system", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-timestamp = { package = "srml-timestamp", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-treasury = { package = "srml-treasury", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-sudo = { package = "srml-sudo", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-authority-discovery = { package = "srml-authority-discovery", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-consensus_aura = { package = "substrate-consensus-aura-primitives", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
-im-online = { package = "srml-im-online", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
-serde = { version = "1.0", optional = true }
-substrate-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", optional = true }
-substrate-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2", default-features = false }
+serde = { version = "1.0.102", optional = true }
 
-edge-identity = { path = "../../modules/edge-identity", default-features = false }
-edge-voting = { path = "../../modules/edge-voting", default-features = false }
-edge-signaling = { path = "../../modules/edge-signaling", default-features = false }
-edge-treasury-reward = { path = "../../modules/edge-treasury-reward", default-features = false }
+# primitives
+authority-discovery-primitives = { package = "sp-authority-discovery", git = "https://github.com/drewstone/substrate.git", default-features = false }
+aura-primitives = { package = "sp-consensus-aura", git = "https://github.com/drewstone/substrate.git", default-features = false }
+block-builder-api = { package = "sp-block-builder", git = "https://github.com/drewstone/substrate.git", default-features = false}
+inherents = { package = "sp-inherents", git = "https://github.com/drewstone/substrate.git", default-features = false }
 edgeware-primitives = { path = "../primitives", default-features = false }
+offchain-primitives = { package = "sp-offchain", git = "https://github.com/drewstone/substrate.git", default-features = false }
+primitives = { package = "sp-core",  git = "https://github.com/drewstone/substrate.git", default-features = false }
+rstd = { package = "sp-std", git = "https://github.com/drewstone/substrate.git", default-features = false }
+sr-api = { package = "sp-api", git = "https://github.com/drewstone/substrate.git", default-features = false }
+sp-runtime = { git = "https://github.com/drewstone/substrate.git", default-features = false }
+sr-staking-primitives = { package = "sp-staking", git = "https://github.com/drewstone/substrate.git", default-features = false }
+substrate-keyring = { package = "sp-keyring", git = "https://github.com/drewstone/substrate.git", optional = true }
+substrate-session = { package = "sp-session", git = "https://github.com/drewstone/substrate.git", default-features = false }
+txpool-runtime-api = { package = "sp-transaction-pool-runtime-api", git = "https://github.com/drewstone/substrate.git", default-features = false }
+version = { package = "sp-version", git = "https://github.com/drewstone/substrate.git", default-features = false }
+
+# pallet dependencies
+authority-discovery = { package = "pallet-authority-discovery", git = "https://github.com/drewstone/substrate.git", default-features = false }
+authorship = { package = "pallet-authorship", git = "https://github.com/drewstone/substrate.git", default-features = false }
+aura = { package = "pallet-aura", git = "https://github.com/drewstone/substrate.git", default-features = false }
+balances = { package = "pallet-balances", git = "https://github.com/drewstone/substrate.git", default-features = false }
+collective = { package = "pallet-collective", git = "https://github.com/drewstone/substrate.git", default-features = false }
+contracts = { package = "pallet-contracts", git = "https://github.com/drewstone/substrate.git", default-features = false }
+contracts-rpc-runtime-api = { package = "pallet-contracts-rpc-runtime-api", git = "https://github.com/drewstone/substrate.git", default-features = false }
+democracy = { package = "pallet-democracy", git = "https://github.com/drewstone/substrate.git", default-features = false }
+elections-phragmen = { package = "pallet-elections-phragmen", git = "https://github.com/drewstone/substrate.git", default-features = false }
+executive = { package = "frame-executive", git = "https://github.com/drewstone/substrate.git", default-features = false }
+finality-tracker = { package = "pallet-finality-tracker", git = "https://github.com/drewstone/substrate.git", default-features = false }
+grandpa = { package = "pallet-grandpa", git = "https://github.com/drewstone/substrate.git", default-features = false }
+im-online = { package = "pallet-im-online", git = "https://github.com/drewstone/substrate.git", default-features = false }
+indices = { package = "pallet-indices", git = "https://github.com/drewstone/substrate.git", default-features = false }
+membership = { package = "pallet-membership", git = "https://github.com/drewstone/substrate.git", default-features = false }
+nicks = { package = "pallet-nicks", git = "https://github.com/drewstone/substrate.git", default-features = false }
+offences = { package = "pallet-offences", git = "https://github.com/drewstone/substrate.git", default-features = false }
+randomness-collective-flip = { package = "pallet-randomness-collective-flip", git = "https://github.com/drewstone/substrate.git", default-features = false }
+session = { package = "pallet-session", git = "https://github.com/drewstone/substrate.git", default-features = false, features = ["historical"] }
+staking = { package = "pallet-staking", git = "https://github.com/drewstone/substrate.git", default-features = false }
+pallet-staking-reward-curve = { git = "https://github.com/drewstone/substrate.git" }
+sudo = { package = "pallet-sudo", git = "https://github.com/drewstone/substrate.git", default-features = false }
+support = { package = "frame-support", git = "https://github.com/drewstone/substrate.git", default-features = false }
+system = { package = "frame-system", git = "https://github.com/drewstone/substrate.git", default-features = false }
+system-rpc-runtime-api = { package = "frame-system-rpc-runtime-api", git = "https://github.com/drewstone/substrate.git", default-features = false }
+timestamp = { package = "pallet-timestamp", git = "https://github.com/drewstone/substrate.git", default-features = false }
+treasury = { package = "pallet-treasury", git = "https://github.com/drewstone/substrate.git", default-features = false }
+utility = { package = "frame-utility", git = "https://github.com/drewstone/substrate.git", default-features = false }
+transaction-payment = { package = "pallet-transaction-payment", git = "https://github.com/drewstone/substrate.git", default-features = false }
+transaction-payment-rpc-runtime-api = { package = "pallet-transaction-payment-rpc-runtime-api", git = "https://github.com/drewstone/substrate.git", default-features = false }
+
+identity = { package = "edge-identity", path = "../../modules/edge-identity", default-features = false }
+signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
+treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
+voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", version = "1.0.2", git = "https://github.com/hicommonwealth/substrate.git", branch = "testnet-v0.9.2" }
+wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/drewstone/substrate.git", version = "1.0.4" }
+
+[dev-dependencies]
+runtime_io = { package = "sp-io", git = "https://github.com/drewstone/substrate.git" }
 
 [features]
 default = ["std"]
 std = [
 	"authority-discovery-primitives/std",
 	"authority-discovery/std",
-	"parity-codec/std",
-	"substrate-primitives/std",
-	"rstd/std",
-	"runtime_primitives/std",
-	"support/std",
-	"aura/std",
 	"authorship/std",
+	"aura-primitives/std",
+	"aura/std",
 	"balances/std",
-	"contracts/std",
+	"block-builder-api/std",
+	"codec/std",
 	"collective/std",
-	"offences/std",
+	"contracts-rpc-runtime-api/std",
+	"contracts/std",
 	"democracy/std",
-	"elections/std",
+	"elections-phragmen/std",
 	"executive/std",
 	"finality-tracker/std",
 	"grandpa/std",
+	"im-online/std",
 	"indices/std",
+	"inherents/std",
+	"membership/std",
+	"nicks/std",
+	"offchain-primitives/std",
+	"offences/std",
+	"primitives/std",
+	"randomness-collective-flip/std",
+	"rstd/std",
+	"rustc-hex",
+	"safe-mix/std",
+	"serde",
 	"session/std",
+	"sr-api/std",
+	"sp-runtime/std",
+	"sr-staking-primitives/std",
 	"staking/std",
+	"substrate-keyring",
+	"substrate-session/std",
+	"sudo/std",
+	"support/std",
+	"system-rpc-runtime-api/std",
 	"system/std",
 	"timestamp/std",
+	"transaction-payment-rpc-runtime-api/std",
+	"transaction-payment/std",
 	"treasury/std",
-	"sudo/std",
+	"txpool-runtime-api/std",
+	"utility/std",
 	"version/std",
-	"serde",
-	"safe-mix/std",
-	"client/std",
-	"consensus_aura/std",
-	"rustc-hex",
-	"substrate-keyring",
-	"offchain-primitives/std",
-	"sr-staking-primitives/std",
-	"substrate-session/std",
-	"im-online/std",
-	"edge-identity/std",
-	"edge-voting/std",
-	"edge-signaling/std",
-	"edge-treasury-reward/std",
 	"edgeware-primitives/std",
+	"identity/std",
+	"signaling/std",
+	"treasury-reward/std",
+	"voting/std",
 ]
