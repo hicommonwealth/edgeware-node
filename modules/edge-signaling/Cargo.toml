@@ -17,7 +17,7 @@ balances = { package ="pallet-balances", git = "https://github.com/drewstone/sub
 voting = { package ="edge-voting", path = "../edge-voting", default-features = false }
 
 [dev-dependencies]
-sp-io = { git = "https://github.com/drewstone/substrate.git", default-features = false }
+sr-io = { package = "sp-io", git = "https://github.com/drewstone/substrate.git", default-features = false }
 substrate-primitives = { package = "sp-core", git = "https://github.com/drewstone/substrate.git", default-features = false }
 
 [features]
