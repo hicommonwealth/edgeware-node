@@ -66,7 +66,7 @@ Ensure you have a fresh start if updating from another version:
 ./scripts/purge-chain.sh
 ```
 
-To start up the Edgeware node and connect to testnet 0.9.0, run:
+To start up the Edgeware node and connect to testnet 0.9.9, run:
 ```
-./target/release/edgeware --chain=chains/testnet-0.9.0.json --name <INSERT_NAME>
+./target/release/edgeware --chain=edg-0.9.9 --name <INSERT_NAME>
 ```
