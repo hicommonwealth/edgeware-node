@@ -273,10 +273,10 @@ impl staking::Trait for Runtime {
 
 parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
 	pub const EmergencyVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 1 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1 * MILLICENTS;
 }
@@ -314,9 +314,9 @@ impl collective::Trait<CouncilCollective> for Runtime {
 }
 
 parameter_types! {
-	pub const CandidacyBond: Balance = 10 * DOLLARS;
+	pub const CandidacyBond: Balance = 10_000 * DOLLARS;
 	pub const VotingBond: Balance = 1 * DOLLARS;
-	pub const TermDuration: BlockNumber = 7 * DAYS;
+	pub const TermDuration: BlockNumber = 28 * DAYS;
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 }
@@ -362,8 +362,8 @@ parameter_types! {
 	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;
 	pub const ContractFee: Balance = 1 * CENTS;
 	pub const TombstoneDeposit: Balance = 1 * DOLLARS;
-	pub const RentByteFee: Balance = 1 * DOLLARS;
-	pub const RentDepositOffset: Balance = 1000 * DOLLARS;
+	pub const RentByteFee: Balance = 1 * CENTS;
+	pub const RentDepositOffset: Balance = 10 * DOLLARS;
 	pub const SurchargeReward: Balance = 150 * DOLLARS;
 }
 

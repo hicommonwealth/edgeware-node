@@ -288,12 +288,12 @@ pub fn testnet_genesis(
 		}),
 		staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: initial_authorities.len() as u32 * 2,
+			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities.iter().map(|x| {
 				(x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)
 			}).collect(),
-			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+			invulnerables: [],
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
@@ -327,12 +327,12 @@ pub fn testnet_genesis(
 		treasury: Some(Default::default()),
 		identity: Some(IdentityConfig {
 			verifiers: crate::testnet_fixtures::get_testnet_identity_verifiers(),
-			expiration_length: 1 * DAYS,
+			expiration_length: 7 * DAYS,
 			registration_bond: 1 * DOLLARS,
 		}),
 		signaling: Some(SignalingConfig {
-			voting_length: 3 * DAYS,
-			proposal_creation_bond: 100 * DOLLARS,
+			voting_length: 7 * DAYS,
+			proposal_creation_bond: 1 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
