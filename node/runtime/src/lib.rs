@@ -78,8 +78,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 27,
-	impl_version: 27,
+	spec_version: 28,
+	impl_version: 28,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -396,11 +396,6 @@ impl contracts::Trait for Runtime {
 	type BlockGasLimit = contracts::DefaultBlockGasLimit;
 }
 
-impl sudo::Trait for Runtime {
-	type Event = Event;
-	type Proposal = Call;
-}
-
 type SubmitTransaction = TransactionSubmitter<ImOnlineId, Runtime, UncheckedExtrinsic>;
 
 parameter_types! {
@@ -528,7 +523,6 @@ construct_runtime!(
 		Grandpa: grandpa::{Module, Call, Storage, Config, Event},
 		Treasury: treasury::{Module, Call, Storage, Config, Event<T>},
 		Contracts: contracts,
-		Sudo: sudo,
 		TransactionPayment: transaction_payment::{Module, Storage},
 		ImOnline: im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
 		AuthorityDiscovery: authority_discovery::{Module, Call, Config},
