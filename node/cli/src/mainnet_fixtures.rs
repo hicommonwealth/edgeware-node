@@ -21,9 +21,7 @@ pub fn get_mainnet_bootnodes() -> Vec<String> {
 	];
 }
 
-/// This is the allocation that will fit into the "balances" collection
-/// of the "balances" module. The total should be 5e26 - 1e26 or 400 million EDG,
-/// since we have also allocated 1e26 to the validators below.
+/// This is the allocation that will fit into the "balances" module
 pub const STASH_ENDOWMENT: Balance = 8999990000000000000000000;
 pub const CONTROLLER_ENDOWMENT: Balance = 10000000000000000000;
 pub fn get_commonwealth_allocation() -> Vec<(AccountId, Balance)> {
@@ -216,10 +214,8 @@ pub fn get_commonwealth_allocation() -> Vec<(AccountId, Balance)> {
 	)]
 }
 
-/// The mainnet commonwealth validator pubkeys and staked balances.
-///
-/// The total of the Commonwealth Mainnet validators balances is thus 1e26 or 20%
-/// i.e 10 * ((1e25 - 1e19) + 1e19) = 1e26 or 20% of 5e26
+/// The mainnet commonwealth validator pubkeys and staked balances. These
+/// staked amounts should be less than the balances of the stash accounts.
 pub fn get_cw_mainnet_validators() -> Vec<(AccountId, AccountId, Balance, AuraId, GrandpaId, ImOnlineId, AuthorityDiscoveryId)> {
 	return vec![(
 		hex!["1ec5e3d9a77ac81d6da0290c04d003bbcb04af8c4902bd59dbf9be4dfa47234f"].into(),
