@@ -302,14 +302,12 @@ pub fn get_cw_mainnet_validators() -> Vec<(AccountId, AccountId, Balance, AuraId
 
 pub fn get_mainnet_identity_verifiers() -> Vec<AccountId> {
 	return vec![
-		// 5FP8pEw3pCxTap1GjJh6JVjoLLvnsVyvKtrxu9PSQThMDn1M
 		hex!["92c3225d346f99794812069a16cb91d979137d1534fff5795dacbaede7369f1d"].into(),
 	];
 }
 
 pub fn get_mainnet_election_members() -> Vec<AccountId> {
 	return vec![
-		// 5C7gaRoByJ99HoiZT9zgJAfx9p3YHLASkdT4Tn3ScgzpX6nX
 		hex!["02456d652d95f78a97ff18e9f1170b3478f3644c4283f58312f2bb98f3ffe74e"].into(),
 	];
 }
