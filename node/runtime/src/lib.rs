@@ -319,7 +319,8 @@ impl collective::Trait<CouncilCollective> for Runtime {
 parameter_types! {
 	pub const CandidacyBond: Balance = 1_000 * DOLLARS;
 	pub const VotingBond: Balance = 10 * DOLLARS;
-	pub const TermDuration: BlockNumber = 7 * DAYS;
+	pub const TermDuration: BlockNumber = 28 * DAYS;
+	// Delay the first council election by 28 days, so everyone can get votes in
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 }
