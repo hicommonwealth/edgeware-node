@@ -279,7 +279,7 @@ parameter_types! {
 	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const EmergencyVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 10 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1_000 * MILLICENTS;
 }
