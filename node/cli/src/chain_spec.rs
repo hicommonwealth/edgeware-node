@@ -530,7 +530,7 @@ pub fn mainnet_genesis(
 		}),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
+			proposal_creation_bond: 100 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
