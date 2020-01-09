@@ -115,5 +115,8 @@ pub fn get_testnet_election_members() -> Vec<AccountId> {
 	return vec![
 		// 5EeJqpx6RCQxg13WW2WJt4CPE6w6vSmFSWNBdzYCh2YX7bFU
 		hex!["72195640f79f8254ce35db3b5d0b17c0243b0fb4489fa4b04688ed121ba22603"].into(),
+		hex!["80d5673f528ec827a9a1ed4bb5b47b737e9dffae3e62e95e104b4f1afc52ec68"].into(),
+		hex!["9878e771c7637945322a46ec58ab59ee62d0a308fc38335cbdd98c50fd0fdc41"].into(),
+
 	];
 }

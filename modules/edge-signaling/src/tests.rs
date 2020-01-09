@@ -96,6 +96,7 @@ pub type Signaling = Module<Test>;
 const BOND: u128 = 10;
 const YES_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const OTHER_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
 
 fn new_test_ext() -> sr_io::TestExternalities {
 	let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
@@ -507,6 +508,45 @@ fn completed_proposal_should_remain_before_deletion() {
 		assert_eq!(
 			Signaling::proposal_of(hash),
 			None
+		);
+	});
+}
+
+#[test]
+fn propose_multichoice_should_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE, OTHER_VOTE];
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::MultiOption, TallyType::OneCoin));
+		let _vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
+		let title2: &[u8] = b"Proposal 2";
+		let proposal2: &[u8] = b"Proposal 2";
+		let hash2 = build_proposal_hash(public, &proposal2);
+		let outcomes = vec![YES_VOTE, NO_VOTE, OTHER_VOTE];
+		assert_ok!(propose(public, title2, proposal2, outcomes, VoteType::MultiOption, TallyType::OneCoin));
+		let vote_id2 = Signaling::proposal_of(hash2).unwrap().vote_id;
+
+		assert_eq!(Signaling::proposal_count(), 2);
+		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001), (hash2, 10001)]);
+		assert_eq!(Signaling::active_proposals(), vec![]);
+		assert_eq!(
+			Signaling::proposal_of(hash),
+			Some(ProposalRecord {
+				transition_time: 10001,
+				..make_record(public, title, proposal)
+			})
+		);
+		assert_eq!(
+			Signaling::proposal_of(hash2),
+			Some(ProposalRecord {
+				index: 1,
+				vote_id: vote_id2,
+				transition_time: 10001,
+				..make_record(public, title2, proposal2)
+			})
 		);
 	});
 }
