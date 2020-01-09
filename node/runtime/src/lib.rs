@@ -24,7 +24,7 @@ use rstd::prelude::*;
 use support::{
 	construct_runtime, parameter_types, traits::{SplitTwoWays, Currency, Randomness}
 };
-use primitives::u32_trait::{_1, _2, _3, _4};
+use primitives::u32_trait::{_1, _2, _3, _4, _5};
 use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature};
 use sr_api::impl_runtime_apis;
 use sp_runtime::{Permill, Perbill, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
@@ -149,9 +149,9 @@ impl indices::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ExistentialDeposit: Balance = 1 * MILLICENTS;
-	pub const TransferFee: Balance = 1 * CENTS;
-	pub const CreationFee: Balance = 1 * CENTS;
+	pub const ExistentialDeposit: Balance = 10 * CENTS;
+	pub const TransferFee: Balance = 10 * CENTS;
+	pub const CreationFee: Balance = 10 * CENTS;
 }
 
 impl balances::Trait for Runtime {
@@ -167,8 +167,8 @@ impl balances::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const TransactionBaseFee: Balance = 1 * CENTS;
-	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
+	pub const TransactionBaseFee: Balance = 10 * CENTS;
+	pub const TransactionByteFee: Balance = 100 * MILLICENTS;
 	// setting this to zero will disable the weight fee.
 	pub const WeightFeeCoefficient: Balance = 1_000;
 	// for a sane configuration, this should always be less than `AvailableBlockRatio`.
@@ -248,9 +248,12 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
+        // 1 hour session, 6 hour era
 	pub const SessionsPerEra: sr_staking_primitives::SessionIndex = 6;
-	pub const BondingDuration: staking::EraIndex = 24 * 28;
-	pub const SlashDeferDuration: staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
+        // 28 eras for unbonding (7 days)
+	pub const BondingDuration: staking::EraIndex = 28;
+        // 28 eras in which slashes can be cancelled (7 days)
+	pub const SlashDeferDuration: staking::EraIndex = 28;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 }
 
@@ -272,13 +275,13 @@ impl staking::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 14 * 24 * 60 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const EmergencyVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
-	pub const MinimumDeposit: Balance = 1 * DOLLARS;
-	pub const EnactmentPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
-	pub const CooloffPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
-	pub const PreimageByteDeposit: Balance = 1 * MILLICENTS;
+	pub const MinimumDeposit: Balance = 100 * DOLLARS;
+	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
+	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
+	pub const PreimageByteDeposit: Balance = 1_000 * MILLICENTS;
 }
 
 impl democracy::Trait for Runtime {
@@ -314,9 +317,10 @@ impl collective::Trait<CouncilCollective> for Runtime {
 }
 
 parameter_types! {
-	pub const CandidacyBond: Balance = 10_000 * DOLLARS;
-	pub const VotingBond: Balance = 1 * DOLLARS;
+	pub const CandidacyBond: Balance = 1_000 * DOLLARS;
+	pub const VotingBond: Balance = 10 * DOLLARS;
 	pub const TermDuration: BlockNumber = 28 * DAYS;
+	// Delay the first council election by 28 days, so everyone can get votes in
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 }
@@ -338,15 +342,15 @@ impl elections_phragmen::Trait for Runtime {
 
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 1 * DAYS;
-	pub const Burn: Permill = Permill::from_percent(50);
+	pub const ProposalBondMinimum: Balance = 1_000 * DOLLARS;
+	pub const SpendPeriod: BlockNumber = 7 * DAYS;
+	pub const Burn: Permill = Permill::from_percent(0);
 }
 
 impl treasury::Trait for Runtime {
 	type Currency = Balances;
-	type ApproveOrigin = collective::EnsureMembers<_4, AccountId, CouncilCollective>;
-	type RejectOrigin = collective::EnsureMembers<_2, AccountId, CouncilCollective>;
+	type ApproveOrigin = collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>;
+	type RejectOrigin = collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
 	type Event = Event;
 	type ProposalRejection = ();
 	type ProposalBond = ProposalBond;
@@ -356,14 +360,14 @@ impl treasury::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ContractTransferFee: Balance = 1 * CENTS;
-	pub const ContractCreationFee: Balance = 1 * CENTS;
-	pub const ContractTransactionBaseFee: Balance = 1 * CENTS;
-	pub const ContractTransactionByteFee: Balance = 10 * MILLICENTS;
-	pub const ContractFee: Balance = 1 * CENTS;
+	pub const ContractTransferFee: Balance = 10 * CENTS;
+	pub const ContractCreationFee: Balance = 10 * CENTS;
+	pub const ContractTransactionBaseFee: Balance = 10 * CENTS;
+	pub const ContractTransactionByteFee: Balance = 100 * MILLICENTS;
+	pub const ContractFee: Balance = 10 * CENTS;
 	pub const TombstoneDeposit: Balance = 1 * DOLLARS;
-	pub const RentByteFee: Balance = 1 * CENTS;
-	pub const RentDepositOffset: Balance = 10 * DOLLARS;
+	pub const RentByteFee: Balance = 1 * DOLLARS;
+	pub const RentDepositOffset: Balance = 1000 * DOLLARS;
 	pub const SurchargeReward: Balance = 150 * DOLLARS;
 }
 
@@ -509,11 +513,11 @@ construct_runtime!(
 		Utility: utility::{Module, Call, Event},
 		Timestamp: timestamp::{Module, Call, Storage, Inherent},
 		Aura: aura::{Module, Config<T>, Inherent(Timestamp)},
-		
+
 		Authorship: authorship::{Module, Call, Storage, Inherent},
 		Indices: indices,
 		Balances: balances::{default, Error},
-		
+
 		Staking: staking::{default, OfflineWorker},
 		Session: session::{Module, Call, Storage, Event, Config<T>},
 		Democracy: democracy::{Module, Call, Storage, Config, Event<T>},
