@@ -20,24 +20,24 @@
 
 use std::sync::Arc;
 use client::{self, LongestChain};
-use grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
+use pallet_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;
 use edgeware_primitives::Block;
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
-use substrate_service::{
+use sc_service::{
 	AbstractService, ServiceBuilder, config::Configuration, error::{Error as ServiceError},
 };
-use inherents::InherentDataProviders;
-use network::construct_simple_protocol;
+use sp_inherents::InherentDataProviders;
+use sc_network::construct_simple_protocol;
 
-use substrate_service::{Service, NetworkStatus};
-use client::{Client, LocalCallExecutor};
-use client_db::Backend;
-use sr_primitives::traits::Block as BlockT;
+use sc_service::{Service, NetworkStatus};
+use sc_client::{Client, LocalCallExecutor};
+use sc_client_db::Backend;
+use sp_runtime::traits::Block as BlockT;
 use edgeware_executor::NativeExecutor;
-use network::NetworkService;
-use offchain::OffchainWorkers;
-use primitives::Blake2Hasher;
+use sc_network::NetworkService;
+use sc_offchain::OffchainWorkers;
+use sp_core::Blake2Hasher;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -50,26 +50,26 @@ construct_simple_protocol! {
 /// be able to perform chain operations.
 macro_rules! new_full_start {
 	($config:expr) => {{
-		type RpcExtension = jsonrpc_core::IoHandler<substrate_rpc::Metadata>;
+		type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 		let mut import_setup = None;
-		let inherent_data_providers = inherents::InherentDataProviders::new();
+		let inherent_data_providers = sp_inherents::InherentDataProviders::new();
 
-		let builder = substrate_service::ServiceBuilder::new_full::<
+		let builder = sc_service::ServiceBuilder::new_full::<
 			edgeware_primitives::Block, edgeware_runtime::RuntimeApi, edgeware_executor::Executor
 		>($config)?
 			.with_select_chain(|_config, backend| {
-				Ok(client::LongestChain::new(backend.clone()))
+				Ok(sc_client::LongestChain::new(backend.clone()))
 			})?
 			.with_transaction_pool(|config, client, _fetcher| {
-				let pool_api = txpool::FullChainApi::new(client.clone());
-				let pool = txpool::BasicPool::new(config, pool_api);
-				let maintainer = txpool::FullBasicPoolMaintainer::new(pool.pool().clone(), client);
-				let maintainable_pool = txpool_api::MaintainableTransactionPool::new(pool, maintainer);
+				let pool_api = sc_transaction_pool::FullChainApi::new(client.clone());
+				let pool = sc_transaction_pool::BasicPool::new(config, pool_api);
+				let maintainer = sc_transaction_pool::FullBasicPoolMaintainer::new(pool.pool().clone(), client);
+				let maintainable_pool = sp_transaction_pool::MaintainableTransactionPool::new(pool, maintainer);
 				Ok(maintainable_pool)
 			})?
 			.with_import_queue(|_config, client, mut select_chain, _transaction_pool| {
 				let select_chain = select_chain.take()
-					.ok_or_else(|| substrate_service::Error::SelectChainRequired)?;
+					.ok_or_else(|| sc_service::Error::SelectChainRequired)?;
 				let (grandpa_block_import, grandpa_link) = grandpa::block_import(
 					client.clone(),
 					&*client,
@@ -102,13 +102,13 @@ macro_rules! new_full_start {
 /// concrete types instead.
 macro_rules! new_full {
 	($config:expr, $with_startup_data: expr) => {{
-		use futures01::sync::mpsc;
-		use network::DhtEvent;
+		use futures01::Stream;
 		use futures::{
 			compat::Stream01CompatExt,
 			stream::StreamExt,
 			future::{FutureExt, TryFutureExt},
 		};
+		use sc_network::Event;
 
 		let (
 			is_authority,
@@ -131,18 +131,10 @@ macro_rules! new_full {
 
 		let (builder, mut import_setup, inherent_data_providers) = new_full_start!($config);
 
-		// Dht event channel from the network to the authority discovery module. Use bounded channel to ensure
-		// back-pressure. Authority discovery is triggering one event per authority within the current authority set.
-		// This estimates the authority set size to be somewhere below 10 000 thereby setting the channel buffer size to
-		// 10 000.
-		let (dht_event_tx, dht_event_rx) =
-			mpsc::channel::<DhtEvent>(10_000);
-
 		let service = builder.with_network_protocol(|_| Ok(crate::service::NodeProtocol::new()))?
 			.with_finality_proof_provider(|client, backend|
 				Ok(Arc::new(grandpa::FinalityProofProvider::new(backend, client)) as _)
 			)?
-			.with_dht_event_tx(dht_event_tx)?
 			.build()?;
 
 		let (block_import, grandpa_link) = import_setup.take()
@@ -151,19 +143,19 @@ macro_rules! new_full {
 		($with_startup_data)(&block_import, &grandpa_link);
 
 		if participates_in_consensus {
-			let proposer = substrate_basic_authorship::ProposerFactory {
+			let proposer = sc_basic_authority::ProposerFactory {
 				client: service.client(),
 				transaction_pool: service.transaction_pool(),
 			};
 
 			let client = service.client();
 			let select_chain = service.select_chain()
-				.ok_or(substrate_service::Error::SelectChainRequired)?;
+				.ok_or(sc_service::Error::SelectChainRequired)?;
 
 			let can_author_with =
-				consensus_common::CanAuthorWithNativeVersion::new(client.executor().clone());
+				sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
 
-			let aura = aura::start_aura::<_, _, _, _, _, aura_primitives::ed25519::AuthorityPair, _, _, _, _>(
+			let aura = sc_consensus_aura::start_aura::<_, _, _, _, _, sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _>(
 				aura::SlotDuration::get_or_compute(&*client)?,
 				client,
 				select_chain,
@@ -178,15 +170,17 @@ macro_rules! new_full {
 
 			service.spawn_essential_task(aura);
 
-			let future03_dht_event_rx = dht_event_rx.compat()
-				.map(|x| x.expect("<mpsc::channel::Receiver as Stream> never returns an error; qed"))
-				.boxed();
-			let authority_discovery = authority_discovery::AuthorityDiscovery::new(
+			let network = service.network();
+			let dht_event_stream = network.event_stream().filter_map(|e| async move { match e {
+				Event::Dht(e) => Some(e),
+				_ => None,
+			}}).boxed();
+			let authority_discovery = sc_authority_discovery::AuthorityDiscovery::new(
 				service.client(),
-				service.network(),
+				network,
 				sentry_nodes,
 				service.keystore(),
-				future03_dht_event_rx,
+				dht_event_stream,
 			);
 			let future01_authority_discovery = authority_discovery.map(|x| Ok(x)).compat();
 
@@ -219,6 +213,7 @@ macro_rules! new_full {
 					grandpa_link,
 					service.network(),
 					service.on_exit(),
+					service.spawn_task_handle(),
 				)?);
 			},
 			(true, false) => {
@@ -231,6 +226,7 @@ macro_rules! new_full {
 					on_exit: service.on_exit(),
 					telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
 					voting_rule: grandpa::VotingRulesBuilder::default().build(),
+					executor: service.spawn_task_handle(),
 				};
 				// the GRANDPA voter task is considered infallible, i.e.
 				// if it fails we take down the service with it.
@@ -266,14 +262,14 @@ type ConcreteClient =
 #[allow(dead_code)]
 type ConcreteBackend = Backend<ConcreteBlock>;
 #[allow(dead_code)]
-type ConcreteTransactionPool = txpool_api::MaintainableTransactionPool<
-	txpool::BasicPool<
-		txpool::FullChainApi<ConcreteClient, ConcreteBlock>,
+type ConcreteTransactionPool = sp_transaction_pool::MaintainableTransactionPool<
+	sc_transaction_pool::BasicPool<
+		sc_transaction_pool::FullChainApi<ConcreteClient, ConcreteBlock>,
 		ConcreteBlock
 	>,
-	txpool::FullBasicPoolMaintainer<
+	sc_transaction_pool::FullBasicPoolMaintainer<
 		ConcreteClient,
-		txpool::FullChainApi<ConcreteClient, Block>
+		sc_transaction_pool::FullChainApi<ConcreteClient, Block>
 	>
 >;
 
@@ -292,7 +288,7 @@ pub fn new_full<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 		ConcreteTransactionPool,
 		OffchainWorkers<
 			ConcreteClient,
-			<ConcreteBackend as client_api::backend::Backend<Block, Blake2Hasher>>::OffchainStorage,
+			<ConcreteBackend as sc_client_api::backend::Backend<Block, Blake2Hasher>>::OffchainStorage,
 			ConcreteBlock,
 		>
 	>,
@@ -305,7 +301,7 @@ pub fn new_full<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 /// Builds a new service for a light client.
 pub fn new_light<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 -> Result<impl AbstractService, ServiceError> {
-	type RpcExtension = jsonrpc_core::IoHandler<substrate_rpc::Metadata>;
+	type RpcExtension = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 	let inherent_data_providers = InherentDataProviders::new();
 
 	let service = ServiceBuilder::new_light::<Block, RuntimeApi, edgeware_executor::Executor>(config)?
@@ -315,10 +311,10 @@ pub fn new_light<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 		.with_transaction_pool(|config, client, fetcher| {
 			let fetcher = fetcher
 				.ok_or_else(|| "Trying to start light transaction pool without active fetcher")?;
-			let pool_api = txpool::LightChainApi::new(client.clone(), fetcher.clone());
-			let pool = txpool::BasicPool::new(config, pool_api);
-			let maintainer = txpool::LightBasicPoolMaintainer::with_defaults(pool.pool().clone(), client, fetcher);
-			let maintainable_pool = txpool_api::MaintainableTransactionPool::new(pool, maintainer);
+			let pool_api = sc_transaction_pool::LightChainApi::new(client.clone(), fetcher.clone());
+			let pool = sc_transaction_pool::BasicPool::new(config, pool_api);
+			let maintainer = sc_transaction_pool::LightBasicPoolMaintainer::with_defaults(pool.pool().clone(), client, fetcher);
+			let maintainable_pool = sp_transaction_pool::MaintainableTransactionPool::new(pool, maintainer);
 			Ok(maintainable_pool)
 		})?
 		.with_import_queue_and_fprb(|_config, client, backend, fetcher, _select_chain, _tx_pool| {
@@ -336,7 +332,7 @@ pub fn new_light<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = aura::import_queue::<_, _, aura_primitives::ed25519::AuthorityPair, ()>(
+			let import_queue = sc_consensus_aura::import_queue::<_, _, sp_consensus_aura::ed25519::AuthorityPair, ()>(
 				aura::SlotDuration::get_or_compute(&*client)?,
 				Box::new(grandpa_block_import),
 				None,
