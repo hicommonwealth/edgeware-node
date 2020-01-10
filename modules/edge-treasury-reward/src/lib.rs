@@ -20,17 +20,17 @@
 #[cfg(test)]
 mod tests;
 
-use support::traits::Currency;
-use rstd::prelude::*;
-use sr_primitives::traits::{Zero};
+use frame_support::traits::Currency;
+use sp_std::prelude::*;
+use sp_runtime::traits::{Zero};
 
-use support::{decl_event, decl_module, decl_storage};
+use frame_support::{decl_event, decl_module, decl_storage};
+use frame_system::{self as system};
+pub type BalanceOf<T> = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
 
-pub type BalanceOf<T> = <<T as staking::Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
-
-pub trait Trait: staking::Trait + treasury::Trait + balances::Trait {
+pub trait Trait: pallet_staking::Trait + pallet_treasury::Trait + pallet_balances::Trait {
 	/// The overarching event type.
-	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 	/// The account balance
 	type Currency: Currency<Self::AccountId>;
 }
@@ -40,14 +40,14 @@ decl_module! {
 		fn deposit_event() = default;
 		/// Mint money for the treasury!
 		fn on_finalize(_n: T::BlockNumber) {
-			if <system::Module<T>>::block_number() % Self::minting_interval() == Zero::zero() {
+			if <frame_system::Module<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
-				<T as staking::Trait>::Currency::deposit_creating(&<treasury::Module<T>>::account_id(), reward);
-				<Pot<T>>::put(<balances::Module<T>>::free_balance(&<treasury::Module<T>>::account_id()));
+				<T as pallet_staking::Trait>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
+				<Pot<T>>::put(<pallet_balances::Module<T>>::free_balance(&<pallet_treasury::Module<T>>::account_id()));
 				Self::deposit_event(RawEvent::TreasuryMinting(
 					Self::pot(),
 					reward,
-					<system::Module<T>>::block_number())
+					<frame_system::Module<T>>::block_number())
 				);
 			}
 		}
@@ -55,9 +55,9 @@ decl_module! {
 }
 
 decl_event!(
-	pub enum Event<T> where <T as system::Trait>::BlockNumber,
-							Balance2 = <<T as staking::Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance,
-							Balance = <T as balances::Trait>::Balance
+	pub enum Event<T> where <T as frame_system::Trait>::BlockNumber,
+							Balance2 = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance,
+							Balance = <T as pallet_balances::Trait>::Balance
 							{
 		TreasuryMinting(Balance, Balance2, BlockNumber),
 	}

@@ -15,20 +15,20 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>
 
 use super::*;
-use sr_staking_primitives::SessionIndex;
-use sr_primitives::traits::OpaqueKeys;
-use sr_primitives::curve::PiecewiseLinear;
-use sr_primitives::testing::UintAuthorityId;
+use sp_staking::SessionIndex;
+use sp_runtime::traits::OpaqueKeys;
+use sp_runtime::curve::PiecewiseLinear;
+use sp_runtime::testing::UintAuthorityId;
 
 #[cfg(feature = "std")]
 use std::{collections::HashSet, cell::RefCell};
 
-use substrate_primitives::{H256, crypto::key_types};
+use sp_core::{H256, crypto::key_types};
 
 
-use support::{parameter_types, impl_outer_origin};
+use frame_support::{parameter_types, impl_outer_origin};
 
-use sr_primitives::{
+use sp_runtime::{
 	Perbill, Permill, KeyTypeId,
 	testing::{Header},
 	traits::{OnFinalize, IdentityLookup, One},
@@ -42,16 +42,16 @@ pub type Balance = u128;
 
 /// Simple structure that exposes how u64 currency can be represented as... u64.
 pub struct CurrencyToVoteHandler;
-impl sr_primitives::traits::Convert<u64, u64> for CurrencyToVoteHandler {
+impl sp_runtime::traits::Convert<u64, u64> for CurrencyToVoteHandler {
 	fn convert(x: u64) -> u64 { x }
 }
-impl sr_primitives::traits::Convert<u128, u64> for CurrencyToVoteHandler {
+impl sp_runtime::traits::Convert<u128, u64> for CurrencyToVoteHandler {
 	fn convert(x: u128) -> u64 { x as u64 }
 }
-impl sr_primitives::traits::Convert<u128, u128> for CurrencyToVoteHandler {
+impl sp_runtime::traits::Convert<u128, u128> for CurrencyToVoteHandler {
 	fn convert(x: u128) -> u128 { x }
 }
-impl sr_primitives::traits::Convert<u64, u128> for CurrencyToVoteHandler {
+impl sp_runtime::traits::Convert<u64, u128> for CurrencyToVoteHandler {
 	fn convert(x: u64) -> u128 { x as u128 }
 }
 
@@ -61,7 +61,7 @@ thread_local! {
 }
 
 pub struct TestSessionHandler;
-impl session::SessionHandler<AccountId> for TestSessionHandler {
+impl pallet_session::SessionHandler<AccountId> for TestSessionHandler {
 	const KEY_TYPE_IDS: &'static [KeyTypeId] = &[key_types::DUMMY];
 
 	fn on_genesis_session<Ks: OpaqueKeys>(_validators: &[(AccountId, Ks)]) {}
@@ -99,13 +99,13 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
-impl system::Trait for Test {
+impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = ::sr_primitives::traits::BlakeTwo256;
+	type Hashing = sp_runtime::traits::BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
@@ -115,6 +115,7 @@ impl system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type ModuleToIndex = ();
 }
 
 parameter_types! {
@@ -123,7 +124,7 @@ parameter_types! {
 	pub const CreationFee: u128 = 0;
 }
 
-impl balances::Trait for Test {
+impl pallet_balances::Trait for Test {
 	/// The type for recording an account's balance.
 	type Balance = u128;
 	/// What to do if an account's free balance gets zeroed.
@@ -146,33 +147,33 @@ parameter_types! {
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(25);
 }
 
-impl session::Trait for Test {
-	type OnSessionEnding = session::historical::NoteHistoricalRoot<Test, Staking>;
+impl pallet_session::Trait for Test {
+	type OnSessionEnding = pallet_session::historical::NoteHistoricalRoot<Test, Staking>;
 	type Keys = UintAuthorityId;
-	type ShouldEndSession = session::PeriodicSessions<Period, Offset>;
+	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
 	type SessionHandler = TestSessionHandler;
 	type Event = ();
 	type ValidatorId = AccountId;
-	type ValidatorIdOf = staking::StashOf<Test>;
+	type ValidatorIdOf = pallet_staking::StashOf<Test>;
 	type SelectInitialValidators = Staking;
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
 }
 
-impl session::historical::Trait for Test {
-	type FullIdentification = staking::Exposure<AccountId, Balance>;
-	type FullIdentificationOf = staking::ExposureOf<Test>;
+impl pallet_session::historical::Trait for Test {
+	type FullIdentification = pallet_staking::Exposure<AccountId, Balance>;
+	type FullIdentificationOf = pallet_staking::ExposureOf<Test>;
 }
 
 parameter_types! {
 	pub const MinimumPeriod: u64 = 5;
 }
-impl timestamp::Trait for Test {
+impl pallet_timestamp::Trait for Test {
 	type Moment = u64;
 	type OnTimestampSet = ();
 	type MinimumPeriod = MinimumPeriod;
 }
 
-staking_reward_curve::build! {
+pallet_staking_reward_curve::build! {
 	const I_NPOS: PiecewiseLinear<'static> = curve!(
 		min_inflation: 0_025_000,
 		max_inflation: 0_100_000,
@@ -185,19 +186,21 @@ staking_reward_curve::build! {
 
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
-	pub const BondingDuration: staking::EraIndex = 3;
+	pub const BondingDuration: pallet_staking::EraIndex = 3;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 }
 
-impl staking::Trait for Test {
-	type Currency = Balances;
-	type Time = Timestamp;
+impl pallet_staking::Trait for Test {
+	type Currency = pallet_balances::Module<Self>;
+	type Time = pallet_timestamp::Module<Self>;
 	type CurrencyToVote = CurrencyToVoteHandler;
 	type RewardRemainder = ();
 	type Event = ();
 	type Slash = ();
 	type Reward = ();
 	type SessionsPerEra = SessionsPerEra;
+	type SlashDeferDuration = ();
+	type SlashCancelOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
 	type RewardCurve = RewardCurve;
@@ -210,10 +213,10 @@ parameter_types! {
 	pub const Burn: Permill = Permill::from_percent(50);
 }
 
-impl treasury::Trait for Test {
+impl pallet_treasury::Trait for Test {
 	type Currency = Balances;
-	type ApproveOrigin = system::EnsureRoot<u64>;
-	type RejectOrigin = system::EnsureRoot<u64>;
+	type ApproveOrigin = frame_system::EnsureRoot<u64>;
+	type RejectOrigin = frame_system::EnsureRoot<u64>;
 	type Event = ();
 	type ProposalRejection = ();
 	type ProposalBond = ProposalBond;
@@ -227,11 +230,10 @@ impl Trait for Test {
 	type Currency = Balances;
 }
 
-pub type Balances = balances::Module<Test>;
-pub type System = system::Module<Test>;
-pub type Staking = staking::Module<Test>;
-pub type Timestamp = timestamp::Module<Test>;
-pub type Treasury = treasury::Module<Test>;
+pub type Balances = pallet_balances::Module<Test>;
+pub type System = frame_system::Module<Test>;
+pub type Staking = pallet_staking::Module<Test>;
+pub type Treasury = pallet_treasury::Module<Test>;
 pub type TreasuryReward = Module<Test>;
 
 pub struct ExtBuilder {
@@ -247,54 +249,48 @@ impl Default for ExtBuilder {
 }
 
 impl ExtBuilder {
-	fn build(self) -> sr_io::TestExternalities {
+	fn build(self) -> sp_io::TestExternalities {
 		let balance_factor = if self.existential_deposit > 0 {
 			256
 		} else {
 			1
 		};
-		let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
-		t.0.extend(
-			balances::GenesisConfig::<Test> {
-				balances: vec![
-						(1, 10000000000 * balance_factor),
-						(2, 10000000000 * balance_factor),
-						(3, 10000000000 * balance_factor),
-						(4, 10000000000 * balance_factor),
-						(10, 10000000000 * balance_factor),
-						(11, 10000000000 * balance_factor),
-						(20, 10000000000 * balance_factor),
-						(21, 10000000000 * balance_factor),
-						(30, 10000000000 * balance_factor),
-						(31, 10000000000 * balance_factor),
-						(40, 10000000000 * balance_factor),
-						(41, 10000000000 * balance_factor),
-						(100, 10000000000 * balance_factor),
-						(101, 10000000000 * balance_factor),
-						// This allow us to have a total_payout different from 0.
-						(999, 1_000_000_000_000),
-				],
-				vesting: vec![],
-			}.build_storage().unwrap().0,
-		);
-
-		t.0.extend(
-			staking::GenesisConfig::<Test> {
-				current_era: 0,
-				stakers: vec![],
-				validator_count: 2,
-				minimum_validator_count: 0,
-				invulnerables: vec![],
-				slash_reward_fraction: Perbill::from_percent(10),
-				.. Default::default()
-			}.build_storage().unwrap().0,
-		);
-		t.0.extend(
-			GenesisConfig::<Test> {
-				current_payout: 9500000,
-				minting_interval: One::one(),
-			}.build_storage().unwrap().0,
-		);
+		let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
+		pallet_balances::GenesisConfig::<Test> {
+			balances: vec![
+					(1, 10000000000 * balance_factor),
+					(2, 10000000000 * balance_factor),
+					(3, 10000000000 * balance_factor),
+					(4, 10000000000 * balance_factor),
+					(10, 10000000000 * balance_factor),
+					(11, 10000000000 * balance_factor),
+					(20, 10000000000 * balance_factor),
+					(21, 10000000000 * balance_factor),
+					(30, 10000000000 * balance_factor),
+					(31, 10000000000 * balance_factor),
+					(40, 10000000000 * balance_factor),
+					(41, 10000000000 * balance_factor),
+					(100, 10000000000 * balance_factor),
+					(101, 10000000000 * balance_factor),
+					// This allow us to have a total_payout different from 0.
+					(999, 1_000_000_000_000),
+			],
+			vesting: vec![],
+		}.assimilate_storage(&mut t).unwrap();
+		
+		pallet_staking::GenesisConfig::<Test> {
+			current_era: 0,
+			stakers: vec![],
+			validator_count: 2,
+			minimum_validator_count: 0,
+			invulnerables: vec![],
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
+		}.assimilate_storage(&mut t).unwrap();
+		GenesisConfig::<Test> {
+			current_payout: 9500000,
+			minting_interval: One::one(),
+		}.assimilate_storage(&mut t).unwrap();
 		t.into()
 	}
 }
@@ -304,7 +300,6 @@ fn basic_setup_works() {
 	// Verifies initial conditions of mock
 	ExtBuilder::default().build().execute_with(|| {
 		// Initial Era and session
-		assert_eq!(Staking::current_era(), 0);
 		let treasury_address = Treasury::account_id();
 		System::set_block_number(1);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(1);

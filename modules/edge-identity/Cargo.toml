@@ -8,15 +8,15 @@ edition = "2018"
 serde = { version = "1.0", default-features = false, optional = true }
 safe-mix = { version = "1.0", default-features = false }
 codec = { package = "parity-scale-codec", version = "1.0.6", default-features = false, features = ["derive"] }
-rstd = { package = "sp-std", git = "https://github.com/paritytech/substrate.git", default-features = false }
-sr-primitives = { package = "sp-runtime", git = "https://github.com/paritytech/substrate.git", default-features = false }
-support = { package ="frame-support", git = "https://github.com/paritytech/substrate.git", default-features = false }
-system = { package ="frame-system", git = "https://github.com/paritytech/substrate.git", default-features = false }
-balances = { package ="pallet-balances", git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+frame-support = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+frame-system = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+pallet-balances = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 
 [dev-dependencies]
-sr-io = { package = "sp-io", git = "https://github.com/paritytech/substrate.git", default-features = false }
-substrate-primitives = { package = "sp-core", git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-io = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 
 [features]
 default = ["std"]
@@ -24,9 +24,9 @@ std = [
     "serde",
     "safe-mix/std",
     "codec/std",
-    "rstd/std",
-    "sr-primitives/std",
-    "support/std",
-    "system/std",
-    "balances/std",
+    "sp-std/std",
+    "sp-runtime/std",
+    "frame-support/std",
+    "frame-system/std",
+    "pallet-balances/std",
 ]

@@ -17,10 +17,10 @@
 //! Some configurable implementations as associated type for the substrate runtime.
 
 use edgeware_primitives::Balance;
-use support::weights::Weight;
+use frame_support::weights::Weight;
 use sp_runtime::traits::{Convert, Saturating};
 use sp_runtime::{Fixed64, Perbill};
-use support::traits::{OnUnbalanced, Currency, Get};
+use frame_support::traits::{OnUnbalanced, Currency, Get};
 use crate::{Balances, System, Authorship, MaximumBlockWeight, NegativeImbalance};
 
 pub struct Author;

@@ -15,22 +15,21 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 use super::*;
-use sr_primitives::{
+use sp_runtime::{
 	Perbill,
 	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup, OnFinalize},
+	traits::{IdentityLookup, OnFinalize},
 };
-use substrate_primitives::H256;
-use support::{parameter_types, impl_outer_origin, assert_err};
+use sp_core::H256;
+use frame_support::{parameter_types, impl_outer_origin, assert_err};
 
-use support::{
-	assert_ok
+use frame_support::{
+	assert_ok, dispatch::DispatchResult
 };
 
-use substrate_primitives::{Blake2Hasher, Hasher};
+use sp_core::{Blake2Hasher, Hasher};
 
 pub use crate::{Event, Module, RawEvent, Trait, IdentityStage, MetadataRecord, IdentityRecord, GenesisConfig};
-
 
 impl_outer_origin! {
 	pub enum Origin for Test {}
@@ -46,13 +45,13 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
-impl system::Trait for Test {
+impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = BlakeTwo256;
+	type Hashing = ::sp_runtime::traits::BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
@@ -62,6 +61,7 @@ impl system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type ModuleToIndex = ();
 }
 
 parameter_types! {
@@ -70,7 +70,7 @@ parameter_types! {
 	pub const CreationFee: u128 = 0;
 }
 
-impl balances::Trait for Test {
+impl pallet_balances::Trait for Test {
 	/// The type for recording an account's balance.
 	type Balance = u128;
 	/// What to do if an account's free balance gets zeroed.
@@ -88,61 +88,57 @@ impl balances::Trait for Test {
 
 impl Trait for Test {
 	type Event = ();
-	type Currency = balances::Module<Self>;
+	type Currency = pallet_balances::Module<Self>;
 }
 
-type Balances = balances::Module<Test>;
-type System = system::Module<Test>;
+type Balances = pallet_balances::Module<Test>;
+type System = frame_system::Module<Test>;
 type Identity = Module<Test>;
 
 const BOND: u128 = 10;
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
-fn new_test_ext() -> sr_io::TestExternalities {
-	let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
+fn new_test_ext() -> sp_io::TestExternalities {
+	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 	// We use default for brevity, but you can configure as desired if needed.
-	t.0.extend(
-		GenesisConfig::<Test> {
-			expiration_length: 10000,
-			verifiers: vec![1_u64],
-			registration_bond: BOND,
-		}.build_storage().unwrap().0,
-	);
-	t.0.extend(
-		balances::GenesisConfig::<Test> {
-			balances: vec![
-				(1, 100),
-				(2, 100),
-				(3, 100),
-				(4, 100),
-			],
-			vesting: vec![],
-		}.build_storage().unwrap().0,
-	);
+	GenesisConfig::<Test> {
+		expiration_length: 10000,
+		verifiers: vec![1_u64],
+		registration_bond: BOND,
+	}.assimilate_storage(&mut t).unwrap();
+	pallet_balances::GenesisConfig::<Test> {
+		balances: vec![
+			(1, 100),
+			(2, 100),
+			(3, 100),
+			(4, 100),
+		],
+		vesting: vec![],
+	}.assimilate_storage(&mut t).unwrap();
 	t.into()
 }
 
-fn register_identity(who: u64, identity_type: &[u8], identity: &[u8]) -> Result {
+fn register_identity(who: u64, identity_type: &[u8], identity: &[u8]) -> DispatchResult {
 	Identity::register(Origin::signed(who), identity_type.to_vec(), identity.to_vec())
 }
 
-fn attest_to_identity(who: u64, identity_hash: H256, attestation: &[u8]) -> Result {
+fn attest_to_identity(who: u64, identity_hash: H256, attestation: &[u8]) -> DispatchResult {
 	Identity::attest(Origin::signed(who), identity_hash, attestation.to_vec())
 }
 
-fn register_and_attest(who: u64, identity_type: &[u8], identity: &[u8], attestation: &[u8]) -> Result {
+fn register_and_attest(who: u64, identity_type: &[u8], identity: &[u8], attestation: &[u8]) -> DispatchResult {
 	Identity::register_and_attest(Origin::signed(who), identity_type.to_vec(), identity.to_vec(), attestation.to_vec())
 }
 
-fn verify_identity(who: u64, identity_hash: H256, verifier_index: u32) -> Result {
+fn verify_identity(who: u64, identity_hash: H256, verifier_index: u32) -> DispatchResult {
 	Identity::verify(Origin::signed(who), identity_hash, verifier_index)
 }
 
-fn deny_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> Result {
+fn deny_many(who: u64, identity_hashes: &[H256], verifier_index: u32) -> DispatchResult {
 	Identity::deny_many(Origin::signed(who), identity_hashes.to_vec(), verifier_index)
 }
 
-fn revoke(who: u64, identity_hash: H256) -> Result {
+fn revoke(who: u64, identity_hash: H256) -> DispatchResult {
 	Identity::revoke(Origin::signed(who), identity_hash)
 }
 
@@ -152,7 +148,7 @@ fn add_metadata_to_account(
 	avatar: &[u8],
 	display_name: &[u8],
 	tagline: &[u8],
-) -> Result {
+) -> DispatchResult {
 	Identity::add_metadata(
 		Origin::signed(who),
 		identity_hash,

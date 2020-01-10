@@ -16,11 +16,11 @@
 
 use super::*;
 
-use support::{parameter_types, impl_outer_origin, assert_err, assert_ok};
-use substrate_primitives::{H256, Blake2Hasher, Hasher};
-use sr_primitives::{
+use frame_support::{parameter_types, impl_outer_origin, assert_err, assert_ok};
+use sp_core::{H256, Blake2Hasher, Hasher};
+use sp_runtime::{
 	Perbill,
-	traits::{BlakeTwo256, OnFinalize, IdentityLookup},
+	traits::{OnFinalize, IdentityLookup},
 	testing::{Header}
 };
 pub use crate::{Event, Module, RawEvent, Trait, GenesisConfig};
@@ -40,13 +40,13 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
-impl system::Trait for Test {
+impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = BlakeTwo256;
+	type Hashing = ::sp_runtime::traits::BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
@@ -56,6 +56,7 @@ impl system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type ModuleToIndex = ();
 }
 
 parameter_types! {
@@ -64,7 +65,7 @@ parameter_types! {
 	pub const CreationFee: u128 = 0;
 }
 
-impl balances::Trait for Test {
+impl pallet_balances::Trait for Test {
 	/// The type for recording an account's balance.
 	type Balance = u128;
 	/// What to do if an account's free balance gets zeroed.
@@ -86,11 +87,11 @@ impl voting::Trait for Test {
 
 impl Trait for Test {
 	type Event = ();
-	type Currency = balances::Module<Self>;
+	type Currency = pallet_balances::Module<Self>;
 }
 
-pub type Balances = balances::Module<Test>;
-pub type System = system::Module<Test>;
+pub type Balances = pallet_balances::Module<Test>;
+pub type System = frame_system::Module<Test>;
 pub type Signaling = Module<Test>;
 
 const BOND: u128 = 10;
@@ -98,26 +99,22 @@ const YES_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 const OTHER_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
 
-fn new_test_ext() -> sr_io::TestExternalities {
-	let mut t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
+fn new_test_ext() -> sp_io::TestExternalities {
+	let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 	// We use default for brevity, but you can configure as desired if needed.
-	t.0.extend(
-		GenesisConfig::<Test> {
-			voting_length: 10000,
-			proposal_creation_bond: BOND,
-		}.build_storage().unwrap().0,
-	);
-	t.0.extend(
-		balances::GenesisConfig::<Test> {
-			balances: vec![
-				(1, 100),
-				(2, 100),
-				(3, 100),
-				(4, 100),
-			],
-			vesting: vec![],
-		}.build_storage().unwrap().0,
-	);
+	GenesisConfig::<Test> {
+		voting_length: 10000,
+		proposal_creation_bond: BOND,
+	}.assimilate_storage(&mut t).unwrap();
+	pallet_balances::GenesisConfig::<Test> {
+		balances: vec![
+			(1, 100),
+			(2, 100),
+			(3, 100),
+			(4, 100),
+		],
+		vesting: vec![],
+	}.assimilate_storage(&mut t).unwrap();
 	t.into()
 }
 
@@ -128,7 +125,7 @@ fn propose(
 	outcomes: Vec<VoteOutcome>,
 	vote_type: VoteType,
 	tally_type: TallyType
-) -> Result {
+) -> DispatchResult {
 	Signaling::create_proposal(
 		Origin::signed(who),
 		title.to_vec(),
@@ -138,7 +135,7 @@ fn propose(
 		tally_type)
 }
 
-fn advance_proposal(who: u64, proposal_hash: H256) -> Result {
+fn advance_proposal(who: u64, proposal_hash: H256) -> DispatchResult {
 	Signaling::advance_proposal(Origin::signed(who), proposal_hash)
 }
 
@@ -224,7 +221,9 @@ fn propose_duplicate_should_fail() {
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin));
-		assert_eq!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal already exists"));
+		assert_err!(
+			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
+			"Proposal already exists");
 		assert_eq!(Signaling::proposal_count(), 1);
 		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
 		assert_eq!(
@@ -246,7 +245,10 @@ fn propose_empty_should_fail() {
 		let proposal = vec![];
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_eq!(propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must not be empty"));
+		assert_err!(
+			propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
+			"Proposal must not be empty"
+		);
 		assert_eq!(Signaling::proposal_count(), 0);
 		assert_eq!(Signaling::inactive_proposals(), vec![]);
 		assert_eq!(Signaling::proposal_of(hash), None);
@@ -262,7 +264,10 @@ fn propose_empty_title_should_fail() {
 		let hash = build_proposal_hash(public, &proposal);
 		let title = vec![];
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_eq!(propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin), Err("Proposal must have title"));
+		assert_err!(
+			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
+			"Proposal must have title"
+		);
 		assert_eq!(Signaling::proposal_count(), 0);
 		assert_eq!(Signaling::inactive_proposals(), vec![]);
 		assert_eq!(Signaling::proposal_of(hash), None);

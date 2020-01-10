@@ -16,8 +16,8 @@
 
 //! Substrate chain configurations.
 
-use chain_spec::ChainSpecExtension;
-use primitives::{Pair, Public, crypto::UncheckedInto, sr25519};
+use sc_chain_spec::ChainSpecExtension;
+use sp_core::{Pair, Public, crypto::UncheckedInto, sr25519};
 use serde::{Serialize, Deserialize};
 use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
@@ -27,14 +27,14 @@ use edgeware_runtime::{
 };
 use edgeware_runtime::Block;
 use edgeware_runtime::constants::currency::*;
-use substrate_service;
+use sc_service;
 use hex_literal::hex;
-use substrate_telemetry::TelemetryEndpoints;
+use sc_telemetry::TelemetryEndpoints;
 use grandpa_primitives::{AuthorityId as GrandpaId};
-use aura_primitives::ed25519::AuthorityId as AuraId;
-use im_online::ed25519::{AuthorityId as ImOnlineId};
-use authority_discovery_primitives::AuthorityId as AuthorityDiscoveryId;
-use sr_primitives::{Perbill, traits::{Verify, IdentifyAccount, One}};
+use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_runtime::{Perbill, traits::{Verify, IdentifyAccount, One}};
 
 pub use edgeware_primitives::{AccountId, Balance, Signature, BlockNumber};
 pub use edgeware_runtime::GenesisConfig;

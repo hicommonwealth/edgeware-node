@@ -33,13 +33,13 @@ use std::sync::Arc;
 
 use edgeware_primitives::{Block, AccountId, Index, Balance};
 use edgeware_runtime::UncheckedExtrinsic;
-use sr_primitives::traits::ProvideRuntimeApi;
-use txpool_api::TransactionPool;
+use sp_runtime::traits::ProvideRuntimeApi;
+use sp_transaction_pool::TransactionPool;
 
 /// Light client extra dependencies.
 pub struct LightDeps<F> {
 	/// Remote access to the blockchain (async).
-	pub remote_blockchain: Arc<dyn client::light::blockchain::RemoteBlockchain<Block>>,
+	pub remote_blockchain: Arc<dyn sc_client::light::blockchain::RemoteBlockchain<Block>>,
 	/// Fetcher instance.
 	pub fetcher: Arc<F>,
 }
@@ -63,12 +63,12 @@ pub fn create<C, P, M, F>(
 	light_deps: Option<LightDeps<F>>,
 ) -> jsonrpc_core::IoHandler<M> where
 	C: ProvideRuntimeApi,
-	C: client::blockchain::HeaderBackend<Block>,
+	C: sc_client::blockchain::HeaderBackend<Block>,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
-	F: client::light::fetcher::Fetcher<Block> + 'static,
+	F: sc_client::light::fetcher::Fetcher<Block> + 'static,
 	P: TransactionPool + 'static,
 	M: jsonrpc_core::Metadata + Default,
 {

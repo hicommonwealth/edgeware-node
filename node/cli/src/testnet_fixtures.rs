@@ -1,9 +1,9 @@
-use authority_discovery_primitives::AuthorityId as AuthorityDiscoveryId;
-use aura_primitives::ed25519::AuthorityId as AuraId;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use edgeware_primitives::{AccountId};
 use grandpa::AuthorityId as GrandpaId;
-use im_online::ed25519::{AuthorityId as ImOnlineId};
-use primitives::crypto::UncheckedInto;
+use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
+use sp_core::crypto::UncheckedInto;
 use hex_literal::hex;
 
 pub fn get_testnet_bootnodes() -> Vec<String> {

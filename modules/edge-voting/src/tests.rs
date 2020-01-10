@@ -14,18 +14,18 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use sr_primitives::{
+use sp_runtime::{
 	Perbill,
 	testing::Header,
 	traits::{BlakeTwo256, IdentityLookup},
 };
-use substrate_primitives::H256;
-use support::{parameter_types, impl_outer_origin, assert_err};
+use sp_core::H256;
+use frame_support::{parameter_types, impl_outer_origin, assert_err};
 
 use super::*;
 use crate::{Trait, Module, VoteType, TallyType};
 
-use support::{
+use frame_support::{
 	assert_ok
 };
 
@@ -45,13 +45,13 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
-impl system::Trait for Test {
+impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = sr_primitives::traits::BlakeTwo256;
+	type Hashing = sp_runtime::traits::BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
@@ -61,18 +61,19 @@ impl system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type ModuleToIndex = ();
 }
 
 impl Trait for Test {
 	type Event = ();
 }
 
-pub type System = system::Module<Test>;
+pub type System = frame_system::Module<Test>;
 pub type Voting = Module<Test>;
 
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
-fn new_test_ext() -> sr_io::TestExternalities {
+fn new_test_ext() -> sp_io::TestExternalities {
 	let t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
 	// We use default for brevity, but you can configure as desired if needed.
 	t.into()
@@ -92,15 +93,15 @@ fn create_vote(
 						outcomes.to_vec())
 }
 
-fn commit(who: u64, vote_id: u64, commit: [u8; 32]) -> Result {
+fn commit(who: u64, vote_id: u64, commit: [u8; 32]) -> DispatchResult {
 	Voting::commit(Origin::signed(who), vote_id, commit)
 }
 
-fn reveal(who: u64, vote_id: u64, vote: Vec<[u8; 32]>, secret: Option<[u8; 32]>) -> Result {
+fn reveal(who: u64, vote_id: u64, vote: Vec<[u8; 32]>, secret: Option<[u8; 32]>) -> DispatchResult {
 	Voting::reveal(Origin::signed(who), vote_id, vote, secret)
 }
 
-fn advance_stage(vote_id: u64) -> Result {
+fn advance_stage(vote_id: u64) -> DispatchResult {
 	Voting::advance_stage(vote_id)
 }
 
