@@ -19,8 +19,8 @@
 //! Service implementation. Specialized wrapper over substrate service.
 
 use std::sync::Arc;
-use client::{self, LongestChain};
-use pallet_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
+use sc_client::{self, LongestChain};
+use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;
 use edgeware_primitives::Block;
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
@@ -37,7 +37,6 @@ use sp_runtime::traits::Block as BlockT;
 use edgeware_executor::NativeExecutor;
 use sc_network::NetworkService;
 use sc_offchain::OffchainWorkers;
-use sp_core::Blake2Hasher;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -70,21 +69,26 @@ macro_rules! new_full_start {
 			.with_import_queue(|_config, client, mut select_chain, _transaction_pool| {
 				let select_chain = select_chain.take()
 					.ok_or_else(|| sc_service::Error::SelectChainRequired)?;
-				let (grandpa_block_import, grandpa_link) = grandpa::block_import(
+				let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
 					client.clone(),
 					&*client,
 					select_chain,
 				)?;
 
-				let import_queue = aura::import_queue::<_, _, aura_primitives::ed25519::AuthorityPair, _>(
-					aura::SlotDuration::get_or_compute(&*client)?,
-					Box::new(grandpa_block_import.clone()),
+				let aura_block_import = sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
+					grandpa_block_import.clone(), client.clone(),
+				);
+
+				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
+					sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+					aura_block_import,
 					Some(Box::new(grandpa_block_import.clone())),
 					None,
 					client,
 					inherent_data_providers.clone(),
 					Some(_transaction_pool),
 				)?;
+
 				import_setup = Some((grandpa_block_import, grandpa_link));
 				Ok(import_queue)
 			})?
@@ -102,9 +106,7 @@ macro_rules! new_full_start {
 /// concrete types instead.
 macro_rules! new_full {
 	($config:expr, $with_startup_data: expr) => {{
-		use futures01::Stream;
 		use futures::{
-			compat::Stream01CompatExt,
 			stream::StreamExt,
 			future::{FutureExt, TryFutureExt},
 		};
@@ -133,7 +135,7 @@ macro_rules! new_full {
 
 		let service = builder.with_network_protocol(|_| Ok(crate::service::NodeProtocol::new()))?
 			.with_finality_proof_provider(|client, backend|
-				Ok(Arc::new(grandpa::FinalityProofProvider::new(backend, client)) as _)
+				Ok(Arc::new(sc_finality_grandpa::FinalityProofProvider::new(backend, client)) as _)
 			)?
 			.build()?;
 
@@ -155,8 +157,8 @@ macro_rules! new_full {
 			let can_author_with =
 				sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
 
-			let aura = sc_consensus_aura::start_aura::<_, _, _, _, _, sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _>(
-				aura::SlotDuration::get_or_compute(&*client)?,
+			let aura = sc_consensus_aura::start_aura::<_, _, _, _, _, sp_consensus_aura::ed25519::AuthorityPair, _, _, _>(
+				sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
 				client,
 				select_chain,
 				block_import,
@@ -195,7 +197,7 @@ macro_rules! new_full {
 			None
 		};
 
-		let config = grandpa::Config {
+		let config = sc_finality_grandpa::Config {
 			// FIXME #1578 make this available through chainspec
 			gossip_duration: std::time::Duration::from_millis(333),
 			justification_period: 512,
@@ -208,7 +210,7 @@ macro_rules! new_full {
 		match (is_authority, disable_grandpa) {
 			(false, false) => {
 				// start the lightweight GRANDPA observer
-				service.spawn_task(grandpa::run_grandpa_observer(
+				service.spawn_task(sc_finality_grandpa::run_grandpa_observer(
 					config,
 					grandpa_link,
 					service.network(),
@@ -218,22 +220,22 @@ macro_rules! new_full {
 			},
 			(true, false) => {
 				// start the full GRANDPA voter
-				let grandpa_config = grandpa::GrandpaParams {
+				let grandpa_config = sc_finality_grandpa::GrandpaParams {
 					config: config,
 					link: grandpa_link,
 					network: service.network(),
 					inherent_data_providers: inherent_data_providers.clone(),
 					on_exit: service.on_exit(),
 					telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
-					voting_rule: grandpa::VotingRulesBuilder::default().build(),
+					voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
 					executor: service.spawn_task_handle(),
 				};
 				// the GRANDPA voter task is considered infallible, i.e.
 				// if it fails we take down the service with it.
-				service.spawn_essential_task(grandpa::run_grandpa_voter(grandpa_config)?);
+				service.spawn_essential_task(sc_finality_grandpa::run_grandpa_voter(grandpa_config)?);
 			},
 			(_, true) => {
-				grandpa::setup_disabled_grandpa(
+				sc_finality_grandpa::setup_disabled_grandpa(
 					service.client(),
 					&inherent_data_providers,
 					service.network(),
@@ -288,7 +290,7 @@ pub fn new_full<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 		ConcreteTransactionPool,
 		OffchainWorkers<
 			ConcreteClient,
-			<ConcreteBackend as sc_client_api::backend::Backend<Block, Blake2Hasher>>::OffchainStorage,
+			<ConcreteBackend as sc_client_api::backend::Backend<Block>>::OffchainStorage,
 			ConcreteBlock,
 		>
 	>,
@@ -321,7 +323,7 @@ pub fn new_light<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 			let fetch_checker = fetcher
 				.map(|fetcher| fetcher.checker().clone())
 				.ok_or_else(|| "Trying to start light import queue without active fetch checker")?;
-			let grandpa_block_import = grandpa::light_block_import::<_, _, _, RuntimeApi>(
+			let grandpa_block_import = sc_finality_grandpa::light_block_import::<_, _, _, RuntimeApi>(
 				client.clone(),
 				backend,
 				&*client,
@@ -332,9 +334,9 @@ pub fn new_light<C: Send + Default + 'static>(config: NodeConfiguration<C>)
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = sc_consensus_aura::import_queue::<_, _, sp_consensus_aura::ed25519::AuthorityPair, ()>(
-				aura::SlotDuration::get_or_compute(&*client)?,
-				Box::new(grandpa_block_import),
+			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, ()>(
+				sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+				grandpa_block_import,
 				None,
 				Some(Box::new(finality_proof_import)),
 				client,

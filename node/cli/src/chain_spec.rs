@@ -23,14 +23,14 @@ use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
 	SystemConfig, WASM_BINARY,
-	IdentityConfig, SignalingConfig, TreasuryRewardConfig,
+	SignalingConfig, TreasuryRewardConfig,
 };
 use edgeware_runtime::Block;
 use edgeware_runtime::constants::currency::*;
 use sc_service;
 use hex_literal::hex;
 use sc_telemetry::TelemetryEndpoints;
-use grandpa_primitives::{AuthorityId as GrandpaId};
+use sp_finality_grandpa::{AuthorityId as GrandpaId};
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
@@ -71,13 +71,16 @@ fn get_lockdrop_participants_allocation() -> Result<Allocation>{
 /// Additional parameters for some Substrate core modules,
 /// customizable from the chain spec.
 #[derive(Default, Clone, Serialize, Deserialize, ChainSpecExtension)]
+#[serde(rename_all = "camelCase")]
 pub struct Extensions {
 	/// Block numbers with known hashes.
-	pub fork_blocks: client::ForkBlocks<Block>,
+	pub fork_blocks: sc_client::ForkBlocks<Block>,
+	/// Known bad block hashes.
+	pub bad_blocks: sc_client::BadBlocks<Block>,
 }
 
 /// Specialized `ChainSpec`.
-pub type ChainSpec = substrate_service::ChainSpec<
+pub type ChainSpec = sc_service::ChainSpec<
 	GenesisConfig,
 	Extensions,
 >;
@@ -272,29 +275,29 @@ pub fn testnet_genesis(
 	const STASH: Balance = 100 * DOLLARS;
 
 	GenesisConfig {
-		system: Some(SystemConfig {
+		frame_system: Some(SystemConfig {
 			code: WASM_BINARY.to_vec(),
 			changes_trie_config: Default::default(),
 		}),
-		balances: Some(BalancesConfig {
+		pallet_balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned().map(|k| (k, ENDOWMENT))
 				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
 				.chain(balances.clone())
 				.collect(),
 			vesting: vesting,
 		}),
-		indices: Some(IndicesConfig {
+		pallet_indices: Some(IndicesConfig {
 			ids: endowed_accounts.iter().cloned()
 				.chain(initial_authorities.iter().map(|x| x.0.clone()))
 				.chain(balances.iter().map(|x| x.0.clone()))
 				.collect::<Vec<_>>(),
 		}),
-		session: Some(SessionConfig {
+		pallet_session: Some(SessionConfig {
 			keys: initial_authorities.iter().map(|x| {
 				(x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()))
 			}).collect::<Vec<_>>(),
 		}),
-		staking: Some(StakingConfig {
+		pallet_staking: Some(StakingConfig {
 			current_era: 0,
 			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
@@ -305,36 +308,31 @@ pub fn testnet_genesis(
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
-		democracy: Some(DemocracyConfig::default()),
-		collective_Instance1: Some(CouncilConfig {
+		pallet_democracy: Some(DemocracyConfig::default()),
+		pallet_collective_Instance1: Some(CouncilConfig {
 			members: crate::testnet_fixtures::get_testnet_election_members(),
 			phantom: Default::default(),
 		}),
-		contracts: Some(ContractsConfig {
-			current_schedule: contracts::Schedule {
+		pallet_contracts: Some(ContractsConfig {
+			current_schedule: pallet_contracts::Schedule {
 				enable_println, // this should only be enabled on development chains
 				..Default::default()
 			},
 			gas_price: 1 * MILLICENTS,
 		}),
-		aura: Some(AuraConfig {
+		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
-		im_online: Some(ImOnlineConfig {
+		pallet_im_online: Some(ImOnlineConfig {
 			keys: vec![],
 		}),
-		authority_discovery: Some(AuthorityDiscoveryConfig {
+		pallet_authority_discovery: Some(AuthorityDiscoveryConfig {
 			keys: vec![],
 		}),
-		grandpa: Some(GrandpaConfig {
+		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),
-		treasury: Some(Default::default()),
-		identity: Some(IdentityConfig {
-			verifiers: crate::testnet_fixtures::get_testnet_identity_verifiers(),
-			expiration_length: 7 * DAYS,
-			registration_bond: 1 * DOLLARS,
-		}),
+		pallet_treasury: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
@@ -467,27 +465,27 @@ pub fn mainnet_genesis(
 ) -> GenesisConfig {
 	let enable_println = false;
 	GenesisConfig {
-		system: Some(SystemConfig {
+		frame_system: Some(SystemConfig {
 			code: WASM_BINARY.to_vec(),
 			changes_trie_config: Default::default(),
 		}),
-		balances: Some(BalancesConfig {
+		pallet_balances: Some(BalancesConfig {
 			balances: founder_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
 				.chain(balances.clone())
 				.collect(),
 			vesting: vesting,
 		}),
-		indices: Some(IndicesConfig {
+		pallet_indices: Some(IndicesConfig {
 			ids: founder_allocation.iter().map(|x| x.0.clone())
 				.chain(balances.iter().map(|x| x.0.clone()))
 				.collect::<Vec<_>>(),
 		}),
-		session: Some(SessionConfig {
+		pallet_session: Some(SessionConfig {
 			keys: initial_authorities.iter().map(|x| {
 				(x.0.clone(), session_keys(x.4.clone(), x.3.clone(), x.5.clone(), x.6.clone()))
 			}).collect::<Vec<_>>(),
 		}),
-		staking: Some(StakingConfig {
+		pallet_staking: Some(StakingConfig {
 			current_era: 0,
 			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
@@ -498,36 +496,31 @@ pub fn mainnet_genesis(
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
-		democracy: Some(DemocracyConfig::default()),
-		collective_Instance1: Some(CouncilConfig {
+		pallet_democracy: Some(DemocracyConfig::default()),
+		pallet_collective_Instance1: Some(CouncilConfig {
 			members: crate::mainnet_fixtures::get_mainnet_election_members(),
 			phantom: Default::default(),
 		}),
-		contracts: Some(ContractsConfig {
-			current_schedule: contracts::Schedule {
+		pallet_contracts: Some(ContractsConfig {
+			current_schedule: pallet_contracts::Schedule {
 				enable_println, // this should only be enabled on development chains
 				..Default::default()
 			},
 			gas_price: 1 * MILLICENTS,
 		}),
-		aura: Some(AuraConfig {
+		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
-		im_online: Some(ImOnlineConfig {
+		pallet_im_online: Some(ImOnlineConfig {
 			keys: vec![],
 		}),
-		authority_discovery: Some(AuthorityDiscoveryConfig {
+		pallet_authority_discovery: Some(AuthorityDiscoveryConfig {
 			keys: vec![],
 		}),
-		grandpa: Some(GrandpaConfig {
+		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),
-		treasury: Some(Default::default()),
-		identity: Some(IdentityConfig {
-			verifiers: crate::mainnet_fixtures::get_mainnet_identity_verifiers(),
-			expiration_length: 7 * DAYS,
-			registration_bond: 1 * DOLLARS,
-		}),
+		pallet_treasury: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 100 * DOLLARS,

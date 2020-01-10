@@ -1,7 +1,7 @@
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use edgeware_primitives::{AccountId, Balance};
-use grandpa::AuthorityId as GrandpaId;
+use sp_finality_grandpa::AuthorityId as GrandpaId;
 use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
 use sp_core::crypto::UncheckedInto;
 use hex_literal::hex;
@@ -298,12 +298,6 @@ pub fn get_cw_mainnet_validators() -> Vec<(AccountId, AccountId, Balance, AuraId
 		hex!["5342c923d5c187f4417862556555ee09475c11141cbc0103272b826e0f8cd0b9"].unchecked_into(),
 		hex!["504e8b32ad648f3bfaf186840421b7717af828b77b2d512a30dd6cd62060401e"].unchecked_into(),
 	)];
-}
-
-pub fn get_mainnet_identity_verifiers() -> Vec<AccountId> {
-	return vec![
-		hex!["92c3225d346f99794812069a16cb91d979137d1534fff5795dacbaede7369f1d"].into(),
-	];
 }
 
 pub fn get_mainnet_election_members() -> Vec<AccountId> {
