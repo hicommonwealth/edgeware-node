@@ -107,8 +107,8 @@ macro_rules! new_full_start {
 macro_rules! new_full {
 	($config:expr, $with_startup_data: expr) => {{
 		use futures::{
-			stream::StreamExt,
-			future::{FutureExt, TryFutureExt},
+			prelude::*,
+			compat::Future01CompatExt
 		};
 		use sc_network::Event;
 
@@ -145,7 +145,7 @@ macro_rules! new_full {
 		($with_startup_data)(&block_import, &grandpa_link);
 
 		if participates_in_consensus {
-			let proposer = sc_basic_authority::ProposerFactory {
+			let proposer = sc_basic_authorship::ProposerFactory {
 				client: service.client(),
 				transaction_pool: service.transaction_pool(),
 			};
@@ -184,9 +184,8 @@ macro_rules! new_full {
 				service.keystore(),
 				dht_event_stream,
 			);
-			let future01_authority_discovery = authority_discovery.map(|x| Ok(x)).compat();
 
-			service.spawn_task(future01_authority_discovery);
+			service.spawn_task(authority_discovery);
 		}
 
 		// if the node isn't actively participating in consensus then it doesn't
@@ -216,7 +215,7 @@ macro_rules! new_full {
 					service.network(),
 					service.on_exit(),
 					service.spawn_task_handle(),
-				)?);
+				)?.compat().map(drop));
 			},
 			(true, false) => {
 				// start the full GRANDPA voter
@@ -232,7 +231,9 @@ macro_rules! new_full {
 				};
 				// the GRANDPA voter task is considered infallible, i.e.
 				// if it fails we take down the service with it.
-				service.spawn_essential_task(sc_finality_grandpa::run_grandpa_voter(grandpa_config)?);
+				service.spawn_essential_task(
+					sc_finality_grandpa::run_grandpa_voter(grandpa_config)?.compat().map(drop)
+				);
 			},
 			(_, true) => {
 				sc_finality_grandpa::setup_disabled_grandpa(
