@@ -45,6 +45,7 @@ pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git
 frame-executive = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-finality-tracker = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+pallet-identity = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-im-online = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-indices = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-membership = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -93,6 +94,7 @@ std = [
 	"frame-executive/std",
 	"pallet-finality-tracker/std",
 	"pallet-grandpa/std",
+	"pallet-identity/std",
 	"pallet-im-online/std",
 	"pallet-indices/std",
 	"sp-inherents/std",
