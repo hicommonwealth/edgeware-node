@@ -57,6 +57,7 @@ pub trait TestClientBuilderExt: Sized {
 }
 
 impl TestClientBuilderExt for substrate_test_client::TestClientBuilder<
+	edgeware_primitives::Block,
 	sc_client::LocalCallExecutor<Backend, Executor>,
 	Backend,
 	GenesisParameters,
@@ -69,5 +70,4 @@ impl TestClientBuilderExt for substrate_test_client::TestClientBuilder<
 		self.build_with_native_executor(None).0
 	}
 }
-
 

@@ -254,7 +254,7 @@ decl_storage! {
 		/// Amount of time a proposal remains in "Voting" stage.
 		pub VotingLength get(fn voting_length) config(): T::BlockNumber;
 		/// Map for retrieving the information about any proposal from its hash.
-		pub ProposalOf get(fn proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+		pub ProposalOf get(fn proposal_of): map hasher(blake2_256) T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
 		pub ProposalCreationBond get(fn proposal_creation_bond) config(): BalanceOf<T>;
 	}

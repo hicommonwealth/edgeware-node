@@ -84,6 +84,7 @@ impl pallet_balances::Trait for Test {
 	type ExistentialDeposit = ExistentialDeposit;
 	type TransferFee = TransferFee;
 	type CreationFee = CreationFee;
+	type OnReapAccount = ();
 }
 
 impl Trait for Test {
