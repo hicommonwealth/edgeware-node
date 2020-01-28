@@ -408,6 +408,11 @@ fn development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
 			get_authority_keys_from_seed("Alice"),
+			get_authority_keys_from_seed("Bob"),
+			get_authority_keys_from_seed("Charlie"),
+			get_authority_keys_from_seed("Dave"),
+			get_authority_keys_from_seed("Eve"),
+			get_authority_keys_from_seed("Ferdie"),
 		],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
 		None,
