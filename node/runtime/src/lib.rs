@@ -254,7 +254,7 @@ pallet_staking_reward_curve::build! {
 	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
 		min_inflation: 0_025_000,
 		max_inflation: 0_100_000,
-		ideal_stake: 0_500_000,
+		ideal_stake: 0_800_000,
 		falloff: 0_050_000,
 		max_piece_count: 40,
 		test_precision: 0_005_000,
@@ -496,12 +496,6 @@ impl pallet_nicks::Trait for Runtime {
 	type MaxLength = MaxLength;
 }
 
-
-impl pallet_sudo::Trait for Runtime {
-	type Event = Event;
-	type Proposal = Call;
-}
-
 impl frame_system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for Runtime {
 	type Public = <Signature as traits::Verify>::Signer;
 	type Signature = Signature;
@@ -588,7 +582,6 @@ construct_runtime!(
 		Offences: pallet_offences::{Module, Call, Storage, Event},
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Nicks: pallet_nicks::{Module, Call, Storage, Event<T>},
-		Sudo: pallet_sudo,
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

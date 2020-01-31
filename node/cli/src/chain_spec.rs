@@ -22,7 +22,7 @@ use serde::{Serialize, Deserialize};
 use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
-	SudoConfig, SystemConfig, WASM_BINARY,
+	SystemConfig, WASM_BINARY,
 	SignalingConfig, TreasuryRewardConfig,
 };
 use edgeware_runtime::Block;
@@ -341,9 +341,6 @@ pub fn testnet_genesis(
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		}),
-		pallet_sudo: Some(SudoConfig {
-			key: _root_key,
-		}),
 	}
 }
 
@@ -537,7 +534,6 @@ pub fn mainnet_genesis(
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		}),
-		pallet_sudo: Some(Default::default()),
 	}
 }
 
