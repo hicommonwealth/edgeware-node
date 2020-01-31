@@ -220,6 +220,6 @@ pub fn get_cw_mainnet_validators() -> Vec<(AccountId, AccountId, Balance, AuraId
 
 pub fn get_mainnet_election_members() -> Vec<AccountId> {
 	return vec![
-		hex!["02456d652d95f78a97ff18e9f1170b3478f3644c4283f58312f2bb98f3ffe74e"].into(),
+		hex!["ca91588bb9258ade926d0c0631798d7e3f17c4581fae56283287d54883244a55"].into(),
 	];
 }
