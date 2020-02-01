@@ -39,14 +39,18 @@ mod browser;
 mod cli;
 #[cfg(feature = "cli")]
 mod factory_impl;
-
-mod testnet_fixtures;
-mod mainnet_fixtures;
+#[cfg(feature = "cli")]
+mod command;
 
 #[cfg(feature = "browser")]
 pub use browser::*;
 #[cfg(feature = "cli")]
 pub use cli::*;
+#[cfg(feature = "cli")]
+pub use command::*;
+
+pub mod mainnet_fixtures;
+pub mod testnet_fixtures;
 
 /// The chain specification option.
 #[derive(Clone, Debug, PartialEq)]

@@ -39,6 +39,7 @@ pallet-aura = { git = "https://github.com/paritytech/substrate.git", default-fea
 pallet-balances = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-collective = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-contracts = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+pallet-contracts-primitives = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-contracts-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-democracy = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -88,6 +89,7 @@ std = [
 	"codec/std",
 	"pallet-collective/std",
 	"pallet-contracts-rpc-runtime-api/std",
+	"pallet-contracts-primitives/std",
 	"pallet-contracts/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",

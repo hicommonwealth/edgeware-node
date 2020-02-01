@@ -1,4 +1,4 @@
-// Copyright 2019-2020 Parity Technologies (UK) Ltd.
+// Copyright 2019-2020 Commonwealth Labs Inc.
 // This file is part of Substrate.
 
 // Substrate is free software: you can redistribute it and/or modify
@@ -35,16 +35,16 @@ async fn start_inner(wasm_ext: Transport) -> Result<Client, Box<dyn std::error::
 	set_console_error_panic_hook();
 	init_console_log(log::Level::Info)?;
 
-	let chain_spec = ChainSpec::EdgewareMainnet.load()
+	let chain_spec = ChainSpec::FlamingFir.load()
 		.map_err(|e| format!("{:?}", e))?;
 
-	let config: Configuration<(), _, _> = browser_configuration(wasm_ext, chain_spec)
+	let config: Configuration<_, _> = browser_configuration(wasm_ext, chain_spec)
 		.await?;
 
 	info!("Edgeware browser node");
 	info!("  version {}", config.full_version());
-	info!("  by Commonwealth Labs, 2018-2019");
-	info!("Chain specification: {}", config.chain_spec.name());
+	info!("  by Commonwealth Labs, 2018-2020");
+	info!("Chain specification: {}", config.expect_chain_spec().name());
 	info!("Node name: {}", config.name);
 	info!("Roles: {:?}", config.roles);
 
