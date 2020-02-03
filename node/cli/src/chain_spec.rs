@@ -85,7 +85,7 @@ pub type ChainSpec = sc_service::ChainSpec<
 	Extensions,
 >;
 
-/// 0.9.0 Testnet configuration
+/// Mainnet configuration
 pub fn edgeware_mainnet_official() -> ChainSpec {
 	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/mainnet.chainspec.json")) {
 		Ok(spec) => spec,
