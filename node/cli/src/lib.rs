@@ -39,13 +39,18 @@ mod browser;
 mod cli;
 #[cfg(feature = "cli")]
 mod factory_impl;
-
-mod testnet_fixtures;
+#[cfg(feature = "cli")]
+mod command;
 
 #[cfg(feature = "browser")]
 pub use browser::*;
 #[cfg(feature = "cli")]
 pub use cli::*;
+#[cfg(feature = "cli")]
+pub use command::*;
+
+pub mod mainnet_fixtures;
+pub mod testnet_fixtures;
 
 /// The chain specification option.
 #[derive(Clone, Debug, PartialEq)]
@@ -58,12 +63,14 @@ pub enum ChainSpec {
 	StagingTestnet,
 	/// Edgeware testnet configuration
 	EdgewareTestnetConfig,
-	/// 0.9.0 Testnet configuration
+	/// 0.9.0 Testnet
 	EDGTestnet090,
-	/// 0.9.5 Testnet configuration
+	/// 0.9.5 Testnet
 	EDGTestnet099,
-	// /// Edgeware mainnet configuration
-	// EdgewareMainnetConfig,
+	/// Edgeware mainnet configuration (should be used to generate chainspec)
+	EdgewareMainnetConfig,
+	/// Edgeware mainnet (should be used to connect to Edgeware)
+	EdgewareMainnet
 }
 
 /// Get a chain config from a spec setting.
@@ -76,7 +83,8 @@ impl ChainSpec {
 			ChainSpec::EdgewareTestnetConfig => chain_spec::edgeware_testnet_config(),
 			ChainSpec::EDGTestnet090 => chain_spec::edgeware_testnet_v090_config(),
 			ChainSpec::EDGTestnet099 => chain_spec::edgeware_testnet_v099_config(),
-			// ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_chainspec(false),
+			ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_mainnet_config(),
+			ChainSpec::EdgewareMainnet => chain_spec::edgeware_mainnet_official(),
 		})
 	}
 
@@ -86,9 +94,10 @@ impl ChainSpec {
 			"local" => Some(ChainSpec::LocalTestnet),
 			"staging" => Some(ChainSpec::StagingTestnet),
 			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
-			// "edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
 			"edg-0.9.0" => Some(ChainSpec::EDGTestnet090),
 			"edg-0.9.9" => Some(ChainSpec::EDGTestnet099),
+			"edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
+			"edgeware" => Some(ChainSpec::EdgewareMainnet),
 			_ => None,
 		}
 	}

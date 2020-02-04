@@ -21,16 +21,16 @@
 #[cfg(test)]
 mod tests;
 
-use support::traits::{Currency, ReservableCurrency};
-use rstd::prelude::*;
+use frame_support::traits::{Currency, ReservableCurrency,};
+use sp_std::prelude::*;
 
-use system::ensure_signed;
-use support::dispatch::Result;
+use frame_system::{self as system, ensure_signed};
+use frame_support::dispatch::DispatchResult;
 use codec::{Decode, Encode};
 
-use sr_primitives::RuntimeDebug;
-use sr_primitives::traits::{Hash};
-use support::{decl_event, decl_module, decl_storage, ensure, StorageMap};
+use sp_runtime::RuntimeDebug;
+use sp_runtime::traits::{Hash};
+use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
 
 pub use voting::{VoteType, VoteOutcome, VoteStage, TallyType};
 
@@ -45,19 +45,27 @@ pub struct ProposalRecord<AccountId, Moment> {
 	pub vote_id: u64,
 }
 
-pub trait Trait: voting::Trait + balances::Trait {
+pub trait Trait: voting::Trait + pallet_balances::Trait {
 	/// The overarching event type
-	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 	/// The account balance.
 	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 }
 
 pub type ProposalTitle = Vec<u8>;
 pub type ProposalContents = Vec<u8>;
-type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as system::Trait>::AccountId>>::Balance;
+type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
+
+decl_error! {
+	pub enum Error for Module<T: Trait> {
+		VoteRecordDoesntExist,
+	}
+}
+
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		type Error = Error<T>;
 		fn deposit_event() = default;
 
 		/// Creates a new signaling proposal.
@@ -68,7 +76,7 @@ decl_module! {
 			outcomes: Vec<VoteOutcome>,
 			vote_type: voting::VoteType,
 			tally_type: voting::TallyType
-		) -> Result {
+		) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!title.is_empty(), "Proposal must have title");
 			ensure!(!contents.is_empty(), "Proposal must not be empty");
@@ -92,7 +100,7 @@ decl_module! {
 			)?;
 
 			let index = <ProposalCount>::get();
-			let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
+			let transition_time = <frame_system::Module<T>>::block_number() + Self::voting_length();
 			<ProposalCount>::mutate(|i| *i += 1);
 			<ProposalOf<T>>::insert(hash, ProposalRecord {
 				index: index,
@@ -110,7 +118,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
-		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> Result {
+		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
 
@@ -122,7 +130,7 @@ decl_module! {
 			// prevoting -> voting or commit
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
 			if let Some(vote_record) = <voting::Module<T>>::get_vote_record(record.vote_id) {
-				let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
+				let transition_time = <frame_system::Module<T>>::block_number() + Self::voting_length();
 				let vote_id = record.vote_id;
 				<ProposalOf<T>>::insert(proposal_hash, ProposalRecord {
 					stage: vote_record.data.stage,
@@ -143,7 +151,7 @@ decl_module! {
 				}
 				Ok(())
 			} else {
-				Err("Vote record does not exist")
+				return Err(Error::<T>::VoteRecordDoesntExist)?
 			}
 		}
 
@@ -169,7 +177,7 @@ decl_module! {
 						let _ = <voting::Module<T>>::advance_stage(vote_id);
 						if let Some(vote_record) = <voting::Module<T>>::get_vote_record(record.vote_id) {
 							// get next transition time
-							let transition_time = <system::Module<T>>::block_number() + Self::voting_length();
+							let transition_time = <frame_system::Module<T>>::block_number() + Self::voting_length();
 							// switch on either completed or voting stage from voting or committed stage
 							if vote_record.data.stage == VoteStage::Completed {
 								// unreserve the proposal creation bond amount
@@ -219,9 +227,9 @@ decl_module! {
 }
 
 decl_event!(
-	pub enum Event<T> where <T as system::Trait>::Hash,
-							<T as system::Trait>::AccountId,
-							<T as system::Trait>::BlockNumber {
+	pub enum Event<T> where <T as frame_system::Trait>::Hash,
+							<T as frame_system::Trait>::AccountId,
+							<T as frame_system::Trait>::BlockNumber {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted when commit stage begins: (ProposalHash, VoteId, CommitEndTime)
@@ -246,7 +254,7 @@ decl_storage! {
 		/// Amount of time a proposal remains in "Voting" stage.
 		pub VotingLength get(fn voting_length) config(): T::BlockNumber;
 		/// Map for retrieving the information about any proposal from its hash.
-		pub ProposalOf get(fn proposal_of): map T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+		pub ProposalOf get(fn proposal_of): map hasher(blake2_256) T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
 		pub ProposalCreationBond get(fn proposal_creation_bond) config(): BalanceOf<T>;
 	}

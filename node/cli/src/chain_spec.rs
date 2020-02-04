@@ -16,25 +16,25 @@
 
 //! Substrate chain configurations.
 
-use chain_spec::ChainSpecExtension;
-use primitives::{Pair, Public, crypto::UncheckedInto, sr25519};
+use sc_chain_spec::ChainSpecExtension;
+use sp_core::{Pair, Public, crypto::UncheckedInto, sr25519};
 use serde::{Serialize, Deserialize};
 use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
-	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig, SudoConfig,
+	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
 	SystemConfig, WASM_BINARY,
-	IdentityConfig, SignalingConfig, TreasuryRewardConfig,
+	SignalingConfig, TreasuryRewardConfig,
 };
 use edgeware_runtime::Block;
 use edgeware_runtime::constants::currency::*;
-use substrate_service;
+use sc_service;
 use hex_literal::hex;
-use substrate_telemetry::TelemetryEndpoints;
-use grandpa_primitives::{AuthorityId as GrandpaId};
-use aura_primitives::ed25519::AuthorityId as AuraId;
-use im_online::ed25519::{AuthorityId as ImOnlineId};
-use authority_discovery_primitives::AuthorityId as AuthorityDiscoveryId;
-use sr_primitives::{Perbill, traits::{Verify, IdentifyAccount, One}};
+use sc_telemetry::TelemetryEndpoints;
+use sp_finality_grandpa::{AuthorityId as GrandpaId};
+use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_runtime::{Perbill, traits::{Verify, IdentifyAccount, One}};
 
 pub use edgeware_primitives::{AccountId, Balance, Signature, BlockNumber};
 pub use edgeware_runtime::GenesisConfig;
@@ -71,16 +71,27 @@ fn get_lockdrop_participants_allocation() -> Result<Allocation>{
 /// Additional parameters for some Substrate core modules,
 /// customizable from the chain spec.
 #[derive(Default, Clone, Serialize, Deserialize, ChainSpecExtension)]
+#[serde(rename_all = "camelCase")]
 pub struct Extensions {
 	/// Block numbers with known hashes.
-	pub fork_blocks: client::ForkBlocks<Block>,
+	pub fork_blocks: sc_client::ForkBlocks<Block>,
+	/// Known bad block hashes.
+	pub bad_blocks: sc_client::BadBlocks<Block>,
 }
 
 /// Specialized `ChainSpec`.
-pub type ChainSpec = substrate_service::ChainSpec<
+pub type ChainSpec = sc_service::ChainSpec<
 	GenesisConfig,
 	Extensions,
 >;
+
+/// Mainnet configuration
+pub fn edgeware_mainnet_official() -> ChainSpec {
+	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/mainnet.chainspec.json")) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
+	}
+}
 
 /// 0.9.0 Testnet configuration
 pub fn edgeware_testnet_v090_config() -> ChainSpec {
@@ -237,7 +248,7 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (
 /// Helper function to create GenesisConfig for testing
 pub fn testnet_genesis(
 	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)>,
-	root_key: AccountId,
+	_root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	enable_println: bool,
 	balances: Vec<(AccountId, Balance)>,
@@ -264,75 +275,67 @@ pub fn testnet_genesis(
 	const STASH: Balance = 100 * DOLLARS;
 
 	GenesisConfig {
-		system: Some(SystemConfig {
+		frame_system: Some(SystemConfig {
 			code: WASM_BINARY.to_vec(),
 			changes_trie_config: Default::default(),
 		}),
-		balances: Some(BalancesConfig {
+		pallet_balances: Some(BalancesConfig {
 			balances: endowed_accounts.iter().cloned().map(|k| (k, ENDOWMENT))
 				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
 				.chain(balances.clone())
 				.collect(),
 			vesting: vesting,
 		}),
-		indices: Some(IndicesConfig {
+		pallet_indices: Some(IndicesConfig {
 			ids: endowed_accounts.iter().cloned()
 				.chain(initial_authorities.iter().map(|x| x.0.clone()))
 				.chain(balances.iter().map(|x| x.0.clone()))
 				.collect::<Vec<_>>(),
 		}),
-		session: Some(SessionConfig {
+		pallet_session: Some(SessionConfig {
 			keys: initial_authorities.iter().map(|x| {
 				(x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()))
 			}).collect::<Vec<_>>(),
 		}),
-		staking: Some(StakingConfig {
+		pallet_staking: Some(StakingConfig {
 			current_era: 0,
-			validator_count: initial_authorities.len() as u32 * 2,
+			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities.iter().map(|x| {
 				(x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)
 			}).collect(),
-			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+			invulnerables: [].to_vec(),
 			slash_reward_fraction: Perbill::from_percent(10),
 			.. Default::default()
 		}),
-		democracy: Some(DemocracyConfig::default()),
-		collective_Instance1: Some(CouncilConfig {
-			members: vec![],
+		pallet_democracy: Some(DemocracyConfig::default()),
+		pallet_collective_Instance1: Some(CouncilConfig {
+			members: crate::testnet_fixtures::get_testnet_election_members(),
 			phantom: Default::default(),
 		}),
-		contracts: Some(ContractsConfig {
-			current_schedule: contracts::Schedule {
+		pallet_contracts: Some(ContractsConfig {
+			current_schedule: pallet_contracts::Schedule {
 				enable_println, // this should only be enabled on development chains
 				..Default::default()
 			},
 			gas_price: 1 * MILLICENTS,
 		}),
-		sudo: Some(SudoConfig {
-			key: root_key,
-		}),
-		aura: Some(AuraConfig {
+		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
-		im_online: Some(ImOnlineConfig {
+		pallet_im_online: Some(ImOnlineConfig {
 			keys: vec![],
 		}),
-		authority_discovery: Some(AuthorityDiscoveryConfig {
+		pallet_authority_discovery: Some(AuthorityDiscoveryConfig {
 			keys: vec![],
 		}),
-		grandpa: Some(GrandpaConfig {
+		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),
-		treasury: Some(Default::default()),
-		identity: Some(IdentityConfig {
-			verifiers: crate::testnet_fixtures::get_testnet_identity_verifiers(),
-			expiration_length: 1 * DAYS,
-			registration_bond: 1 * DOLLARS,
-		}),
+		pallet_treasury: Some(Default::default()),
 		signaling: Some(SignalingConfig {
-			voting_length: 3 * DAYS,
-			proposal_creation_bond: 100 * DOLLARS,
+			voting_length: 7 * DAYS,
+			proposal_creation_bond: 1 * DOLLARS,
 		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
@@ -380,6 +383,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 pub fn edgeware_testnet_config() -> ChainSpec {
 	let data = r#"
 		{
+			"ss58Format": 7,
 			"tokenDecimals": 18,
 			"tokenSymbol": "EDG"
 		}"#;
@@ -392,8 +396,8 @@ pub fn edgeware_testnet_config() -> ChainSpec {
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
 		Some(DEFAULT_PROTOCOL_ID),
-		None,
 		properties,
+		Default::default(),
 	)
 }
 
@@ -401,6 +405,11 @@ fn development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
 			get_authority_keys_from_seed("Alice"),
+			get_authority_keys_from_seed("Bob"),
+			get_authority_keys_from_seed("Charlie"),
+			get_authority_keys_from_seed("Dave"),
+			get_authority_keys_from_seed("Eve"),
+			get_authority_keys_from_seed("Ferdie"),
 		],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
 		None,
@@ -452,66 +461,133 @@ pub fn local_testnet_config() -> ChainSpec {
 	)
 }
 
-#[cfg(test)]
-pub(crate) mod tests {
-	use super::*;
-	use crate::service::new_full;
-	use substrate_service::Roles;
-	use service_test;
-
-	fn local_testnet_genesis_instant_single() -> GenesisConfig {
-		testnet_genesis(
-			vec![
-				get_authority_keys_from_seed("Alice"),
-			],
-			get_account_id_from_seed::<sr25519::Public>("Alice"),
-			None,
-			false,
-			vec![],
-			vec![],
-		)
-	}
-
-	/// Local testnet config (single validator - Alice)
-	pub fn integration_test_config_with_single_authority() -> ChainSpec {
-		ChainSpec::from_genesis(
-			"Integration Test",
-			"test",
-			local_testnet_genesis_instant_single,
-			vec![],
-			None,
-			None,
-			None,
-			Default::default(),
-		)
-	}
-
-	/// Local testnet config (multivalidator Alice + Bob)
-	pub fn integration_test_config_with_two_authorities() -> ChainSpec {
-		ChainSpec::from_genesis(
-			"Integration Test",
-			"test",
-			local_testnet_genesis,
-			vec![],
-			None,
-			None,
-			None,
-			Default::default(),
-		)
-	}
-
-	#[test]
-	#[ignore]
-	fn test_connectivity() {
-		service_test::connectivity(
-			integration_test_config_with_two_authorities(),
-			|config| new_full(config),
-			|mut config| {
-				// light nodes are unsupported
-				config.roles = Roles::FULL;
-				new_full(config)
+/// Helper function to create GenesisConfig for testing
+pub fn mainnet_genesis(
+	initial_authorities: Vec<(AccountId, AccountId, Balance, AuraId, GrandpaId, ImOnlineId, AuthorityDiscoveryId)>,
+	founder_allocation: Vec<(AccountId, Balance)>,
+	balances: Vec<(AccountId, Balance)>,
+	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
+) -> GenesisConfig {
+	let enable_println = false;
+	GenesisConfig {
+		frame_system: Some(SystemConfig {
+			code: WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		pallet_balances: Some(BalancesConfig {
+			balances: founder_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
+				.chain(balances.clone())
+				.collect(),
+			vesting: vesting,
+		}),
+		pallet_indices: Some(IndicesConfig {
+			ids: founder_allocation.iter().map(|x| x.0.clone())
+				.chain(balances.iter().map(|x| x.0.clone()))
+				.collect::<Vec<_>>(),
+		}),
+		pallet_session: Some(SessionConfig {
+			keys: initial_authorities.iter().map(|x| {
+				(x.0.clone(), session_keys(x.4.clone(), x.3.clone(), x.5.clone(), x.6.clone()))
+			}).collect::<Vec<_>>(),
+		}),
+		pallet_staking: Some(StakingConfig {
+			current_era: 0,
+			validator_count: 60,
+			minimum_validator_count: initial_authorities.len() as u32,
+			stakers: initial_authorities.iter().map(|x| {
+				(x.0.clone(), x.1.clone(), x.2.clone(), StakerStatus::Validator)
+			}).collect(),
+			invulnerables: vec![],
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
+		}),
+		pallet_democracy: Some(DemocracyConfig::default()),
+		pallet_collective_Instance1: Some(CouncilConfig {
+			members: crate::mainnet_fixtures::get_mainnet_election_members(),
+			phantom: Default::default(),
+		}),
+		pallet_contracts: Some(ContractsConfig {
+			current_schedule: pallet_contracts::Schedule {
+				enable_println, // this should only be enabled on development chains
+				..Default::default()
 			},
-			true,
-		);
+			gas_price: 1 * MILLICENTS,
+		}),
+		pallet_aura: Some(AuraConfig {
+			authorities: vec![],
+		}),
+		pallet_im_online: Some(ImOnlineConfig {
+			keys: vec![],
+		}),
+		pallet_authority_discovery: Some(AuthorityDiscoveryConfig {
+			keys: vec![],
+		}),
+		pallet_grandpa: Some(GrandpaConfig {
+			authorities: vec![],
+		}),
+		pallet_treasury: Some(Default::default()),
+		signaling: Some(SignalingConfig {
+			voting_length: 7 * DAYS,
+			proposal_creation_bond: 100 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
+			minting_interval: One::one(),
+		}),
 	}
+}
+
+
+/// Mainnet config
+fn edgeware_mainnet_config_genesis() -> GenesisConfig {
+	let allocation = get_lockdrop_participants_allocation().unwrap();
+	let balances = allocation.balances.iter().map(|b| {
+		let balance = b.1.to_string().parse::<Balance>().unwrap();
+		return (
+			<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(),
+			balance,
+		);
+	})
+	.filter(|b| b.1 > 0)
+	.collect();
+	let vesting = allocation.vesting.iter().map(|b| {
+		let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
+		return (
+			(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
+			b.1,
+			b.2,
+			vesting_balance,
+		);
+	})
+	.filter(|b| b.3 > 0)
+	.collect();
+
+	mainnet_genesis(
+		crate::mainnet_fixtures::get_cw_mainnet_validators(),
+		crate::mainnet_fixtures::get_commonwealth_allocation(),
+		balances,
+		vesting,
+	)
+}
+
+/// Edgeware config (8 validators)
+pub fn edgeware_mainnet_config() -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 7,
+			"tokenDecimals": 18,
+			"tokenSymbol": "EDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+	let boot_nodes = crate::mainnet_fixtures::get_mainnet_bootnodes();
+	ChainSpec::from_genesis(
+		"Edgeware",
+		"edgeware",
+		edgeware_mainnet_config_genesis,
+		boot_nodes,
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		Some(DEFAULT_PROTOCOL_ID),
+		properties,
+		Default::default(),
+	)
 }

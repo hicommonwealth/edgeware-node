@@ -20,18 +20,18 @@
 #[cfg(test)]
 mod tests;
 
-use rstd::prelude::*;
-use rstd::result;
-use system::ensure_signed;
-use support::dispatch::Result;
+use sp_std::prelude::*;
+use sp_std::result;
+use frame_system::{self as system, ensure_signed};
+use frame_support::dispatch::DispatchResult;
 use codec::{Decode, Encode};
 
-use sr_primitives::RuntimeDebug;
-use sr_primitives::traits::{
+use sp_runtime::RuntimeDebug;
+use sp_runtime::traits::{
 	Hash
 };
 
-use support::{decl_event, decl_module, decl_storage, ensure, StorageMap};
+use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
@@ -94,13 +94,20 @@ pub struct VoteRecord<AccountId> {
 	pub outcomes: Vec<VoteOutcome>,
 }
 
-pub trait Trait: system::Trait {
+pub trait Trait: frame_system::Trait {
 	/// The overarching event type.
-	type Event: From<Event<Self>> + Into<<Self as system::Trait>::Event>;
+	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+}
+
+decl_error! {
+    pub enum Error for Module<T: Trait> {
+        VoteCompleted
+    }
 }
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		type Error = Error<T>;
 		fn deposit_event() = default;
 
 		/// A function for commit-reveal voting schemes that adds a vote commitment.
@@ -108,7 +115,7 @@ decl_module! {
 		/// A vote commitment is formatted using the native hash function. There
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
-		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> Result {
+		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.is_commit_reveal, "Commitments are not configured for this vote");
@@ -127,7 +134,7 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
-		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> Result {
+		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
@@ -215,14 +222,14 @@ impl<T: Trait> Module<T> {
 	}
 
 	/// A helper function for advancing the stage of a vote, as a state machine
-	pub fn advance_stage(vote_id: u64) -> Result {
+	pub fn advance_stage(vote_id: u64) -> DispatchResult {
 		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
 		let curr_stage = record.data.stage;
 		let next_stage = match curr_stage {
 			VoteStage::PreVoting if record.data.is_commit_reveal => VoteStage::Commit,
 			VoteStage::PreVoting | VoteStage::Commit => VoteStage::Voting,
 			VoteStage::Voting => VoteStage::Completed,
-			VoteStage::Completed => return Err("Vote already completed"),
+			VoteStage::Completed => return Err(Error::<T>::VoteCompleted)?,
 		};
 		record.data.stage = next_stage;
 		<VoteRecords<T>>::insert(record.id, record);
@@ -266,7 +273,7 @@ impl<T: Trait> Module<T> {
 }
 
 decl_event!(
-	pub enum Event<T> where <T as system::Trait>::AccountId {
+	pub enum Event<T> where <T as frame_system::Trait>::AccountId {
 		/// new vote (id, creator, type of vote)
 		VoteCreated(u64, AccountId, VoteType),
 		/// vote stage transition (id, old stage, new stage)
@@ -281,7 +288,7 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Voting {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(fn vote_records): map u64 => Option<VoteRecord<T::AccountId>>;
+		pub VoteRecords get(fn vote_records): map  hasher(blake2_256) u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(fn vote_record_count): u64;
 	}

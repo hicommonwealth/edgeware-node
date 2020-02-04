@@ -1,9 +1,9 @@
-use authority_discovery_primitives::AuthorityId as AuthorityDiscoveryId;
-use aura_primitives::ed25519::AuthorityId as AuraId;
+use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use edgeware_primitives::{AccountId};
-use grandpa::AuthorityId as GrandpaId;
-use im_online::ed25519::{AuthorityId as ImOnlineId};
-use primitives::crypto::UncheckedInto;
+use sp_finality_grandpa::AuthorityId as GrandpaId;
+use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
+use sp_core::crypto::UncheckedInto;
 use hex_literal::hex;
 
 pub fn get_testnet_bootnodes() -> Vec<String> {
@@ -99,13 +99,6 @@ pub fn get_testnet_initial_authorities() -> Vec<(AccountId, AccountId, GrandpaId
 	)];
 }
 
-pub fn get_testnet_identity_verifiers() -> Vec<AccountId> {
-	return vec![
-		// 5FC2u6RCD2j61kDDVJp2pCnJN1946uxyGuZDhUR9htmaDmf5
-		hex!["8a4b84c72992c08895cab8f3583f3c13c556ab58e9bbceb6c7f6910221196b78"].into(),
-	];
-}
-
 pub fn get_testnet_root_key() -> AccountId {
 	// 5G8jA2TLTQqnofx2jCE1MAtaZNqnJf1ujv7LdZBv2LGznJE2
 	return hex!["f04eaed79cba531626964ba59d727b670524247c92cdd0b5f5da04c8eccb796b"].into();
@@ -115,5 +108,8 @@ pub fn get_testnet_election_members() -> Vec<AccountId> {
 	return vec![
 		// 5EeJqpx6RCQxg13WW2WJt4CPE6w6vSmFSWNBdzYCh2YX7bFU
 		hex!["72195640f79f8254ce35db3b5d0b17c0243b0fb4489fa4b04688ed121ba22603"].into(),
+		hex!["80d5673f528ec827a9a1ed4bb5b47b737e9dffae3e62e95e104b4f1afc52ec68"].into(),
+		hex!["9878e771c7637945322a46ec58ab59ee62d0a308fc38335cbdd98c50fd0fdc41"].into(),
+
 	];
 }

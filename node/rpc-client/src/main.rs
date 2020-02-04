@@ -24,7 +24,7 @@
 use futures::Future;
 use hyper::rt;
 use edgeware_primitives::Hash;
-use substrate_rpc::author::{
+use sc_rpc::author::{
 	AuthorClient,
 	hash::ExtrinsicOrHash,
 };
