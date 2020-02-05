@@ -162,7 +162,7 @@ impl pallet_indices::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const ExistentialDeposit: Balance = 10 * CENTS;
+	pub const ExistentialDeposit: Balance = 1 * MILLICENTS;
 	pub const TransferFee: Balance = 10 * CENTS;
 	pub const CreationFee: Balance = 10 * CENTS;
 }
