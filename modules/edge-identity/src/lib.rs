@@ -1,4 +1,4 @@
-// Copyright 2018 Commonwealth Labs, Inc.
+// Copyright 2018-2020 Commonwealth Labs, Inc.
 // This file is part of Edgeware.
 
 // Edgeware is free software: you can redistribute it and/or modify

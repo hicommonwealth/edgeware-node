@@ -1035,13 +1035,13 @@ dependencies = [
 
 [[package]]
 name = "edgeware-cli"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "browser-utils 0.8.0 (git+https://github.com/paritytech/substrate.git)",
- "edgeware-executor 2.0.0",
- "edgeware-primitives 2.0.0",
- "edgeware-rpc 2.0.0",
- "edgeware-runtime 2.0.0",
+ "edgeware-executor 3.0.0",
+ "edgeware-primitives 3.0.0",
+ "edgeware-rpc 3.0.0",
+ "edgeware-runtime 3.0.0",
  "frame-support 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "frame-system 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "futures 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1100,12 +1100,12 @@ dependencies = [
 
 [[package]]
 name = "edgeware-executor"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "criterion 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "edgeware-primitives 2.0.0",
- "edgeware-runtime 2.0.0",
- "edgeware-testing 2.0.0",
+ "edgeware-primitives 3.0.0",
+ "edgeware-runtime 3.0.0",
+ "edgeware-testing 3.0.0",
  "frame-support 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "frame-system 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "pallet-balances 2.0.0 (git+https://github.com/paritytech/substrate.git)",
@@ -1130,7 +1130,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-primitives"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "pretty_assertions 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "sp-core 2.0.0 (git+https://github.com/paritytech/substrate.git)",
@@ -1140,10 +1140,10 @@ dependencies = [
 
 [[package]]
 name = "edgeware-rpc"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
- "edgeware-primitives 2.0.0",
- "edgeware-runtime 2.0.0",
+ "edgeware-primitives 3.0.0",
+ "edgeware-runtime 3.0.0",
  "jsonrpc-core 14.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "pallet-contracts-rpc 0.8.0 (git+https://github.com/paritytech/substrate.git)",
  "pallet-transaction-payment-rpc 2.0.0 (git+https://github.com/paritytech/substrate.git)",
@@ -1156,9 +1156,9 @@ dependencies = [
 
 [[package]]
 name = "edgeware-rpc-client"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
- "edgeware-primitives 2.0.0",
+ "edgeware-primitives 3.0.0",
  "env_logger 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.29 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.12.35 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1169,12 +1169,12 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "edge-signaling 1.0.0",
  "edge-treasury-reward 1.0.0",
  "edge-voting 1.0.0",
- "edgeware-primitives 2.0.0",
+ "edgeware-primitives 3.0.0",
  "frame-executive 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "frame-support 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "frame-system 2.0.0 (git+https://github.com/paritytech/substrate.git)",
@@ -1232,13 +1232,13 @@ dependencies = [
 
 [[package]]
 name = "edgeware-testing"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "edge-signaling 1.0.0",
  "edge-treasury-reward 1.0.0",
- "edgeware-executor 2.0.0",
- "edgeware-primitives 2.0.0",
- "edgeware-runtime 2.0.0",
+ "edgeware-executor 3.0.0",
+ "edgeware-primitives 3.0.0",
+ "edgeware-runtime 3.0.0",
  "frame-support 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "frame-system 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "pallet-balances 2.0.0 (git+https://github.com/paritytech/substrate.git)",
@@ -3197,7 +3197,7 @@ dependencies = [
 
 [[package]]
 name = "node-transaction-factory"
-version = "2.0.0"
+version = "3.0.0"
 dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parity-scale-codec 1.1.2 (registry+https://github.com/rust-lang/crates.io-index)",

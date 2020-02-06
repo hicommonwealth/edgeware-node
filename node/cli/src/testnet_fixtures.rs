@@ -1,3 +1,21 @@
+// Copyright 2018-2020 Commonwealth Labs, Inc.
+// This file is part of Edgeware.
+
+// Edgeware is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Edgeware is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
+
+//! Testnet fixtures
+
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use edgeware_primitives::{AccountId};
@@ -6,6 +24,7 @@ use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
 use sp_core::crypto::UncheckedInto;
 use hex_literal::hex;
 
+/// Testnet bootnodes
 pub fn get_testnet_bootnodes() -> Vec<String> {
 	return vec![
 		"/ip4/45.77.78.68/tcp/30333/p2p/QmVxmq3EtJa7NWae6hQv3PqBNud2UhubUWVXjVewtGeciK".to_string(),
@@ -17,6 +36,7 @@ pub fn get_testnet_bootnodes() -> Vec<String> {
 	];
 }
 
+/// Testnet initial authorities
 pub fn get_testnet_initial_authorities() -> Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)> {
 	return vec![(
 		// 5DRQpsFg1BgziDA5oMfwVyWzF8CkwwnxsguSu1utbgRNQFrK
@@ -99,11 +119,13 @@ pub fn get_testnet_initial_authorities() -> Vec<(AccountId, AccountId, GrandpaId
 	)];
 }
 
+/// Testnet root key
 pub fn get_testnet_root_key() -> AccountId {
 	// 5G8jA2TLTQqnofx2jCE1MAtaZNqnJf1ujv7LdZBv2LGznJE2
 	return hex!["f04eaed79cba531626964ba59d727b670524247c92cdd0b5f5da04c8eccb796b"].into();
 }
 
+/// Testnet election members
 pub fn get_testnet_election_members() -> Vec<AccountId> {
 	return vec![
 		// 5EeJqpx6RCQxg13WW2WJt4CPE6w6vSmFSWNBdzYCh2YX7bFU
