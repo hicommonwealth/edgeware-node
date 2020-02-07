@@ -11,3 +11,4 @@
 run_node.sh
 testnets/testing*.json
 edgeware*.wasm
+*/keygen*.sh

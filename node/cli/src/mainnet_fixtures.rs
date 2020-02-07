@@ -147,7 +147,7 @@ pub fn get_commonwealth_allocation() -> Vec<(AccountId, Balance)> {
 		hex!["b0492fa7ac84ecb20f9f69e1c328b521fce8f472af2cc13784286d2240e4924c"].into(),
 		CONTROLLER_ENDOWMENT,
 	), (
-		hex!["5659fd25a0d3cda5b86e447af8d61369ef1a6434048b4fd3d8400d45400d8772"].into(),
+		hex!["58e8d8750021d11f5bf1106966235ed293a4288511016af7f3b2e81a84ead342"].into(),
 		92_500_000_000_000_000_000_000_000,
 	), (
 		hex!["688421b084a363cb394c5e3a7c79f44482bf2f15f6d86ea37ae110a3af238f07"].into(),
@@ -257,4 +257,10 @@ pub fn get_mainnet_election_members() -> Vec<AccountId> {
 	return vec![
 		hex!["ca91588bb9258ade926d0c0631798d7e3f17c4581fae56283287d54883244a55"].into(),
 	];
+}
+
+/// Mainnet root key
+pub fn get_mainnet_root_key() -> AccountId {
+	// 5G8jA2TLTQqnofx2jCE1MAtaZNqnJf1ujv7LdZBv2LGznJE2
+	return hex!["0000000000000000000000000000000000000000000000000000000000000000"].into();
 }
