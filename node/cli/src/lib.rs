@@ -59,14 +59,12 @@ pub enum ChainSpec {
 	Development,
 	/// Whatever the current runtime is, with simple Alice/Bob auths.
 	LocalTestnet,
-	/// Whatever the current runtime is with the "global testnet" defaults.
-	StagingTestnet,
 	/// Edgeware testnet configuration
 	EdgewareTestnetConfig,
-	/// 0.9.0 Testnet
-	EDGTestnet090,
-	/// 0.9.5 Testnet
+	/// 0.9.9 Testnet
 	EDGTestnet099,
+	/// 1.0.0 Testnet,
+	BerlinTestnet,
 	/// Edgeware mainnet configuration (should be used to generate chainspec)
 	EdgewareMainnetConfig,
 	/// Edgeware mainnet (should be used to connect to Edgeware)
@@ -79,10 +77,12 @@ impl ChainSpec {
 		Ok(match self {
 			ChainSpec::Development => chain_spec::development_config(),
 			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
-			ChainSpec::StagingTestnet => chain_spec::staging_testnet_config(),
-			ChainSpec::EdgewareTestnetConfig => chain_spec::edgeware_testnet_config(),
-			ChainSpec::EDGTestnet090 => chain_spec::edgeware_testnet_v090_config(),
+			ChainSpec::EdgewareTestnetConfig => chain_spec::edgeware_testnet_config(
+				"Berlin".to_string(),
+				"berlin_edgeware_testnet".to_string(),
+			),
 			ChainSpec::EDGTestnet099 => chain_spec::edgeware_testnet_v099_config(),
+			ChainSpec::BerlinTestnet => chain_spec::edgeware_berlin_testnet_config(),
 			ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_mainnet_config(),
 			ChainSpec::EdgewareMainnet => chain_spec::edgeware_mainnet_official(),
 		})
@@ -92,10 +92,9 @@ impl ChainSpec {
 		match s {
 			"dev" => Some(ChainSpec::Development),
 			"local" => Some(ChainSpec::LocalTestnet),
-			"staging" => Some(ChainSpec::StagingTestnet),
 			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
-			"edg-0.9.0" => Some(ChainSpec::EDGTestnet090),
 			"edg-0.9.9" => Some(ChainSpec::EDGTestnet099),
+			"berlin" => Some(ChainSpec::BerlinTestnet),
 			"edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
 			"edgeware" => Some(ChainSpec::EdgewareMainnet),
 			_ => None,

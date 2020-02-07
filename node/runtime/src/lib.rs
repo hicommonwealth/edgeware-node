@@ -552,6 +552,12 @@ impl voting::Trait for Runtime {
 	type Event = Event;
 }
 
+impl pallet_sudo::Trait for Runtime {
+	type Event = Event;
+	type Proposal = Call;
+}
+
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -584,6 +590,7 @@ construct_runtime!(
 		Offences: pallet_offences::{Module, Call, Storage, Event},
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Nicks: pallet_nicks::{Module, Call, Storage, Event<T>},
+		Sudo: pallet_sudo,
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
