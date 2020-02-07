@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-rpc-client"
-version = "2.0.0"
+version = "3.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
@@ -11,4 +11,4 @@ hyper = "0.12.35"
 jsonrpc-core-client = { version = "14.0.3", features = ["http", "ws"] }
 log = "0.4.8"
 edgeware-primitives = { path = "../primitives" }
-sc-rpc = { git = "https://github.com/paritytech/substrate.git", version = "2.0.0" }
+sc-rpc = { git = "https://github.com/paritytech/substrate.git" }

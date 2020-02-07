@@ -1,3 +1,21 @@
+// Copyright 2018-2020 Commonwealth Labs, Inc.
+// This file is part of Edgeware.
+
+// Edgeware is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+
+// Edgeware is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
+
+//! Mainnet fixtures
+
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 use edgeware_primitives::{AccountId, Balance};
@@ -6,6 +24,7 @@ use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
 use sp_core::crypto::UncheckedInto;
 use hex_literal::hex;
 
+/// Bootnodes for mainnet launch
 pub fn get_mainnet_bootnodes() -> Vec<String> {
 	return vec![
 		"/ip4/144.202.61.115/tcp/30333/p2p/QmXTb6R2AvA6FrvD4w2YRD2oj9WQk2f9Dg1dTqGsdxgwuD".to_string(),
@@ -18,13 +37,27 @@ pub fn get_mainnet_bootnodes() -> Vec<String> {
 		"/ip4/149.28.115.253/tcp/30333/p2p/QmQvAPW1bBpx5N7YJLcBhHNqANw4dxVmBTiJNeuC8FoYeR".to_string(),
 		"/ip4/66.42.116.197/tcp/30333/p2p/QmU1g7NFj1cd46T69ZXig9c7Xc6RLGwjZm4Ur6d4JPBDh2".to_string(),
 		"/ip4/104.207.139.151/tcp/30333/p2p/QmPuU4VY2nckAodyWXv3VyCwavk5FF9yqVWB4G1LtNf9v9".to_string(),
+		"/ip4/45.77.238.189/tcp/30333/p2p/Qme2d6D8WGGhsymJLmhBwEadW8sFhXZZ9HKEzhbueunTZc".to_string(),
+		"/ip4/209.250.227.147/tcp/30333/p2p/QmfWEPyZmrZeS6dgsi7hjvKX1u6AxGGrvEH6BZsXBe68Eo".to_string(),
+		"/ip4/202.182.103.213/tcp/30333/p2p/QmTxiQDFQykWEWpywtPiNDJK8EFnGumSYHJDuUJ8uhBWDu".to_string(),
+		"/ip4/207.148.77.158/tcp/30333/p2p/Qmcswgc3oYLdyWZmTo9Kf3pr3fnLdaA34fpJRPtYTKwpPS".to_string(),
+		"/ip4/140.82.54.194/tcp/30333/p2p/QmTzLQJn7MCkJZEcucSgoBnUgzF85YC5RK5wRq7oRupSFR".to_string(),
+		"/ip4/155.138.133.37/tcp/30333/p2p/QmYJtBiHi9s6nghnW4PqgKAab4Gq6BQikmR66rk5yoiY9f".to_string(),
+		"/ip4/45.32.171.175/tcp/30333/p2p/QmYi3K6422sZ9RqNjcCJ4s3DoUdyK6C2U9RDH4kwQC1KXB".to_string(),
+		"/ip4/45.77.105.248/tcp/30333/p2p/QmQzjXREKk4QbfrkwtRsEEdrQA85k1ERvcUPvTaSC2FTnX".to_string(),
+		"/ip4/144.202.19.214/tcp/30333/p2p/QmRybov4ZYCcgm6QyRkH2TgSjRngQuL4m3td5MQxmgqWHu".to_string(),
+		"/ip4/207.246.98.108/tcp/30333/p2p/QmfH6NCWUcRwfVcJsDocNF5ZUpGUex8xWba64rHvomyweV".to_string(),
 	];
 }
 
-/// This is the allocation that will fit into the "balances" module
+
+/// Split endowment amount for Commonwealth
 pub const COMMONWEALTH_ENDOWMENT: Balance = 75_000_000_000_000_000_000_000_000;
+/// Split endowment amount for stash
 pub const STASH_ENDOWMENT: Balance = 10_000_000_000_000_000_000;
+/// Split endowment amount for controllers
 pub const CONTROLLER_ENDOWMENT: Balance = 10_000_000_000_000_000_000;
+/// Genesis allocation that will fit into the "balances" module for Commonwealth/Founders
 pub fn get_commonwealth_allocation() -> Vec<(AccountId, Balance)> {
 	return vec![(
 		hex!["14ad3d151938d63a4e02454f034a3158c719ed9de2e233dd0843c2d81ddba53d"].into(),
@@ -131,9 +164,10 @@ pub fn get_commonwealth_allocation() -> Vec<(AccountId, Balance)> {
 	)]
 }
 
+/// 5 EDG stake amount for Commonwealth validators
+pub const STAKED_ENDOWMENT: Balance = 5_000_000_000_000_000_000;
 /// The mainnet commonwealth validator pubkeys and staked balances. These
 /// staked amounts should be less than the balances of the stash accounts.
-pub const STAKED_ENDOWMENT: Balance = 5_000_000_000_000_000_000;
 pub fn get_cw_mainnet_validators() -> Vec<(AccountId, AccountId, Balance, AuraId, GrandpaId, ImOnlineId, AuthorityDiscoveryId)> {
 	return vec![(
 		hex!["1ec5e3d9a77ac81d6da0290c04d003bbcb04af8c4902bd59dbf9be4dfa47234f"].into(),
@@ -218,6 +252,7 @@ pub fn get_cw_mainnet_validators() -> Vec<(AccountId, AccountId, Balance, AuraId
 	)];
 }
 
+/// Commonwealth election member
 pub fn get_mainnet_election_members() -> Vec<AccountId> {
 	return vec![
 		hex!["ca91588bb9258ade926d0c0631798d7e3f17c4581fae56283287d54883244a55"].into(),
