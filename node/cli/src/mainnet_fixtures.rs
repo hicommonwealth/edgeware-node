@@ -261,6 +261,5 @@ pub fn get_mainnet_election_members() -> Vec<AccountId> {
 
 /// Mainnet root key
 pub fn get_mainnet_root_key() -> AccountId {
-	// 5G8jA2TLTQqnofx2jCE1MAtaZNqnJf1ujv7LdZBv2LGznJE2
 	return hex!["0000000000000000000000000000000000000000000000000000000000000000"].into();
 }
