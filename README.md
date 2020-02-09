@@ -63,10 +63,10 @@ cargo build --release
 
 Ensure you have a fresh start if updating from another version:
 ```
-./scripts/purge-chain.sh
+./scripts/purge-chain.sh berlin
 ```
 
-To start up the Edgeware node and connect to testnet 0.9.9, run:
+To start up the Edgeware node and connect to the Berlin testnet, run:
 ```
-./target/release/edgeware --chain=edg-0.9.9 --name <INSERT_NAME>
+./target/release/edgeware --chain=berlin --name <INSERT_NAME>
 ```
