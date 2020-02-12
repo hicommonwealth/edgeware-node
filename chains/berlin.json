@@ -21,7 +21,7 @@
   ],
   "protocolId": "edg",
   "properties": {
-    "ss58Format": 7,
+    "ss58Format": 42,
     "tokenDecimals": 18,
     "tokenSymbol": "EDG"
   },
