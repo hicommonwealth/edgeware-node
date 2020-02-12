@@ -19,6 +19,8 @@
 //! Service implementation. Specialized wrapper over substrate service.
 
 use std::sync::Arc;
+
+use sc_consensus_aura;
 use sc_client::{self, LongestChain};
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use edgeware_executor;

@@ -29,7 +29,7 @@ use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
 use sp_runtime::traits::{Hash, Zero};
-use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
+use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap, StorageValue};
 
 pub trait Trait: pallet_balances::Trait {
 	/// The overarching event type.
@@ -261,7 +261,7 @@ impl<T: Trait> Module<T> {
 	/// Helper function for executing the registration of identities
 	fn do_register_identity(sender: T::AccountId, identity_type: IdentityType, identity: Identity, identity_hash: T::Hash) -> DispatchResult {
 		ensure!(!<UsedTypes<T>>::get(sender.clone()).iter().any(|i| i == &identity_type), "Identity type already used");
-		ensure!(!<IdentityOf<T>>::exists(identity_hash), "Identity already exists");
+		ensure!(!<IdentityOf<T>>::get(identity_hash).is_some(), "Identity already exists");
 		// Reserve the registration bond amount
 		T::Currency::reserve(&sender, Self::registration_bond()).map_err(|_| "Not enough currency for reserve bond")?;
 		// reserve identity type

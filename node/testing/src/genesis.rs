@@ -49,7 +49,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 				(eve(), 101 * DOLLARS),
 				(ferdie(), 100 * DOLLARS),
 			],
-			vesting: vec![],
 		}),
 		pallet_session: Some(SessionConfig {
 			keys: vec![
@@ -96,5 +95,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		signaling: Some(Default::default()),
 		treasury_reward: Some(Default::default()),
 		pallet_sudo: Some(Default::default()),
+		pallet_vesting: Some(Default::default()),
 	}
 }

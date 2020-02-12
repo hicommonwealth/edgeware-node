@@ -65,6 +65,8 @@ pallet-treasury = { git = "https://github.com/paritytech/substrate.git", default
 pallet-utility = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+pallet-vesting = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+
 
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
@@ -126,6 +128,7 @@ std = [
 	"pallet-treasury/std",
 	"sp-transaction-pool/std",
 	"pallet-utility/std",
+	"pallet-vesting/std",
 	"sp-version/std",
 	"sp-offchain/std",
 	"edgeware-primitives/std",

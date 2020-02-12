@@ -22,7 +22,7 @@ use serde::{Serialize, Deserialize};
 use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
-	SudoConfig, SystemConfig, WASM_BINARY,
+	SudoConfig, SystemConfig, VestingConfig, WASM_BINARY,
 	SignalingConfig, TreasuryRewardConfig,
 };
 use edgeware_runtime::Block;
@@ -192,7 +192,6 @@ pub fn testnet_genesis(
 				.chain(initial_authorities.iter().map(|x| (x.1.clone(), STASH)))
 				.chain(balances.clone())
 				.collect(),
-			vesting: vesting,
 		}),
 		pallet_indices: Some(IndicesConfig {
 			ids: endowed_accounts.iter().cloned()
@@ -253,6 +252,9 @@ pub fn testnet_genesis(
 		}),
 		pallet_sudo: Some(SudoConfig {
 			key: _root_key,
+		}),
+		pallet_vesting: Some(VestingConfig {
+			vesting: vesting,
 		}),
 	}
 }
@@ -394,7 +396,6 @@ pub fn mainnet_genesis(
 			balances: founder_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
 				.chain(balances.clone())
 				.collect(),
-			vesting: vesting,
 		}),
 		pallet_indices: Some(IndicesConfig {
 			ids: founder_allocation.iter().map(|x| x.0.clone())
@@ -452,6 +453,9 @@ pub fn mainnet_genesis(
 		}),
 		pallet_sudo: Some(SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
+		}),
+		pallet_vesting: Some(VestingConfig {
+			vesting: vesting,
 		}),
 	}
 }

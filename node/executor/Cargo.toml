@@ -6,7 +6,7 @@ description = "Edgeware implementation using a substrate node."
 edition = "2018"
 
 [dependencies]
-trie-root = "0.15.2"
+trie-root = "0.16.0"
 codec = { package = "parity-scale-codec", version = "1.0.0" }
 sp-io = { git = "https://github.com/paritytech/substrate.git" }
 sp-state-machine = { git = "https://github.com/paritytech/substrate.git" }
