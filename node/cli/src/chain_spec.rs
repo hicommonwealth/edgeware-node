@@ -299,7 +299,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) -> ChainSpec {
 	let data = r#"
 		{
-			"ss58Format": 7,
+			"ss58Format": 42,
 			"tokenDecimals": 18,
 			"tokenSymbol": "EDG"
 		}"#;
