@@ -301,7 +301,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 		{
 			"ss58Format": 42,
 			"tokenDecimals": 18,
-			"tokenSymbol": "EDG"
+			"tokenSymbol": "tEDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
 	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();

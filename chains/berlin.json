@@ -23,7 +23,7 @@
   "properties": {
     "ss58Format": 42,
     "tokenDecimals": 18,
-    "tokenSymbol": "EDG"
+    "tokenSymbol": "tEDG"
   },
   "forkBlocks": null,
   "badBlocks": null,
