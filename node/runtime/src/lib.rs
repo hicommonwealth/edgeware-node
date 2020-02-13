@@ -33,7 +33,7 @@ use sp_runtime::transaction_validity::TransactionValidity;
 use frame_support::weights::Weight;
 use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
-	OpaqueKeys,
+	OpaqueKeys, ConvertInto
 };
 use sp_version::RuntimeVersion;
 #[cfg(any(feature = "std", test))]
@@ -78,8 +78,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 30,
-	impl_version: 30,
+	spec_version: 31,
+	impl_version: 31,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -169,14 +169,12 @@ parameter_types! {
 
 impl pallet_balances::Trait for Runtime {
 	type Balance = Balance;
-	type OnFreeBalanceZero = ((Staking, Contracts), Session);
-	type OnReapAccount = System;
+	type OnReapAccount = (((System, Staking), Contracts), Session);
 	type OnNewAccount = Indices;
 	type Event = Event;
 	type DustRemoval = ();
 	type TransferPayment = ();
 	type ExistentialDeposit = ExistentialDeposit;
-	type TransferFee = TransferFee;
 	type CreationFee = CreationFee;
 }
 
@@ -411,7 +409,6 @@ impl pallet_contracts::Trait for Runtime {
 	type RentByteFee = RentByteFee;
 	type RentDepositOffset = RentDepositOffset;
 	type SurchargeReward = SurchargeReward;
-	type TransferFee = ContractTransferFee;
 	type CreationFee = ContractCreationFee;
 	type TransactionBaseFee = ContractTransactionBaseFee;
 	type TransactionByteFee = ContractTransactionByteFee;
@@ -538,6 +535,17 @@ impl frame_system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for 
 	}
 }
 
+impl pallet_vesting::Trait for Runtime {
+	type Event = Event;
+	type Currency = Balances;
+	type BlockNumberToBalance = ConvertInto;
+}
+
+impl pallet_sudo::Trait for Runtime {
+	type Event = Event;
+	type Proposal = Call;
+}
+
 impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
@@ -551,12 +559,6 @@ impl treasury_reward::Trait for Runtime {
 impl voting::Trait for Runtime {
 	type Event = Event;
 }
-
-impl pallet_sudo::Trait for Runtime {
-	type Event = Event;
-	type Proposal = Call;
-}
-
 
 construct_runtime!(
 	pub enum Runtime where
@@ -591,6 +593,7 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Nicks: pallet_nicks::{Module, Call, Storage, Event<T>},
 		Sudo: pallet_sudo,
+		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

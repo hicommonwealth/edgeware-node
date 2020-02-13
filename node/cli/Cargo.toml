@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-cli"
-version = "3.0.0"
+version = "3.0.1"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 build = "build.rs"
@@ -31,6 +31,7 @@ jsonrpc-core = "14.0.3"
 log = "0.4.8"
 rand = "0.7.2"
 structopt = { version = "0.3.8", optional = true }
+tracing = "0.1.10"
 hex = "0.3.2"
 serde_json = "1.0"
 
@@ -45,6 +46,7 @@ sp-finality-tracker = { git = "https://github.com/paritytech/substrate.git", def
 sp-inherents = { git = "https://github.com/paritytech/substrate.git" }
 sp-keyring = { git = "https://github.com/paritytech/substrate.git" }
 sp-io = { git = "https://github.com/paritytech/substrate.git" }
+sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
 
 # client dependencies
 sc-client-api = { git = "https://github.com/paritytech/substrate.git" }
@@ -62,7 +64,7 @@ sc-basic-authorship = { git = "https://github.com/paritytech/substrate.git" }
 sc-service = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sc-telemetry = { git = "https://github.com/paritytech/substrate.git" }
 sc-authority-discovery = { git = "https://github.com/paritytech/substrate.git" }
-sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
+sc-tracing = { git = "https://github.com/paritytech/substrate.git" }
 
 # frame dependencies
 pallet-indices = { git = "https://github.com/paritytech/substrate.git" }

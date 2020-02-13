@@ -22,7 +22,7 @@ use serde::{Serialize, Deserialize};
 use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
-	SudoConfig, SystemConfig, WASM_BINARY,
+	SudoConfig, SystemConfig, VestingConfig, WASM_BINARY,
 	SignalingConfig, TreasuryRewardConfig,
 };
 use edgeware_runtime::Block;
@@ -192,7 +192,6 @@ pub fn testnet_genesis(
 				.chain(initial_authorities.iter().map(|x| (x.1.clone(), STASH)))
 				.chain(balances.clone())
 				.collect(),
-			vesting: vesting,
 		}),
 		pallet_indices: Some(IndicesConfig {
 			ids: endowed_accounts.iter().cloned()
@@ -254,6 +253,9 @@ pub fn testnet_genesis(
 		pallet_sudo: Some(SudoConfig {
 			key: _root_key,
 		}),
+		pallet_vesting: Some(VestingConfig {
+			vesting: vesting,
+		}),
 	}
 }
 
@@ -297,9 +299,9 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) -> ChainSpec {
 	let data = r#"
 		{
-			"ss58Format": 7,
+			"ss58Format": 42,
 			"tokenDecimals": 18,
-			"tokenSymbol": "EDG"
+			"tokenSymbol": "tEDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
 	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
@@ -315,7 +317,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	)
 }
 
-fn development_config_genesis() -> GenesisConfig {
+fn multi_development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
 			get_authority_keys_from_seed("Alice"),
@@ -334,8 +336,29 @@ fn development_config_genesis() -> GenesisConfig {
 	)
 }
 
+fn development_config_genesis() -> GenesisConfig {
+	testnet_genesis(
+		vec![
+			get_authority_keys_from_seed("Alice"),
+		],
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		None,
+		true,
+		vec![],
+		vec![],
+		vec![],
+	)
+}
+
 /// Development config (single validator Alice)
 pub fn development_config() -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 42,
+			"tokenDecimals": 18,
+			"tokenSymbol": "tEDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
 		"Development",
 		"dev",
@@ -343,7 +366,28 @@ pub fn development_config() -> ChainSpec {
 		vec![],
 		None,
 		None,
+		properties,
+		Default::default(),
+	)
+}
+
+/// Development config (6 validators Alice, Bob, Charlie, Dave, Eve, Ferdie)
+pub fn multi_development_config() -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 42,
+			"tokenDecimals": 18,
+			"tokenSymbol": "tEDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+	ChainSpec::from_genesis(
+		"Multi Development",
+		"multi-dev",
+		multi_development_config_genesis,
+		vec![],
 		None,
+		None,
+		properties,
 		Default::default(),
 	)
 }
@@ -394,7 +438,6 @@ pub fn mainnet_genesis(
 			balances: founder_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
 				.chain(balances.clone())
 				.collect(),
-			vesting: vesting,
 		}),
 		pallet_indices: Some(IndicesConfig {
 			ids: founder_allocation.iter().map(|x| x.0.clone())
@@ -452,6 +495,9 @@ pub fn mainnet_genesis(
 		}),
 		pallet_sudo: Some(SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
+		}),
+		pallet_vesting: Some(VestingConfig {
+			vesting: vesting,
 		}),
 	}
 }
