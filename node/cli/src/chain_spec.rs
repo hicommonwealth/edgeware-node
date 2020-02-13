@@ -317,7 +317,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	)
 }
 
-fn development_config_genesis() -> GenesisConfig {
+fn multi_development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
 			get_authority_keys_from_seed("Alice"),
@@ -336,8 +336,29 @@ fn development_config_genesis() -> GenesisConfig {
 	)
 }
 
+fn development_config_genesis() -> GenesisConfig {
+	testnet_genesis(
+		vec![
+			get_authority_keys_from_seed("Alice"),
+		],
+		get_account_id_from_seed::<sr25519::Public>("Alice"),
+		None,
+		true,
+		vec![],
+		vec![],
+		vec![],
+	)
+}
+
 /// Development config (single validator Alice)
 pub fn development_config() -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 42,
+			"tokenDecimals": 18,
+			"tokenSymbol": "tEDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
 		"Development",
 		"dev",
@@ -345,7 +366,28 @@ pub fn development_config() -> ChainSpec {
 		vec![],
 		None,
 		None,
+		properties,
+		Default::default(),
+	)
+}
+
+/// Development config (6 validators Alice, Bob, Charlie, Dave, Eve, Ferdie)
+pub fn multi_development_config() -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 42,
+			"tokenDecimals": 18,
+			"tokenSymbol": "tEDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+	ChainSpec::from_genesis(
+		"Multi Development",
+		"multi-dev",
+		multi_development_config_genesis,
+		vec![],
 		None,
+		None,
+		properties,
 		Default::default(),
 	)
 }

@@ -57,6 +57,8 @@ pub mod testnet_fixtures;
 pub enum ChainSpec {
 	/// Whatever the current runtime is, with just Alice as an auth.
 	Development,
+	/// Whatever the current runtime is, with just Alice as an auth.
+	MultiNodeDevelopment,
 	/// Whatever the current runtime is, with simple Alice/Bob auths.
 	LocalTestnet,
 	/// Edgeware testnet configuration
@@ -76,6 +78,7 @@ impl ChainSpec {
 	pub(crate) fn load(self) -> Result<chain_spec::ChainSpec, String> {
 		Ok(match self {
 			ChainSpec::Development => chain_spec::development_config(),
+			ChainSpec::MultiNodeDevelopment => chain_spec::multi_development_config(),
 			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
 			ChainSpec::EdgewareTestnetConfig => chain_spec::edgeware_testnet_config(
 				"Berlin".to_string(),
@@ -91,6 +94,7 @@ impl ChainSpec {
 	pub(crate) fn from(s: &str) -> Option<Self> {
 		match s {
 			"dev" => Some(ChainSpec::Development),
+			"multi-dev" => Some(ChainSpec::MultiNodeDevelopment),
 			"local" => Some(ChainSpec::LocalTestnet),
 			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
 			"edg-0.9.9" => Some(ChainSpec::EDGTestnet099),
