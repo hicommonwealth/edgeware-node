@@ -1,5 +1,5 @@
 [package]
-name = "node-transaction-factory"
+name = "edgeware-transaction-factory"
 version = "3.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"

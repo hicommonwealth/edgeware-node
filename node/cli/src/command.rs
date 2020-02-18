@@ -16,7 +16,7 @@
 
 use sc_cli::{VersionInfo, error};
 use sc_service::{Roles as ServiceRoles};
-use node_transaction_factory::RuntimeAdapter;
+use edgeware_transaction_factory::RuntimeAdapter;
 use crate::{Cli, service, ChainSpec, load_spec, Subcommand, factory_impl::FactoryState};
 
 /// Parse command line arguments into service configuration.
@@ -39,6 +39,16 @@ where
 			load_spec,
 			&version,
 		),
+		Some(Subcommand::Inspect(cmd)) => {
+			cmd.init(&mut config, load_spec, &version)?;
+
+			let client = sc_service::new_full_client::<
+				edgeware_runtime::Block, edgeware_runtime::RuntimeApi, edgeware_executor::Executor, _, _,
+			>(&config)?;
+			let inspect = edgeware_inspect::Inspector::<edgeware_runtime::Block>::new(client);
+
+			cmd.run(inspect)
+		},
 		Some(Subcommand::Factory(cli_args)) => {
 			sc_cli::init(&cli_args.shared_params, &version)?;
 			sc_cli::init_config(&mut config, &cli_args.shared_params, &version, load_spec)?;
@@ -72,7 +82,7 @@ where
 			);
 
 			let service_builder = new_full_start!(config).0;
-			node_transaction_factory::factory::<FactoryState<_>, _, _, _, _, _>(
+			edgeware_transaction_factory::factory::<FactoryState<_>, _, _, _, _, _>(
 				factory_state,
 				service_builder.client(),
 				service_builder.select_chain()

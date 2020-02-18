@@ -194,12 +194,7 @@ pub fn testnet_genesis(
 				.collect(),
 		}),
 		pallet_indices: Some(IndicesConfig {
-			ids: endowed_accounts.iter().cloned()
-				.chain(founder_allocation.iter().map(|x| x.0.clone()))
-				.chain(initial_authorities.iter().map(|x| x.0.clone()))
-				.chain(initial_authorities.iter().map(|x| x.1.clone()))
-				.chain(balances.iter().map(|x| x.0.clone()))
-				.collect::<Vec<_>>(),
+			indices: vec![],
 		}),
 		pallet_session: Some(SessionConfig {
 			keys: initial_authorities.iter().map(|x| {
@@ -440,9 +435,7 @@ pub fn mainnet_genesis(
 				.collect(),
 		}),
 		pallet_indices: Some(IndicesConfig {
-			ids: founder_allocation.iter().map(|x| x.0.clone())
-				.chain(balances.iter().map(|x| x.0.clone()))
-				.collect::<Vec<_>>(),
+			indices: vec![],
 		}),
 		pallet_session: Some(SessionConfig {
 			keys: initial_authorities.iter().map(|x| {

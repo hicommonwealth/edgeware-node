@@ -13,6 +13,9 @@ pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git" }
 pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git" }
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git" }
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git" }
+sc-keystore = { git = "https://github.com/paritytech/substrate.git" }
+sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate.git" }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
