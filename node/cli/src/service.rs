@@ -198,48 +198,39 @@ macro_rules! new_full {
 			gossip_duration: std::time::Duration::from_millis(333),
 			justification_period: 512,
 			name: Some(name),
-			observer_enabled: true,
+			observer_enabled: false,
 			keystore,
 			is_authority,
 		};
 
-		match (is_authority, disable_grandpa) {
-			(false, false) => {
-				// start the lightweight GRANDPA observer
-				service.spawn_task("grandpa-observer", sc_finality_grandpa::run_grandpa_observer(
-					config,
-					grandpa_link,
-					service.network(),
-					service.on_exit(),
-					service.spawn_task_handle(),
-				)?);
-			},
-			(true, false) => {
-				// start the full GRANDPA voter
-				let grandpa_config = sc_finality_grandpa::GrandpaParams {
-					config: config,
-					link: grandpa_link,
-					network: service.network(),
-					inherent_data_providers: inherent_data_providers.clone(),
-					on_exit: service.on_exit(),
-					telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
-					voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
-					executor: service.spawn_task_handle(),
-				};
-				// the GRANDPA voter task is considered infallible, i.e.
-				// if it fails we take down the service with it.
-				service.spawn_essential_task(
-					"grandpa-voter",
-					sc_finality_grandpa::run_grandpa_voter(grandpa_config)?
-				);
-			},
-			(_, true) => {
-				sc_finality_grandpa::setup_disabled_grandpa(
-					service.client(),
-					&inherent_data_providers,
-					service.network(),
-				)?;
-			},
+		if !disable_grandpa {
+			// start the full GRANDPA voter
+			// NOTE: unlike in substrate we are currently running the full
+			// GRANDPA voter protocol for all full nodes (regardless of whether
+			// they're validators or not). at this point the full voter should
+			// provide better guarantees of block and vote data availability than
+			// the observer.
+			let grandpa_config = sc_finality_grandpa::GrandpaParams {
+				config,
+				link: grandpa_link,
+				network: service.network(),
+				inherent_data_providers: inherent_data_providers.clone(),
+				on_exit: service.on_exit(),
+				telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
+				voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
+				executor: service.spawn_task_handle(),
+			};
+
+			service.spawn_essential_task(
+				"grandpa-voter",
+				sc_finality_grandpa::run_grandpa_voter(grandpa_config)?
+			);
+		} else {
+			sc_finality_grandpa::setup_disabled_grandpa(
+				service.client(),
+				&inherent_data_providers,
+				service.network(),
+			)?;
 		}
 
 		Ok((service, inherent_data_providers))
