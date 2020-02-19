@@ -26,5 +26,5 @@ native_executor_instance!(
 	pub Executor,
 	edgeware_runtime::api::dispatch,
 	edgeware_runtime::native_version,
-	sp_io::benchmarking::HostFunctions,
+	frame_benchmarking::benchmarking::HostFunctions,
 );
