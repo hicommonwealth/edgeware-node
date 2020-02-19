@@ -5,6 +5,11 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
 
+[package.metadata.wasm-pack.profile.release]
+# `wasm-opt` has some problems on linux, see
+# https://github.com/rustwasm/wasm-pack/issues/781 etc.
+wasm-opt = false
+
 [dependencies]
 # third-party dependencies
 codec = { package = "parity-scale-codec", version = "1.0.6", default-features = false, features = ["derive"] }
