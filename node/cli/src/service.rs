@@ -195,7 +195,7 @@ macro_rules! new_full {
 
 		let config = sc_finality_grandpa::Config {
 			// FIXME #1578 make this available through chainspec
-			gossip_duration: std::time::Duration::from_millis(333),
+			gossip_duration: std::time::Duration::from_millis(1000),
 			justification_period: 512,
 			name: Some(name),
 			observer_enabled: false,
