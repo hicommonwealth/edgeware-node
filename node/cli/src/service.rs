@@ -223,7 +223,6 @@ macro_rules! new_full {
 				on_exit: service.on_exit(),
 				telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
 				voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
-				executor: service.spawn_task_handle(),
 			};
 
 			service.spawn_essential_task(
