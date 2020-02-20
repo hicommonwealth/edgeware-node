@@ -45,7 +45,6 @@ decl_module! {
 				<T as pallet_staking::Trait>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
 				Self::deposit_event(RawEvent::TreasuryMinting(
 					<pallet_balances::Module<T>>::free_balance(<pallet_treasury::Module<T>>::account_id()),
-					reward,
 					<frame_system::Module<T>>::block_number(),
 					<pallet_treasury::Module<T>>::account_id())
 				);
@@ -57,9 +56,8 @@ decl_module! {
 decl_event!(
 	pub enum Event<T> where <T as frame_system::Trait>::BlockNumber,
 							<T as frame_system::Trait>::AccountId,
-							Balance2 = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance,
 							Balance = <T as pallet_balances::Trait>::Balance {
-		TreasuryMinting(Balance, Balance2, BlockNumber, AccountId),
+		TreasuryMinting(Balance, BlockNumber, AccountId),
 	}
 );
 
