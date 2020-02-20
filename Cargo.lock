@@ -1018,7 +1018,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-cli"
-version = "3.0.1"
+version = "3.0.2"
 dependencies = [
  "browser-utils 0.8.0 (git+https://github.com/paritytech/substrate.git)",
  "edgeware-executor 3.0.0",
