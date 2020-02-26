@@ -30,7 +30,6 @@ use sc_service::{
 	AbstractService, ServiceBuilder, config::Configuration, error::{Error as ServiceError},
 };
 use sp_inherents::InherentDataProviders;
-use sc_network::construct_simple_protocol;
 
 use sc_service::{Service, NetworkStatus};
 use sc_client::{Client, LocalCallExecutor};
@@ -39,11 +38,6 @@ use sp_runtime::traits::Block as BlockT;
 use edgeware_executor::NativeExecutor;
 use sc_network::NetworkService;
 use sc_offchain::OffchainWorkers;
-
-construct_simple_protocol! {
-	/// Demo protocol attachment for substrate.
-	pub struct NodeProtocol where Block = Block { }
-}
 
 /// Starts a `ServiceBuilder` for a full service.
 ///
@@ -78,14 +72,13 @@ macro_rules! new_full_start {
 					grandpa_block_import.clone(), client.clone(),
 				);
 
-				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
-					sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>(
+					sc_consensus_aura::slot_duration(&*client)?,
 					aura_block_import,
 					Some(Box::new(grandpa_block_import.clone())),
 					None,
 					client,
 					inherent_data_providers.clone(),
-					Some(_transaction_pool),
 				)?;
 
 				import_setup = Some((grandpa_block_import, grandpa_link));
@@ -135,7 +128,7 @@ macro_rules! new_full {
 
 		let (builder, mut import_setup, inherent_data_providers) = new_full_start!($config);
 
-		let service = builder.with_network_protocol(|_| Ok(crate::service::NodeProtocol::new()))?
+		let service = builder
 			.with_finality_proof_provider(|client, backend|
 				Ok(Arc::new(sc_finality_grandpa::FinalityProofProvider::new(backend, client)) as _)
 			)?
@@ -160,7 +153,7 @@ macro_rules! new_full {
 				sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
 
 			let aura = sc_consensus_aura::start_aura::<_, _, _, _, _, sp_consensus_aura::ed25519::AuthorityPair, _, _, _>(
-				sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+				sc_consensus_aura::slot_duration(&*client)?,
 				client,
 				select_chain,
 				block_import,
@@ -244,9 +237,7 @@ macro_rules! new_full {
 	}}
 }
 
-#[allow(dead_code)]
 type ConcreteBlock = edgeware_primitives::Block;
-#[allow(dead_code)]
 type ConcreteClient =
 	Client<
 		Backend<ConcreteBlock>,
@@ -255,15 +246,13 @@ type ConcreteClient =
 		ConcreteBlock,
 		edgeware_runtime::RuntimeApi
 	>;
-#[allow(dead_code)]
 type ConcreteBackend = Backend<ConcreteBlock>;
-#[allow(dead_code)]
 type ConcreteTransactionPool = sc_transaction_pool::BasicPool<
 	sc_transaction_pool::FullChainApi<ConcreteClient, ConcreteBlock>,
 	ConcreteBlock
 >;
 
-/// A specialized configuration object for setting up the node.
+/// A specialized configuration object for setting up the node..
 pub type NodeConfiguration = Configuration<GenesisConfig, crate::chain_spec::Extensions>;
 
 /// Builds a new service for a full client.
@@ -274,7 +263,7 @@ pub fn new_full(config: NodeConfiguration)
 		ConcreteClient,
 		LongestChain<ConcreteBackend, ConcreteBlock>,
 		NetworkStatus<ConcreteBlock>,
-		NetworkService<ConcreteBlock, crate::service::NodeProtocol, <ConcreteBlock as BlockT>::Hash>,
+		NetworkService<ConcreteBlock, <ConcreteBlock as BlockT>::Hash>,
 		ConcreteTransactionPool,
 		OffchainWorkers<
 			ConcreteClient,
@@ -322,19 +311,17 @@ pub fn new_light(config: NodeConfiguration)
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, ()>(
-				sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>(
+				sc_consensus_aura::slot_duration(&*client)?,
 				grandpa_block_import,
 				None,
 				Some(Box::new(finality_proof_import)),
 				client,
 				inherent_data_providers.clone(),
-				None,
 			)?;
 
 			Ok((import_queue, finality_proof_request_builder))
 		})?
-		.with_network_protocol(|_| Ok(NodeProtocol::new()))?
 		.with_finality_proof_provider(|client, backend|
 			Ok(Arc::new(GrandpaFinalityProofProvider::new(backend, client)) as _)
 		)?

@@ -29,6 +29,15 @@ use sp_runtime::Perbill;
 
 /// Create genesis runtime configuration for tests.
 pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig {
+	let endowed = vec![
+		(alice(), 111 * DOLLARS),
+		(bob(), 100 * DOLLARS),
+		(charlie(), 100_000_000 * DOLLARS),
+		(dave(), 111 * DOLLARS),
+		(eve(), 101 * DOLLARS),
+		(ferdie(), 100 * DOLLARS),
+	];
+
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
 			changes_trie_config: if support_changes_trie { Some(ChangesTrieConfiguration {
@@ -41,26 +50,19 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 			indices: vec![],
 		}),
 		pallet_balances: Some(BalancesConfig {
-			balances: vec![
-				(alice(), 111 * DOLLARS),
-				(bob(), 100 * DOLLARS),
-				(charlie(), 100_000_000 * DOLLARS),
-				(dave(), 111 * DOLLARS),
-				(eve(), 101 * DOLLARS),
-				(ferdie(), 100 * DOLLARS),
-			],
+			balances: endowed,
 		}),
 		pallet_session: Some(SessionConfig {
 			keys: vec![
-				(alice(), to_session_keys(
+				(dave(), alice(), to_session_keys(
 					&Ed25519Keyring::Alice,
 					&Sr25519Keyring::Alice,
 				)),
-				(bob(), to_session_keys(
+				(eve(), bob(), to_session_keys(
 					&Ed25519Keyring::Bob,
 					&Sr25519Keyring::Bob,
 				)),
-				(charlie(), to_session_keys(
+				(ferdie(), charlie(), to_session_keys(
 					&Ed25519Keyring::Charlie,
 					&Sr25519Keyring::Charlie,
 				)),
