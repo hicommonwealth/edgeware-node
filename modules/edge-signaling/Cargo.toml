@@ -9,16 +9,16 @@ serde = { version = "1.0", default-features = false, optional = true }
 serde_derive = { version = "1.0", optional = true }
 safe-mix = { version = "1.0", default-features = false }
 codec = { package = "parity-scale-codec", version = "1.0.6", default-features = false, features = ["derive"] }
-sp-std = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-sp-runtime = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-frame-support = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-frame-system = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-pallet-balances = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
+sp-std = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
 voting = { package ="edge-voting", path = "../edge-voting", default-features = false }
 
 [dev-dependencies]
-sp-io = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-sp-core = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
 
 [features]
 default = ["std"]

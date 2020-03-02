@@ -41,46 +41,46 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-consensus-aura = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup"}
-sp-finality-grandpa = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-core = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-runtime = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-timestamp = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-sp-finality-tracker = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-sp-inherents = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-keyring = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-io = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-consensus = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git"}
+sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
 
 # client dependencies
-sc-client-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-client = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-chain-spec = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-transaction-pool = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sp-transaction-pool = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-network = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-consensus-aura = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-finality-grandpa = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-client-db = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-offchain = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-rpc = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-basic-authorship = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-service = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-sc-telemetry = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-authority-discovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-tracing = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-client = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-network = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git" }
 
 # frame dependencies
-pallet-indices = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-pallet-timestamp = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-pallet-contracts = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-frame-system = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-pallet-balances = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-pallet-transaction-payment = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-frame-support = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-pallet-im-online = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", default-features = false }
-pallet-authority-discovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git" }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git" }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -89,31 +89,31 @@ edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
-sc-cli = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", optional = true }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
 edgeware-transaction-factory = { version = "3.0.0", optional = true, path = "../transaction-factory" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git" }
 
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", optional = true }
+browser-utils = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
 
 [dev-dependencies]
-sc-keystore = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
-sc-service-test = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git" }
 futures = "0.3.1"
 tempfile = "3.1.0"
 
 [build-dependencies]
-sc-cli = { git = "https://github.com/drewstone/substrate.git", branch = "drew.customup", optional = true }
-build-script-utils = { package = "substrate-build-script-utils", git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
+build-script-utils = { package = "substrate-build-script-utils", git = "https://github.com/hicommonwealth/substrate.git" }
 structopt = { version = "0.3.8", optional = true }
 vergen = { version = "3.0.4", optional = true }
 edgeware-transaction-factory = { version = "3.0.0", optional = true, path = "../transaction-factory" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/drewstone/substrate.git", branch = "drew.customup" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git" }
 
 
 [features]
