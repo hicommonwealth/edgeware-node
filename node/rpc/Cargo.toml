@@ -18,4 +18,4 @@ sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
 sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git" }
 
 edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
+edgeware-runtime = { path = "../runtime/edgeware" }

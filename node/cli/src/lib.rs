@@ -31,7 +31,7 @@
 pub mod chain_spec;
 
 #[macro_use]
-mod service;
+pub mod service;
 #[cfg(feature = "browser")]
 mod browser;
 #[cfg(feature = "cli")]

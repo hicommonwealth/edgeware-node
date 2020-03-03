@@ -29,6 +29,6 @@ wabt = "0.9.2"
 
 edgeware-executor = { path = "../executor" }
 edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
+edgeware-runtime = { path = "../runtime/edgeware" }
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling" }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward" }

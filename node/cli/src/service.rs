@@ -27,10 +27,11 @@ use edgeware_executor;
 use edgeware_primitives::Block;
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use sc_service::{
-	AbstractService, ServiceBuilder, config::Configuration, error::{Error as ServiceError},
+	AbstractService, ServiceBuilder, config::Configuration, error::{Error as ServiceError}
 };
-use sp_inherents::InherentDataProviders;
 
+use sp_inherents::InherentDataProviders;
+use sc_network::construct_simple_protocol;
 use sc_service::{Service, NetworkStatus};
 use sc_client::{Client, LocalCallExecutor};
 use sc_client_db::Backend;
@@ -38,6 +39,12 @@ use sp_runtime::traits::Block as BlockT;
 use edgeware_executor::NativeExecutor;
 use sc_network::NetworkService;
 use sc_offchain::OffchainWorkers;
+pub use crate::ChainSpec;
+
+construct_simple_protocol! {
+	/// Demo protocol attachment for substrate.
+	pub struct NodeProtocol where Block = Block { }
+}
 
 /// Starts a `ServiceBuilder` for a full service.
 ///
@@ -128,7 +135,7 @@ macro_rules! new_full {
 
 		let (builder, mut import_setup, inherent_data_providers) = new_full_start!($config);
 
-		let service = builder
+		let service = builder.with_network_protocol(|_| Ok(crate::service::NodeProtocol::new()))?
 			.with_finality_proof_provider(|client, backend|
 				Ok(Arc::new(sc_finality_grandpa::FinalityProofProvider::new(backend, client)) as _)
 			)?
@@ -237,6 +244,8 @@ macro_rules! new_full {
 	}}
 }
 
+
+/// Concrete configuration for Edgeware runtime
 type ConcreteBlock = edgeware_primitives::Block;
 type ConcreteClient =
 	Client<
@@ -263,7 +272,7 @@ pub fn new_full(config: NodeConfiguration)
 		ConcreteClient,
 		LongestChain<ConcreteBackend, ConcreteBlock>,
 		NetworkStatus<ConcreteBlock>,
-		NetworkService<ConcreteBlock, <ConcreteBlock as BlockT>::Hash>,
+		NetworkService<ConcreteBlock, crate::service::NodeProtocol, <ConcreteBlock as BlockT>::Hash>,
 		ConcreteTransactionPool,
 		OffchainWorkers<
 			ConcreteClient,
@@ -322,6 +331,7 @@ pub fn new_light(config: NodeConfiguration)
 
 			Ok((import_queue, finality_proof_request_builder))
 		})?
+		.with_network_protocol(|_| Ok(NodeProtocol::new()))?
 		.with_finality_proof_provider(|client, backend|
 			Ok(Arc::new(GrandpaFinalityProofProvider::new(backend, client)) as _)
 		)?
