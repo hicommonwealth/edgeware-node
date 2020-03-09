@@ -1,17 +1,22 @@
 [package]
 name = "edgeware-cli"
-version = "3.0.2"
+version = "3.0.3"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 build = "build.rs"
 edition = "2018"
 default-run = "edgeware"
 
+[package.metadata.wasm-pack.profile.release]
+# `wasm-opt` has some problems on linux, see
+# https://github.com/rustwasm/wasm-pack/issues/781 etc.
+wasm-opt = false
+
 [badges]
-travis-ci = { repository = "paritytech/substrate", branch = "master" }
+travis-ci = { repository = "hicommonwealth/edgeware-node", branch = "master" }
 maintenance = { status = "actively-developed" }
-is-it-maintained-issue-resolution = { repository = "paritytech/substrate" }
-is-it-maintained-open-issues = { repository = "paritytech/substrate" }
+is-it-maintained-issue-resolution = { repository = "hicommonwealth/edgeware-node" }
+is-it-maintained-open-issues = { repository = "hicommonwealth/edgeware-node" }
 
 [[bin]]
 name = "edgeware"
@@ -36,75 +41,89 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { git = "https://github.com/paritytech/substrate.git" }
-sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git"}
-sp-finality-grandpa = { git = "https://github.com/paritytech/substrate.git" }
-sp-core = { git = "https://github.com/paritytech/substrate.git" }
-sp-runtime = { git = "https://github.com/paritytech/substrate.git" }
-sp-timestamp = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-sp-finality-tracker = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-sp-inherents = { git = "https://github.com/paritytech/substrate.git" }
-sp-keyring = { git = "https://github.com/paritytech/substrate.git" }
-sp-io = { git = "https://github.com/paritytech/substrate.git" }
-sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
+sp-api = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git"}
+sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-offchain = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-session = { git = "https://github.com/hicommonwealth/substrate.git" }
+
 
 # client dependencies
-sc-client-api = { git = "https://github.com/paritytech/substrate.git" }
-sc-client = { git = "https://github.com/paritytech/substrate.git" }
-sc-chain-spec = { git = "https://github.com/paritytech/substrate.git" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate.git" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git" }
-sc-network = { git = "https://github.com/paritytech/substrate.git" }
-sc-consensus-aura = { git = "https://github.com/paritytech/substrate.git" }
-sc-finality-grandpa = { git = "https://github.com/paritytech/substrate.git" }
-sc-client-db = { git = "https://github.com/paritytech/substrate.git" }
-sc-offchain = { git = "https://github.com/paritytech/substrate.git" }
-sc-rpc = { git = "https://github.com/paritytech/substrate.git" }
-sc-basic-authorship = { git = "https://github.com/paritytech/substrate.git" }
-sc-service = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-sc-telemetry = { git = "https://github.com/paritytech/substrate.git" }
-sc-authority-discovery = { git = "https://github.com/paritytech/substrate.git" }
-sc-tracing = { git = "https://github.com/paritytech/substrate.git" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-client = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-executor = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-network = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git" }
 
 # frame dependencies
-pallet-indices = { git = "https://github.com/paritytech/substrate.git" }
-pallet-timestamp = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-pallet-contracts = { git = "https://github.com/paritytech/substrate.git" }
-frame-system = { git = "https://github.com/paritytech/substrate.git" }
-pallet-balances = { git = "https://github.com/paritytech/substrate.git" }
-pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git" }
-frame-support = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-pallet-im-online = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git" }
+pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git" }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git" }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
+frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git" }
 
 # node-specific dependencies
-edgeware-runtime = { path = "../runtime" }
+edgeware-runtime = { path = "../runtime/edgeware" }
 edgeware-rpc = { path = "../rpc" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
-sc-cli = { git = "https://github.com/paritytech/substrate.git", optional = true }
-node-transaction-factory = { git = "https://github.com/paritytech/substrate.git", optional = true }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
+edgeware-transaction-factory = { optional = true, path = "../transaction-factory" }
+edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git" }
 
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { git = "https://github.com/paritytech/substrate.git", optional = true }
+browser-utils = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
 
 [dev-dependencies]
-sc-keystore = { git = "https://github.com/paritytech/substrate.git" }
-sc-service-test = { git = "https://github.com/paritytech/substrate.git" }
+sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git" }
 futures = "0.3.1"
 tempfile = "3.1.0"
 
 [build-dependencies]
-sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git", optional = true }
-build-script-utils = { package = "substrate-build-script-utils", git = "https://github.com/paritytech/substrate.git" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
+build-script-utils = { package = "substrate-build-script-utils", git = "https://github.com/hicommonwealth/substrate.git" }
 structopt = { version = "0.3.8", optional = true }
 vergen = { version = "3.0.4", optional = true }
-node-transaction-factory = { version = "0.8.0", optional = true, git = "https://github.com/paritytech/substrate.git" }
+edgeware-transaction-factory = { optional = true, path = "../transaction-factory" }
+edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git" }
+
 
 [features]
 default = ["cli", "wasmtime"]
@@ -115,9 +134,12 @@ browser = [
 ]
 cli = [
 	"sc-cli",
-	"node-transaction-factory",
-	"sc-service/rocksdb",
+	"edgeware-transaction-factory",
+	"edgeware-inspect",
 	"edgeware-executor/wasmi-errno",
+	"sc-cli",
+	"frame-benchmarking-cli",
+	"sc-service/rocksdb",
 	"vergen",
 	"structopt",
 ]

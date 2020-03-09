@@ -43,11 +43,10 @@ decl_module! {
 			if <frame_system::Module<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
 				<T as pallet_staking::Trait>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
-				<Pot<T>>::put(<pallet_balances::Module<T>>::free_balance(&<pallet_treasury::Module<T>>::account_id()));
 				Self::deposit_event(RawEvent::TreasuryMinting(
-					Self::pot(),
-					reward,
-					<frame_system::Module<T>>::block_number())
+					<pallet_balances::Module<T>>::free_balance(<pallet_treasury::Module<T>>::account_id()),
+					<frame_system::Module<T>>::block_number(),
+					<pallet_treasury::Module<T>>::account_id())
 				);
 			}
 		}
@@ -56,10 +55,9 @@ decl_module! {
 
 decl_event!(
 	pub enum Event<T> where <T as frame_system::Trait>::BlockNumber,
-							Balance2 = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance,
-							Balance = <T as pallet_balances::Trait>::Balance
-							{
-		TreasuryMinting(Balance, Balance2, BlockNumber),
+							<T as frame_system::Trait>::AccountId,
+							Balance = <T as pallet_balances::Trait>::Balance {
+		TreasuryMinting(Balance, BlockNumber, AccountId),
 	}
 );
 
@@ -69,7 +67,5 @@ decl_storage! {
 		pub MintingInterval get(fn minting_interval) config(): T::BlockNumber;
 		/// Current payout of module
 		pub CurrentPayout get(fn current_payout) config(): BalanceOf<T>;
-		/// Current pot
-		pub Pot get(fn pot): T::Balance;
 	}
 }

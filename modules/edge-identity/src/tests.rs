@@ -62,30 +62,24 @@ impl frame_system::Trait for Test {
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
 	type ModuleToIndex = ();
+	type AccountData = pallet_balances::AccountData<u128>;
+	type OnNewAccount = ();
+	type OnKilledAccount = ();
 }
 
+
 parameter_types! {
-	pub const ExistentialDeposit: u128 = 0;
-	pub const TransferFee: u128 = 0;
-	pub const CreationFee: u128 = 0;
+	pub const ExistentialDeposit: u128 = 1;
 }
 
 impl pallet_balances::Trait for Test {
-	/// The type for recording an account's balance.
 	type Balance = u128;
-	/// What to do if an account's free balance gets zeroed.
-	type OnFreeBalanceZero = ();
-	/// What to do if a new account is created.
-	type OnNewAccount = ();
-	/// The ubiquitous event type.
-	type Event = ();
 	type DustRemoval = ();
-	type TransferPayment = ();
+	type Event = ();
 	type ExistentialDeposit = ExistentialDeposit;
-	type TransferFee = TransferFee;
-	type CreationFee = CreationFee;
-	type OnReapAccount = ();
+	type AccountStore = frame_system::Module<Test>;
 }
+
 
 impl Trait for Test {
 	type Event = ();
@@ -114,7 +108,6 @@ fn new_test_ext() -> sp_io::TestExternalities {
 			(3, 100),
 			(4, 100),
 		],
-		vesting: vec![],
 	}.assimilate_storage(&mut t).unwrap();
 	t.into()
 }

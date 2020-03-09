@@ -27,10 +27,11 @@ use sp_core::{H256, crypto::key_types};
 
 
 use frame_support::{parameter_types, impl_outer_origin};
+use frame_support::{traits::Contains};
 
 use sp_runtime::{
 	Perbill, Permill, KeyTypeId,
-	testing::{Header},
+	testing::{Header}, Percent,
 	traits::{OnFinalize, IdentityLookup, One},
 };
 
@@ -105,7 +106,7 @@ impl frame_system::Trait for Test {
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = sp_runtime::traits::BlakeTwo256;
+	type Hashing = ::sp_runtime::traits::BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
@@ -116,28 +117,22 @@ impl frame_system::Trait for Test {
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
 	type ModuleToIndex = ();
+	type AccountData = pallet_balances::AccountData<u128>;
+	type OnNewAccount = ();
+	type OnKilledAccount = ();
 }
 
+
 parameter_types! {
-	pub const ExistentialDeposit: u128 = 0;
-	pub const TransferFee: u128 = 0;
-	pub const CreationFee: u128 = 0;
+	pub const ExistentialDeposit: u128 = 1;
 }
 
 impl pallet_balances::Trait for Test {
-	/// The type for recording an account's balance.
 	type Balance = u128;
-	/// What to do if an account's free balance gets zeroed.
-	type OnFreeBalanceZero = ();
-	/// What to do if a new account is created.
-	type OnNewAccount = ();
-	/// The ubiquitous event type.
-	type Event = ();
 	type DustRemoval = ();
-	type TransferPayment = ();
+	type Event = ();
 	type ExistentialDeposit = ExistentialDeposit;
-	type TransferFee = TransferFee;
-	type CreationFee = CreationFee;
+	type AccountStore = frame_system::Module<Test>;
 }
 
 parameter_types! {
@@ -148,15 +143,14 @@ parameter_types! {
 }
 
 impl pallet_session::Trait for Test {
-	type OnSessionEnding = pallet_session::historical::NoteHistoricalRoot<Test, Staking>;
 	type Keys = UintAuthorityId;
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
 	type SessionHandler = TestSessionHandler;
 	type Event = ();
 	type ValidatorId = AccountId;
 	type ValidatorIdOf = pallet_staking::StashOf<Test>;
-	type SelectInitialValidators = Staking;
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+	type SessionManager = Staking;
 }
 
 impl pallet_session::historical::Trait for Test {
@@ -211,6 +205,20 @@ parameter_types! {
 	pub const ProposalBondMinimum: u64 = 1;
 	pub const SpendPeriod: u64 = 2;
 	pub const Burn: Permill = Permill::from_percent(50);
+	pub const TipCountdown: u64 = 1;
+	pub const TipFindersFee: Percent = Percent::from_percent(20);
+	pub const TipReportDepositBase: Balance = 1;
+	pub const TipReportDepositPerByte: Balance = 1;
+}
+
+pub struct TenToFourteen;
+impl Contains<u64> for TenToFourteen {
+	fn contains(n: &u64) -> bool {
+		*n >= 10 && *n <= 14
+	}
+	fn sorted_members() -> Vec<u64> {
+		vec![10, 11, 12, 13, 14]
+	}
 }
 
 impl pallet_treasury::Trait for Test {
@@ -223,6 +231,11 @@ impl pallet_treasury::Trait for Test {
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
+	type Tippers = TenToFourteen;
+	type TipCountdown = TipCountdown;
+	type TipFindersFee = TipFindersFee;
+	type TipReportDepositBase = TipReportDepositBase;
+	type TipReportDepositPerByte = TipReportDepositPerByte;
 }
 
 impl Trait for Test {
@@ -275,7 +288,6 @@ impl ExtBuilder {
 					// This allow us to have a total_payout different from 0.
 					(999, 1_000_000_000_000),
 			],
-			vesting: vec![],
 		}.assimilate_storage(&mut t).unwrap();
 		
 		pallet_staking::GenesisConfig::<Test> {

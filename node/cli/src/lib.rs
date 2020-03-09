@@ -27,12 +27,11 @@
 //! hasn't been tested.
 
 #![warn(missing_docs)]
-#![warn(unused_extern_crates)]
 
 pub mod chain_spec;
 
 #[macro_use]
-mod service;
+pub mod service;
 #[cfg(feature = "browser")]
 mod browser;
 #[cfg(feature = "cli")]

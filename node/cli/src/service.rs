@@ -27,11 +27,11 @@ use edgeware_executor;
 use edgeware_primitives::Block;
 use edgeware_runtime::{GenesisConfig, RuntimeApi};
 use sc_service::{
-	AbstractService, ServiceBuilder, config::Configuration, error::{Error as ServiceError},
+	AbstractService, ServiceBuilder, config::Configuration, error::{Error as ServiceError}
 };
+
 use sp_inherents::InherentDataProviders;
 use sc_network::construct_simple_protocol;
-
 use sc_service::{Service, NetworkStatus};
 use sc_client::{Client, LocalCallExecutor};
 use sc_client_db::Backend;
@@ -39,6 +39,7 @@ use sp_runtime::traits::Block as BlockT;
 use edgeware_executor::NativeExecutor;
 use sc_network::NetworkService;
 use sc_offchain::OffchainWorkers;
+pub use crate::ChainSpec;
 
 construct_simple_protocol! {
 	/// Demo protocol attachment for substrate.
@@ -63,8 +64,7 @@ macro_rules! new_full_start {
 			})?
 			.with_transaction_pool(|config, client, _fetcher| {
 				let pool_api = sc_transaction_pool::FullChainApi::new(client.clone());
-				let pool = sc_transaction_pool::BasicPool::new(config, std::sync::Arc::new(pool_api));
-				Ok(pool)
+				Ok(sc_transaction_pool::BasicPool::new(config, std::sync::Arc::new(pool_api)))
 			})?
 			.with_import_queue(|_config, client, mut select_chain, _transaction_pool| {
 				let select_chain = select_chain.take()
@@ -79,21 +79,26 @@ macro_rules! new_full_start {
 					grandpa_block_import.clone(), client.clone(),
 				);
 
-				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
-					sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>(
+					sc_consensus_aura::slot_duration(&*client)?,
 					aura_block_import,
 					Some(Box::new(grandpa_block_import.clone())),
 					None,
 					client,
 					inherent_data_providers.clone(),
-					Some(_transaction_pool),
 				)?;
 
 				import_setup = Some((grandpa_block_import, grandpa_link));
 				Ok(import_queue)
 			})?
-			.with_rpc_extensions(|client, pool, _backend, fetcher, _remote_blockchain| -> Result<RpcExtension, _> {
-				Ok(edgeware_rpc::create(client, pool, edgeware_rpc::LightDeps::none(fetcher)))
+			.with_rpc_extensions(|builder| -> Result<RpcExtension, _> {
+				let deps = edgeware_rpc::FullDeps {
+					client: builder.client().clone(),
+					pool: builder.pool(),
+					select_chain: builder.select_chain().cloned()
+						.expect("SelectChain is present for full services or set up failed; qed."),
+				};
+				Ok(edgeware_rpc::create_full(deps))
 			})?;
 
 		(builder, import_setup, inherent_data_providers)
@@ -155,7 +160,7 @@ macro_rules! new_full {
 				sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
 
 			let aura = sc_consensus_aura::start_aura::<_, _, _, _, _, sp_consensus_aura::ed25519::AuthorityPair, _, _, _>(
-				sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+				sc_consensus_aura::slot_duration(&*client)?,
 				client,
 				select_chain,
 				block_import,
@@ -218,7 +223,6 @@ macro_rules! new_full {
 				on_exit: service.on_exit(),
 				telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
 				voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
-				executor: service.spawn_task_handle(),
 			};
 
 			service.spawn_essential_task(
@@ -240,9 +244,9 @@ macro_rules! new_full {
 	}}
 }
 
-#[allow(dead_code)]
+
+/// Concrete configuration for Edgeware runtime
 type ConcreteBlock = edgeware_primitives::Block;
-#[allow(dead_code)]
 type ConcreteClient =
 	Client<
 		Backend<ConcreteBlock>,
@@ -251,15 +255,13 @@ type ConcreteClient =
 		ConcreteBlock,
 		edgeware_runtime::RuntimeApi
 	>;
-#[allow(dead_code)]
 type ConcreteBackend = Backend<ConcreteBlock>;
-#[allow(dead_code)]
 type ConcreteTransactionPool = sc_transaction_pool::BasicPool<
 	sc_transaction_pool::FullChainApi<ConcreteClient, ConcreteBlock>,
 	ConcreteBlock
 >;
 
-/// A specialized configuration object for setting up the node.
+/// A specialized configuration object for setting up the node..
 pub type NodeConfiguration = Configuration<GenesisConfig, crate::chain_spec::Extensions>;
 
 /// Builds a new service for a full client.
@@ -318,14 +320,13 @@ pub fn new_light(config: NodeConfiguration)
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, ()>(
-				sc_consensus_aura::SlotDuration::get_or_compute(&*client)?,
+			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>(
+				sc_consensus_aura::slot_duration(&*client)?,
 				grandpa_block_import,
 				None,
 				Some(Box::new(finality_proof_import)),
 				client,
 				inherent_data_providers.clone(),
-				None,
 			)?;
 
 			Ok((import_queue, finality_proof_request_builder))
@@ -334,14 +335,19 @@ pub fn new_light(config: NodeConfiguration)
 		.with_finality_proof_provider(|client, backend|
 			Ok(Arc::new(GrandpaFinalityProofProvider::new(backend, client)) as _)
 		)?
-		.with_rpc_extensions(|client, pool, _backend, fetcher, remote_blockchain| -> Result<RpcExtension, _> {
-			let fetcher = fetcher
+		.with_rpc_extensions(|builder,| -> Result<RpcExtension, _> {
+			let fetcher = builder.fetcher()
 				.ok_or_else(|| "Trying to start node RPC without active fetcher")?;
-			let remote_blockchain = remote_blockchain
+			let remote_blockchain = builder.remote_backend()
 				.ok_or_else(|| "Trying to start node RPC without active remote blockchain")?;
 
-			let light_deps = edgeware_rpc::LightDeps { remote_blockchain, fetcher };
-			Ok(edgeware_rpc::create(client, pool, Some(light_deps)))
+			let light_deps = edgeware_rpc::LightDeps {
+				remote_blockchain,
+				fetcher,
+				client: builder.client().clone(),
+				pool: builder.pool(),
+			};
+			Ok(edgeware_rpc::create_light(light_deps))
 		})?
 		.build()?;
 

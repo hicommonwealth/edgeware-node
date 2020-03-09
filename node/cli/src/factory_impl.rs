@@ -32,7 +32,7 @@ use sp_core::{sr25519, crypto::Pair};
 use sp_runtime::{
 	generic::Era, traits::{Block as BlockT, Header as HeaderT, SignedExtension, Verify, IdentifyAccount}
 };
-use node_transaction_factory::RuntimeAdapter;
+use edgeware_transaction_factory::RuntimeAdapter;
 use sp_inherents::InherentData;
 use sp_timestamp;
 use sp_finality_tracker;
