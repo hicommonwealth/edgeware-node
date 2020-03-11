@@ -5,15 +5,15 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
-sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-client = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate.git" }
+sc-cli = { git = "https://github.com/paritytech/substrate.git" }
+sc-client-api = { git = "https://github.com/paritytech/substrate.git" }
+sc-client = { git = "https://github.com/paritytech/substrate.git" }
 codec = { package = "parity-scale-codec", version = "1.0.0", features = ["derive"] }
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
 log = "0.4.8"
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-core = { git = "https://github.com/paritytech/substrate.git" }
+sp-api = { git = "https://github.com/paritytech/substrate.git" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git" }
+sc-service = { git = "https://github.com/paritytech/substrate.git" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate.git" }

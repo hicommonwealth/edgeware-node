@@ -202,7 +202,6 @@ pub fn testnet_genesis(
 			}).collect::<Vec<_>>(),
 		}),
 		pallet_staking: Some(StakingConfig {
-			current_era: 0,
 			validator_count: 20,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities.iter().map(|x| {
@@ -443,7 +442,6 @@ pub fn mainnet_genesis(
 			}).collect::<Vec<_>>(),
 		}),
 		pallet_staking: Some(StakingConfig {
-			current_era: 0,
 			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities.iter().map(|x| {

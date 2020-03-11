@@ -182,6 +182,7 @@ parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: pallet_staking::EraIndex = 3;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
+	pub const MaxNominatorRewardedPerValidator: u32 = 64;
 }
 
 impl pallet_staking::Trait for Test {
@@ -198,6 +199,7 @@ impl pallet_staking::Trait for Test {
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
 	type RewardCurve = RewardCurve;
+	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 }
 
 parameter_types! {
@@ -291,7 +293,6 @@ impl ExtBuilder {
 		}.assimilate_storage(&mut t).unwrap();
 		
 		pallet_staking::GenesisConfig::<Test> {
-			current_era: 0,
 			stakers: vec![],
 			validator_count: 2,
 			minimum_validator_count: 0,

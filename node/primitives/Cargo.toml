@@ -5,11 +5,11 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 
 [dev-dependencies]
-sp-serializer = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-serializer = { git = "https://github.com/paritytech/substrate.git" }
 pretty_assertions = "0.6.1"
 
 [features]
