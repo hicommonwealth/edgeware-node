@@ -20,34 +20,34 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit="256"]
 
-use sp_std::prelude::*;
-use frame_support::{
+pub use sp_std::prelude::*;
+pub use frame_support::{
 	construct_runtime, parameter_types, traits::{SplitTwoWays, Currency, Randomness}, debug
 };
-use sp_core::u32_trait::{_1, _2, _3, _4};
-use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature};
-use sp_api::impl_runtime_apis;
-use sp_runtime::{Permill, Perbill, Percent, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
-use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::transaction_validity::TransactionValidity;
-use frame_support::weights::Weight;
-use sp_runtime::traits::{
+pub use sp_core::u32_trait::{_1, _2, _3, _4};
+pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature};
+pub use sp_api::impl_runtime_apis;
+pub use sp_runtime::{Permill, Perbill, Percent, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
+pub use sp_runtime::curve::PiecewiseLinear;
+pub use sp_runtime::transaction_validity::TransactionValidity;
+pub use frame_support::weights::Weight;
+pub use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
 	OpaqueKeys, ConvertInto
 };
-use sp_version::RuntimeVersion;
+pub use sp_version::RuntimeVersion;
 #[cfg(any(feature = "std", test))]
-use sp_version::NativeVersion;
-use sp_core::OpaqueMetadata;
-use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use pallet_grandpa::AuthorityList as GrandpaAuthorityList;
-use pallet_grandpa::fg_primitives;
-use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
-use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
-use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
-use pallet_contracts_rpc_runtime_api::ContractExecResult;
-use frame_system::offchain::TransactionSubmitter;
-use sp_inherents::{InherentData, CheckInherentsResult};
+pub use sp_version::NativeVersion;
+pub use sp_core::{Blake2Hasher, OpaqueMetadata, U256};
+pub use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+pub use pallet_grandpa::AuthorityList as GrandpaAuthorityList;
+pub use pallet_grandpa::fg_primitives;
+pub use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
+pub use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+pub use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
+pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
+pub use frame_system::offchain::TransactionSubmitter;
+pub use sp_inherents::{InherentData, CheckInherentsResult};
 
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
@@ -56,6 +56,7 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_contracts::Gas;
 pub use frame_support::StorageValue;
 pub use pallet_staking::StakerStatus;
+pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -493,16 +494,6 @@ parameter_types! {
 	pub const MaxLength: usize = 16;
 }
 
-impl pallet_nicks::Trait for Runtime {
-	type Event = Event;
-	type Currency = Balances;
-	type ReservationFee = ReservationFee;
-	type Slashed = Treasury;
-	type ForceOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
-	type MinLength = MinLength;
-	type MaxLength = MaxLength;
-}
-
 impl frame_system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for Runtime {
 	type Public = <Signature as traits::Verify>::Signer;
 	type Signature = Signature;
@@ -559,6 +550,23 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
+// EVM structs
+pub struct FixedGasPrice;
+impl FeeCalculator for FixedGasPrice {
+	fn min_gas_price() -> U256 {
+		// Gas price is always one token per gas.
+		1.into()
+	}
+}
+
+impl pallet_evm::Trait for Runtime {
+	type FeeCalculator = FixedGasPrice;
+	type ConvertAccountId = HashTruncateConvertAccountId<Blake2Hasher>;
+	type Currency = Balances;
+	type Event = Event;
+	type Precompiles = ();
+}
+
 impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
@@ -605,9 +613,9 @@ construct_runtime!(
 		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
 		Offences: pallet_offences::{Module, Call, Storage, Event},
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
-		Nicks: pallet_nicks::{Module, Call, Storage, Event<T>},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
+		Evm: pallet_evm::{Module, Config, Call, Storage, Event},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

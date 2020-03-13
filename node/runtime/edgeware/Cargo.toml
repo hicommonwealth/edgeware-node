@@ -48,6 +48,7 @@ pallet-contracts-primitives = { git = "https://github.com/paritytech/substrate.g
 pallet-contracts-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-democracy = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+pallet-evm = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 frame-executive = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-finality-tracker = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -100,6 +101,7 @@ std = [
 	"pallet-contracts/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
+	"pallet-evm/std",
 	"frame-executive/std",
 	"pallet-finality-tracker/std",
 	"pallet-grandpa/std",
