@@ -57,6 +57,7 @@ pub use pallet_contracts::Gas;
 pub use frame_support::StorageValue;
 pub use pallet_staking::StakerStatus;
 pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
+pub use pallet_evm::Account as EVMAccount;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
