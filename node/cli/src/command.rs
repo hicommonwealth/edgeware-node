@@ -46,7 +46,7 @@ where
 			cmd.update_config(&mut config, load_spec, &version)?;
 
 			let client = sc_service::new_full_client::<
-				edgeware_runtime::Block, edgeware_runtime::RuntimeApi, edgeware_executor::Executor, _, _,
+				edgeware_runtime::Block, edgeware_runtime::RuntimeApi, edgeware_executor::Executor,
 			>(&config)?;
 			let inspect = edgeware_inspect::Inspector::<edgeware_runtime::Block>::new(client);
 
@@ -56,7 +56,7 @@ where
 			cmd.init(&version)?;
 			cmd.update_config(&mut config, load_spec, &version)?;
 
-			cmd.run::<_, _, edgeware_runtime::Block, edgeware_executor::Executor>(config)
+			cmd.run::<edgeware_runtime::Block, edgeware_executor::Executor>(config)
 		},
 		Some(Subcommand::Factory(cli_args)) => {
 			cli_args.shared_params.init(&version)?;
@@ -94,7 +94,7 @@ where
 			);
 
 			let service_builder = new_full_start!(config).0;
-			edgeware_transaction_factory::factory::<FactoryState<_>, _, _, _, _, _>(
+			edgeware_transaction_factory::factory(
 				factory_state,
 				service_builder.client(),
 				service_builder.select_chain()
@@ -108,7 +108,7 @@ where
 			subcommand.update_config(&mut config, load_spec, &version)?;
 			subcommand.run(
 				config,
-				|config: service::NodeConfiguration| Ok(new_full_start!(config).0),
+				|config: sc_service::Configuration| Ok(new_full_start!(config).0),
 			)
 		},
 	}

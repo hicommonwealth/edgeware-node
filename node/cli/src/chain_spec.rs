@@ -22,7 +22,7 @@ use serde::{Serialize, Deserialize};
 use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
-	SudoConfig, SystemConfig, VestingConfig, WASM_BINARY,
+	SudoConfig, SystemConfig, VestingConfig, EVMConfig, WASM_BINARY,
 	SignalingConfig, TreasuryRewardConfig,
 };
 use edgeware_runtime::Block;
@@ -80,7 +80,7 @@ pub struct Extensions {
 }
 
 /// Specialized `ChainSpec`.
-pub type ChainSpec = sc_service::ChainSpec<
+pub type ChainSpec = sc_service::GenericChainSpec<
 	GenesisConfig,
 	Extensions,
 >;
@@ -249,6 +249,9 @@ pub fn testnet_genesis(
 		}),
 		pallet_vesting: Some(VestingConfig {
 			vesting: vesting,
+		}),
+		pallet_evm: Some(EVMConfig {
+			accounts: vec![],
 		}),
 	}
 }
@@ -489,6 +492,9 @@ pub fn mainnet_genesis(
 		}),
 		pallet_vesting: Some(VestingConfig {
 			vesting: vesting,
+		}),
+		pallet_evm: Some(EVMConfig {
+			accounts: vec![],
 		}),
 	}
 }

@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-cli"
-version = "3.0.3"
+version = "3.0.4"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 build = "build.rs"
@@ -28,7 +28,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # third-party dependencies
-codec = { package = "parity-scale-codec", version = "1.0.6" }
+codec = { package = "parity-scale-codec", version = "1.2.0" }
 serde = { version = "1.0.102", features = ["derive"] }
 futures = { version = "0.3.1", features = ["compat"] }
 hex-literal = "0.2.1"
@@ -114,6 +114,9 @@ sc-keystore = { git = "https://github.com/paritytech/substrate.git" }
 sc-service-test = { git = "https://github.com/paritytech/substrate.git" }
 futures = "0.3.1"
 tempfile = "3.1.0"
+assert_cmd = "0.12"
+nix = "0.17"
+serde_json = "1.0"
 
 [build-dependencies]
 sc-cli = { git = "https://github.com/paritytech/substrate.git", optional = true }

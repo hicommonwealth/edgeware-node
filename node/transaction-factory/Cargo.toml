@@ -10,7 +10,7 @@ sc-block-builder = { git = "https://github.com/paritytech/substrate.git" }
 sc-cli = { git = "https://github.com/paritytech/substrate.git" }
 sc-client-api = { git = "https://github.com/paritytech/substrate.git" }
 sc-client = { git = "https://github.com/paritytech/substrate.git" }
-codec = { package = "parity-scale-codec", version = "1.0.0", features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "1.2.0" }
 sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
 log = "0.4.8"
 sp-core = { git = "https://github.com/paritytech/substrate.git" }

@@ -32,14 +32,13 @@ pub async fn start_client(chain_spec: String, log_level: String, wasm_ext: Trans
 		.map_err(|err| JsValue::from_str(&err.to_string()))
 }
 
-async fn start_inner(chain_spec: String, log_level: String, wasm_ext: Transport) -> Result<Client, Box<dyn std::error::Error>> {
+async fn start_inner(chain_spec: String, log_level: String) -> Result<Client, Box<dyn std::error::Error>> {
 	set_console_error_panic_hook();
 	init_console_log(log::Level::from_str(&log_level)?)?;
 	let chain_spec = ChainSpec::from_json_bytes(chain_spec.as_bytes().to_vec())
 		.map_err(|e| format!("{:?}", e))?;
 
-	let config: Configuration<_, _> = browser_configuration(wasm_ext, chain_spec)
-		.await?;
+	let config = browser_configuration(chain_spec).await?;
 
 	info!("Edgeware browser node");
 	info!("  version {}", config.full_version());

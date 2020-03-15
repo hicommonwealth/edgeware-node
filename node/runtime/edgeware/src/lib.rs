@@ -38,7 +38,7 @@ pub use sp_runtime::traits::{
 pub use sp_version::RuntimeVersion;
 #[cfg(any(feature = "std", test))]
 pub use sp_version::NativeVersion;
-pub use sp_core::{Blake2Hasher, OpaqueMetadata, U256};
+pub use sp_core::{OpaqueMetadata, U256};
 pub use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 pub use pallet_grandpa::AuthorityList as GrandpaAuthorityList;
 pub use pallet_grandpa::fg_primitives;
@@ -562,7 +562,7 @@ impl FeeCalculator for FixedGasPrice {
 
 impl pallet_evm::Trait for Runtime {
 	type FeeCalculator = FixedGasPrice;
-	type ConvertAccountId = HashTruncateConvertAccountId<Blake2Hasher>;
+	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
 	type Currency = Balances;
 	type Event = Event;
 	type Precompiles = ();
@@ -616,7 +616,7 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		Evm: pallet_evm::{Module, Config, Call, Storage, Event},
+		EVM: pallet_evm::{Module, Config, Call, Storage, Event},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

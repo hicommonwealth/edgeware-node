@@ -22,8 +22,6 @@
 
 #![warn(missing_docs)]
 
-#![warn(missing_docs)]
-
 pub mod cli;
 pub mod command;
 

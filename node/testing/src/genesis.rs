@@ -97,5 +97,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		treasury_reward: Some(Default::default()),
 		pallet_sudo: Some(Default::default()),
 		pallet_vesting: Some(Default::default()),
+		pallet_evm: Some(Default::default()),
 	}
 }
