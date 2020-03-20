@@ -8,7 +8,7 @@ members = [
 	"node/primitives",
 	"node/rpc",
 	"node/rpc-client",
-	"node/runtime/edgeware",
+	"node/runtime",
 	"node/transaction-factory",
 ]
 

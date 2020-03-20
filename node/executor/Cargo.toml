@@ -16,7 +16,7 @@ sp-trie = { git = "https://github.com/paritytech/substrate.git" }
 frame-benchmarking = { git = "https://github.com/paritytech/substrate.git" }
 
 edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime/edgeware" }
+edgeware-runtime = { path = "../runtime" }
 
 [dev-dependencies]
 test-client = { package = "substrate-test-client", git = "https://github.com/paritytech/substrate.git" }

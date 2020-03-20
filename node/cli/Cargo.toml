@@ -92,7 +92,7 @@ pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.gi
 frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git" }
 
 # node-specific dependencies
-edgeware-runtime = { path = "../runtime/edgeware" }
+edgeware-runtime = { path = "../runtime" }
 edgeware-rpc = { path = "../rpc" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
