@@ -288,7 +288,7 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Voting {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(fn vote_records): map  hasher(blake2_256) u64 => Option<VoteRecord<T::AccountId>>;
+		pub VoteRecords get(fn vote_records): map  hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(fn vote_record_count): u64;
 	}
