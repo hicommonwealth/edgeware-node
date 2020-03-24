@@ -296,8 +296,9 @@ impl pallet_staking::Trait for Runtime {
 parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
-	pub const EmergencyVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
+	pub const FastTrackVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
+	pub const InstantAllowed: bool = false;
 	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1_000 * MILLICENTS;
@@ -310,7 +311,6 @@ impl pallet_democracy::Trait for Runtime {
 	type EnactmentPeriod = EnactmentPeriod;
 	type LaunchPeriod = LaunchPeriod;
 	type VotingPeriod = VotingPeriod;
-	type EmergencyVotingPeriod = EmergencyVotingPeriod;
 	type MinimumDeposit = MinimumDeposit;
 	/// A straight majority of the council can decide what their next motion is.
 	type ExternalOrigin = pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
@@ -326,6 +326,9 @@ impl pallet_democracy::Trait for Runtime {
 	type CooloffPeriod = CooloffPeriod;
 	type PreimageByteDeposit = PreimageByteDeposit;
 	type Slash = Treasury;
+	type InstantOrigin = frame_system::EnsureNever<AccountId>;
+	type InstantAllowed = InstantAllowed;
+	type FastTrackVotingPeriod = FastTrackVotingPeriod;
 }
 
 parameter_types! {
