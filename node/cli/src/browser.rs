@@ -19,15 +19,15 @@ use log::info;
 use wasm_bindgen::prelude::*;
 use sc_service::Configuration;
 use browser_utils::{
-	Transport, Client,
+	Client,
 	browser_configuration, set_console_error_panic_hook, init_console_log,
 };
 use std::str::FromStr;
 
 /// Starts the client.
 #[wasm_bindgen]
-pub async fn start_client(chain_spec: String, log_level: String, wasm_ext: Transport) -> Result<Client, JsValue> {
-	start_inner(chain_spec, log_level, wasm_ext)
+pub async fn start_client(chain_spec: String, log_level: String) -> Result<Client, JsValue> {
+	start_inner(chain_spec, log_level)
 		.await
 		.map_err(|err| JsValue::from_str(&err.to_string()))
 }
@@ -40,9 +40,9 @@ async fn start_inner(chain_spec: String, log_level: String) -> Result<Client, Bo
 
 	let config = browser_configuration(chain_spec).await?;
 
-	info!("Edgeware browser node");
+	info!("Substrate browser node");
 	info!("  version {}", config.full_version());
-	info!("  by Commonwealth Labs, 2018-2020");
+	info!("  by Parity Technologies, 2017-2020");
 	info!("Chain specification: {}", config.expect_chain_spec().name());
 	info!("Node name: {}", config.name);
 	info!("Roles: {:?}", config.roles);

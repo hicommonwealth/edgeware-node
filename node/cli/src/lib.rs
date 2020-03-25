@@ -62,8 +62,6 @@ pub enum ChainSpec {
 	LocalTestnet,
 	/// Edgeware testnet configuration
 	EdgewareTestnetConfig,
-	/// 0.9.9 Testnet
-	EDGTestnet099,
 	/// 1.0.0 Testnet,
 	BerlinTestnet,
 	/// Edgeware mainnet configuration (should be used to generate chainspec)
@@ -83,7 +81,6 @@ impl ChainSpec {
 				"Berlin".to_string(),
 				"berlin_edgeware_testnet".to_string(),
 			),
-			ChainSpec::EDGTestnet099 => chain_spec::edgeware_testnet_v099_config(),
 			ChainSpec::BerlinTestnet => chain_spec::edgeware_berlin_testnet_config(),
 			ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_mainnet_config(),
 			ChainSpec::EdgewareMainnet => chain_spec::edgeware_mainnet_official(),
@@ -96,7 +93,6 @@ impl ChainSpec {
 			"multi-dev" => Some(ChainSpec::MultiNodeDevelopment),
 			"local" => Some(ChainSpec::LocalTestnet),
 			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
-			"edg-0.9.9" => Some(ChainSpec::EDGTestnet099),
 			"berlin" => Some(ChainSpec::BerlinTestnet),
 			"edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
 			"edgeware" => Some(ChainSpec::EdgewareMainnet),

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-//! A CLI extension for edgeware node, adding sub-command to pretty print debug info
+//! A CLI extension for the Edgeware node, adding sub-command to pretty print debug info
 //! about blocks and extrinsics.
 //!
 //! The blocks and extrinsics can either be retrieved from the database (on-chain),
