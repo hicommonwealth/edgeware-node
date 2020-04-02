@@ -129,7 +129,6 @@ impl frame_system::Trait for Runtime {
 	type Version = Version;
 	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
-	// type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Session, Staking, Vesting);
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 }
@@ -548,22 +547,22 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
-// // EVM structs
-// pub struct FixedGasPrice;
-// impl FeeCalculator for FixedGasPrice {
-// 	fn min_gas_price() -> U256 {
-// 		// Gas price is always one token per gas.
-// 		1.into()
-// 	}
-// }
+// EVM structs
+pub struct FixedGasPrice;
+impl FeeCalculator for FixedGasPrice {
+	fn min_gas_price() -> U256 {
+		// Gas price is always one token per gas.
+		1.into()
+	}
+}
 
-// impl pallet_evm::Trait for Runtime {
-// 	type FeeCalculator = FixedGasPrice;
-// 	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
-// 	type Currency = Balances;
-// 	type Event = Event;
-// 	type Precompiles = ();
-// }
+impl pallet_evm::Trait for Runtime {
+	type FeeCalculator = FixedGasPrice;
+	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
+	type Currency = Balances;
+	type Event = Event;
+	type Precompiles = ();
+}
 
 impl signaling::Trait for Runtime {
 	type Event = Event;
@@ -613,7 +612,7 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		// EVM: pallet_evm::{Module, Config, Call, Storage, Event},
+		EVM: pallet_evm::{Module, Config, Call, Storage, Event},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

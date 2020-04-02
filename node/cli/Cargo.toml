@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-cli"
-version = "3.0.4"
+version = "3.0.5"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 build = "build.rs"
