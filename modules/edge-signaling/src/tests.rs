@@ -16,11 +16,11 @@
 
 use super::*;
 
-use frame_support::{parameter_types, impl_outer_origin, assert_err, assert_ok, traits::OnFinalize};
+use frame_support::{parameter_types, impl_outer_origin, assert_err, assert_ok};
 use sp_core::{H256, Blake2Hasher, Hasher};
 use sp_runtime::{
 	Perbill,
-	traits::{IdentityLookup},
+	traits::{IdentityLookup, OnFinalize},
 	testing::{Header}
 };
 pub use crate::{Event, Module, RawEvent, Trait, GenesisConfig};
