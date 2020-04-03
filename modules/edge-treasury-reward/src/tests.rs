@@ -240,9 +240,15 @@ impl pallet_treasury::Trait for Test {
 	type TipReportDepositPerByte = TipReportDepositPerByte;
 }
 
+
+parameter_types! {
+	pub const TreasuryRewardPercentage: Percent = Percent::from_percent(100);
+}
+
 impl Trait for Test {
 	type Event = ();
 	type Currency = Balances;
+	type TreasuryRewardPercentage = TreasuryRewardPercentage;
 }
 
 pub type Balances = pallet_balances::Module<Test>;
@@ -303,6 +309,8 @@ impl ExtBuilder {
 		GenesisConfig::<Test> {
 			current_payout: 9500000,
 			minting_interval: One::one(),
+			recipients: vec![],
+			recipient_percentages: vec![]
 		}.assimilate_storage(&mut t).unwrap();
 		t.into()
 	}
