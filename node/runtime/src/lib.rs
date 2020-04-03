@@ -56,8 +56,8 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_contracts::Gas;
 pub use frame_support::StorageValue;
 pub use pallet_staking::StakerStatus;
-pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
-pub use pallet_evm::Account as EVMAccount;
+// pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
+// pub use pallet_evm::Account as EVMAccount;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -80,8 +80,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 33,
-	impl_version: 33,
+	spec_version: 34,
+	impl_version: 34,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -547,22 +547,22 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
-// EVM structs
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
+// // EVM structs
+// pub struct FixedGasPrice;
+// impl FeeCalculator for FixedGasPrice {
+// 	fn min_gas_price() -> U256 {
+// 		// Gas price is always one token per gas.
+// 		1.into()
+// 	}
+// }
 
-impl pallet_evm::Trait for Runtime {
-	type FeeCalculator = FixedGasPrice;
-	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
-	type Currency = Balances;
-	type Event = Event;
-	type Precompiles = ();
-}
+// impl pallet_evm::Trait for Runtime {
+// 	type FeeCalculator = FixedGasPrice;
+// 	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
+// 	type Currency = Balances;
+// 	type Event = Event;
+// 	type Precompiles = ();
+// }
 
 impl signaling::Trait for Runtime {
 	type Event = Event;
@@ -612,7 +612,7 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		EVM: pallet_evm::{Module, Config, Call, Storage, Event},
+		// EVM: pallet_evm::{Module, Config, Call, Storage, Event},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
