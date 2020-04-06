@@ -88,25 +88,18 @@ pub type ChainSpec = sc_service::GenericChainSpec<
 
 /// Mainnet configuration
 pub fn edgeware_mainnet_official() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/mainnet.chainspec.json")) {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/mainnet.chainspec.json")[..]) {
 		Ok(spec) => spec,
-		Err(e) => panic!(e),
+		Err(e) => panic!(e)
 	}
 }
 
-/// 0.9.9 Testnet configuration
-pub fn edgeware_testnet_v099_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/testnet-0.9.9.chainspec.json")) {
-		Ok(spec) => spec,
-		Err(e) => panic!(e),
-	}
-}
 
 /// 1.0.0 Berlin Testnet configuration
-pub fn edgeware_berlin_testnet_config() -> ChainSpec {
-	match ChainSpec::from_json_file(std::path::PathBuf::from("chains/berlin.chainspec.json")) {
+pub fn edgeware_berlin_official() -> ChainSpec {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/berlin.chainspec.json")[..]) {
 		Ok(spec) => spec,
-		Err(e) => panic!(e),
+		Err(e) => panic!(e)
 	}
 }
 

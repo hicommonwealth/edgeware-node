@@ -29,7 +29,7 @@ pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Has
 pub use sp_api::impl_runtime_apis;
 pub use sp_runtime::{Permill, Perbill, Percent, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
 pub use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource};
+use sp_runtime::transaction_validity::{TransactionValidity};
 pub use frame_support::weights::Weight;
 pub use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
@@ -56,8 +56,8 @@ pub use pallet_balances::Call as BalancesCall;
 pub use pallet_contracts::Gas;
 pub use frame_support::StorageValue;
 pub use pallet_staking::StakerStatus;
-pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
-pub use pallet_evm::Account as EVMAccount;
+// pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
+// pub use pallet_evm::Account as EVMAccount;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -80,8 +80,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 33,
-	impl_version: 33,
+	spec_version: 34,
+	impl_version: 34,
 	apis: RUNTIME_API_VERSIONS,
 };
 
@@ -148,11 +148,6 @@ impl pallet_utility::Trait for Runtime {
 	type MultisigDepositBase = MultisigDepositBase;
 	type MultisigDepositFactor = MultisigDepositFactor;
 	type MaxSignatories = MaxSignatories;
-}
-
-parameter_types! {
-	pub const EpochDuration: u64 = EPOCH_DURATION_IN_SLOTS;
-	pub const ExpectedBlockTime: Moment = MILLISECS_PER_BLOCK;
 }
 
 impl pallet_aura::Trait for Runtime {
@@ -231,7 +226,7 @@ impl_opaque_keys! {
 }
 
 parameter_types! {
-	pub const Period: BlockNumber = 10 * MINUTES;
+	pub const Period: BlockNumber = 1 * HOURS;
 	pub const Offset: BlockNumber = 0;
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 }
@@ -296,7 +291,7 @@ impl pallet_staking::Trait for Runtime {
 parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
-	pub const FastTrackVotingPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
+	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	pub const InstantAllowed: bool = false;
 	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
@@ -316,6 +311,7 @@ impl pallet_democracy::Trait for Runtime {
 	type ExternalOrigin = pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
 	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
 	type ExternalMajorityOrigin = pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>;
+	type EmergencyVotingPeriod = EmergencyVotingPeriod;
 	/// A unanimous council can have the next scheduled referendum be a straight default-carries
 	/// (NTB) vote.
 	type ExternalDefaultOrigin = pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>;
@@ -326,9 +322,6 @@ impl pallet_democracy::Trait for Runtime {
 	type CooloffPeriod = CooloffPeriod;
 	type PreimageByteDeposit = PreimageByteDeposit;
 	type Slash = Treasury;
-	type InstantOrigin = frame_system::EnsureNever<AccountId>;
-	type InstantAllowed = InstantAllowed;
-	type FastTrackVotingPeriod = FastTrackVotingPeriod;
 }
 
 parameter_types! {
@@ -700,11 +693,8 @@ impl_runtime_apis! {
 	}
 
 	impl sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block> for Runtime {
-		fn validate_transaction(
-			source: TransactionSource,
-			tx: <Block as BlockT>::Extrinsic,
-		) -> TransactionValidity {
-			Executive::validate_transaction(source, tx)
+		fn validate_transaction(tx: <Block as BlockT>::Extrinsic) -> TransactionValidity {
+			Executive::validate_transaction(tx)
 		}
 	}
 

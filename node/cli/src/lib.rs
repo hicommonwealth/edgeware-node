@@ -81,8 +81,8 @@ impl ChainSpec {
 				"Berlin".to_string(),
 				"berlin_edgeware_testnet".to_string(),
 			),
-			ChainSpec::BerlinTestnet => chain_spec::edgeware_berlin_testnet_config(),
 			ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_mainnet_config(),
+			ChainSpec::BerlinTestnet => chain_spec::edgeware_berlin_official(),
 			ChainSpec::EdgewareMainnet => chain_spec::edgeware_mainnet_official(),
 		})
 	}
@@ -90,11 +90,11 @@ impl ChainSpec {
 	pub(crate) fn from(s: &str) -> Option<Self> {
 		match s {
 			"dev" => Some(ChainSpec::Development),
-			"multi-dev" => Some(ChainSpec::MultiNodeDevelopment),
+			"multi-dev" | "multi" => Some(ChainSpec::MultiNodeDevelopment),
 			"local" => Some(ChainSpec::LocalTestnet),
-			"edgeware-testnet" => Some(ChainSpec::EdgewareTestnetConfig),
+			"testnet-conf" => Some(ChainSpec::EdgewareTestnetConfig),
+			"mainnet-conf" => Some(ChainSpec::EdgewareMainnetConfig),
 			"berlin" => Some(ChainSpec::BerlinTestnet),
-			"edgeware-mainnet" => Some(ChainSpec::EdgewareMainnetConfig),
 			"edgeware" => Some(ChainSpec::EdgewareMainnet),
 			_ => None,
 		}
