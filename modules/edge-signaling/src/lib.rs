@@ -24,7 +24,7 @@ use frame_support::traits::{Currency, ReservableCurrency,};
 use sp_std::prelude::*;
 
 use frame_system::{self as system, ensure_signed};
-use frame_support::dispatch::DispatchResult;
+use frame_support::{dispatch::DispatchResult, weights::{SimpleDispatchInfo}};
 use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
@@ -68,6 +68,7 @@ decl_module! {
 		fn deposit_event() = default;
 
 		/// Creates a new signaling proposal.
+		#[weight = SimpleDispatchInfo::FixedNormal(200_000)]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -117,6 +118,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
+		#[weight = SimpleDispatchInfo::FixedNormal(200_000)]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;

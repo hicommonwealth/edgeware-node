@@ -29,7 +29,7 @@ use edgeware_runtime::{
 use edgeware_runtime::Block;
 use edgeware_runtime::constants::currency::*;
 use sc_service;
-
+use sc_service::ChainType;
 use sc_telemetry::TelemetryEndpoints;
 use sp_finality_grandpa::{AuthorityId as GrandpaId};
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
@@ -299,9 +299,11 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	ChainSpec::from_genesis(
 		&testnet_name,
 		&testnet_node_name,
+		ChainType::Live,
 		edgeware_testnet_config_genesis,
 		boot_nodes,
-		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+			.expect("Staging telemetry url is valid; qed")),
 		Some(DEFAULT_PROTOCOL_ID),
 		properties,
 		Default::default(),
@@ -353,6 +355,7 @@ pub fn development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Development",
 		"dev",
+		ChainType::Development,
 		development_config_genesis,
 		vec![],
 		None,
@@ -374,6 +377,7 @@ pub fn multi_development_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Multi Development",
 		"multi-dev",
+		ChainType::Development,
 		multi_development_config_genesis,
 		vec![],
 		None,
@@ -403,6 +407,7 @@ pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
 		"local_testnet",
+		ChainType::Local,
 		local_testnet_genesis,
 		vec![],
 		None,
@@ -539,9 +544,11 @@ pub fn edgeware_mainnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Edgeware",
 		"edgeware",
+		ChainType::Live,
 		edgeware_mainnet_config_genesis,
 		boot_nodes,
-		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+			.expect("Staging telemetry url is valid; qed")),
 		Some(DEFAULT_PROTOCOL_ID),
 		properties,
 		Default::default(),

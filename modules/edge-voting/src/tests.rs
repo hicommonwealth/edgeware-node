@@ -23,7 +23,7 @@ use sp_core::H256;
 use frame_support::{parameter_types, impl_outer_origin, assert_err};
 
 use super::*;
-use crate::{Trait, Module, VoteType, TallyType};
+pub use crate::{Trait, Module, VoteType, TallyType};
 
 use frame_support::{
 	assert_ok

@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Substrate CLI library.
+//! Edgeware CLI library.
 //!
 //! This package has two Cargo features:
 //!
@@ -50,61 +50,3 @@ pub use command::*;
 
 pub mod mainnet_fixtures;
 pub mod testnet_fixtures;
-
-/// The chain specification option.
-#[derive(Clone, Debug, PartialEq)]
-pub enum ChainSpec {
-	/// Whatever the current runtime is, with just Alice as an auth.
-	Development,
-	/// Whatever the current runtime is, with just Alice as an auth.
-	MultiNodeDevelopment,
-	/// Whatever the current runtime is, with simple Alice/Bob auths.
-	LocalTestnet,
-	/// Edgeware testnet configuration
-	EdgewareTestnetConfig,
-	/// 1.0.0 Testnet,
-	BerlinTestnet,
-	/// Edgeware mainnet configuration (should be used to generate chainspec)
-	EdgewareMainnetConfig,
-	/// Edgeware mainnet (should be used to connect to Edgeware)
-	EdgewareMainnet
-}
-
-/// Get a chain config from a spec setting.
-impl ChainSpec {
-	pub(crate) fn load(self) -> Result<chain_spec::ChainSpec, String> {
-		Ok(match self {
-			ChainSpec::Development => chain_spec::development_config(),
-			ChainSpec::MultiNodeDevelopment => chain_spec::multi_development_config(),
-			ChainSpec::LocalTestnet => chain_spec::local_testnet_config(),
-			ChainSpec::EdgewareTestnetConfig => chain_spec::edgeware_testnet_config(
-				"Berlin".to_string(),
-				"berlin_edgeware_testnet".to_string(),
-			),
-			ChainSpec::EdgewareMainnetConfig => chain_spec::edgeware_mainnet_config(),
-			ChainSpec::BerlinTestnet => chain_spec::edgeware_berlin_official(),
-			ChainSpec::EdgewareMainnet => chain_spec::edgeware_mainnet_official(),
-		})
-	}
-
-	pub(crate) fn from(s: &str) -> Option<Self> {
-		match s {
-			"dev" => Some(ChainSpec::Development),
-			"multi-dev" | "multi" => Some(ChainSpec::MultiNodeDevelopment),
-			"local" => Some(ChainSpec::LocalTestnet),
-			"testnet-conf" => Some(ChainSpec::EdgewareTestnetConfig),
-			"mainnet-conf" => Some(ChainSpec::EdgewareMainnetConfig),
-			"berlin" => Some(ChainSpec::BerlinTestnet),
-			"edgeware" => Some(ChainSpec::EdgewareMainnet),
-			_ => None,
-		}
-	}
-}
-
-fn load_spec(id: &str) -> Result<Box<dyn sc_service::ChainSpec>, String> {
-	Ok(match ChainSpec::from(id) {
-		Some(spec) => Box::new(spec.load()?),
-		None => Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(id))?),
-	})
-}
-

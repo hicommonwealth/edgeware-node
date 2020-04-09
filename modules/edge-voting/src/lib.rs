@@ -23,7 +23,7 @@ mod tests;
 use sp_std::prelude::*;
 use sp_std::result;
 use frame_system::{self as system, ensure_signed};
-use frame_support::dispatch::DispatchResult;
+use frame_support::{dispatch::DispatchResult, weights::{SimpleDispatchInfo}};
 use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
@@ -115,6 +115,7 @@ decl_module! {
 		/// A vote commitment is formatted using the native hash function. There
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
+		#[weight = SimpleDispatchInfo::FixedNormal(200_000)]
 		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -134,6 +135,7 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
+		#[weight = SimpleDispatchInfo::FixedNormal(1_000_000)]
 		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;

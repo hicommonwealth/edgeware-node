@@ -27,12 +27,12 @@ use sp_core::{H256, crypto::key_types};
 
 
 use frame_support::{parameter_types, impl_outer_origin};
-use frame_support::{traits::{Contains}};
+use frame_support::{traits::{Contains, OnFinalize}};
 
 use sp_runtime::{
 	Perbill, Permill, KeyTypeId,
 	testing::{Header}, Percent,
-	traits::{IdentityLookup, One, OnFinalize},
+	traits::{IdentityLookup, One},
 };
 
 use crate::GenesisConfig;

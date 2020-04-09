@@ -8,10 +8,10 @@ edition = "2018"
 codec = { package = "parity-scale-codec", version = "1.3.0" }
 derive_more = "0.99"
 log = "0.4.8"
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-service = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 structopt = "0.3.8"

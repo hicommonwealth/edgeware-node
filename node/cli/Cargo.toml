@@ -41,55 +41,55 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop"}
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update"}
+sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", default-features = false }
+sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", default-features = false }
+sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 
 
 # client dependencies
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-network = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-network = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", default-features = false }
+sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 
 # frame dependencies
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", default-features = false }
+pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", default-features = false }
+pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -98,20 +98,20 @@ edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", optional = true }
 edgeware-transaction-factory = { optional = true, path = "../transaction-factory" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
+browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", optional = true }
 
 [dev-dependencies]
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
+sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 futures = "0.3.1"
 tempfile = "3.1.0"
 assert_cmd = "0.12"
@@ -119,13 +119,13 @@ nix = "0.17"
 serde_json = "1.0"
 
 [build-dependencies]
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
-build-script-utils = { package = "substrate-build-script-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update", optional = true }
+substrate-build-script-utils = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 structopt = { version = "0.3.8", optional = true }
 vergen = { version = "3.0.4", optional = true }
 edgeware-transaction-factory = { optional = true, path = "../transaction-factory" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "drew.node-update" }
 
 
 [features]

@@ -29,7 +29,7 @@ pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Has
 pub use sp_api::impl_runtime_apis;
 pub use sp_runtime::{Permill, Perbill, Percent, ApplyExtrinsicResult, impl_opaque_keys, generic, create_runtime_str};
 pub use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::transaction_validity::{TransactionValidity};
+use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource, TransactionPriority};
 pub use frame_support::weights::Weight;
 pub use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
@@ -94,6 +94,9 @@ pub fn native_version() -> NativeVersion {
 	}
 }
 
+/// A transaction submitter with the given key type.
+pub type TransactionSubmitterOf<KeyType> = TransactionSubmitter<KeyType, Runtime, UncheckedExtrinsic>;
+
 type NegativeImbalance = <Balances as Currency<AccountId>>::NegativeImbalance;
 
 pub type DealWithFees = SplitTwoWays<
@@ -148,6 +151,17 @@ impl pallet_utility::Trait for Runtime {
 	type MultisigDepositBase = MultisigDepositBase;
 	type MultisigDepositFactor = MultisigDepositFactor;
 	type MaxSignatories = MaxSignatories;
+}
+
+parameter_types! {
+	pub const MaximumWeight: Weight = 2_000_000;
+}
+
+impl pallet_scheduler::Trait for Runtime {
+	type Event = Event;
+	type Origin = Origin;
+	type Call = Call;
+	type MaximumWeight = MaximumWeight;
 }
 
 impl pallet_aura::Trait for Runtime {
@@ -232,14 +246,15 @@ parameter_types! {
 }
 
 impl pallet_session::Trait for Runtime {
+	type Event = Event;
+	type ValidatorId = <Self as frame_system::Trait>::AccountId;
+	type ValidatorIdOf = pallet_staking::StashOf<Self>;
 	type SessionManager = Staking;
 	type SessionHandler = <SessionKeys as OpaqueKeys>::KeyTypeIdProviders;
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
-	type Event = Event;
 	type Keys = SessionKeys;
-	type ValidatorId = <Self as frame_system::Trait>::AccountId;
-	type ValidatorIdOf = pallet_staking::StashOf<Self>;
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 }
 
 
@@ -260,19 +275,20 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-        // 1 hour session, 6 hour era
+	/// 1 hour session, 6 hour era
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
-        // 28 eras for unbonding (7 days)
+	/// 28 eras for unbonding (7 days)
 	pub const BondingDuration: pallet_staking::EraIndex = 28;
-        // 28 eras in which slashes can be cancelled (7 days)
+	/// 28 eras in which slashes can be cancelled (7 days)
 	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 64;
+	pub const ElectionLookahead: BlockNumber = 25; // 10 minutes per session => 100 block.
 }
 
 impl pallet_staking::Trait for Runtime {
 	type Currency = Balances;
-	type Time = Timestamp;
+	type UnixTime = Timestamp;
 	type CurrencyToVote = CurrencyToVoteHandler;
 	type RewardRemainder = Treasury;
 	type Event = Event;
@@ -286,12 +302,17 @@ impl pallet_staking::Trait for Runtime {
 	type SessionInterface = Self;
 	type RewardCurve = RewardCurve;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
+	type NextNewSession = Session;
+	type ElectionLookahead = ElectionLookahead;
+	type Call = Call;
+	type SubmitTransaction = TransactionSubmitterOf<()>;
+	type UnsignedPriority = StakingUnsignedPriority;
 }
 
 parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
-	pub const EmergencyVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const FastTrackVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	pub const InstantAllowed: bool = false;
 	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
@@ -311,17 +332,19 @@ impl pallet_democracy::Trait for Runtime {
 	type ExternalOrigin = pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
 	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
 	type ExternalMajorityOrigin = pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>;
-	type EmergencyVotingPeriod = EmergencyVotingPeriod;
-	/// A unanimous council can have the next scheduled referendum be a straight default-carries
-	/// (NTB) vote.
+	/// A unanimous council can have the next scheduled referendum be a straight default-carries (NTB) vote.
 	type ExternalDefaultOrigin = pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>;
-	type FastTrackOrigin = frame_system::EnsureNever<AccountId>;
+	type FastTrackOrigin = pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>;
+	type InstantOrigin = pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>;
+	type InstantAllowed = InstantAllowed;
+	type FastTrackVotingPeriod = FastTrackVotingPeriod;
 	// To cancel a proposal which has been passed, 2/3 of the council must agree to it.
 	type CancellationOrigin = pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>;
 	type VetoOrigin = frame_system::EnsureNever<AccountId>;
 	type CooloffPeriod = CooloffPeriod;
 	type PreimageByteDeposit = PreimageByteDeposit;
 	type Slash = Treasury;
+	type Scheduler = Scheduler;
 }
 
 parameter_types! {
@@ -349,6 +372,8 @@ impl pallet_elections_phragmen::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
 	type ChangeMembers = Council;
+	/// This implies that council's genesis members cannot be set directly and must come from this module.
+	type InitializeMembers = Council;
 	type CurrencyToVote = CurrencyToVoteHandler;
 	type CandidacyBond = CandidacyBond;
 	type VotingBond = VotingBond;
@@ -425,20 +450,21 @@ impl pallet_contracts::Trait for Runtime {
 	type BlockGasLimit = pallet_contracts::DefaultBlockGasLimit;
 }
 
-/// A runtime transaction submitter.
-pub type SubmitTransaction = TransactionSubmitter<ImOnlineId, Runtime, UncheckedExtrinsic>;
-
 parameter_types! {
 	pub const SessionDuration: BlockNumber = EPOCH_DURATION_IN_SLOTS as _;
+	pub const ImOnlineUnsignedPriority: TransactionPriority = TransactionPriority::max_value();
+	/// We prioritize im-online heartbeats over phragmen solution submission.
+	pub const StakingUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 2;
 }
 
 impl pallet_im_online::Trait for Runtime {
 	type AuthorityId = ImOnlineId;
 	type Event = Event;
 	type Call = Call;
-	type SubmitTransaction = SubmitTransaction;
+	type SubmitTransaction = TransactionSubmitterOf<Self::AuthorityId>;
 	type SessionDuration = SessionDuration;
 	type ReportUnresponsiveness = Offences;
+	type UnsignedPriority = ImOnlineUnsignedPriority;
 }
 
 impl pallet_offences::Trait for Runtime {
@@ -491,6 +517,8 @@ parameter_types! {
 	pub const MaxLength: usize = 16;
 }
 
+/// Submits transaction with the node's public and signature type. Adheres to the signed extension
+/// format of the chain.
 impl frame_system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for Runtime {
 	type Public = <Signature as traits::Verify>::Signer;
 	type Signature = Signature;
@@ -519,6 +547,7 @@ impl frame_system::offchain::CreateTransaction<Runtime, UncheckedExtrinsic> for 
 			frame_system::CheckNonce::<Runtime>::from(index),
 			frame_system::CheckWeight::<Runtime>::new(),
 			pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
+			Default::default(),
 			Default::default(),
 		);
 		let raw_payload = SignedPayload::new(call, extra).map_err(|e| {
@@ -612,6 +641,7 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
+		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		// EVM: pallet_evm::{Module, Config, Call, Storage, Event},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
@@ -639,6 +669,7 @@ pub type SignedExtra = (
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 	pallet_contracts::CheckBlockGasLimit<Runtime>,
+	pallet_staking::LockStakingStatus<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
@@ -693,8 +724,11 @@ impl_runtime_apis! {
 	}
 
 	impl sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block> for Runtime {
-		fn validate_transaction(tx: <Block as BlockT>::Extrinsic) -> TransactionValidity {
-			Executive::validate_transaction(tx)
+		fn validate_transaction(
+			source: TransactionSource,
+			tx: <Block as BlockT>::Extrinsic,
+		) -> TransactionValidity {
+			Executive::validate_transaction(source, tx)
 		}
 	}
 
@@ -787,59 +821,5 @@ impl_runtime_apis! {
 		) -> Option<Vec<(Vec<u8>, sp_core::crypto::KeyTypeId)>> {
 			SessionKeys::decode_into_raw_public_keys(&encoded)
 		}
-	}
-}
-
-#[cfg(test)]
-mod tests {
-	use super::*;
-	use system::offchain::SubmitSignedTransaction;
-
-	fn is_submit_signed_transaction<T>(_arg: T) where
-		T: SubmitSignedTransaction<
-			Runtime,
-			Call,
-			Extrinsic=UncheckedExtrinsic,
-			CreateTransaction=Runtime,
-			Signer=ImOnlineId,
-		>,
-	{}
-
-	#[test]
-	fn validate_bounds() {
-		let x = SubmitTransaction::default();
-		is_submit_signed_transaction(x);
-	}
-
-	#[test]
-	fn block_hooks_weight_should_not_exceed_limits() {
-		use sp_runtime::weights::WeighBlock;
-		let check_for_block = |b| {
-			let block_hooks_weight =
-				<AllModules as WeighBlock<BlockNumber>>::on_initialize(b) +
-				<AllModules as WeighBlock<BlockNumber>>::on_finalize(b);
-
-			assert_eq!(
-				block_hooks_weight,
-				0,
-				"This test might fail simply because the value being compared to has increased to a \
-				module declaring a new weight for a hook or call. In this case update the test and \
-				happily move on.",
-			);
-
-			// Invariant. Always must be like this to have a sane chain.
-			assert!(block_hooks_weight < MaximumBlockWeight::get());
-
-			// Warning.
-			if block_hooks_weight > MaximumBlockWeight::get() / 2 {
-				println!(
-					"block hooks weight is consuming more than a block's capacity. You probably want \
-					to re-think this. This test will fail now."
-				);
-				assert!(false);
-			}
-		};
-
-		let _ = (0..100_000).for_each(check_for_block);
 	}
 }

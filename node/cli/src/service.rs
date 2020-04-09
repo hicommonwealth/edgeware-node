@@ -38,7 +38,6 @@ use sp_runtime::traits::Block as BlockT;
 use edgeware_executor::NativeExecutor;
 use sc_network::NetworkService;
 use sc_offchain::OffchainWorkers;
-pub use crate::ChainSpec;
 
 /// Starts a `ServiceBuilder` for a full service.
 ///
@@ -87,7 +86,7 @@ macro_rules! new_full_start {
 				import_setup = Some((grandpa_block_import, grandpa_link));
 				Ok(import_queue)
 			})?
-			.with_rpc_extensions(|builder| -> Result<RpcExtension, _> {
+			.with_rpc_extensions(|builder| -> std::result::Result<RpcExtension, _> {
 				let deps = edgeware_rpc::FullDeps {
 					client: builder.client().clone(),
 					pool: builder.pool(),
@@ -112,23 +111,16 @@ macro_rules! new_full {
 		use sc_client_api::ExecutorProvider;
 
 		let (
-			is_authority,
+			role,
 			force_authoring,
 			name,
 			disable_grandpa,
-			sentry_nodes,
 		) = (
-			$config.roles.is_authority(),
+			$config.role.clone(),
 			$config.force_authoring,
-			$config.name.clone(),
+			$config.network.node_name.clone(),
 			$config.disable_grandpa,
-			$config.network.sentry_nodes.clone(),
 		);
-
-		// sentry nodes announce themselves as authorities to the network
-		// and should run the same protocols authorities do, but it should
-		// never actively participate in any consensus process.
-		let participates_in_consensus = is_authority && !$config.sentry_mode;
 
 		let (builder, mut import_setup, inherent_data_providers) = new_full_start!($config);
 
@@ -145,7 +137,7 @@ macro_rules! new_full {
 
 		($with_startup_data)(&block_import, &grandpa_link);
 
-		if participates_in_consensus {
+		if let sc_service::config::Role::Authority { sentry_nodes } = &role {
 			let proposer = sc_basic_authorship::ProposerFactory::new(
 				service.client(),
 				service.transaction_pool()
@@ -181,7 +173,7 @@ macro_rules! new_full {
 			let authority_discovery = sc_authority_discovery::AuthorityDiscovery::new(
 				service.client(),
 				network,
-				sentry_nodes,
+				sentry_nodes.clone(),
 				service.keystore(),
 				dht_event_stream,
 				service.prometheus_registry(),
@@ -192,7 +184,7 @@ macro_rules! new_full {
 
 		// if the node isn't actively participating in consensus then it doesn't
 		// need a keystore, regardless of which protocol we use below.
-		let keystore = if participates_in_consensus {
+		let keystore = if role.is_authority() {
 			Some(service.keystore())
 		} else {
 			None
@@ -205,7 +197,7 @@ macro_rules! new_full {
 			name: Some(name),
 			observer_enabled: false,
 			keystore,
-			is_authority,
+			is_authority: role.is_network_authority(),
 		};
 
 		let enable_grandpa = !disable_grandpa;
@@ -226,6 +218,8 @@ macro_rules! new_full {
 				prometheus_registry: service.prometheus_registry(),
 			};
 
+			// the GRANDPA voter task is considered infallible, i.e.
+			// if it fails we take down the service with it.
 			service.spawn_essential_task(
 				"grandpa-voter",
 				sc_finality_grandpa::run_grandpa_voter(grandpa_config)?

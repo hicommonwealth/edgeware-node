@@ -23,30 +23,31 @@ use sp_finality_grandpa::AuthorityId as GrandpaId;
 use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
 use sp_core::crypto::UncheckedInto;
 use hex_literal::hex;
+use sc_network::config::MultiaddrWithPeerId;
 
 /// Bootnodes for mainnet launch
-pub fn get_mainnet_bootnodes() -> Vec<String> {
+pub fn get_mainnet_bootnodes() -> Vec<MultiaddrWithPeerId> {
 	return vec![
-		"/ip4/144.202.61.115/tcp/30333/p2p/QmXTb6R2AvA6FrvD4w2YRD2oj9WQk2f9Dg1dTqGsdxgwuD".to_string(),
-		"/ip4/107.191.48.39/tcp/30333/p2p/QmdFq4WXvgokUi5MAcGvzcV4PZmo6fZN2fxcEbcPQioGcK".to_string(),
-		"/ip4/66.42.113.164/tcp/30333/p2p/Qmawkfqh4y4vnPWiy87pBnWpgsyy8QrQmUFprDTktgatSm".to_string(),
-		"/ip4/144.202.58.79/tcp/30333/p2p/QmXWhRta7P3xW43WbJ6CDH9ZsHwVxFhLJNjpBa6J3jaAqj".to_string(),
-		"/ip4/207.148.13.203/tcp/30333/p2p/QmRgKnmZNYVCznVd4ao5UHCHGWieT3sePB5g8v7PSGofD2".to_string(),
-		"/ip4/207.148.11.222/tcp/30333/p2p/QmbzrqjbDcwhhX1oiKndxTjK1ULjqVw36QvrEuRKSZjgLY".to_string(),
-		"/ip4/149.28.120.45/tcp/30333/p2p/QmfB4F7TeUcuZZ4AMT3nvvfPVME4eWyJUUdWkXeus3AThe".to_string(),
-		"/ip4/149.28.115.253/tcp/30333/p2p/QmQvAPW1bBpx5N7YJLcBhHNqANw4dxVmBTiJNeuC8FoYeR".to_string(),
-		"/ip4/66.42.116.197/tcp/30333/p2p/QmU1g7NFj1cd46T69ZXig9c7Xc6RLGwjZm4Ur6d4JPBDh2".to_string(),
-		"/ip4/104.207.139.151/tcp/30333/p2p/QmPuU4VY2nckAodyWXv3VyCwavk5FF9yqVWB4G1LtNf9v9".to_string(),
-		"/ip4/45.77.238.189/tcp/30333/p2p/QmUQNwBa3BTYEAggMqsM2o5owtG1szKGMcy4Yi5sxPEvmh".to_string(),
-		"/ip4/209.250.227.147/tcp/30333/p2p/QmTDGjGu9GiyZLgTFaqMFUkguer4svD3DLHyZbEePWGK2M".to_string(),
-		"/ip4/202.182.103.213/tcp/30333/p2p/QmekEvkhcEvsRYw47LVoYm7v1dAjh3qbt2wZK7HNydr3kq".to_string(),
-		"/ip4/207.148.77.158/tcp/30333/p2p/QmWF6T36iBiXdCAsb477vHyTEKTq33RTLRAcsyTiGwrqwB".to_string(),
-		"/ip4/140.82.54.194/tcp/30333/p2p/QmdCUnV8hK3oiKSkoL4r9W5foEVBvMQ49ATUNpgxWcCgXc".to_string(),
-		"/ip4/155.138.133.37/tcp/30333/p2p/QmYrQtJXQSJkfcpKYgVXcbYMEuHP1PLgz41uy2dutipp9s".to_string(),
-		"/ip4/45.32.171.175/tcp/30333/p2p/QmdC8MEhaWbngY7qHpgXvYr3bVYcXy1HFUBWVWzhQFFybV".to_string(),
-		"/ip4/45.77.105.248/tcp/30333/p2p/QmPqNBGgeP4553TzxNd34GshUSHapsjykHhVcwnNrqpMLT".to_string(),
-		"/ip4/144.202.19.214/tcp/30333/p2p/QmUr8uUsd7QJQnnbHbVh6hhdHKsZUS1xrNKJmb7YZEshae".to_string(),
-		"/ip4/207.246.98.108/tcp/30333/p2p/QmVFxV5Ay158YiS7bkxNkAshEECDFMbqnfkizTgEfKQC7F".to_string(),
+		"/ip4/144.202.61.115/tcp/30333/p2p/QmXTb6R2AvA6FrvD4w2YRD2oj9WQk2f9Dg1dTqGsdxgwuD".parse().unwrap(),
+		"/ip4/107.191.48.39/tcp/30333/p2p/QmdFq4WXvgokUi5MAcGvzcV4PZmo6fZN2fxcEbcPQioGcK".parse().unwrap(),
+		"/ip4/66.42.113.164/tcp/30333/p2p/Qmawkfqh4y4vnPWiy87pBnWpgsyy8QrQmUFprDTktgatSm".parse().unwrap(),
+		"/ip4/144.202.58.79/tcp/30333/p2p/QmXWhRta7P3xW43WbJ6CDH9ZsHwVxFhLJNjpBa6J3jaAqj".parse().unwrap(),
+		"/ip4/207.148.13.203/tcp/30333/p2p/QmRgKnmZNYVCznVd4ao5UHCHGWieT3sePB5g8v7PSGofD2".parse().unwrap(),
+		"/ip4/207.148.11.222/tcp/30333/p2p/QmbzrqjbDcwhhX1oiKndxTjK1ULjqVw36QvrEuRKSZjgLY".parse().unwrap(),
+		"/ip4/149.28.120.45/tcp/30333/p2p/QmfB4F7TeUcuZZ4AMT3nvvfPVME4eWyJUUdWkXeus3AThe".parse().unwrap(),
+		"/ip4/149.28.115.253/tcp/30333/p2p/QmQvAPW1bBpx5N7YJLcBhHNqANw4dxVmBTiJNeuC8FoYeR".parse().unwrap(),
+		"/ip4/66.42.116.197/tcp/30333/p2p/QmU1g7NFj1cd46T69ZXig9c7Xc6RLGwjZm4Ur6d4JPBDh2".parse().unwrap(),
+		"/ip4/104.207.139.151/tcp/30333/p2p/QmPuU4VY2nckAodyWXv3VyCwavk5FF9yqVWB4G1LtNf9v9".parse().unwrap(),
+		"/ip4/45.77.238.189/tcp/30333/p2p/QmUQNwBa3BTYEAggMqsM2o5owtG1szKGMcy4Yi5sxPEvmh".parse().unwrap(),
+		"/ip4/209.250.227.147/tcp/30333/p2p/QmTDGjGu9GiyZLgTFaqMFUkguer4svD3DLHyZbEePWGK2M".parse().unwrap(),
+		"/ip4/202.182.103.213/tcp/30333/p2p/QmekEvkhcEvsRYw47LVoYm7v1dAjh3qbt2wZK7HNydr3kq".parse().unwrap(),
+		"/ip4/207.148.77.158/tcp/30333/p2p/QmWF6T36iBiXdCAsb477vHyTEKTq33RTLRAcsyTiGwrqwB".parse().unwrap(),
+		"/ip4/140.82.54.194/tcp/30333/p2p/QmdCUnV8hK3oiKSkoL4r9W5foEVBvMQ49ATUNpgxWcCgXc".parse().unwrap(),
+		"/ip4/155.138.133.37/tcp/30333/p2p/QmYrQtJXQSJkfcpKYgVXcbYMEuHP1PLgz41uy2dutipp9s".parse().unwrap(),
+		"/ip4/45.32.171.175/tcp/30333/p2p/QmdC8MEhaWbngY7qHpgXvYr3bVYcXy1HFUBWVWzhQFFybV".parse().unwrap(),
+		"/ip4/45.77.105.248/tcp/30333/p2p/QmPqNBGgeP4553TzxNd34GshUSHapsjykHhVcwnNrqpMLT".parse().unwrap(),
+		"/ip4/144.202.19.214/tcp/30333/p2p/QmUr8uUsd7QJQnnbHbVh6hhdHKsZUS1xrNKJmb7YZEshae".parse().unwrap(),
+		"/ip4/207.246.98.108/tcp/30333/p2p/QmVFxV5Ay158YiS7bkxNkAshEECDFMbqnfkizTgEfKQC7F".parse().unwrap(),
 	];
 }
 
