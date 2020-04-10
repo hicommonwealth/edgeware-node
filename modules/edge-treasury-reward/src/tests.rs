@@ -25,8 +25,9 @@ use std::{collections::HashSet, cell::RefCell};
 
 use sp_core::{H256, crypto::key_types};
 
-
-use frame_support::{parameter_types, impl_outer_origin};
+use frame_system::RawOrigin;
+use frame_support::dispatch::DispatchResult;
+use frame_support::{parameter_types, impl_outer_origin, assert_err, assert_ok};
 use frame_support::{traits::{Contains}};
 
 use sp_runtime::{
@@ -242,13 +243,15 @@ impl pallet_treasury::Trait for Test {
 
 
 parameter_types! {
-	pub const TreasuryRewardPercentage: Percent = Percent::from_percent(100);
+	pub const MinimumTreasuryPct: Percent = Percent::from_percent(50);
+	pub const MaximumRecipientPct: Percent = Percent::from_percent(20);
 }
 
 impl Trait for Test {
 	type Event = ();
 	type Currency = Balances;
-	type TreasuryRewardPercentage = TreasuryRewardPercentage;
+	type MinimumTreasuryPct = MinimumTreasuryPct;
+	type MaximumRecipientPct = MaximumRecipientPct;
 }
 
 pub type Balances = pallet_balances::Module<Test>;
@@ -270,12 +273,20 @@ impl Default for ExtBuilder {
 }
 
 impl ExtBuilder {
-	fn build(self) -> sp_io::TestExternalities {
+	fn build(self, recipients: Option<Vec<u64>>, pcts: Option<Vec<Percent>>) -> sp_io::TestExternalities {
 		let balance_factor = if self.existential_deposit > 0 {
 			256
 		} else {
 			1
 		};
+
+		let recipients = recipients.unwrap_or_else(|| vec![1, 2, 3]);
+		let pcts = pcts.unwrap_or_else(|| vec![
+			Percent::from_percent(10),
+			Percent::from_percent(10),
+			Percent::from_percent(10),
+		]);
+
 		let mut t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 		pallet_balances::GenesisConfig::<Test> {
 			balances: vec![
@@ -309,17 +320,35 @@ impl ExtBuilder {
 		GenesisConfig::<Test> {
 			current_payout: 9500000,
 			minting_interval: One::one(),
-			recipients: vec![],
-			recipient_percentages: vec![]
+			recipients: recipients,
+			recipient_percentages: pcts,
 		}.assimilate_storage(&mut t).unwrap();
 		t.into()
 	}
 }
 
+fn add_recipient(recipient: u64, percent: Percent) -> DispatchResult {
+	TreasuryReward::add(RawOrigin::Root.into(), recipient, percent)
+}
+
+fn remove_recipient(recipient: u64) -> DispatchResult {
+	TreasuryReward::remove(RawOrigin::Root.into(), recipient)
+}
+
+
 #[test]
 fn basic_setup_works() {
 	// Verifies initial conditions of mock
-	ExtBuilder::default().build().execute_with(|| {
+	ExtBuilder::default().build(
+		Some(vec![1, 2, 3]),
+		Some(vec![Percent::from_percent(10), Percent::from_percent(10), Percent::from_percent(10)]),
+	).execute_with(|| {
+		// Check recipients
+		let recipients = TreasuryReward::recipients();
+		assert_eq!(recipients, vec![1, 2, 3]);
+		// Check leftover recipient allocation
+		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
+		assert_eq!(recipient_allocation, Percent::from_percent(70));
 		// Initial Era and session
 		let treasury_address = Treasury::account_id();
 		System::set_block_number(1);
@@ -335,5 +364,25 @@ fn basic_setup_works() {
 		System::set_block_number(103);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(104);
 		assert_eq!(Balances::free_balance(treasury_address) > 0, true);
+	});
+}
+
+#[test]
+fn add_and_remove_participants_without_dilution_augmentation() {
+	ExtBuilder::default().build(
+		Some(vec![1, 2, 3]),
+		Some(vec![Percent::from_percent(10), Percent::from_percent(10), Percent::from_percent(10)]),
+	).execute_with(|| {
+		let recipient = 4;
+		assert_ok!(add_recipient(recipient, Percent::from_percent(10)));
+		let recipients = <TreasuryReward>::recipients();
+		assert_eq!(recipients, vec![1, 2, 3, 4]);
+		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
+		assert_eq!(recipient_allocation, Percent::from_percent(60));
+		assert_ok!(remove_recipient(recipient));
+		let recipients = <TreasuryReward>::recipients();
+		assert_eq!(recipients, vec![1, 2, 3]);
+		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
+		assert_eq!(recipient_allocation, Percent::from_percent(70));
 	});
 }
