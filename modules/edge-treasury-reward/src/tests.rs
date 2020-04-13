@@ -244,7 +244,7 @@ impl pallet_treasury::Trait for Test {
 
 parameter_types! {
 	pub const MinimumTreasuryPct: Percent = Percent::from_percent(50);
-	pub const MaximumRecipientPct: Percent = Percent::from_percent(20);
+	pub const MaximumRecipientPct: Percent = Percent::from_percent(50);
 }
 
 impl Trait for Test {
@@ -335,6 +335,10 @@ fn remove_recipient(recipient: u64) -> DispatchResult {
 	TreasuryReward::remove(RawOrigin::Root.into(), recipient)
 }
 
+fn update(recipient: u64, percent: Percent) -> DispatchResult {
+	TreasuryReward::update(RawOrigin::Root.into(), recipient, percent)
+}
+
 
 #[test]
 fn basic_setup_works() {
@@ -373,16 +377,166 @@ fn add_and_remove_participants_without_dilution_augmentation() {
 		Some(vec![1, 2, 3]),
 		Some(vec![Percent::from_percent(10), Percent::from_percent(10), Percent::from_percent(10)]),
 	).execute_with(|| {
+		// Add new recipient
 		let recipient = 4;
 		assert_ok!(add_recipient(recipient, Percent::from_percent(10)));
+		// Check recipient is added successfully
 		let recipients = <TreasuryReward>::recipients();
 		assert_eq!(recipients, vec![1, 2, 3, 4]);
+		// Check the available allocation is smaller
 		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
 		assert_eq!(recipient_allocation, Percent::from_percent(60));
+		// Remove recipient
 		assert_ok!(remove_recipient(recipient));
 		let recipients = <TreasuryReward>::recipients();
+		// Check recipient was removed successfully
 		assert_eq!(recipients, vec![1, 2, 3]);
+		// Check available allocation has grown from removing when there is room
 		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
 		assert_eq!(recipient_allocation, Percent::from_percent(70));
+	});
+}
+
+#[test]
+fn add_and_remove_participant_with_dilution_and_augmentation() {
+	ExtBuilder::default().build(
+		Some(vec![1]),
+		Some(vec![Percent::from_percent(100)]),
+	).execute_with(|| {
+		// Check the available allocation is zero
+		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
+		assert_eq!(recipient_allocation, Percent::from_percent(0));
+		let alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(100));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+		// Add new recipient
+		let recipient = 2;
+		assert_ok!(add_recipient(recipient, Percent::from_percent(50)));
+		// Check the available allocation is still zero
+		let recipient_allocation = TreasuryReward::get_available_recipient_alloc();
+		assert_eq!(recipient_allocation, Percent::from_percent(0));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		let mut alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(50));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+		let alloc_2 = TreasuryReward::recipient_percentages(recipient).unwrap();
+		assert_eq!(alloc_2.current, Percent::from_percent(50));
+		assert_eq!(alloc_2.proposed, Percent::from_percent(50));
+		// Remove recipient
+		assert_ok!(remove_recipient(recipient));
+		// Assert storage item was removed
+		assert_eq!(TreasuryReward::recipient_percentages(recipient).is_none(), true);
+		// Check augmented allocation is back to max for remaining participant
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(100));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+	});
+}
+
+#[test]
+fn add_and_remove_many_participants() {
+	ExtBuilder::default().build(
+		Some(vec![1]),
+		Some(vec![Percent::from_percent(100)]),
+	).execute_with(|| {
+		let recipients = vec![2, 3, 4, 5, 6];
+		// Add first dilution
+		assert_ok!(add_recipient(recipients[0], Percent::from_percent(10)));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		let mut alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(90));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+		// Add second dilution
+		assert_ok!(add_recipient(recipients[1], Percent::from_percent(10)));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(81));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+		// Add third dilution
+		assert_ok!(add_recipient(recipients[2], Percent::from_percent(10)));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(72));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+		// Add fourth dilution
+		assert_ok!(add_recipient(recipients[3], Percent::from_percent(10)));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(65));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+		// Add fifth dilution
+		assert_ok!(add_recipient(recipients[4], Percent::from_percent(10)));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(59));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));
+
+		for i in 0..recipients.len() {
+			alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+			assert_ok!(remove_recipient(recipients[i]));
+		}
+		// Ensure augmentation occurred, lack of precision causes this to be lower than intended
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(97));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(100));		
+	});
+}
+
+#[test]
+fn add_and_remove_room() {
+	ExtBuilder::default().build(
+		Some(vec![1]),
+		Some(vec![Percent::from_percent(90)]),
+	).execute_with(|| {
+		let recipient = 2;
+		// Add first dilution
+		assert_ok!(add_recipient(recipient, Percent::from_percent(20)));
+		// Check the individual allocations of recipients, ensure dilution occurred
+		let mut alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(81));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(90));
+		let alloc_2 = TreasuryReward::recipient_percentages(recipient).unwrap();
+		assert_eq!(alloc_2.current, Percent::from_percent(19));
+		assert_eq!(alloc_2.proposed, Percent::from_percent(20));
+		assert_ok!(remove_recipient(recipient));
+		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
+		assert_eq!(alloc_1.current, Percent::from_percent(90));
+		assert_eq!(alloc_1.proposed, Percent::from_percent(90));
+		let sum = TreasuryReward::sum_percentages(TreasuryReward::get_percentages());
+		assert_eq!(sum, 90);
+	});
+}
+
+#[test]
+fn update_after_adding_and_diluting_with_room() {
+	ExtBuilder::default().build(
+		Some(vec![1]),
+		Some(vec![Percent::from_percent(90)]),
+	).execute_with(|| {
+		let recipient = 2;
+		// Add first dilution
+		assert_ok!(add_recipient(recipient, Percent::from_percent(20)));
+		assert_ok!(update(recipient, Percent::from_percent(30)));
+		let alloc_2 = TreasuryReward::recipient_percentages(recipient).unwrap();
+		assert_eq!(alloc_2.current, Percent::from_percent(28));
+		assert_eq!(alloc_2.proposed, Percent::from_percent(30));
+
+	});
+}
+
+#[test]
+fn update_after_adding_and_diluting_without_room() {
+	ExtBuilder::default().build(
+		Some(vec![1]),
+		Some(vec![Percent::from_percent(100)]),
+	).execute_with(|| {
+		let recipient = 2;
+		// Add first dilution
+		assert_ok!(add_recipient(recipient, Percent::from_percent(20)));
+		assert_ok!(update(recipient, Percent::from_percent(30)));
+		let alloc_2 = TreasuryReward::recipient_percentages(recipient).unwrap();
+		assert_eq!(alloc_2.current, Percent::from_percent(30));
+		assert_eq!(alloc_2.proposed, Percent::from_percent(30));
+
 	});
 }

@@ -20,14 +20,10 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 };
 use sp_core::H256;
-use frame_support::{parameter_types, impl_outer_origin, assert_err};
+use frame_support::{parameter_types, impl_outer_origin, assert_err, assert_ok};
 
 use super::*;
 use crate::{Trait, Module, VoteType, TallyType};
-
-use frame_support::{
-	assert_ok
-};
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 

@@ -27,7 +27,7 @@ use sp_std::prelude::*;
 use sp_runtime::{Percent, PerThing, RuntimeDebug};
 use sp_runtime::traits::{Zero, Saturating};
 
-use frame_support::{decl_event, decl_module, decl_storage};
+use frame_support::{decl_event, decl_module, decl_storage, assert_ok};
 use frame_system::{self as system};
 
 pub type BalanceOf<T> = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
@@ -60,15 +60,24 @@ decl_module! {
 		/// account when submitting and voting on add recipient proposals.
 		fn add(origin, recipient: T::AccountId, pct: Percent) {
 			ensure_root(origin)?;
+			assert!(pct.deconstruct() <= T::MaximumRecipientPct::get().deconstruct(), "Invalid proposed percentage. Too large.");
 			assert!(!Self::recipients().contains(&recipient), "Duplicate recipients not allowed");
 			let leftover_allocation = Self::get_available_recipient_alloc();
 			// Dilute current allocations by overflowed percentage
 			if pct.deconstruct() > leftover_allocation.deconstruct() {
 				let diff = pct.saturating_sub(leftover_allocation);
+				let first_portion = pct.saturating_sub(diff);
+				let second_portion = pct.saturating_sub(first_portion);
+				// Add new recipient with diff first, this needs to be diluted with the leftover
+				Self::add_recipient(recipient.clone(), pct, first_portion);
+				assert!(Self::sum_percentages(Self::get_percentages()) <= 100, "Invalid percentage calculation");
 				Self::dilute_percentages(diff);
+				Self::add_to_allocation(recipient, second_portion);
+			} else {
+				// Add new recipient
+				Self::add_recipient(recipient, pct, pct);
 			}
-			// Add new recipient
-			Self::add_recipient(recipient, pct);
+			assert!(Self::sum_percentages(Self::get_percentages()) <= 100, "Invalid percentage calculation");
 		}
 
 		fn remove(origin, recipient: T::AccountId) {
@@ -79,7 +88,16 @@ decl_module! {
 			// Remove recipient from pool and the mapping to their allocation
 			Self::remove_recipient(recipient.clone());
 			// Calculation occurs over updated set of recipients since we put it back.
-			Self::augment_percentages(pct.current);
+			Self::augment_percentages(pct.proposed);
+			assert!(Self::sum_percentages(Self::get_percentages()) <= 100, "Invalid percentage calculation");
+		}
+
+		fn update(origin, recipient: T::AccountId, pct: Percent) {
+			ensure_root(origin.clone())?;
+			assert!(pct.deconstruct() <= T::MaximumRecipientPct::get().deconstruct(), "Invalid proposed percentage. Too large.");
+			assert_ok!(Self::remove(origin.clone(), recipient.clone()));
+			assert_ok!(Self::add(origin, recipient, pct));
+			assert!(Self::sum_percentages(Self::get_percentages()) <= 100, "Invalid percentage calculation");
 		}
 
 		fn update_minting_interval(origin, interval: T::BlockNumber) {
@@ -98,12 +116,36 @@ decl_module! {
 		fn on_finalize(_n: T::BlockNumber) {
 			if <frame_system::Module<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
-				<T as pallet_staking::Trait>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
+				let recipients_alloc = Percent::from_percent(Self::sum_percentages(Self::get_percentages()));
+				let leftover_pct = Self::get_leftover(recipients_alloc);
+				let treasury_reward_pct = T::MinimumTreasuryPct::get().saturating_add(leftover_pct);
+				let treasury_reward = treasury_reward_pct * reward;
+				let recipients_reward = reward - treasury_reward;
+
+				<T as pallet_staking::Trait>::Currency::deposit_creating(
+					&<pallet_treasury::Module<T>>::account_id(),
+					treasury_reward,
+				);
 				Self::deposit_event(RawEvent::TreasuryMinting(
 					<pallet_balances::Module<T>>::free_balance(<pallet_treasury::Module<T>>::account_id()),
 					<frame_system::Module<T>>::block_number(),
 					<pallet_treasury::Module<T>>::account_id())
 				);
+
+				let recipients = Self::recipients();
+				for i in 0..recipients.len() {
+					if let Some(alloc) = Self::recipient_percentages(recipients[i].clone()) {
+						<T as pallet_staking::Trait>::Currency::deposit_creating(
+							&recipients[i].clone(),
+							alloc.current * recipients_reward,
+						);
+						Self::deposit_event(RawEvent::TreasuryMinting(
+							<pallet_balances::Module<T>>::free_balance(recipients[i].clone()),
+							<frame_system::Module<T>>::block_number(),
+							recipients[i].clone())
+						);
+					}
+				}
 			}
 		}
 	}
@@ -152,13 +194,25 @@ impl<T: Trait> Module<T> {
 		}
 	}
 
+	fn get_percentages() -> Vec<Percent> {
+		let recipients = Self::recipients();
+		let mut pcts = vec![];
+		for i in 0..recipients.len() {
+			if let Some(alloc) = Self::recipient_percentages(recipients[i].clone()) {
+				pcts.push(alloc.current);
+			}
+		}
+
+		return pcts;
+	}
+
 	fn sum_percentages(pcts: Vec<Percent>) -> u8 {
 		let mut pct = 0;
 		for i in 0..pcts.len() {
 			pct += pcts[i].deconstruct();
 		}
 
-		pct
+		return pct;
 	}
 
 	fn get_leftover(pct: Percent) -> Percent {
@@ -177,17 +231,17 @@ impl<T: Trait> Module<T> {
 		return Self::get_leftover(pct_sum);
 	}
 
-	fn add_recipient(recipient: T::AccountId, pct: Percent) {
+	fn add_recipient(recipient: T::AccountId, proposed_pct: Percent, current_pct: Percent) {
 		let mut recipients = Self::recipients();
 		// Add the new recipient to the pool
 		recipients.push(recipient.clone());
 		<Recipients<T>>::put(recipients);
 		// Add the recipients percentage
 		<RecipientPercentages<T>>::insert(recipient.clone(), RecipientAllocation {
-			current: pct,
-			proposed: pct,
+			current: current_pct,
+			proposed: proposed_pct,
 		});
-		Self::deposit_event(RawEvent::RecipientAdded(recipient, pct));
+		Self::deposit_event(RawEvent::RecipientAdded(recipient, proposed_pct));
 	}
 
 	fn remove_recipient(recipient: T::AccountId) {
@@ -200,6 +254,13 @@ impl<T: Trait> Module<T> {
 		// Remove the removed recipient's percentage from the map
 		<RecipientPercentages<T>>::remove(recipient.clone());
 		Self::deposit_event(RawEvent::RecipientRemoved(recipient));
+	}
+
+	fn add_to_allocation(recipient: T::AccountId, pct: Percent) {
+		if let Some(mut alloc) = Self::recipient_percentages(recipient.clone()) {
+			alloc.current = alloc.current.saturating_add(pct);
+			<RecipientPercentages<T>>::insert(recipient, alloc);
+		}
 	}
 }
 
