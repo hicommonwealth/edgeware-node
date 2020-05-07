@@ -580,7 +580,7 @@ impl<C> frame_system::offchain::SendTransactionTypes<C> for Runtime where
 
 parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
-	pub const EvmModuleId: ModuleId = ModuleId(*b"ethvirtm");
+	pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
 }
 
 impl pallet_vesting::Trait for Runtime {
@@ -609,7 +609,7 @@ impl pallet_evm::Trait for Runtime {
 	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
 	type Currency = Balances;
 	type Precompiles = ();
-	type ModuleId = EvmModuleId;
+	type ModuleId = EVMModuleId;
 	type Event = Event;
 }
 
@@ -635,9 +635,9 @@ construct_runtime!(
 	{
 		System: frame_system::{Module, Call, Config, Storage, Event<T>},
 		Utility: pallet_utility::{Module, Call, Storage, Event<T>},
+		Aura: pallet_aura::{Module, Config<T>, Inherent(Timestamp)},
 
 		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-		Aura: pallet_aura::{Module, Config<T>, Inherent(Timestamp)},
 		Authorship: pallet_authorship::{Module, Call, Storage, Inherent},
 		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
 		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
@@ -654,12 +654,12 @@ construct_runtime!(
 		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
 		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
 
-		Identity: pallet_identity::{Module, Call, Storage, Event<T>},
+		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
 		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
 		Offences: pallet_offences::{Module, Call, Storage, Event},
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
-		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
+		Identity: pallet_identity::{Module, Call, Storage, Event<T>},
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event},
