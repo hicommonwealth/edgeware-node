@@ -21,7 +21,7 @@ use sc_cli::{Result, SubstrateCli};
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> &'static str {
-		"Substrate Node"
+		"Edgeware Node"
 	}
 
 	fn impl_version() -> &'static str {
@@ -37,7 +37,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> &'static str {
-		"https://github.com/paritytech/substrate/issues/new"
+		"https://github.com/hicommonwealth/edgeware-node/issues/new"
 	}
 
 	fn copyright_start_year() -> i32 {
@@ -45,7 +45,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn executable_name() -> &'static str {
-		"substrate"
+		"edgeware"
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
