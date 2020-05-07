@@ -6,6 +6,7 @@ edition = "2018"
 
 [dependencies]
 jsonrpc-core = "14.0.3"
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 pallet-contracts-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
@@ -15,6 +16,8 @@ sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git",
 sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-finality-grandpa-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

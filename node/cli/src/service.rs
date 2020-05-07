@@ -21,7 +21,6 @@
 use std::sync::Arc;
 
 use sc_consensus_aura;
-use sc_client::{self, LongestChain};
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider, StorageAndProofProvider};
 use edgeware_executor;
 use edgeware_primitives::Block;
@@ -31,14 +30,7 @@ use sc_service::{
 };
 
 use sp_inherents::InherentDataProviders;
-use sc_service::{Service, NetworkStatus};
-use sc_client::{Client, LocalCallExecutor};
-use sc_client_db::Backend;
-use sp_runtime::traits::Block as BlockT;
-use edgeware_executor::NativeExecutor;
-use sc_network::NetworkService;
-use sc_offchain::OffchainWorkers;
-pub use crate::ChainSpec;
+use sc_consensus::LongestChain;
 
 /// Starts a `ServiceBuilder` for a full service.
 ///
@@ -81,13 +73,14 @@ macro_rules! new_full_start {
 					justification_import.clone(), client.clone(),
 				);
 
-				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>(
+				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
 					sc_consensus_aura::slot_duration(&*client)?,
 					aura_block_import,
 					Some(Box::new(justification_import.clone())),
 					None,
 					client,
 					inherent_data_providers.clone(),
+					spawn_task_handle
 				)?;
 
 				import_setup = Some((grandpa_block_import, grandpa_link));
@@ -98,21 +91,21 @@ macro_rules! new_full_start {
 					.expect("GRANDPA LinkHalf is present for full services or set up failed; qed.");
 				let shared_authority_set = grandpa_link.shared_authority_set();
 				let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
-				let deps = node_rpc::FullDeps {
+				let deps = edgeware_rpc::FullDeps {
 					client: builder.client().clone(),
 					pool: builder.pool(),
 					select_chain: builder.select_chain().cloned()
 						.expect("SelectChain is present for full services or set up failed; qed."),
-					grandpa: node_rpc::GrandpaDeps {
+					grandpa: edgeware_rpc::GrandpaDeps {
 						shared_voter_state: shared_voter_state.clone(),
 						shared_authority_set: shared_authority_set.clone(),
 					},
 				};
 				rpc_setup = Some((shared_voter_state));
-				Ok(node_rpc::create_full(deps))
+				Ok(edgeware_rpc::create_full(deps))
 			})?;
 
-		(builder, import_setup, inherent_data_providers)
+			(builder, import_setup, inherent_data_providers, rpc_setup)
 	}}
 }
 
@@ -144,11 +137,10 @@ macro_rules! new_full {
 		let service = builder
 			.with_finality_proof_provider(|client, backend| {
 				// GenesisAuthoritySetProvider is implemented for StorageAndProofProvider
-				let provider = client as Arc<dyn grandpa::StorageAndProofProvider<_, _>>;
-				Ok(Arc::new(grandpa::FinalityProofProvider::new(backend, provider)) as _)
+				let provider = client as Arc<dyn sc_finality_grandpa::StorageAndProofProvider<_, _>>;
+				Ok(Arc::new(sc_finality_grandpa::FinalityProofProvider::new(backend, provider)) as _)
 			})?
 			.build()?;
-
 
 		let (block_import, grandpa_link) = import_setup.take()
 			.expect("Link Half and Block Import are present for Full Services or setup failed before. qed");
@@ -185,22 +177,6 @@ macro_rules! new_full {
 			)?;
 
 			service.spawn_essential_task("aura-proposer", aura);
-
-			// let network = service.network();
-			// let dht_event_stream = network.event_stream().filter_map(|e| async move { match e {
-			// 	Event::Dht(e) => Some(e),
-			// 	_ => None,
-			// }}).boxed();
-			// let authority_discovery = sc_authority_discovery::AuthorityDiscovery::new(
-			// 	service.client(),
-			// 	network,
-			// 	sentry_nodes,
-			// 	service.keystore(),
-			// 	dht_event_stream,
-			// 	service.prometheus_registry(),
-			// );
-
-			// service.spawn_task("authority-discovery", authority_discovery);
 		}
 
 		// Spawn authority discovery module.
@@ -238,7 +214,7 @@ macro_rules! new_full {
 
 		// if the node isn't actively participating in consensus then it doesn't
 		// need a keystore, regardless of which protocol we use below.
-		let keystore = if participates_in_consensus {
+		let keystore = if role.is_authority() {
 			Some(service.keystore())
 		} else {
 			None
@@ -270,6 +246,7 @@ macro_rules! new_full {
 				telemetry_on_connect: Some(service.telemetry_on_connect_stream()),
 				voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
 				prometheus_registry: service.prometheus_registry(),
+				shared_voter_state,
 			};
 
 			service.spawn_essential_task(
@@ -290,23 +267,6 @@ macro_rules! new_full {
 		new_full!($config, |_, _| {})
 	}}
 }
-
-
-/// Concrete configuration for Edgeware runtime
-type ConcreteBlock = edgeware_primitives::Block;
-type ConcreteClient =
-	Client<
-		Backend<ConcreteBlock>,
-		LocalCallExecutor<Backend<ConcreteBlock>,
-		NativeExecutor<edgeware_executor::Executor>>,
-		ConcreteBlock,
-		edgeware_runtime::RuntimeApi
-	>;
-type ConcreteBackend = Backend<ConcreteBlock>;
-type ConcreteTransactionPool = sc_transaction_pool::BasicPool<
-	sc_transaction_pool::FullChainApi<ConcreteClient, ConcreteBlock>,
-	ConcreteBlock
->;
 
 /// Builds a new service for a full client.
 pub fn new_full(config: Configuration)
@@ -349,13 +309,14 @@ pub fn new_light(config: Configuration)
 			let finality_proof_request_builder =
 				finality_proof_import.create_finality_proof_request_builder();
 
-			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>(
+			let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
 				sc_consensus_aura::slot_duration(&*client)?,
 				grandpa_block_import,
 				None,
 				Some(Box::new(finality_proof_import)),
 				client,
 				inherent_data_providers.clone(),
+				spawn_task_handle,
 			)?;
 
 			Ok((import_queue, finality_proof_request_builder))

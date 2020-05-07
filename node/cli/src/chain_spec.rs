@@ -23,13 +23,12 @@ use edgeware_runtime::{
 	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
 	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
 	SudoConfig, SystemConfig, VestingConfig, WASM_BINARY,
-	SignalingConfig, TreasuryRewardConfig,
-	// EVMConfig
+	SignalingConfig, TreasuryRewardConfig, ElectionsConfig,
+	EVMConfig
 };
 use edgeware_runtime::Block;
 use edgeware_runtime::constants::currency::*;
-use sc_service;
-
+use sc_service::ChainType;
 use sc_telemetry::TelemetryEndpoints;
 use sp_finality_grandpa::{AuthorityId as GrandpaId};
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
@@ -75,9 +74,9 @@ fn get_lockdrop_participants_allocation() -> Result<Allocation>{
 #[serde(rename_all = "camelCase")]
 pub struct Extensions {
 	/// Block numbers with known hashes.
-	pub fork_blocks: sc_client::ForkBlocks<Block>,
+	pub fork_blocks: sc_client_api::ForkBlocks<Block>,
 	/// Known bad block hashes.
-	pub bad_blocks: sc_client::BadBlocks<Block>,
+	pub bad_blocks: sc_client_api::BadBlocks<Block>,
 }
 
 /// Specialized `ChainSpec`.
@@ -172,7 +171,7 @@ pub fn testnet_genesis(
 		]
 	});
 
-	const STASH: Balance = 100 * DOLLARS;
+	const STASH: Balance = 100000000 * DOLLARS;
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
@@ -215,7 +214,6 @@ pub fn testnet_genesis(
 				enable_println, // this should only be enabled on development chains
 				..Default::default()
 			},
-			gas_price: 1 * MILLICENTS,
 		}),
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
@@ -229,7 +227,23 @@ pub fn testnet_genesis(
 		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),
-		pallet_treasury: Some(Default::default()),
+        pallet_treasury: Some(Default::default()),
+		pallet_elections_phragmen: Some(ElectionsConfig {
+			members: endowed_accounts.iter()
+						.take((endowed_accounts.len() + 1) / 2)
+						.cloned()
+						.map(|member| (member, STASH))
+						.collect(),
+        }),
+		pallet_sudo: Some(SudoConfig {
+			key: _root_key,
+		}),
+		pallet_vesting: Some(VestingConfig {
+			vesting: vesting,
+		}),
+		pallet_evm: Some(EVMConfig {
+			accounts: vec![],
+		}),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
@@ -238,15 +252,6 @@ pub fn testnet_genesis(
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		}),
-		pallet_sudo: Some(SudoConfig {
-			key: _root_key,
-		}),
-		pallet_vesting: Some(VestingConfig {
-			vesting: vesting,
-		}),
-		// pallet_evm: Some(EVMConfig {
-		// 	accounts: vec![],
-		// }),
 	}
 }
 
@@ -298,10 +303,12 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
 	ChainSpec::from_genesis(
 		&testnet_name,
-		&testnet_node_name,
+        &testnet_node_name,
+        ChainType::Development,
 		edgeware_testnet_config_genesis,
 		boot_nodes,
-		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+			.expect("Staging telemetry url is valid; qed")),
 		Some(DEFAULT_PROTOCOL_ID),
 		properties,
 		Default::default(),
@@ -352,7 +359,8 @@ pub fn development_config() -> ChainSpec {
 	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
 		"Development",
-		"dev",
+        "dev",
+        ChainType::Development,
 		development_config_genesis,
 		vec![],
 		None,
@@ -373,7 +381,8 @@ pub fn multi_development_config() -> ChainSpec {
 	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
 		"Multi Development",
-		"multi-dev",
+        "multi-dev",
+        ChainType::Development,
 		multi_development_config_genesis,
 		vec![],
 		None,
@@ -402,7 +411,8 @@ fn local_testnet_genesis() -> GenesisConfig {
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
-		"local_testnet",
+        "local_testnet",
+        ChainType::Development,
 		local_testnet_genesis,
 		vec![],
 		None,
@@ -458,7 +468,6 @@ pub fn mainnet_genesis(
 				enable_println, // this should only be enabled on development chains
 				..Default::default()
 			},
-			gas_price: 1 * MILLICENTS,
 		}),
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
@@ -473,23 +482,24 @@ pub fn mainnet_genesis(
 			authorities: vec![],
 		}),
 		pallet_treasury: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 100 * DOLLARS,
-		}),
-		treasury_reward: Some(TreasuryRewardConfig {
-			current_payout: 95 * DOLLARS,
-			minting_interval: One::one(),
-		}),
-		pallet_sudo: Some(SudoConfig {
+		pallet_elections_phragmen: Some(Default::default()),
+        pallet_sudo: Some(SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		}),
 		pallet_vesting: Some(VestingConfig {
 			vesting: vesting,
 		}),
-		// pallet_evm: Some(EVMConfig {
-		// 	accounts: vec![],
-		// }),
+		pallet_evm: Some(EVMConfig {
+			accounts: vec![],
+		}),
+		signaling: Some(SignalingConfig {
+			voting_length: 7 * DAYS,
+			proposal_creation_bond: 1 * DOLLARS,
+		}),
+		treasury_reward: Some(TreasuryRewardConfig {
+			current_payout: 95 * DOLLARS,
+			minting_interval: One::one(),
+		}),
 	}
 }
 
@@ -538,10 +548,12 @@ pub fn edgeware_mainnet_config() -> ChainSpec {
 	let boot_nodes = crate::mainnet_fixtures::get_mainnet_bootnodes();
 	ChainSpec::from_genesis(
 		"Edgeware",
-		"edgeware",
+        "edgeware",
+        ChainType::Live,
 		edgeware_mainnet_config_genesis,
 		boot_nodes,
-		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])),
+				Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+			.expect("Staging telemetry url is valid; qed")),
 		Some(DEFAULT_PROTOCOL_ID),
 		properties,
 		Default::default(),

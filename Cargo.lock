@@ -1228,7 +1228,10 @@ dependencies = [
 name = "edgeware-primitives"
 version = "3.0.0"
 dependencies = [
+ "frame-system",
+ "parity-scale-codec",
  "pretty_assertions",
+ "sp-application-crypto",
  "sp-core",
  "sp-runtime",
  "sp-serializer",
@@ -1243,6 +1246,9 @@ dependencies = [
  "jsonrpc-core",
  "pallet-contracts-rpc",
  "pallet-transaction-payment-rpc",
+ "sc-client-api",
+ "sc-finality-grandpa",
+ "sc-finality-grandpa-rpc",
  "sc-keystore",
  "sp-api",
  "sp-blockchain",
@@ -1351,6 +1357,7 @@ dependencies = [
  "pallet-treasury",
  "parity-scale-codec",
  "sc-executor",
+ "sc-service",
  "sp-core",
  "sp-io",
  "sp-keyring",
@@ -5778,6 +5785,23 @@ dependencies = [
  "sp-runtime",
  "sp-utils",
  "substrate-prometheus-endpoint",
+]
+
+[[package]]
+name = "sc-finality-grandpa-rpc"
+version = "0.8.0-dev"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#e7457b1eb9980596301fe1afd36478a6725157ef"
+dependencies = [
+ "derive_more",
+ "finality-grandpa",
+ "futures 0.3.4",
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "log 0.4.8",
+ "sc-finality-grandpa",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

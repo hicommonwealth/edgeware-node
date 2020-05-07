@@ -8,6 +8,7 @@ edition = "2018"
 [dependencies]
 pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 codec = { package = "parity-scale-codec", version = "1.3.0" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", features = ["test-helpers", "db"] }
 pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }

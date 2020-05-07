@@ -17,6 +17,7 @@
 //! Utilites to build a `TestClient` for `node-runtime`.
 
 use sp_runtime::BuildStorage;
+use sc_service::client;
 
 /// Re-export test-client utilities.
 pub use substrate_test_client::*;
@@ -28,9 +29,9 @@ pub type Executor = sc_executor::NativeExecutor<edgeware_executor::Executor>;
 pub type Backend = sc_client_db::Backend<edgeware_primitives::Block>;
 
 /// Test client type.
-pub type Client = sc_client::Client<
+pub type Client = client::Client<
 	Backend,
-	sc_client::LocalCallExecutor<Backend, Executor>,
+	client::LocalCallExecutor<Backend, Executor>,
 	edgeware_primitives::Block,
 	edgeware_runtime::RuntimeApi,
 >;
@@ -58,7 +59,7 @@ pub trait TestClientBuilderExt: Sized {
 
 impl TestClientBuilderExt for substrate_test_client::TestClientBuilder<
 	edgeware_primitives::Block,
-	sc_client::LocalCallExecutor<Backend, Executor>,
+	client::LocalCallExecutor<Backend, Executor>,
 	Backend,
 	GenesisParameters,
 > {

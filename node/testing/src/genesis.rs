@@ -82,7 +82,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		}),
 		pallet_contracts: Some(ContractsConfig {
 			current_schedule: Default::default(),
-			gas_price: 1 * MILLICENTS,
 		}),
 		pallet_aura: Some(Default::default()),
 		pallet_grandpa: Some(GrandpaConfig {
@@ -93,10 +92,11 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		pallet_democracy: Some(Default::default()),
 		pallet_collective_Instance1: Some(Default::default()),
 		pallet_treasury: Some(Default::default()),
-		signaling: Some(Default::default()),
-		treasury_reward: Some(Default::default()),
+		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(Default::default()),
 		pallet_vesting: Some(Default::default()),
-		// pallet_evm: Some(Default::default()),
+		pallet_evm: Some(Default::default()),
+		signaling: Some(Default::default()),
+		treasury_reward: Some(Default::default()),
 	}
 }
