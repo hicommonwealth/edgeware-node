@@ -228,13 +228,7 @@ pub fn testnet_genesis(
 			authorities: vec![],
 		}),
         pallet_treasury: Some(Default::default()),
-		pallet_elections_phragmen: Some(ElectionsConfig {
-			members: endowed_accounts.iter()
-						.take((endowed_accounts.len() + 1) / 2)
-						.cloned()
-						.map(|member| (member, STASH))
-						.collect(),
-        }),
+		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(SudoConfig {
 			key: _root_key,
 		}),
