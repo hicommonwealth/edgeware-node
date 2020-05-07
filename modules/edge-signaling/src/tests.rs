@@ -16,11 +16,14 @@
 
 use super::*;
 
-use frame_support::{parameter_types, impl_outer_origin, assert_err, assert_ok};
+use frame_support::{
+	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
+	traits::{OnFinalize}
+};
 use sp_core::{H256, Blake2Hasher, Hasher};
 use sp_runtime::{
 	Perbill,
-	traits::{IdentityLookup, OnFinalize},
+	traits::{BlakeTwo256, IdentityLookup},
 	testing::{Header}
 };
 pub use crate::{Event, Module, RawEvent, Trait, GenesisConfig};
@@ -35,7 +38,7 @@ pub struct Test;
 
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
-	pub const MaximumBlockWeight: u32 = 1024;
+	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
@@ -46,13 +49,16 @@ impl frame_system::Trait for Test {
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = ::sp_runtime::traits::BlakeTwo256;
+	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type MaximumBlockWeight = MaximumBlockWeight;
+	type DbWeight = ();
+	type BlockExecutionWeight = ();
+	type ExtrinsicBaseWeight = ();
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
@@ -69,8 +75,8 @@ parameter_types! {
 
 impl pallet_balances::Trait for Test {
 	type Balance = u128;
-	type DustRemoval = ();
 	type Event = ();
+	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Test>;
 }

@@ -37,59 +37,54 @@ log = "0.4.8"
 rand = "0.7.2"
 structopt = { version = "0.3.8", optional = true }
 tracing = "0.1.10"
+parking_lot = "0.10.0"
 hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop"}
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-
+sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 
 # client dependencies
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-network = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-network = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+
 
 # frame dependencies
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -98,34 +93,38 @@ edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
-edgeware-transaction-factory = { optional = true, path = "../transaction-factory" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", optional = true }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
+browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", optional = true }
+
+[target.'cfg(target_arch="x86_64")'.dependencies]
+node-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", features = [ "wasmtime" ] }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", optional = true, features = [ "wasmtime" ] }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false, features = [ "wasmtime" ] }
 
 [dev-dependencies]
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-futures = "0.3.1"
+sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+futures = "0.3.4"
 tempfile = "3.1.0"
-assert_cmd = "0.12"
+assert_cmd = "1.0"
 nix = "0.17"
 serde_json = "1.0"
+regex = "1"
+platforms = "0.2.1"
 
 [build-dependencies]
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
-build-script-utils = { package = "substrate-build-script-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", optional = true }
+substrate-build-script-utils = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", optional = true }
 structopt = { version = "0.3.8", optional = true }
-vergen = { version = "3.0.4", optional = true }
-edgeware-transaction-factory = { optional = true, path = "../transaction-factory" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 
 
 [features]
@@ -136,15 +135,13 @@ browser = [
 	"wasm-bindgen-futures",
 ]
 cli = [
-	"sc-cli",
-	"edgeware-transaction-factory",
 	"edgeware-inspect",
 	"edgeware-executor/wasmi-errno",
 	"sc-cli",
 	"frame-benchmarking-cli",
-	"sc-service/rocksdb",
-	"vergen",
+	"sc-service/db",
 	"structopt",
+	"substrate-build-script-utils",
 ]
 wasmtime = [
 	"cli",

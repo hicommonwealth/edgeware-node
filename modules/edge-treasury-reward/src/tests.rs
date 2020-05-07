@@ -18,21 +18,20 @@ use super::*;
 use sp_staking::SessionIndex;
 use sp_runtime::traits::OpaqueKeys;
 use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::testing::UintAuthorityId;
+use sp_runtime::testing::{UintAuthorityId, TestXt};
 
 #[cfg(feature = "std")]
 use std::{collections::HashSet, cell::RefCell};
 
 use sp_core::{H256, crypto::key_types};
 
-
-use frame_support::{parameter_types, impl_outer_origin};
-use frame_support::{traits::{Contains}};
+use frame_support::{parameter_types, impl_outer_origin, impl_outer_dispatch, weights::Weight};
+use frame_support::{traits::{Contains, ContainsLengthBound, OnFinalize}};
 
 use sp_runtime::{
-	Perbill, Permill, KeyTypeId,
+	Perbill, Permill, KeyTypeId, ModuleId,
 	testing::{Header}, Percent,
-	traits::{IdentityLookup, One, OnFinalize},
+	traits::{BlakeTwo256, IdentityLookup, One},
 };
 
 use crate::GenesisConfig;
@@ -90,29 +89,37 @@ impl_outer_origin! {
 	pub enum Origin for Test {}
 }
 
+impl_outer_dispatch! {
+	pub enum Call for Test where origin: Origin {
+		pallet_staking::Staking,
+	}
+}
+
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Test;
 
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
-	pub const MaximumBlockWeight: u32 = 1024;
+	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
-
 impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = ::sp_runtime::traits::BlakeTwo256;
+	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type MaximumBlockWeight = MaximumBlockWeight;
+	type DbWeight = ();
+	type BlockExecutionWeight = ();
+	type ExtrinsicBaseWeight = ();
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
@@ -121,7 +128,6 @@ impl frame_system::Trait for Test {
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 }
-
 
 parameter_types! {
 	pub const ExistentialDeposit: u128 = 1;
@@ -151,6 +157,7 @@ impl pallet_session::Trait for Test {
 	type ValidatorIdOf = pallet_staking::StashOf<Test>;
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
 	type SessionManager = Staking;
+	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
 }
 
 impl pallet_session::historical::Trait for Test {
@@ -178,6 +185,15 @@ pallet_staking_reward_curve::build! {
 	);
 }
 
+impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test where
+	Call: From<LocalCall>,
+{
+	type OverarchingCall = Call;
+	type Extrinsic = Extrinsic;
+}
+
+pub type Extrinsic = TestXt<Call, ()>;
+
 parameter_types! {
 	pub const SessionsPerEra: SessionIndex = 3;
 	pub const BondingDuration: pallet_staking::EraIndex = 3;
@@ -187,7 +203,7 @@ parameter_types! {
 
 impl pallet_staking::Trait for Test {
 	type Currency = pallet_balances::Module<Self>;
-	type Time = pallet_timestamp::Module<Self>;
+	type UnixTime = pallet_timestamp::Module<Self>;
 	type CurrencyToVote = CurrencyToVoteHandler;
 	type RewardRemainder = ();
 	type Event = ();
@@ -199,7 +215,40 @@ impl pallet_staking::Trait for Test {
 	type BondingDuration = BondingDuration;
 	type SessionInterface = Self;
 	type RewardCurve = RewardCurve;
+	type NextNewSession = pallet_session::Module<Test>;
+	type ElectionLookahead = ();
+	type Call = Call;
+	type MaxIterations = ();
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
+	type UnsignedPriority = ();
+}
+
+
+
+thread_local! {
+	static TEN_TO_FOURTEEN: RefCell<Vec<u64>> = RefCell::new(vec![10,11,12,13,14]);
+}
+pub struct TenToFourteen;
+impl Contains<u64> for TenToFourteen {
+	fn sorted_members() -> Vec<u64> {
+		TEN_TO_FOURTEEN.with(|v| {
+			v.borrow().clone()
+		})
+	}
+	#[cfg(feature = "runtime-benchmarks")]
+	fn add(new: &u64) {
+		TEN_TO_FOURTEEN.with(|v| {
+			let mut members = v.borrow_mut();
+			members.push(*new);
+			members.sort();
+		})
+	}
+}
+impl ContainsLengthBound for TenToFourteen {
+	fn max_len() -> usize {
+		TEN_TO_FOURTEEN.with(|v| v.borrow().len())
+	}
+	fn min_len() -> usize { 0 }
 }
 
 parameter_types! {
@@ -209,35 +258,32 @@ parameter_types! {
 	pub const Burn: Permill = Permill::from_percent(50);
 	pub const TipCountdown: u64 = 1;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
-	pub const TipReportDepositBase: Balance = 1;
-	pub const TipReportDepositPerByte: Balance = 1;
+	pub const TipReportDepositBase: u64 = 1;
+	pub const TipReportDepositPerByte: u64 = 1;
+	pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
 }
-
-pub struct TenToFourteen;
-impl Contains<u64> for TenToFourteen {
-	fn contains(n: &u64) -> bool {
-		*n >= 10 && *n <= 14
-	}
-	fn sorted_members() -> Vec<u64> {
-		vec![10, 11, 12, 13, 14]
-	}
-}
-
 impl pallet_treasury::Trait for Test {
-	type Currency = Balances;
+	type ModuleId = TreasuryModuleId;
+	type Currency = pallet_balances::Module<Test>;
 	type ApproveOrigin = frame_system::EnsureRoot<u64>;
 	type RejectOrigin = frame_system::EnsureRoot<u64>;
+	type Tippers = TenToFourteen;
+	type TipCountdown = TipCountdown;
+	type TipFindersFee = TipFindersFee;
+	type TipReportDepositBase = TipReportDepositBase;
+	type TipReportDepositPerByte = TipReportDepositPerByte;
 	type Event = ();
 	type ProposalRejection = ();
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
-	type Tippers = TenToFourteen;
-	type TipCountdown = TipCountdown;
-	type TipFindersFee = TipFindersFee;
-	type TipReportDepositBase = TipReportDepositBase;
-	type TipReportDepositPerByte = TipReportDepositPerByte;
+}
+
+
+parameter_types! {
+	pub const MinimumTreasuryPct: Percent = Percent::from_percent(50);
+	pub const MaximumRecipientPct: Percent = Percent::from_percent(50);
 }
 
 impl Trait for Test {
