@@ -125,7 +125,7 @@ impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 250;
-	pub const MaximumBlockWeight: Weight = 1_000_000_000;
+	pub const MaximumBlockWeight: Weight = 2 * frame_support::weights::constants::WEIGHT_PER_SECOND;
 	pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
 	pub const Version: RuntimeVersion = VERSION;
 	pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
@@ -294,12 +294,10 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-        // 1 hour session, 6 hour era
+  // 1 hour session, 6 hour era
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
-        // 28 eras for unbonding (7 days)
-	pub const BondingDuration: pallet_staking::EraIndex = 28;
-        // 28 eras in which slashes can be cancelled (7 days)
-	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
+	pub const BondingDuration: pallet_staking::EraIndex = 28 * 24;
+	pub const SlashDeferDuration: pallet_staking::EraIndex = 7 * 24;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &CURVE;
 	pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
 	pub const MaxNominatorRewardedPerValidator: u32 = 64;

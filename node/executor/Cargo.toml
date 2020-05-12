@@ -51,6 +51,10 @@ criterion = "0.3.0"
 edgeware-testing = { path = "../testing" }
 
 [features]
+std = [
+    "sp-runtime-interface/std",
+    "sp-runtime/std",
+]
 wasmtime = [
     "sc-executor/wasmtime",
 ]

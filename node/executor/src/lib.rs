@@ -19,14 +19,14 @@
 
 pub use sc_executor::NativeExecutor;
 use sc_executor::native_executor_instance;
-use sp_runtime_interface::runtime_interface;
+// use sp_runtime_interface::runtime_interface;
 
-#[runtime_interface]
-trait MyInterface {
-	fn child_storage_kill() {
-		println!("We fixed it");
-	}
-}
+// #[runtime_interface]
+// trait MyInterface {
+// 	fn child_storage_kill() {
+// 		println!("We fixed it");
+// 	}
+// }
 
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
@@ -34,5 +34,8 @@ native_executor_instance!(
 	pub Executor,
 	edgeware_runtime::api::dispatch,
 	edgeware_runtime::native_version,
-	(frame_benchmarking::benchmarking::HostFunctions, my_interface::HostFunctions),
+	(
+		frame_benchmarking::benchmarking::HostFunctions,
+		// my_interface::HostFunctions
+	),
 );
