@@ -5,9 +5,6 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 edition = "2018"
 
-[package.metadata.docs.rs]
-targets = ["x86_64-unknown-linux-gnu"]
-
 [dependencies]
 trie-root = "0.16.0"
 codec = { package = "parity-scale-codec", version = "1.3.0" }
@@ -17,20 +14,10 @@ sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch 
 sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sp-trie = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 frame-benchmarking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-wasmi = "0.6.2"
-parity-wasm = "0.41.0"
-lazy_static = "1.4.0"
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sp-wasm-interface = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sp-runtime-interface = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sp-externalities = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sc-executor-common = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sc-executor-wasmi = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sc-executor-wasmtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", optional = true }
-
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
+edgeware-runtime-interface = { path = "../runtime-interface" }
 
 [dev-dependencies]
 test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
@@ -51,19 +38,14 @@ criterion = "0.3.0"
 edgeware-testing = { path = "../testing" }
 
 [features]
-std = [
-    "sp-runtime-interface/std",
-    "sp-runtime/std",
-]
 wasmtime = [
     "sc-executor/wasmtime",
 ]
 wasmi-errno = [
-	"sc-executor/wasmi-errno",
+    "sc-executor/wasmi-errno",
 ]
 stress-test = []
 
 [[bench]]
 name = "bench"
 harness = false
-

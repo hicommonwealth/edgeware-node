@@ -14,21 +14,31 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-//! A `CodeExecutor` specialization which uses natively compiled runtime when the wasm to be
-//! executed is equivalent to the natively compiled code.
+use sp_runtime_interface::runtime_interface;
 
-pub use sc_executor::NativeExecutor;
-use sc_executor::native_executor_instance;
-use edgeware_runtime_interface;
+#[runtime_interface]
+pub trait Storage {
+    fn child_storage_kill(a: u64, b: u64, c: u32) {
+        return;
+    }
 
-// Declare an instance of the native executor named `Executor`. Include the wasm binary as the
-// equivalent wasm code.
-native_executor_instance!(
-	pub Executor,
-	edgeware_runtime::api::dispatch,
-	edgeware_runtime::native_version,
-	(
-		frame_benchmarking::benchmarking::HostFunctions,
-		edgeware_runtime_interface::storage::HostFunctions,
-	),
-);
+    fn child_root(a: u64) -> Option<u64> {
+        return Some(a);
+    }
+
+    fn child_get(a: u64, b: u64, c: u32, d: u64) -> Option<u64> {
+        return Some(a);
+    }
+
+    fn child_storage_key_or_panic(a: u64) -> u64 {
+        return a;
+    }
+
+    fn child_read(a: u64, b: u64, c: u32, d: u64, e: u64, f: u32) -> Option<u32> {
+        return Some(c);
+    }
+
+    fn child_clear(a: u64, b: u64, c: u32, d: u64) {
+        return;
+    }
+}
