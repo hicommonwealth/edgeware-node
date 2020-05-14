@@ -18,27 +18,48 @@ use sp_runtime_interface::runtime_interface;
 
 #[runtime_interface]
 pub trait Storage {
-    fn child_storage_kill(a: u64, b: u64, c: u32) {
+    fn child_storage_kill(_a: u64, _b: u64, _c: u32) {
         return;
     }
 
-    fn child_root(a: u64) -> Option<u64> {
+    fn child_root(_a: u64) -> Option<u64> {
         return Some(a);
     }
 
-    fn child_get(a: u64, b: u64, c: u32, d: u64) -> Option<u64> {
+    fn child_get(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
         return Some(a);
     }
 
-    fn child_storage_key_or_panic(a: u64) -> u64 {
+    fn child_storage_key_or_panic(_a: u64) -> u64 {
         return a;
     }
 
-    fn child_read(a: u64, b: u64, c: u32, d: u64, e: u64, f: u32) -> Option<u32> {
+    fn child_read(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64, _f: u32) -> Option<u32> {
         return Some(c);
     }
 
-    fn child_clear(a: u64, b: u64, c: u32, d: u64) {
+    fn child_clear(_a: u64, _b: u64, _c: u32, _d: u64) {
         return;
     }
+
+    fn child_set(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64) {
+        return;
+    }
+    
+    /*
+        Not sure if these will be needed in the future but
+        commenting out since combing the git history is annoying
+    */ 
+
+    // fn child_exists(_a: u64, _b: u64, _c: u32, _d: u64) -> bool {
+    //     return false;
+    // }
+
+    // fn child_clear_prefix(_a: u64, _b: u64, _c: u32, _d: u64) {
+    //     return;
+    // }
+
+    // fn child_next_key(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
+    //     return;
+    // }
 }
