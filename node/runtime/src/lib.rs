@@ -232,6 +232,7 @@ impl pallet_transaction_payment::Trait for Runtime {
 parameter_types! {
 	pub const MinimumPeriod: Moment = SLOT_DURATION / 2;
 }
+
 impl pallet_timestamp::Trait for Runtime {
 	type Moment = Moment;
 	type OnTimestampSet = Aura;
@@ -296,8 +297,8 @@ pallet_staking_reward_curve::build! {
 parameter_types! {
   // 1 hour session, 6 hour era
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
-	pub const BondingDuration: pallet_staking::EraIndex = 28 * 24;
-	pub const SlashDeferDuration: pallet_staking::EraIndex = 7 * 24;
+	pub const BondingDuration: pallet_staking::EraIndex = 2 * 28;
+	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &CURVE;
 	pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
 	pub const MaxNominatorRewardedPerValidator: u32 = 64;
@@ -381,7 +382,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 parameter_types! {
 	pub const CandidacyBond: Balance = 1_000 * DOLLARS;
 	pub const VotingBond: Balance = 10 * DOLLARS;
-	pub const TermDuration: BlockNumber = 28 * DAYS;
+	pub const TermDuration: BlockNumber = 14 * DAYS;
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
@@ -409,8 +410,8 @@ impl pallet_elections_phragmen::Trait for Runtime {
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
 	pub const ProposalBondMinimum: Balance = 1_000 * DOLLARS;
-	pub const SpendPeriod: BlockNumber = 7 * DAYS;
-	pub const Burn: Permill = Permill::from_percent(20);
+	pub const SpendPeriod: BlockNumber = 14 * DAYS;
+	pub const Burn: Permill = Permill::from_percent(5);
 	pub const TipCountdown: BlockNumber = 1 * DAYS;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
 	pub const TipReportDepositBase: Balance = 1 * DOLLARS;
