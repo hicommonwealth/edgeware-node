@@ -23,19 +23,19 @@ pub trait Storage {
     }
 
     fn child_root(_a: u64) -> Option<u64> {
-        return Some(a);
+        return Some(_a);
     }
 
     fn child_get(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
-        return Some(a);
+        return Some(_a);
     }
 
     fn child_storage_key_or_panic(_a: u64) -> u64 {
-        return a;
+        return _a;
     }
 
     fn child_read(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64, _f: u32) -> Option<u32> {
-        return Some(c);
+        return Some(_c);
     }
 
     fn child_clear(_a: u64, _b: u64, _c: u32, _d: u64) {
