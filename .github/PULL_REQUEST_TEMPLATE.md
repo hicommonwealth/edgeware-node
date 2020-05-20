@@ -9,7 +9,7 @@ Before you submitting, please check that:
 - [ ] You labeled the PR with appropriate labels if you have permissions to do so.
 - [ ] You mentioned a related issue if this PR related to it, e.g. `Fixes #228` or `Related #1337`.
 - [ ] You asked any particular reviewers to review. If you aren't sure, start with GH suggestions.
-- [ ] Your PR adheres [the style guide](https://github.com/hicommonwealth/edgeware-documentation/blob/master/docs/build-on-edgeware/style-guide.md)
+- [ ] Your PR adheres [the style guide](https://github.com/hicommonwealth/edgeware-documentation/blob/03cd9cecb579be3ddab1ff919691b80929d1804e/docs/understanding-edgeware/style-guide.md#code-style-guide)
   - In particular, mind the maximal line length.
   - There is no commented code checked in unless necessary.
   - Any panickers have a proof or removed.
