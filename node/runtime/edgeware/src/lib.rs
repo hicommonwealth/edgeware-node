@@ -780,15 +780,12 @@ impl_runtime_apis! {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use system::offchain::SubmitSignedTransaction;
+	use frame_system::offchain::SubmitSignedTransaction;
 
 	fn is_submit_signed_transaction<T>(_arg: T) where
 		T: SubmitSignedTransaction<
 			Runtime,
 			Call,
-			Extrinsic=UncheckedExtrinsic,
-			CreateTransaction=Runtime,
-			Signer=ImOnlineId,
 		>,
 	{}
 
@@ -800,7 +797,7 @@ mod tests {
 
 	#[test]
 	fn block_hooks_weight_should_not_exceed_limits() {
-		use sp_runtime::weights::WeighBlock;
+		use frame_support::weights::WeighBlock;
 		let check_for_block = |b| {
 			let block_hooks_weight =
 				<AllModules as WeighBlock<BlockNumber>>::on_initialize(b) +

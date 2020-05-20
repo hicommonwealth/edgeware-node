@@ -116,7 +116,7 @@ impl<T: Get<Perbill>> Convert<Fixed64, Fixed64> for TargetedFeeAdjustment<T> {
 #[cfg(test)]
 mod tests {
 	use super::*;
-	use sp_runtime::weights::Weight;
+	use frame_support::weights::Weight;
 	use sp_runtime::assert_eq_error_rate;
 	use crate::{MaximumBlockWeight, AvailableBlockRatio, Runtime};
 	use crate::{constants::currency::*, TransactionPayment, TargetBlockFullness};
@@ -151,8 +151,8 @@ mod tests {
 	}
 
 	fn run_with_system_weight<F>(w: Weight, assertions: F) where F: Fn() -> () {
-		let mut t: runtime_io::TestExternalities =
-			system::GenesisConfig::default().build_storage::<Runtime>().unwrap().into();
+		let mut t: sp_io::TestExternalities =
+			frame_system::GenesisConfig::default().build_storage::<Runtime>().unwrap().into();
 		t.execute_with(|| {
 			System::set_block_limits(w, 0);
 			assertions()
@@ -228,7 +228,7 @@ mod tests {
 				if fm == next { panic!("The fee should ever increase"); }
 				fm = next;
 				iterations += 1;
-				let fee = <Runtime as transaction_payment::Trait>::WeightToFee::convert(tx_weight);
+				let fee = <Runtime as pallet_transaction_payment::Trait>::WeightToFee::convert(tx_weight);
 				let adjusted_fee = fm.saturated_multiply_accumulate(fee);
 				println!(
 					"iteration {}, new fm = {:?}. Fee at this point is: {} units / {} millicents, \
