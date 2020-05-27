@@ -95,7 +95,7 @@ pub fn create_full<C, P, M, SC>(
 	let FullDeps {
 		client,
 		pool,
-		select_chain,
+		select_chain: _,
 		grandpa,
 	} = deps;
 	let GrandpaDeps {
