@@ -19,13 +19,13 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit="256"]
-use codec::{Encode};
+
 use sp_std::prelude::*;
 use frame_support::{
 	construct_runtime, parameter_types, debug,
 	weights::{
-		Weight,
-		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight},
+		Weight, IdentityFee,
+		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 	},
 	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier},
 };
@@ -37,14 +37,14 @@ use sp_core::{
 pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature};
 pub use sp_api::impl_runtime_apis;
 pub use sp_runtime::{
-	Permill, Perbill, Percent, ApplyExtrinsicResult, Perquintill,
-	impl_opaque_keys, generic, create_runtime_str, ModuleId
+	Permill, Perbill, Perquintill, Percent, PerThing, ApplyExtrinsicResult,
+	impl_opaque_keys, generic, create_runtime_str, ModuleId,
 };
 pub use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource, TransactionPriority};
 use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
-	ConvertInto, OpaqueKeys, NumberFor,
+	ConvertInto, OpaqueKeys, NumberFor, Saturating,
 };
 pub use sp_version::RuntimeVersion;
 #[cfg(any(feature = "std", test))]
@@ -57,6 +57,9 @@ pub use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 pub use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
 pub use sp_inherents::{InherentData, CheckInherentsResult};
+
+use codec::{Encode};
+use static_assertions::const_assert;
 
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
@@ -71,7 +74,7 @@ pub use pallet_evm::Account as EVMAccount;
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
-pub use impls::{CurrencyToVoteHandler, Author, LinearWeightToFee, TargetedFeeAdjustment};
+pub use impls::{CurrencyToVoteHandler, Author, TargetedFeeAdjustment};
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -123,13 +126,20 @@ impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	}
 }
 
+const AVERAGE_ON_INITIALIZE_WEIGHT: Perbill = Perbill::from_percent(10);
 parameter_types! {
 	pub const BlockHashCount: BlockNumber = 250;
-	pub const MaximumBlockWeight: Weight = 2 * frame_support::weights::constants::WEIGHT_PER_SECOND;
+	pub const MaximumBlockWeight: Weight = 2 * WEIGHT_PER_SECOND;
+	pub MaximumExtrinsicWeight: Weight =
+		AvailableBlockRatio::get().saturating_sub(AVERAGE_ON_INITIALIZE_WEIGHT)
+		* MaximumBlockWeight::get();
 	pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
 	pub const Version: RuntimeVersion = VERSION;
 	pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
+	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) * MaximumBlockWeight::get();
 }
+
+const_assert!(AvailableBlockRatio::get().deconstruct() >= AVERAGE_ON_INITIALIZE_WEIGHT.deconstruct());
 
 impl frame_system::Trait for Runtime {
 	type Origin = Origin;
@@ -147,6 +157,7 @@ impl frame_system::Trait for Runtime {
 	type DbWeight = RocksDbWeight;
 	type BlockExecutionWeight = BlockExecutionWeight;
 	type ExtrinsicBaseWeight = ExtrinsicBaseWeight;
+	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = Version;
@@ -171,10 +182,7 @@ impl pallet_utility::Trait for Runtime {
 	type MultisigDepositBase = MultisigDepositBase;
 	type MultisigDepositFactor = MultisigDepositFactor;
 	type MaxSignatories = MaxSignatories;
-}
-
-parameter_types! {
-	pub const MaximumSchedulerWeight: Weight = Perbill::from_percent(80) * MaximumBlockWeight::get();
+	type IsCallable = ();
 }
 
 impl pallet_scheduler::Trait for Runtime {
@@ -214,18 +222,22 @@ impl pallet_balances::Trait for Runtime {
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
-	// In the Substrate node, a weight of 10_000_000 (smallest non-zero weight)
-	// is mapped to 10_000_000 units of fees, hence:
-	pub const WeightFeeCoefficient: Balance = 1;
 	// for a sane configuration, this should always be less than `AvailableBlockRatio`.
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
 }
+
+// for a sane configuration, this should always be less than `AvailableBlockRatio`.
+const_assert!(
+	TargetBlockFullness::get().deconstruct() <
+	(AvailableBlockRatio::get().deconstruct() as <Perquintill as PerThing>::Inner)
+		* (<Perquintill as PerThing>::ACCURACY / <Perbill as PerThing>::ACCURACY as <Perquintill as PerThing>::Inner)
+);
 
 impl pallet_transaction_payment::Trait for Runtime {
 	type Currency = Balances;
 	type OnTransactionPayment = DealWithFees;
 	type TransactionByteFee = TransactionByteFee;
-	type WeightToFee = LinearWeightToFee<WeightFeeCoefficient>;
+	type WeightToFee = IdentityFee<Balance>;
 	type FeeMultiplierUpdate = TargetedFeeAdjustment<TargetBlockFullness>;
 }
 
@@ -337,6 +349,7 @@ parameter_types! {
 	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1 * CENTS;
+	pub const MaxVotes: u32 = 100;
 }
 
 impl pallet_democracy::Trait for Runtime {
@@ -363,12 +376,15 @@ impl pallet_democracy::Trait for Runtime {
 	type VetoOrigin = frame_system::EnsureNever<AccountId>;
 	type CooloffPeriod = CooloffPeriod;
 	type PreimageByteDeposit = PreimageByteDeposit;
+	type OperationalPreimageOrigin = pallet_collective::EnsureMember<AccountId, CouncilCollective>;
 	type Slash = Treasury;
 	type Scheduler = Scheduler;
+	type MaxVotes = MaxVotes;
 }
 
 parameter_types! {
 	pub const CouncilMotionDuration: BlockNumber = 5 * DAYS;
+	pub const CouncilMaxProposals: u32 = 100;
 }
 
 type CouncilCollective = pallet_collective::Instance1;
@@ -377,6 +393,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 	type Proposal = Call;
 	type Event = Event;
 	type MotionDuration = CouncilMotionDuration;
+	type MaxProposals = CouncilMaxProposals;
 }
 
 parameter_types! {
@@ -387,6 +404,9 @@ parameter_types! {
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
 }
+
+// Make sure that there are no more than `MAX_MEMBERS` members elected via phragmen.
+const_assert!(DesiredMembers::get() <= pallet_collective::MAX_MEMBERS);
 
 impl pallet_elections_phragmen::Trait for Runtime {
 	type ModuleId = ElectionsPhragmenModuleId;
@@ -490,7 +510,8 @@ impl<LocalCall> frame_system::offchain::CreateSignedTransaction<LocalCall> for R
 			.saturating_sub(1);
 		let tip = 0;
 		let extra: SignedExtra = (
-			frame_system::CheckVersion::<Runtime>::new(),
+			frame_system::CheckSpecVersion::<Runtime>::new(),
+			frame_system::CheckTxVersion::<Runtime>::new(),
 			frame_system::CheckGenesis::<Runtime>::new(),
 			frame_system::CheckEra::<Runtime>::from(generic::Era::mortal(period, current_block)),
 			frame_system::CheckNonce::<Runtime>::from(nonce),
@@ -530,10 +551,15 @@ impl pallet_im_online::Trait for Runtime {
 	type UnsignedPriority = ImOnlineUnsignedPriority;
 }
 
+parameter_types! {
+	pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * MaximumBlockWeight::get();
+}
+
 impl pallet_offences::Trait for Runtime {
 	type Event = Event;
 	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
 	type OnOffenceHandler = Staking;
+	type WeightSoftLimit = OffencesWeightSoftLimit;
 }
 
 impl pallet_authority_discovery::Trait for Runtime {}
@@ -699,8 +725,13 @@ pub type SignedBlock = generic::SignedBlock<Block>;
 /// BlockId type as expected by this runtime.
 pub type BlockId = generic::BlockId<Block>;
 /// The SignedExtension to the basic transaction logic.
+///
+/// When you change this, you **MUST** modify [`sign`] in `bin/node/testing/src/keyring.rs`!
+///
+/// [`sign`]: <../../testing/src/keyring.rs.html>
 pub type SignedExtra = (
-	frame_system::CheckVersion<Runtime>,
+	frame_system::CheckSpecVersion<Runtime>,
+	frame_system::CheckTxVersion<Runtime>,
 	frame_system::CheckGenesis<Runtime>,
 	frame_system::CheckEra<Runtime>,
 	frame_system::CheckNonce<Runtime>,
