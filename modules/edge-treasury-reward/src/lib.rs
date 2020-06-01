@@ -25,7 +25,7 @@ use sp_std::prelude::*;
 use sp_runtime::traits::{Zero};
 
 use frame_support::{decl_event, decl_module, decl_storage};
-use frame_system::{self as system};
+use frame_system::{self as system, ensure_root};
 pub type BalanceOf<T> = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
 
 pub trait Trait: pallet_staking::Trait + pallet_treasury::Trait + pallet_balances::Trait {
@@ -49,6 +49,20 @@ decl_module! {
 					<pallet_treasury::Module<T>>::account_id())
 				);
 			}
+		}
+
+		/// Sets the fixed treasury payout per minting interval.
+		#[weight = 5_000_000]
+		fn set_current_payout(origin, payout: BalanceOf<T>) {
+			ensure_root(origin)?;
+			<CurrentPayout<T>>::put(payout);
+		}
+
+		/// Sets the treasury minting interval.
+		#[weight = 5_000_000]
+		fn set_minting_interval(origin, interval: T::BlockNumber) {
+			ensure_root(origin)?;
+			<MintingInterval<T>>::put(interval);
 		}
 	}
 }
