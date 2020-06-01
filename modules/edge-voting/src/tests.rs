@@ -42,12 +42,13 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
-	type Call = ();
 	type BlockNumber = u64;
+	type Call = ();
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
 	type AccountId = u64;
@@ -59,13 +60,14 @@ impl frame_system::Trait for Test {
 	type DbWeight = ();
 	type BlockExecutionWeight = ();
 	type ExtrinsicBaseWeight = ();
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type MaximumBlockLength = MaximumBlockLength;
+	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
 	type ModuleToIndex = ();
-	type AccountData = ();
+	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
+	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
 
 impl Trait for Test {
