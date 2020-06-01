@@ -304,7 +304,7 @@ pallet_staking_reward_curve::build! {
     const CURVE: PiecewiseLinear<'static> = curve!(
         min_inflation: 0_025_000,
         max_inflation: 0_100_000,
-        ideal_stake: 0_800_000,
+        ideal_stake: 0_500_000,
         falloff: 0_050_000,
         max_piece_count: 40,
         test_precision: 0_005_000,
@@ -442,7 +442,7 @@ parameter_types! {
     pub const ProposalBond: Permill = Permill::from_percent(5);
     pub const ProposalBondMinimum: Balance = 1_000 * DOLLARS;
     pub const SpendPeriod: BlockNumber = 14 * DAYS;
-    pub const Burn: Permill = Permill::from_percent(5);
+    pub const Burn: Permill = Permill::from_percent(0);
     pub const TipCountdown: BlockNumber = 1 * DAYS;
     pub const TipFindersFee: Percent = Percent::from_percent(20);
     pub const TipReportDepositBase: Balance = 1 * DOLLARS;
