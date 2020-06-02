@@ -103,6 +103,7 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 impl frame_system::Trait for Test {
 	type Origin = Origin;
@@ -127,6 +128,7 @@ impl frame_system::Trait for Test {
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
+	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
 
 parameter_types! {

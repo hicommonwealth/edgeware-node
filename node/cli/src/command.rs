@@ -41,7 +41,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn copyright_start_year() -> i32 {
-		2017
+		2019
 	}
 
 	fn executable_name() -> &'static str {
@@ -69,8 +69,6 @@ impl SubstrateCli for Cli {
 
 /// Parse command line arguments into service configuration.
 pub fn run() -> Result<()> {
-	sc_cli::reset_signal_pipe_handler()?;
-
 	let cli = Cli::from_args();
 
 	match &cli.subcommand {
@@ -79,7 +77,7 @@ pub fn run() -> Result<()> {
 			runner.run_node(
 				service::new_light,
 				service::new_full,
-				edgeware_runtime::VERSION
+				edgeware_runtime::VERSION,
 			)
 		}
 		Some(Subcommand::Inspect(cmd)) => {
@@ -93,8 +91,10 @@ pub fn run() -> Result<()> {
 
 				runner.sync_run(|config| cmd.run::<Block, Executor>(config))
 			} else {
-				println!("Benchmarking wasn't enabled when building the node. \
-				You can enable it with `--features runtime-benchmarks`.");
+				println!(
+					"Benchmarking wasn't enabled when building the node. \
+				You can enable it with `--features runtime-benchmarks`."
+				);
 				Ok(())
 			}
 		}

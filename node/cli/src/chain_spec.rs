@@ -16,34 +16,37 @@
 
 //! Substrate chain configurations.
 
-use sc_chain_spec::ChainSpecExtension;
-use sp_core::{Pair, Public, sr25519};
-use serde::{Serialize, Deserialize};
-use edgeware_runtime::{
-	AuthorityDiscoveryConfig, AuraConfig, BalancesConfig, ContractsConfig, CouncilConfig, DemocracyConfig,
-	GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig, SessionKeys, StakerStatus, StakingConfig,
-	SudoConfig, SystemConfig, VestingConfig, WASM_BINARY,
-	SignalingConfig, TreasuryRewardConfig, EVMConfig
-};
-use edgeware_runtime::Block;
 use edgeware_runtime::constants::currency::*;
+use edgeware_runtime::Block;
+use edgeware_runtime::{
+	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig,
+	DemocracyConfig, EVMConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
+	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	TreasuryRewardConfig, VestingConfig, WASM_BINARY,
+};
+use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
+use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
 use sc_telemetry::TelemetryEndpoints;
-use sp_finality_grandpa::{AuthorityId as GrandpaId};
-use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use pallet_im_online::ed25519::{AuthorityId as ImOnlineId};
+use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
-use sp_runtime::{Perbill, traits::{Verify, IdentifyAccount, One}};
+use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+use sp_core::{sr25519, Pair, Public};
+use sp_finality_grandpa::AuthorityId as GrandpaId;
+use sp_runtime::{
+	traits::{IdentifyAccount, One, Verify},
+	Perbill,
+};
 
-pub use edgeware_primitives::{AccountId, Balance, Signature, BlockNumber};
+pub use edgeware_primitives::{AccountId, Balance, BlockNumber, Signature};
+pub use edgeware_runtime::constants::time::*;
 pub use edgeware_runtime::GenesisConfig;
-pub use edgeware_runtime::constants::{time::*};
 
+use hex::FromHex;
+use serde_json::Result;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
-use serde_json::{Result};
-use hex::FromHex;
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -52,11 +55,11 @@ const DEFAULT_PROTOCOL_ID: &str = "edg";
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Allocation {
-    balances: Vec<(String, String)>,
-    vesting: Vec<(String, BlockNumber, BlockNumber, String)>,
+	balances: Vec<(String, String)>,
+	vesting: Vec<(String, BlockNumber, BlockNumber, String)>,
 }
 
-fn get_lockdrop_participants_allocation() -> Result<Allocation>{
+fn get_lockdrop_participants_allocation() -> Result<Allocation> {
 	let path = Path::new("node/cli/lockdrop/lockdrop-allocation.json");
 	let mut file = File::open(&path).unwrap();
 	let mut data = String::new();
@@ -79,25 +82,21 @@ pub struct Extensions {
 }
 
 /// Specialized `ChainSpec`.
-pub type ChainSpec = sc_service::GenericChainSpec<
-	GenesisConfig,
-	Extensions,
->;
+pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
 /// Mainnet configuration
 pub fn edgeware_mainnet_official() -> ChainSpec {
 	match ChainSpec::from_json_bytes(&include_bytes!("../res/mainnet.chainspec.json")[..]) {
 		Ok(spec) => spec,
-		Err(e) => panic!(e)
+		Err(e) => panic!(e),
 	}
 }
-
 
 /// 1.0.0 Berlin Testnet configuration
 pub fn edgeware_berlin_official() -> ChainSpec {
 	match ChainSpec::from_json_bytes(&include_bytes!("../res/berlin.chainspec.json")[..]) {
 		Ok(spec) => spec,
-		Err(e) => panic!(e)
+		Err(e) => panic!(e),
 	}
 }
 
@@ -107,7 +106,12 @@ fn session_keys(
 	im_online: ImOnlineId,
 	authority_discovery: AuthorityDiscoveryId,
 ) -> SessionKeys {
-	SessionKeys { grandpa, aura, im_online, authority_discovery }
+	SessionKeys {
+		grandpa,
+		aura,
+		im_online,
+		authority_discovery,
+	}
 }
 
 /// Helper function to generate a crypto pair from seed
@@ -118,8 +122,9 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 }
 
 /// Helper function to generate an account ID from seed
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>
+pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
+where
+	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
@@ -178,30 +183,43 @@ pub fn testnet_genesis(
 			changes_trie_config: Default::default(),
 		}),
 		pallet_balances: Some(BalancesConfig {
-			balances: endowed_accounts.iter().cloned().map(|k| (k, STASH))
-				.chain(founder_allocation.iter().map(|x| (x.0.clone(), x.1.clone())))
+			balances: endowed_accounts
+				.iter()
+				.cloned()
+				.map(|k| (k, STASH))
+				.chain(
+					founder_allocation
+						.iter()
+						.map(|x| (x.0.clone(), x.1.clone())),
+				)
 				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
 				.chain(initial_authorities.iter().map(|x| (x.1.clone(), STASH)))
 				.chain(balances.clone())
 				.collect(),
 		}),
-		pallet_indices: Some(IndicesConfig {
-			indices: vec![],
-		}),
+		pallet_indices: Some(IndicesConfig { indices: vec![] }),
 		pallet_session: Some(SessionConfig {
-			keys: initial_authorities.iter().map(|x| {
-				(x.0.clone(), x.0.clone(), session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()))
-			}).collect::<Vec<_>>(),
+			keys: initial_authorities
+				.iter()
+				.map(|x| {
+					(
+						x.0.clone(),
+						x.0.clone(),
+						session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
+					)
+				})
+				.collect::<Vec<_>>(),
 		}),
 		pallet_staking: Some(StakingConfig {
 			validator_count: 20,
 			minimum_validator_count: initial_authorities.len() as u32,
-			stakers: initial_authorities.iter().map(|x| {
-				(x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator)
-			}).collect(),
+			stakers: initial_authorities
+				.iter()
+				.map(|x| (x.0.clone(), x.1.clone(), STASH, StakerStatus::Validator))
+				.collect(),
 			invulnerables: [].to_vec(),
 			slash_reward_fraction: Perbill::from_percent(10),
-			.. Default::default()
+			..Default::default()
 		}),
 		pallet_democracy: Some(DemocracyConfig::default()),
 		pallet_collective_Instance1: Some(CouncilConfig {
@@ -217,25 +235,17 @@ pub fn testnet_genesis(
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
-		pallet_im_online: Some(ImOnlineConfig {
-			keys: vec![],
-		}),
-		pallet_authority_discovery: Some(AuthorityDiscoveryConfig {
-			keys: vec![],
-		}),
+		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
+		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
 		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),
-        pallet_treasury: Some(Default::default()),
+		pallet_treasury: Some(Default::default()),
 		pallet_elections_phragmen: Some(Default::default()),
-		pallet_sudo: Some(SudoConfig {
-			key: _root_key,
-		}),
-		pallet_vesting: Some(VestingConfig {
-			vesting: vesting,
-		}),
+		pallet_sudo: Some(SudoConfig { key: _root_key }),
+		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(EVMConfig {
-			accounts: vec![],
+			accounts: std::collections::BTreeMap::new(),
 		}),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
@@ -250,26 +260,29 @@ pub fn testnet_genesis(
 
 fn edgeware_testnet_config_genesis() -> GenesisConfig {
 	let allocation = get_lockdrop_participants_allocation().unwrap();
-	let balances = allocation.balances.iter().map(|b| {
-		let balance = b.1.to_string().parse::<Balance>().unwrap();
-		return (
-			<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(),
-			balance,
-		);
-	})
-	.filter(|b| b.1 > 0)
-	.collect();
-	let vesting = allocation.vesting.iter().map(|b| {
-		let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
-		return (
-			(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
-			b.1,
-			b.2,
-			vesting_balance,
-		);
-	})
-	.filter(|b| b.3 > 0)
-	.collect();
+	let balances = allocation
+		.balances
+		.iter()
+		.map(|b| {
+			let balance = b.1.to_string().parse::<Balance>().unwrap();
+			return (<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(), balance);
+		})
+		.filter(|b| b.1 > 0)
+		.collect();
+	let vesting = allocation
+		.vesting
+		.iter()
+		.map(|b| {
+			let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
+			return (
+				(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
+				b.1,
+				b.2,
+				vesting_balance,
+			);
+		})
+		.filter(|b| b.3 > 0)
+		.collect();
 
 	let initial_authorities = crate::testnet_fixtures::get_mtestnet_initial_authorities();
 
@@ -296,12 +309,14 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
 	ChainSpec::from_genesis(
 		&testnet_name,
-        &testnet_node_name,
-        ChainType::Development,
+		&testnet_node_name,
+		ChainType::Development,
 		edgeware_testnet_config_genesis,
 		boot_nodes,
-		Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-			.expect("Staging telemetry url is valid; qed")),
+		Some(
+			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+				.expect("Staging telemetry url is valid; qed"),
+		),
 		Some(DEFAULT_PROTOCOL_ID),
 		properties,
 		Default::default(),
@@ -329,9 +344,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 
 fn development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
-		vec![
-			get_authority_keys_from_seed("Alice"),
-		],
+		vec![get_authority_keys_from_seed("Alice")],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
 		None,
 		true,
@@ -352,8 +365,8 @@ pub fn development_config() -> ChainSpec {
 	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
 		"Development",
-        "dev",
-        ChainType::Development,
+		"dev",
+		ChainType::Development,
 		development_config_genesis,
 		vec![],
 		None,
@@ -374,8 +387,8 @@ pub fn multi_development_config() -> ChainSpec {
 	let properties = serde_json::from_str(data).unwrap();
 	ChainSpec::from_genesis(
 		"Multi Development",
-        "multi-dev",
-        ChainType::Development,
+		"multi-dev",
+		ChainType::Development,
 		multi_development_config_genesis,
 		vec![],
 		None,
@@ -404,8 +417,8 @@ fn local_testnet_genesis() -> GenesisConfig {
 pub fn local_testnet_config() -> ChainSpec {
 	ChainSpec::from_genesis(
 		"Local Testnet",
-        "local_testnet",
-        ChainType::Development,
+		"local_testnet",
+		ChainType::Development,
 		local_testnet_genesis,
 		vec![],
 		None,
@@ -417,7 +430,15 @@ pub fn local_testnet_config() -> ChainSpec {
 
 /// Helper function to create GenesisConfig for testing
 pub fn mainnet_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, Balance, AuraId, GrandpaId, ImOnlineId, AuthorityDiscoveryId)>,
+	initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		Balance,
+		AuraId,
+		GrandpaId,
+		ImOnlineId,
+		AuthorityDiscoveryId,
+	)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
 	balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
@@ -429,27 +450,42 @@ pub fn mainnet_genesis(
 			changes_trie_config: Default::default(),
 		}),
 		pallet_balances: Some(BalancesConfig {
-			balances: founder_allocation.iter().map(|x| (x.0.clone(), x.1.clone()))
+			balances: founder_allocation
+				.iter()
+				.map(|x| (x.0.clone(), x.1.clone()))
 				.chain(balances.clone())
 				.collect(),
 		}),
-		pallet_indices: Some(IndicesConfig {
-			indices: vec![],
-		}),
+		pallet_indices: Some(IndicesConfig { indices: vec![] }),
 		pallet_session: Some(SessionConfig {
-			keys: initial_authorities.iter().map(|x| {
-				(x.0.clone(), x.0.clone(), session_keys(x.4.clone(), x.3.clone(), x.5.clone(), x.6.clone()))
-			}).collect::<Vec<_>>(),
+			keys: initial_authorities
+				.iter()
+				.map(|x| {
+					(
+						x.0.clone(),
+						x.0.clone(),
+						session_keys(x.4.clone(), x.3.clone(), x.5.clone(), x.6.clone()),
+					)
+				})
+				.collect::<Vec<_>>(),
 		}),
 		pallet_staking: Some(StakingConfig {
 			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
-			stakers: initial_authorities.iter().map(|x| {
-				(x.0.clone(), x.1.clone(), x.2.clone(), StakerStatus::Validator)
-			}).collect(),
+			stakers: initial_authorities
+				.iter()
+				.map(|x| {
+					(
+						x.0.clone(),
+						x.1.clone(),
+						x.2.clone(),
+						StakerStatus::Validator,
+					)
+				})
+				.collect(),
 			invulnerables: vec![],
 			slash_reward_fraction: Perbill::from_percent(10),
-			.. Default::default()
+			..Default::default()
 		}),
 		pallet_democracy: Some(DemocracyConfig::default()),
 		pallet_collective_Instance1: Some(CouncilConfig {
@@ -465,25 +501,19 @@ pub fn mainnet_genesis(
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
-		pallet_im_online: Some(ImOnlineConfig {
-			keys: vec![],
-		}),
-		pallet_authority_discovery: Some(AuthorityDiscoveryConfig {
-			keys: vec![],
-		}),
+		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
+		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
 		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),
 		pallet_treasury: Some(Default::default()),
 		pallet_elections_phragmen: Some(Default::default()),
-        pallet_sudo: Some(SudoConfig {
+		pallet_sudo: Some(SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		}),
-		pallet_vesting: Some(VestingConfig {
-			vesting: vesting,
-		}),
+		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(EVMConfig {
-			accounts: vec![],
+			accounts: std::collections::BTreeMap::new(),
 		}),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
@@ -496,30 +526,32 @@ pub fn mainnet_genesis(
 	}
 }
 
-
 /// Mainnet config
 fn edgeware_mainnet_config_genesis() -> GenesisConfig {
 	let allocation = get_lockdrop_participants_allocation().unwrap();
-	let balances = allocation.balances.iter().map(|b| {
-		let balance = b.1.to_string().parse::<Balance>().unwrap();
-		return (
-			<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(),
-			balance,
-		);
-	})
-	.filter(|b| b.1 > 0)
-	.collect();
-	let vesting = allocation.vesting.iter().map(|b| {
-		let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
-		return (
-			(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
-			b.1,
-			b.2,
-			vesting_balance,
-		);
-	})
-	.filter(|b| b.3 > 0)
-	.collect();
+	let balances = allocation
+		.balances
+		.iter()
+		.map(|b| {
+			let balance = b.1.to_string().parse::<Balance>().unwrap();
+			return (<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(), balance);
+		})
+		.filter(|b| b.1 > 0)
+		.collect();
+	let vesting = allocation
+		.vesting
+		.iter()
+		.map(|b| {
+			let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
+			return (
+				(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
+				b.1,
+				b.2,
+				vesting_balance,
+			);
+		})
+		.filter(|b| b.3 > 0)
+		.collect();
 
 	mainnet_genesis(
 		crate::mainnet_fixtures::get_cw_mainnet_validators(),
@@ -541,12 +573,14 @@ pub fn edgeware_mainnet_config() -> ChainSpec {
 	let boot_nodes = crate::mainnet_fixtures::get_mainnet_bootnodes();
 	ChainSpec::from_genesis(
 		"Edgeware",
-        "edgeware",
-        ChainType::Live,
+		"edgeware",
+		ChainType::Live,
 		edgeware_mainnet_config_genesis,
 		boot_nodes,
-				Some(TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-			.expect("Staging telemetry url is valid; qed")),
+		Some(
+			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+				.expect("Staging telemetry url is valid; qed"),
+		),
 		Some(DEFAULT_PROTOCOL_ID),
 		properties,
 		Default::default(),
