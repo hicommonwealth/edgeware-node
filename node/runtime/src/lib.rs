@@ -670,9 +670,15 @@ impl signaling::Trait for Runtime {
 	type Currency = Balances;
 }
 
+parameter_types! {
+	pub const MinimumTreasuryPct: Percent = Percent::from_percent(50);
+	pub const MaximumRecipientPct: Percent = Percent::from_percent(10);
+}
 impl treasury_reward::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
+	type MinimumTreasuryPct = MinimumTreasuryPct;
+	type MaximumRecipientPct = MaximumRecipientPct;
 }
 
 impl voting::Trait for Runtime {
