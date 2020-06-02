@@ -74,20 +74,12 @@ macro_rules! new_full_start {
 				let justification_import = grandpa_block_import.clone();
 
 				let aura_block_import =
-					sc_consensus_aura::AuraBlockImport::<
-						_,
-						_,
-						_,
-						sp_consensus_aura::ed25519::AuthorityPair,
-					>::new(justification_import.clone(), client.clone());
+					sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
+						justification_import.clone(),
+						client.clone()
+					);
 
-				let import_queue = sc_consensus_aura::import_queue::<
-					_,
-					_,
-					_,
-					sp_consensus_aura::ed25519::AuthorityPair,
-					_,
-				>(
+				let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
 					sc_consensus_aura::slot_duration(&*client)?,
 					aura_block_import,
 					Some(Box::new(justification_import.clone())),
@@ -341,13 +333,7 @@ pub fn new_light(config: Configuration) -> Result<impl AbstractService, ServiceE
 					let finality_proof_request_builder =
 						finality_proof_import.create_finality_proof_request_builder();
 
-					let import_queue = sc_consensus_aura::import_queue::<
-						_,
-						_,
-						_,
-						sp_consensus_aura::ed25519::AuthorityPair,
-						_,
-					>(
+					let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
 						sc_consensus_aura::slot_duration(&*client)?,
 						grandpa_block_import,
 						None,

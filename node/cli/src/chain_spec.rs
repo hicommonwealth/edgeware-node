@@ -130,9 +130,7 @@ where
 }
 
 /// Helper function to generate stash, controller and session key from seed
-pub fn get_authority_keys_from_seed(
-	seed: &str,
-) -> (
+pub fn get_authority_keys_from_seed(seed: &str) -> (
 	AccountId,
 	AccountId,
 	GrandpaId,
@@ -152,14 +150,7 @@ pub fn get_authority_keys_from_seed(
 
 /// Helper function to create GenesisConfig for testing
 pub fn testnet_genesis(
-	initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		AuraId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-	)>,
+	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)>,
 	_root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	enable_println: bool,
