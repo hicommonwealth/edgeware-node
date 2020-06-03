@@ -16,8 +16,8 @@
 
 //! Utilites to build a `TestClient` for `node-runtime`.
 
-use sp_runtime::BuildStorage;
 use sc_service::client;
+use sp_runtime::BuildStorage;
 
 /// Re-export test-client utilities.
 pub use substrate_test_client::*;
@@ -44,7 +44,9 @@ pub struct GenesisParameters {
 
 impl substrate_test_client::GenesisInit for GenesisParameters {
 	fn genesis_storage(&self) -> Storage {
-		crate::genesis::config(self.support_changes_trie, None).build_storage().unwrap()
+		crate::genesis::config(self.support_changes_trie, None)
+			.build_storage()
+			.unwrap()
 	}
 }
 
@@ -57,13 +59,15 @@ pub trait TestClientBuilderExt: Sized {
 	fn build(self) -> Client;
 }
 
-impl TestClientBuilderExt for substrate_test_client::TestClientBuilder<
-	edgeware_primitives::Block,
-	client::LocalCallExecutor<Backend, Executor>,
-	Backend,
-	GenesisParameters,
-> {
-	fn new() -> Self{
+impl TestClientBuilderExt
+	for substrate_test_client::TestClientBuilder<
+		edgeware_primitives::Block,
+		client::LocalCallExecutor<Backend, Executor>,
+		Backend,
+		GenesisParameters,
+	>
+{
+	fn new() -> Self {
 		Self::default()
 	}
 
@@ -71,4 +75,3 @@ impl TestClientBuilderExt for substrate_test_client::TestClientBuilder<
 		self.build_with_native_executor(None).0
 	}
 }
-

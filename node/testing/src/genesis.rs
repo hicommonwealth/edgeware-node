@@ -17,15 +17,14 @@
 //! Genesis Configuration.
 
 use crate::keyring::*;
-use sp_keyring::{Ed25519Keyring, Sr25519Keyring};
-use edgeware_runtime::{
-	GenesisConfig, BalancesConfig, SessionConfig, StakingConfig, SystemConfig,
-	GrandpaConfig, IndicesConfig, ContractsConfig, WASM_BINARY,
-};
 use edgeware_runtime::constants::currency::*;
+use edgeware_runtime::{
+	BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
+	StakingConfig, SystemConfig, WASM_BINARY,
+};
 use sp_core::ChangesTrieConfiguration;
+use sp_keyring::{Ed25519Keyring, Sr25519Keyring};
 use sp_runtime::Perbill;
-
 
 /// Create genesis runtime configuration for tests.
 pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig {
@@ -40,45 +39,65 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
-			changes_trie_config: if support_changes_trie { Some(ChangesTrieConfiguration {
-				digest_interval: 2,
-				digest_levels: 2,
-			}) } else { None },
-			code: code.map(|x| x.to_vec()).unwrap_or_else(|| WASM_BINARY.to_vec()),
+			changes_trie_config: if support_changes_trie {
+				Some(ChangesTrieConfiguration {
+					digest_interval: 2,
+					digest_levels: 2,
+				})
+			} else {
+				None
+			},
+			code: code
+				.map(|x| x.to_vec())
+				.unwrap_or_else(|| WASM_BINARY.to_vec()),
 		}),
-		pallet_indices: Some(IndicesConfig {
-			indices: vec![],
-		}),
-		pallet_balances: Some(BalancesConfig {
-			balances: endowed,
-		}),
+		pallet_indices: Some(IndicesConfig { indices: vec![] }),
+		pallet_balances: Some(BalancesConfig { balances: endowed }),
 		pallet_session: Some(SessionConfig {
 			keys: vec![
-				(dave(), alice(), to_session_keys(
-					&Ed25519Keyring::Alice,
-					&Sr25519Keyring::Alice,
-				)),
-				(eve(), bob(), to_session_keys(
-					&Ed25519Keyring::Bob,
-					&Sr25519Keyring::Bob,
-				)),
-				(ferdie(), charlie(), to_session_keys(
-					&Ed25519Keyring::Charlie,
-					&Sr25519Keyring::Charlie,
-				)),
-			]
+				(
+					dave(),
+					alice(),
+					to_session_keys(&Ed25519Keyring::Alice, &Sr25519Keyring::Alice),
+				),
+				(
+					eve(),
+					bob(),
+					to_session_keys(&Ed25519Keyring::Bob, &Sr25519Keyring::Bob),
+				),
+				(
+					ferdie(),
+					charlie(),
+					to_session_keys(&Ed25519Keyring::Charlie, &Sr25519Keyring::Charlie),
+				),
+			],
 		}),
 		pallet_staking: Some(StakingConfig {
 			stakers: vec![
-				(dave(), alice(), 111 * DOLLARS, pallet_staking::StakerStatus::Validator),
-				(eve(), bob(), 100 * DOLLARS, pallet_staking::StakerStatus::Validator),
-				(ferdie(), charlie(), 100 * DOLLARS, pallet_staking::StakerStatus::Validator)
+				(
+					dave(),
+					alice(),
+					111 * DOLLARS,
+					pallet_staking::StakerStatus::Validator,
+				),
+				(
+					eve(),
+					bob(),
+					100 * DOLLARS,
+					pallet_staking::StakerStatus::Validator,
+				),
+				(
+					ferdie(),
+					charlie(),
+					100 * DOLLARS,
+					pallet_staking::StakerStatus::Validator,
+				),
 			],
 			validator_count: 3,
 			minimum_validator_count: 0,
 			slash_reward_fraction: Perbill::from_percent(10),
 			invulnerables: vec![alice(), bob(), charlie()],
-			.. Default::default()
+			..Default::default()
 		}),
 		pallet_contracts: Some(ContractsConfig {
 			current_schedule: Default::default(),

@@ -42,10 +42,12 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 
 type AccountId = u64;
 type BlockNumber = u64;
+
 impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
@@ -69,8 +71,8 @@ impl frame_system::Trait for Test {
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
+	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
-
 
 parameter_types! {
 	pub const ExistentialDeposit: u128 = 1;

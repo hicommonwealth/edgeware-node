@@ -103,6 +103,7 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 impl frame_system::Trait for Test {
 	type Origin = Origin;
@@ -127,6 +128,7 @@ impl frame_system::Trait for Test {
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
+	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
 
 parameter_types! {
@@ -373,5 +375,58 @@ fn basic_setup_works() {
 		System::set_block_number(103);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(104);
 		assert_eq!(Balances::free_balance(treasury_address) > 0, true);
+	});
+}
+
+#[test]
+fn setting_treasury_block_reward () {
+	// Verifies initial conditions of mock
+	ExtBuilder::default().build().execute_with(|| {
+		// Initial Era and session
+		let treasury_address = Treasury::account_id();
+		System::set_block_number(1);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(1);
+		assert_eq!(Balances::free_balance(treasury_address)==9500000, true);
+		System::set_block_number(2);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(2);
+		assert_eq!(Balances::free_balance(treasury_address)==19000000, true);
+
+		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),95).unwrap();
+		<TreasuryReward>::set_minting_interval(tests::Origin::system(frame_system::RawOrigin::Root),2).unwrap();
+		
+		System::set_block_number(3);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(3);
+		assert_eq!(Balances::free_balance(treasury_address)==19000000, true);
+		System::set_block_number(4);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(4);
+		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+
+		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),0).unwrap();
+
+		System::set_block_number(5);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(5);
+		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+		System::set_block_number(6);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(6);
+		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+
+		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),105).unwrap();
+
+		System::set_block_number(7);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(7);
+		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+		System::set_block_number(8);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(8);
+		assert_eq!(Balances::free_balance(treasury_address)==19000200, true);
+
+		<TreasuryReward>::set_minting_interval(tests::Origin::system(frame_system::RawOrigin::Root),1).unwrap();
+		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),10).unwrap();
+
+		System::set_block_number(9);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(9);
+		assert_eq!(Balances::free_balance(treasury_address)==19000210, true);
+		System::set_block_number(10);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(10);
+		assert_eq!(Balances::free_balance(treasury_address)==19000220, true);
 	});
 }
