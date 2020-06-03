@@ -18,7 +18,8 @@ use super::*;
 
 use frame_support::{
 	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
-	traits::{OnFinalize}
+	traits::{OnFinalize}, Twox128, Blake2_256, StorageHasher,
+	storage::{unhashed, generator::StorageMap as GeneratorMap},
 };
 use sp_core::{H256, Blake2Hasher, Hasher};
 use sp_runtime::{
@@ -43,14 +44,16 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
+type AccountId = u64;
+type BlockNumber = u64;
 impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
-	type BlockNumber = u64;
+	type BlockNumber = BlockNumber;
 	type Call = ();
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
-	type AccountId = u64;
+	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
@@ -92,6 +95,7 @@ impl Trait for Test {
 
 pub type Balances = pallet_balances::Module<Test>;
 pub type System = frame_system::Module<Test>;
+pub type Voting = voting::Module<Test>;
 pub type Signaling = Module<Test>;
 
 const BOND: u128 = 10;
@@ -552,5 +556,67 @@ fn propose_multichoice_should_work() {
 				..make_record(public, title2, proposal2)
 			})
 		);
+	});
+}
+
+fn blake_hashed_key<Map>(key: &H256) -> Vec<u8>
+where Map: GeneratorMap<H256, ProposalRecord<AccountId, BlockNumber>>
+{
+	let module_prefix_hashed = Twox128::hash(Map::module_prefix());
+	let storage_prefix_hashed = Twox128::hash(Map::storage_prefix());
+	let key_hashed = key.using_encoded(Blake2_256::hash);
+
+	let mut final_key = Vec::with_capacity(
+		module_prefix_hashed.len() + storage_prefix_hashed.len() + key_hashed.as_ref().len()
+	);
+
+	final_key.extend_from_slice(&module_prefix_hashed[..]);
+	final_key.extend_from_slice(&storage_prefix_hashed[..]);
+	final_key.extend_from_slice(key_hashed.as_ref());
+
+	final_key
+}
+
+#[test]
+fn change_hasher_migration() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		// build proposal, vote and record
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		let index = ProposalCount::get();
+		let vote_id = Voting::create_vote(
+			public.clone(),
+			VoteType::Binary,
+			false, // not commit-reveal
+			TallyType::OneCoin,
+			outcomes,
+		).expect("Voting::create_vote failed");
+		let transition_time = System::block_number() + Signaling::voting_length();
+		let record = ProposalRecord {
+			index: index,
+			author: public.clone(),
+			stage: VoteStage::PreVoting,
+			transition_time: transition_time,
+			title: title.to_vec(),
+			contents: proposal.to_vec(),
+			vote_id: vote_id,
+		};
+		// create hash corresponding to old version
+		let old_key = blake_hashed_key::<ProposalOf::<Test>>(&hash);
+		// set up old content
+		unhashed::put(old_key.as_ref(), &record.encode());
+		InactiveProposals::<Test>::mutate(|proposals| proposals.push((hash, transition_time)));
+		// proposal will not be available with the new hasher
+		assert!(Signaling::proposal_of(hash).is_none());
+		crate::migration::migrate::<Test>();
+		// do the migration
+		let maybe_prop = Signaling::proposal_of(hash);
+		// check that it was successfull
+		assert!(maybe_prop.is_some());
+		let prop = maybe_prop.unwrap();
+		assert_eq!(prop, record);
 	});
 }
