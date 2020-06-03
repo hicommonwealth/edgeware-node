@@ -559,26 +559,27 @@ fn propose_multichoice_should_work() {
 	});
 }
 
-fn blake_hashed_key<Map>(key: &H256) -> Vec<u8>
-where Map: GeneratorMap<H256, ProposalRecord<AccountId, BlockNumber>>
-{
-	let module_prefix_hashed = Twox128::hash(Map::module_prefix());
-	let storage_prefix_hashed = Twox128::hash(Map::storage_prefix());
-	let key_hashed = key.using_encoded(Blake2_256::hash);
-
-	let mut final_key = Vec::with_capacity(
-		module_prefix_hashed.len() + storage_prefix_hashed.len() + key_hashed.as_ref().len()
-	);
-
-	final_key.extend_from_slice(&module_prefix_hashed[..]);
-	final_key.extend_from_slice(&storage_prefix_hashed[..]);
-	final_key.extend_from_slice(key_hashed.as_ref());
-
-	final_key
-}
-
 #[test]
 fn change_hasher_migration() {
+	mod deprecated {
+		use sp_std::prelude::*;
+		
+		use codec::{Encode, Decode};
+		use frame_support::{decl_module, decl_storage};
+
+		use crate::{Trait, ProposalRecord};
+
+		decl_module! {
+			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
+		}
+		decl_storage! {
+			trait Store for Module<T: Trait> as Signaling {
+				pub ProposalOf get(fn proposal_of): map hasher(opaque_blake2_256) 
+					T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+			}
+		}
+	}
+
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
 		// build proposal, vote and record
@@ -604,15 +605,15 @@ fn change_hasher_migration() {
 			contents: proposal.to_vec(),
 			vote_id: vote_id,
 		};
-		// create hash corresponding to old version
-		let old_key = blake_hashed_key::<ProposalOf::<Test>>(&hash);
-		// set up old content
-		unhashed::put(old_key.as_ref(), &record.encode());
+		// insert the record with the old hasher
+		deprecated::ProposalOf::<Test>::insert(hash, &record);
 		InactiveProposals::<Test>::mutate(|proposals| proposals.push((hash, transition_time)));
-		// proposal will not be available with the new hasher
-		assert!(Signaling::proposal_of(hash).is_none());
-		crate::migration::migrate::<Test>();
+		assert!(
+			Signaling::proposal_of(hash).is_none(),
+			"proposal should not (yet) be available with the new hasher"
+		);
 		// do the migration
+		crate::migration::migrate::<Test>();
 		let maybe_prop = Signaling::proposal_of(hash);
 		// check that it was successfull
 		assert!(maybe_prop.is_some());
