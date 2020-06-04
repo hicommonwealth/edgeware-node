@@ -26,7 +26,7 @@ use std::{collections::HashSet, cell::RefCell};
 use sp_core::{H256, crypto::key_types};
 use frame_system::RawOrigin;
 use frame_support::dispatch::DispatchResult;
-use frame_support::{assert_ok, parameter_types, impl_outer_origin, impl_outer_dispatch, weights::Weight};
+use frame_support::{assert_ok, assert_err, parameter_types, impl_outer_origin, impl_outer_dispatch, weights::Weight};
 use frame_support::{traits::{Contains, ContainsLengthBound, OnFinalize}};
 
 use sp_runtime::{
@@ -411,55 +411,55 @@ fn basic_setup_works() {
 fn setting_treasury_block_reward () {
 	// Verifies initial conditions of mock
 	ExtBuilder::default().build(
-		Some(vec![1, 2, 3]),
-		Some(vec![Percent::from_percent(10), Percent::from_percent(10), Percent::from_percent(10)]),
+		Some(vec![]),
+		Some(vec![]),
 	).execute_with(|| {
 		// Initial Era and session
 		let treasury_address = Treasury::account_id();
 		System::set_block_number(1);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(1);
-		assert_eq!(Balances::free_balance(treasury_address)==9500000, true);
+		assert_eq!(Balances::free_balance(treasury_address), 9500000);
 		System::set_block_number(2);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(2);
-		assert_eq!(Balances::free_balance(treasury_address)==19000000, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000000);
 
 		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),95).unwrap();
 		<TreasuryReward>::set_minting_interval(tests::Origin::system(frame_system::RawOrigin::Root),2).unwrap();
 		
 		System::set_block_number(3);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(3);
-		assert_eq!(Balances::free_balance(treasury_address)==19000000, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000000);
 		System::set_block_number(4);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(4);
-		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000095);
 
 		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),0).unwrap();
 
 		System::set_block_number(5);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(5);
-		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000095);
 		System::set_block_number(6);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(6);
-		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000095);
 
 		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),105).unwrap();
 
 		System::set_block_number(7);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(7);
-		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000095);
 		System::set_block_number(8);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(8);
-		assert_eq!(Balances::free_balance(treasury_address)==19000200, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000200);
 
 		<TreasuryReward>::set_minting_interval(tests::Origin::system(frame_system::RawOrigin::Root),1).unwrap();
 		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),10).unwrap();
 
 		System::set_block_number(9);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(9);
-		assert_eq!(Balances::free_balance(treasury_address)==19000210, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000210);
 		System::set_block_number(10);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(10);
-		assert_eq!(Balances::free_balance(treasury_address)==19000220, true);
+		assert_eq!(Balances::free_balance(treasury_address), 19000220);
 	});
 }
 
@@ -594,7 +594,7 @@ fn add_and_remove_room() {
 		alloc_1 = TreasuryReward::recipient_percentages(1).unwrap();
 		assert_eq!(alloc_1.current, Percent::from_percent(90));
 		assert_eq!(alloc_1.proposed, Percent::from_percent(90));
-		let sum = TreasuryReward::sum_percentages(TreasuryReward::get_percentages());
+		let sum = TreasuryReward::sum_percentages(TreasuryReward::get_recipient_pcts());
 		assert_eq!(sum, 90);
 	});
 }
@@ -629,6 +629,35 @@ fn update_after_adding_and_diluting_without_room() {
 		let alloc_2 = TreasuryReward::recipient_percentages(recipient).unwrap();
 		assert_eq!(alloc_2.current, Percent::from_percent(30));
 		assert_eq!(alloc_2.proposed, Percent::from_percent(30));
+	});
+}
 
+#[test]
+fn high_recipient_percentage_should_fail() {
+	ExtBuilder::default().build(
+		Some(vec![1, 2, 3]),
+		Some(vec![Percent::from_percent(10), Percent::from_percent(10), Percent::from_percent(10)]),
+	).execute_with(|| {
+		assert_err!(add_recipient(4, Percent::from_percent(51)), "Invalid proposed percentage. Too large.");
+	});
+}
+
+#[test]
+fn payout_participants_and_treasury_successfully() {
+	ExtBuilder::default().build(
+		Some(vec![1000, 1001, 1002]),
+		Some(vec![Percent::from_percent(10), Percent::from_percent(10), Percent::from_percent(10)]),
+	).execute_with(|| {
+		// Initial Era and session
+		let treasury_address = Treasury::account_id();
+		assert_eq!(Balances::free_balance(1000) == 0, true);
+		assert_eq!(Balances::free_balance(1001) == 0, true);
+		assert_eq!(Balances::free_balance(1002) == 0, true);
+		System::set_block_number(1);
+		<TreasuryReward as OnFinalize<u64>>::on_finalize(1);
+		assert_eq!(Balances::free_balance(treasury_address), 8075000);
+		assert_eq!(Balances::free_balance(1000), 475000);
+		assert_eq!(Balances::free_balance(1001), 475000);
+		assert_eq!(Balances::free_balance(1002), 475000);
 	});
 }
