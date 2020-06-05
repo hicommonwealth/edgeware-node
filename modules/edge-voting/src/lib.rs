@@ -290,8 +290,18 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Voting {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(fn vote_records): map  hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
+		pub VoteRecords get(fn vote_records): map hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(fn vote_record_count): u64;
+	}
+}
+
+mod migration {
+	use super::*;
+
+	pub fn migrate<T: Trait>() {
+		for idx in 0..(VoteRecordCount::get() + 1) {
+			VoteRecords::<T>::migrate_key_from_blake(idx);
+		}
 	}
 }
