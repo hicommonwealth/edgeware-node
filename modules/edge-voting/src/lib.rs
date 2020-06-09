@@ -23,7 +23,7 @@ mod tests;
 use sp_std::prelude::*;
 use sp_std::result;
 use frame_system::{self as system, ensure_signed};
-use frame_support::dispatch::DispatchResult;
+use frame_support::{dispatch::DispatchResult, traits::Get, weights::Weight};
 use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
@@ -109,6 +109,11 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		type Error = Error<T>;
 		fn deposit_event() = default;
+
+		fn on_runtime_upgrade() -> Weight {
+			migration::migrate::<T>();
+			T::MaximumBlockWeight::get()
+		}
 
 		/// A function for commit-reveal voting schemes that adds a vote commitment.
 		///
