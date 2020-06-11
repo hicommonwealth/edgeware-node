@@ -34,7 +34,8 @@ let prefixes = [
 ];
 
 // load chain specs
-let edgeware = JSON.parse(require('fs').readFileSync('./berlin-state.json', 'utf8'));
+// let edgeware = JSON.parse(require('fs').readFileSync('./berlin-state.json', 'utf8'));
+let edgeware = JSON.parse(require('fs').readFileSync('./live-state.json', 'utf8'));
 var spec = JSON.parse(require('fs').readFileSync('./genesis-dev.json', 'utf8'));
 // adjust name and ids (for the UI)
 spec.name = edgeware.name;
@@ -42,9 +43,7 @@ spec.id = edgeware.id;
 spec.protocolId = edgeware.protocolId;
 
 // TODO migration flags and or storage versions
-Object.keys(edgeware.genesis.raw.top)
-  .filter(key => prefixes.some(prefix => key.startsWith('0x'+prefix)))
-  .forEach(key => spec.genesis.raw.top[key] = edgeware.genesis.raw.top[key]);
+Object.keys(edgeware.genesis.raw.top).filter(key => prefixes.some(prefix => key.startsWith('0x'+prefix))).forEach(key => spec.genesis.raw.top[key] = edgeware.genesis.raw.top[key]);
   // replace dev code with edgeware code
 const CODE_HASH = '0x3a636f6465';
 spec.genesis.raw.top[CODE_HASH] = edgeware.genesis.raw.top[CODE_HASH];
@@ -54,4 +53,4 @@ spec.genesis.raw.top[StakingForceEra] = ForceNone;
 // delete System.LastRuntimeUpgrade
 const SystemLastRuntimeUpgrade = '0x26aa394eea5630e07c48ae0c9558cef7f9cce9c888469bb1a0dceaa129672ef8';
 delete spec.genesis.raw.top[SystemLastRuntimeUpgrade];
-require('fs').writeFile('./hybrid-genesis.json', JSON.stringify(spec, null, 4), () => {});
+require('fs').writeFile('./hybrid-live-genesis.json', JSON.stringify(spec, null, 4), () => {});
