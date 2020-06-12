@@ -595,8 +595,10 @@ pub fn edgeware_mainnet_config() -> ChainSpec {
 	)
 }
 
-/// Mainnet config
+/// Time travel config
 fn edgeware_time_travel_config_genesis() -> GenesisConfig {
+	const STASH: Balance = 100000000 * DOLLARS;
+
 	let allocation = get_lockdrop_participants_allocation().unwrap();
 	let balances = allocation
 		.balances
@@ -606,6 +608,14 @@ fn edgeware_time_travel_config_genesis() -> GenesisConfig {
 			return (<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(), balance);
 		})
 		.filter(|b| b.1 > 0)
+		.chain(vec![
+			get_account_id_from_seed::<sr25519::Public>("Alice"),
+			get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Bob"),
+			get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+		].iter().map(|a| {
+			(a.clone(), STASH)
+		}))
 		.collect();
 	let vesting = allocation
 		.vesting
