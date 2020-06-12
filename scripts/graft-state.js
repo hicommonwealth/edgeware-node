@@ -7,7 +7,7 @@ let prefixes = [
     'c2261276cc9d1f8598ea4b6a74b15c2f', /* Balances */
     '3f1467a096bcd71a5b6a0c8155e20810', /* TransactionPayment */
     'd57bce545fb382c34570e5dfbf338f5e', /* Authorship */
-    '5f3e4907f716ac89b6347d15ececedca', /* Staking */
+    // '5f3e4907f716ac89b6347d15ececedca', /* Staking */
     'd5c41b52a371aa36c9254ce34324f2a5', /* Offences */
     'cec5070d609dd3497f72bde07fc96ba0', /* Session */
     '2b06af9719ac64d755623cda8ddd9b94', /* ImOnline */
@@ -36,7 +36,7 @@ let prefixes = [
 // load chain specs
 // let edgeware = JSON.parse(require('fs').readFileSync('./berlin-state.json', 'utf8'));
 let edgeware = JSON.parse(require('fs').readFileSync('./live-state.json', 'utf8'));
-var spec = JSON.parse(require('fs').readFileSync('./genesis-dev.json', 'utf8'));
+var spec = JSON.parse(require('fs').readFileSync('./old-dev-spec.json', 'utf8'));
 // adjust name and ids (for the UI)
 spec.name = edgeware.name;
 spec.id = edgeware.id;
@@ -48,9 +48,9 @@ Object.keys(edgeware.genesis.raw.top).filter(key => prefixes.some(prefix => key.
 const CODE_HASH = '0x3a636f6465';
 spec.genesis.raw.top[CODE_HASH] = edgeware.genesis.raw.top[CODE_HASH];
 const StakingForceEra = '0x5f3e4907f716ac89b6347d15ececedcaf7dad0317324aecae8744b87fc95f2f3';
-const ForceNone = '0x02'
+const ForceNone = '0x02';
 spec.genesis.raw.top[StakingForceEra] = ForceNone;
 // delete System.LastRuntimeUpgrade
 const SystemLastRuntimeUpgrade = '0x26aa394eea5630e07c48ae0c9558cef7f9cce9c888469bb1a0dceaa129672ef8';
 delete spec.genesis.raw.top[SystemLastRuntimeUpgrade];
-require('fs').writeFile('./hybrid-live-genesis.json', JSON.stringify(spec, null, 4), () => {});
+require('fs').writeFile('./hybrid-live-old-dev.json', JSON.stringify(spec, null, 4), () => {});
