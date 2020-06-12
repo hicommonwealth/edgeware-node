@@ -53,6 +53,7 @@ impl SubstrateCli for Cli {
 			"dev" => Box::new(chain_spec::development_config()),
 			"multi-dev" | "multi" => Box::new(chain_spec::multi_development_config()),
 			"local" => Box::new(chain_spec::local_testnet_config()),
+			"time-travel" => Box::new(chain_spec::edgeware_time_travel_config()),
 			"testnet-conf" => Box::new(chain_spec::edgeware_testnet_config(
 				"Berlin".to_string(),
 				"berlin_edgeware_testnet".to_string(),

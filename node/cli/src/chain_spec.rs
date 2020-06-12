@@ -442,8 +442,15 @@ pub fn mainnet_genesis(
 	founder_allocation: Vec<(AccountId, Balance)>,
 	balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
+	_root_key: Option<AccountId>
 ) -> GenesisConfig {
 	let enable_println = false;
+	let key = if _root_key.is_none() {
+		crate::mainnet_fixtures::get_mainnet_root_key()
+	} else {
+		_root_key.unwrap()
+	};
+
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
 			code: WASM_BINARY.to_vec(),
@@ -509,7 +516,7 @@ pub fn mainnet_genesis(
 		pallet_treasury: Some(Default::default()),
 		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(SudoConfig {
-			key: crate::mainnet_fixtures::get_mainnet_root_key(),
+			key: key,
 		}),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(EVMConfig {
@@ -558,6 +565,7 @@ fn edgeware_mainnet_config_genesis() -> GenesisConfig {
 		crate::mainnet_fixtures::get_commonwealth_allocation(),
 		balances,
 		vesting,
+		None,
 	)
 }
 
@@ -576,6 +584,81 @@ pub fn edgeware_mainnet_config() -> ChainSpec {
 		"edgeware",
 		ChainType::Live,
 		edgeware_mainnet_config_genesis,
+		boot_nodes,
+		Some(
+			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+				.expect("Staging telemetry url is valid; qed"),
+		),
+		Some(DEFAULT_PROTOCOL_ID),
+		properties,
+		Default::default(),
+	)
+}
+
+/// Mainnet config
+fn edgeware_time_travel_config_genesis() -> GenesisConfig {
+	let allocation = get_lockdrop_participants_allocation().unwrap();
+	let balances = allocation
+		.balances
+		.iter()
+		.map(|b| {
+			let balance = b.1.to_string().parse::<Balance>().unwrap();
+			return (<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(), balance);
+		})
+		.filter(|b| b.1 > 0)
+		.collect();
+	let vesting = allocation
+		.vesting
+		.iter()
+		.map(|b| {
+			let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
+			return (
+				(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
+				b.1,
+				b.2,
+				vesting_balance,
+			);
+		})
+		.filter(|b| b.3 > 0)
+		.collect();
+
+	mainnet_genesis(
+		vec![
+			get_authority_keys_from_seed("Alice"),
+			get_authority_keys_from_seed("Bob"),
+		].iter().map(|elt| {
+			return (
+				elt.0.clone(),
+				elt.1.clone(),
+				1_000_000_000_000_000_000_000_000,
+				elt.3.clone(),
+				elt.2.clone(),
+				elt.4.clone(),
+				elt.5.clone(),
+			);
+		}).collect(),
+		crate::mainnet_fixtures::get_commonwealth_allocation(),
+		balances,
+		vesting,
+		Some(get_account_id_from_seed::<sr25519::Public>("Alice"))
+	)
+}
+
+/// Edgeware config (8 validators)
+pub fn edgeware_time_travel_config() -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 7,
+			"tokenDecimals": 18,
+			"tokenSymbol": "EDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+	let boot_nodes = vec![];
+	ChainSpec::from_genesis(
+		"Time travel Edgeware",
+		"time_travel_edgeware",
+		ChainType::Development,
+		edgeware_time_travel_config_genesis,
 		boot_nodes,
 		Some(
 			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
