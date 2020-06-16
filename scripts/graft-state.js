@@ -34,7 +34,6 @@ let prefixes = [
 ];
 
 // load chain specs
-// let edgeware = JSON.parse(require('fs').readFileSync('./berlin-state.json', 'utf8'));
 let edgeware = JSON.parse(require('fs').readFileSync('./live-state.json', 'utf8'));
 var spec = JSON.parse(require('fs').readFileSync('./old-dev-spec.json', 'utf8'));
 // adjust name and ids (for the UI)
