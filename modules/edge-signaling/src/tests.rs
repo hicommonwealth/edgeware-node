@@ -18,7 +18,8 @@ use super::*;
 
 use frame_support::{
 	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
-	traits::{OnFinalize}
+	traits::{OnFinalize}, Twox128, Blake2_256, StorageHasher,
+	storage::{unhashed, generator::StorageMap as GeneratorMap},
 };
 use sp_core::{H256, Blake2Hasher, Hasher};
 use sp_runtime::{
@@ -43,14 +44,18 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
+
+type AccountId = u64;
+type BlockNumber = u64;
+
 impl frame_system::Trait for Test {
 	type Origin = Origin;
 	type Index = u64;
-	type BlockNumber = u64;
+	type BlockNumber = BlockNumber;
 	type Call = ();
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
-	type AccountId = u64;
+	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
@@ -92,6 +97,7 @@ impl Trait for Test {
 
 pub type Balances = pallet_balances::Module<Test>;
 pub type System = frame_system::Module<Test>;
+pub type Voting = voting::Module<Test>;
 pub type Signaling = Module<Test>;
 
 const BOND: u128 = 10;
@@ -552,5 +558,68 @@ fn propose_multichoice_should_work() {
 				..make_record(public, title2, proposal2)
 			})
 		);
+	});
+}
+
+#[test]
+fn change_hasher_migration() {
+	mod deprecated {
+		use sp_std::prelude::*;
+		
+		use codec::{Encode, Decode};
+		use frame_support::{decl_module, decl_storage};
+
+		use crate::{Trait, ProposalRecord};
+
+		decl_module! {
+			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
+		}
+		decl_storage! {
+			trait Store for Module<T: Trait> as Signaling {
+				pub ProposalOf get(fn proposal_of): map hasher(opaque_blake2_256) 
+					T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+			}
+		}
+	}
+
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		// build proposal, vote and record
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		let index = ProposalCount::get();
+		let vote_id = Voting::create_vote(
+			public.clone(),
+			VoteType::Binary,
+			false, // not commit-reveal
+			TallyType::OneCoin,
+			outcomes,
+		).expect("Voting::create_vote failed");
+		let transition_time = System::block_number() + Signaling::voting_length();
+		let record = ProposalRecord {
+			index: index,
+			author: public.clone(),
+			stage: VoteStage::PreVoting,
+			transition_time: transition_time,
+			title: title.to_vec(),
+			contents: proposal.to_vec(),
+			vote_id: vote_id,
+		};
+		// insert the record with the old hasher
+		deprecated::ProposalOf::<Test>::insert(hash, &record);
+		InactiveProposals::<Test>::mutate(|proposals| proposals.push((hash, transition_time)));
+		assert!(
+			Signaling::proposal_of(hash).is_none(),
+			"proposal should not (yet) be available with the new hasher"
+		);
+		// do the migration
+		crate::migration::migrate::<Test>();
+		let maybe_prop = Signaling::proposal_of(hash);
+		// check that it was successfull
+		assert!(maybe_prop.is_some());
+		let prop = maybe_prop.unwrap();
+		assert_eq!(prop, record);
 	});
 }
