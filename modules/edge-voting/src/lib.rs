@@ -23,7 +23,7 @@ mod tests;
 use sp_std::prelude::*;
 use sp_std::result;
 use frame_system::{self as system, ensure_signed};
-use frame_support::dispatch::DispatchResult;
+use frame_support::{dispatch::DispatchResult, traits::Get, weights::Weight};
 use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
@@ -109,6 +109,11 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		type Error = Error<T>;
 		fn deposit_event() = default;
+
+		fn on_runtime_upgrade() -> Weight {
+			migration::migrate::<T>();
+			T::MaximumBlockWeight::get()
+		}
 
 		/// A function for commit-reveal voting schemes that adds a vote commitment.
 		///
@@ -290,8 +295,18 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Voting {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(fn vote_records): map  hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
+		pub VoteRecords get(fn vote_records): map hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(fn vote_record_count): u64;
+	}
+}
+
+mod migration {
+	use super::*;
+
+	pub fn migrate<T: Trait>() {
+		for idx in 0..(VoteRecordCount::get() + 1) {
+			VoteRecords::<T>::migrate_key_from_blake(idx);
+		}
 	}
 }

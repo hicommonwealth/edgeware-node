@@ -561,3 +561,63 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 		assert_ok!(reveal(public, 1, vote.3.to_vec(), Some(SECRET)));
 	});
 }
+
+#[test]
+fn change_hasher_migration() {
+	mod deprecated {
+		use sp_std::prelude::*;
+
+		use codec::{Encode, Decode};
+		use frame_support::{decl_module, decl_storage};
+
+		use crate::{Trait, VoteRecord};
+
+		decl_module! {
+			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
+		}
+		decl_storage! {
+			trait Store for Module<T: Trait> as Voting {
+				pub VoteRecords get(fn vote_records): map hasher(opaque_blake2_256)
+					u64 => Option<VoteRecord<T::AccountId>>;
+			}
+		}
+	}
+
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		// build vote record
+		let public = get_test_key();
+		let yes_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+		let no_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		let outcomes = vec![yes_vote, no_vote];
+		let id = VoteRecordCount::get() + 1;
+		let record = VoteRecord {
+			id: id,
+			commitments: vec![],
+			reveals: vec![],
+			outcomes: outcomes,
+			data: VoteData {
+				initiator: public.clone(),
+				stage: VoteStage::PreVoting,
+				vote_type: VoteType::Binary,
+				tally_type: TallyType::OneCoin,
+				is_commit_reveal: false,
+			},
+		};
+
+		// insert the record with the old hasher
+		deprecated::VoteRecords::<Test>::insert(id, &record);
+		VoteRecordCount::mutate(|i| *i += 1);
+		assert!(
+			Voting::vote_records(id).is_none(),
+			"proposal should not (yet) be available with the new hasher"
+		);
+		// do the migration
+		crate::migration::migrate::<Test>();
+		let maybe_vote = Voting::vote_records(id);
+		// check that it was successfull
+		assert!(maybe_vote.is_some());
+		let vote = maybe_vote.unwrap();
+		assert_eq!(vote, record);
+	});
+}
