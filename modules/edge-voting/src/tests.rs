@@ -44,7 +44,9 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
+
 impl frame_system::Trait for Test {
+	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
@@ -66,6 +68,7 @@ impl frame_system::Trait for Test {
 	type ModuleToIndex = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
+	type MigrateAccount = ();
 	type OnKilledAccount = ();
 	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
