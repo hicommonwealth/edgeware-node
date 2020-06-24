@@ -4,6 +4,9 @@ version = "3.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
 [dependencies]
 jsonrpc-core = "14.0.3"
 sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
@@ -18,6 +21,7 @@ sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch
 sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 sc-finality-grandpa-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-
+sc-rpc-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

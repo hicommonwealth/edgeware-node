@@ -86,7 +86,7 @@ impl pallet_session::SessionHandler<AccountId> for TestSessionHandler {
 }
 
 impl_outer_origin! {
-	pub enum Origin for Test {}
+	pub enum Origin for Test  where system = frame_system { }
 }
 
 impl_outer_dispatch! {
@@ -105,14 +105,16 @@ parameter_types! {
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
+
 impl frame_system::Trait for Test {
+	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
-	type Call = ();
+	type Call = Call;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
-	type AccountId = u64;
+	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
@@ -127,6 +129,7 @@ impl frame_system::Trait for Test {
 	type ModuleToIndex = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
+	type MigrateAccount = ();
 	type OnKilledAccount = ();
 	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
@@ -201,6 +204,7 @@ parameter_types! {
 	pub const BondingDuration: pallet_staking::EraIndex = 3;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
 	pub const MaxNominatorRewardedPerValidator: u32 = 64;
+	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
 }
 
 impl pallet_staking::Trait for Test {
@@ -223,9 +227,8 @@ impl pallet_staking::Trait for Test {
 	type MaxIterations = ();
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type UnsignedPriority = ();
+	type MinSolutionScoreBump = MinSolutionScoreBump;
 }
-
-
 
 thread_local! {
 	static TEN_TO_FOURTEEN: RefCell<Vec<u64>> = RefCell::new(vec![10,11,12,13,14]);
@@ -391,8 +394,8 @@ fn setting_treasury_block_reward () {
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(2);
 		assert_eq!(Balances::free_balance(treasury_address)==19000000, true);
 
-		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),95).unwrap();
-		<TreasuryReward>::set_minting_interval(tests::Origin::system(frame_system::RawOrigin::Root),2).unwrap();
+		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(),95).unwrap();
+		<TreasuryReward>::set_minting_interval(frame_system::RawOrigin::Root.into(),2).unwrap();
 		
 		System::set_block_number(3);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(3);
@@ -401,7 +404,7 @@ fn setting_treasury_block_reward () {
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(4);
 		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
 
-		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),0).unwrap();
+		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(),0).unwrap();
 
 		System::set_block_number(5);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(5);
@@ -410,7 +413,7 @@ fn setting_treasury_block_reward () {
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(6);
 		assert_eq!(Balances::free_balance(treasury_address)==19000095, true);
 
-		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),105).unwrap();
+		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(),105).unwrap();
 
 		System::set_block_number(7);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(7);
@@ -419,8 +422,8 @@ fn setting_treasury_block_reward () {
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(8);
 		assert_eq!(Balances::free_balance(treasury_address)==19000200, true);
 
-		<TreasuryReward>::set_minting_interval(tests::Origin::system(frame_system::RawOrigin::Root),1).unwrap();
-		<TreasuryReward>::set_current_payout(tests::Origin::system(frame_system::RawOrigin::Root),10).unwrap();
+		<TreasuryReward>::set_minting_interval(frame_system::RawOrigin::Root.into(),1).unwrap();
+		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(),10).unwrap();
 
 		System::set_block_number(9);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(9);

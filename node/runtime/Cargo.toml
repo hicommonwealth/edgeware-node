@@ -56,8 +56,11 @@ pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", bran
 pallet-identity = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+pallet-multisig = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 pallet-offences = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+pallet-proxy = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 pallet-randomness-collective-flip = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+pallet-recovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 pallet-scheduler = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false, features = ["historical"] }
 pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
@@ -108,8 +111,11 @@ std = [
 	"pallet-identity/std",
 	"pallet-im-online/std",
 	"pallet-indices/std",
+	"pallet-multisig/std",
 	"sp-inherents/std",
 	"pallet-offences/std",
+	"pallet-proxy/std",
+	"pallet-recovery/std",
 	"sp-core/std",
 	"pallet-randomness-collective-flip/std",
 	"sp-std/std",
