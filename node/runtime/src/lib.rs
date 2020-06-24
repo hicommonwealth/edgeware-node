@@ -20,65 +20,71 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
+use sp_std::prelude::*;
+
 pub use edgeware_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
 };
 use frame_support::{
-	construct_runtime, debug, parameter_types,
-	traits::{Currency, Imbalance, KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, Randomness},
+	construct_runtime, parameter_types, debug, RuntimeDebug,
 	weights::{
+		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
-		IdentityFee, Weight,
 	},
+	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier},
 };
-pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
+use frame_system::{EnsureRoot, EnsureOneOf};
+use frame_support::traits::InstanceFilter;
+use codec::{Encode, Decode};
+
 pub use pallet_grandpa::fg_primitives;
 pub use pallet_grandpa::{AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 pub use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
-pub use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
 pub use sp_api::impl_runtime_apis;
 pub use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
+pub use pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo;
+pub use pallet_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 pub use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use sp_core::{
+pub use sp_core::{
 	crypto::KeyTypeId,
 	u32_trait::{_1, _2, _3, _4, _8},
 	OpaqueMetadata, U256,
 };
-pub use sp_inherents::{CheckInherentsResult, InherentData};
+use sp_runtime::{
+	Permill, Perbill, Perquintill, Percent, ApplyExtrinsicResult,
+	impl_opaque_keys, generic, create_runtime_str, ModuleId, FixedPointNumber,
+};
 pub use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::traits::{
-	self, BlakeTwo256, Block as BlockT, ConvertInto, NumberFor, OpaqueKeys, SaturatedConversion,
-	Saturating, StaticLookup,
+	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
+	ConvertInto, OpaqueKeys, NumberFor, Saturating,
 };
-use sp_runtime::transaction_validity::{
-	TransactionPriority, TransactionSource, TransactionValidity,
-};
-pub use sp_runtime::{
-	create_runtime_str, generic, impl_opaque_keys, ApplyExtrinsicResult, ModuleId, PerThing,
-	Perbill, Percent, Permill, Perquintill,
-};
-use sp_std::prelude::*;
+pub use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource, TransactionPriority};
+
 #[cfg(any(feature = "std", test))]
 pub use sp_version::NativeVersion;
 pub use sp_version::RuntimeVersion;
 
-use codec::Encode;
+pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
+pub use pallet_session::{historical as pallet_session_historical};
+pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
+
+pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
 
-pub use frame_support::StorageValue;
-pub use pallet_balances::Call as BalancesCall;
-pub use pallet_contracts::Gas;
-pub use pallet_evm::Account as EVMAccount;
-pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
-pub use pallet_session::historical as pallet_session_historical;
-pub use pallet_staking::StakerStatus;
-pub use pallet_timestamp::Call as TimestampCall;
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
+#[cfg(any(feature = "std", test))]
+pub use pallet_balances::Call as BalancesCall;
+#[cfg(any(feature = "std", test))]
+pub use frame_system::Call as SystemCall;
+#[cfg(any(feature = "std", test))]
+pub use pallet_staking::StakerStatus;
+
 
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
-pub use impls::{Author, CurrencyToVoteHandler, TargetedFeeAdjustment};
+use impls::{CurrencyToVoteHandler, Author};
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -148,6 +154,7 @@ const_assert!(
 );
 
 impl frame_system::Trait for Runtime {
+	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Call = Call;
 	type Index = Index;
@@ -169,27 +176,83 @@ impl frame_system::Trait for Runtime {
 	type Version = Version;
 	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
-	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Session, Staking, Vesting);
+	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Session, Staking, Vesting);
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
-}
-
-parameter_types! {
-	// One storage item; value is size 4+4+16+32 bytes = 56 bytes.
-	pub const MultisigDepositBase: Balance = 30 * CENTS;
-	// Additional storage item size of 32 bytes.
-	pub const MultisigDepositFactor: Balance = 5 * CENTS;
-	pub const MaxSignatories: u16 = 100;
 }
 
 impl pallet_utility::Trait for Runtime {
 	type Event = Event;
 	type Call = Call;
+}
+
+parameter_types! {
+	// One storage item; key size is 32; value is size 4+4+16+32 bytes = 56 bytes.
+	pub const DepositBase: Balance = deposit(1, 88);
+	// Additional storage item size of 32 bytes.
+	pub const DepositFactor: Balance = deposit(0, 32);
+	pub const MaxSignatories: u16 = 100;
+}
+
+impl pallet_multisig::Trait for Runtime {
+	type Event = Event;
+	type Call = Call;
 	type Currency = Balances;
-	type MultisigDepositBase = MultisigDepositBase;
-	type MultisigDepositFactor = MultisigDepositFactor;
+	type DepositBase = DepositBase;
+	type DepositFactor = DepositFactor;
 	type MaxSignatories = MaxSignatories;
-	type IsCallable = ();
+}
+
+parameter_types! {
+	// One storage item; key size 32, value size 8; .
+	pub const ProxyDepositBase: Balance = deposit(1, 8);
+	// Additional storage item size of 33 bytes.
+	pub const ProxyDepositFactor: Balance = deposit(0, 33);
+	pub const MaxProxies: u16 = 32;
+}
+
+/// The type used to represent the kinds of proxying allowed.
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+pub enum ProxyType {
+	Any,
+	NonTransfer,
+	Governance,
+	Staking,
+}
+impl Default for ProxyType { fn default() -> Self { Self::Any } }
+impl InstanceFilter<Call> for ProxyType {
+	fn filter(&self, c: &Call) -> bool {
+		match self {
+			ProxyType::Any => true,
+			ProxyType::NonTransfer => !matches!(c,
+				Call::Balances(..) | Call::Vesting(pallet_vesting::Call::vested_transfer(..))
+					| Call::Indices(pallet_indices::Call::transfer(..))
+			),
+			ProxyType::Governance => matches!(c,
+				Call::Democracy(..) | Call::Council(..) | Call::Elections(..) | Call::Treasury(..)
+			),
+			ProxyType::Staking => matches!(c, Call::Staking(..)),
+		}
+	}
+	fn is_superset(&self, o: &Self) -> bool {
+		match (self, o) {
+			(x, y) if x == y => true,
+			(ProxyType::Any, _) => true,
+			(_, ProxyType::Any) => false,
+			(ProxyType::NonTransfer, _) => true,
+			_ => false,
+		}
+	}
+}
+
+impl pallet_proxy::Trait for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type Currency = Balances;
+	type ProxyType = ProxyType;
+	type ProxyDepositBase = ProxyDepositBase;
+	type ProxyDepositFactor = ProxyDepositFactor;
+	type MaxProxies = MaxProxies;
 }
 
 impl pallet_scheduler::Trait for Runtime {
@@ -228,24 +291,18 @@ impl pallet_balances::Trait for Runtime {
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
-	// for a sane configuration, this should always be less than `AvailableBlockRatio`.
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
 }
-
-// for a sane configuration, this should always be less than `AvailableBlockRatio`.
-const_assert!(
-	TargetBlockFullness::get().deconstruct()
-		< (AvailableBlockRatio::get().deconstruct() as <Perquintill as PerThing>::Inner)
-			* (<Perquintill as PerThing>::ACCURACY
-				/ <Perbill as PerThing>::ACCURACY as <Perquintill as PerThing>::Inner)
-);
 
 impl pallet_transaction_payment::Trait for Runtime {
 	type Currency = Balances;
 	type OnTransactionPayment = DealWithFees;
 	type TransactionByteFee = TransactionByteFee;
 	type WeightToFee = IdentityFee<Balance>;
-	type FeeMultiplierUpdate = TargetedFeeAdjustment<TargetBlockFullness>;
+	type FeeMultiplierUpdate =
+		TargetedFeeAdjustment<Self, TargetBlockFullness, AdjustmentVariable, MinimumMultiplier>;
 }
 
 parameter_types! {
@@ -321,6 +378,8 @@ parameter_types! {
 	pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
 	pub const MaxNominatorRewardedPerValidator: u32 = 64;
 	pub const MaxIterations: u32 = 5;
+	// 0.05%. The higher the value, the more strict solution acceptance becomes.
+	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
 }
 
 impl pallet_staking::Trait for Runtime {
@@ -335,13 +394,18 @@ impl pallet_staking::Trait for Runtime {
 	type BondingDuration = BondingDuration;
 	type SlashDeferDuration = SlashDeferDuration;
 	/// A super-majority of the council can cancel the slash.
-	type SlashCancelOrigin = pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>;
+	type SlashCancelOrigin = EnsureOneOf<
+		AccountId,
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>
+	>;
 	type SessionInterface = Self;
 	type RewardCurve = RewardCurve;
 	type NextNewSession = Session;
 	type ElectionLookahead = ElectionLookahead;
 	type Call = Call;
 	type MaxIterations = MaxIterations;
+	type MinSolutionScoreBump = MinSolutionScoreBump;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type UnsignedPriority = StakingUnsignedPriority;
 }
@@ -632,6 +696,24 @@ impl pallet_identity::Trait for Runtime {
 }
 
 parameter_types! {
+	pub const ConfigDepositBase: Balance = 5 * DOLLARS;
+	pub const FriendDepositFactor: Balance = 50 * CENTS;
+	pub const MaxFriends: u16 = 9;
+	pub const RecoveryDeposit: Balance = 5 * DOLLARS;
+}
+
+impl pallet_recovery::Trait for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type Currency = Balances;
+	type ConfigDepositBase = ConfigDepositBase;
+	type FriendDepositFactor = FriendDepositFactor;
+	type MaxFriends = MaxFriends;
+	type RecoveryDeposit = RecoveryDeposit;
+}
+
+
+parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
 	pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
 }
@@ -687,7 +769,7 @@ construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
 		System: frame_system::{Module, Call, Config, Storage, Event<T>},
-		Utility: pallet_utility::{Module, Call, Storage, Event<T>},
+		Utility: pallet_utility::{Module, Call, Event},
 		Aura: pallet_aura::{Module, Config<T>, Inherent(Timestamp)},
 
 		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
@@ -714,9 +796,12 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		Identity: pallet_identity::{Module, Call, Storage, Event<T>},
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
+		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 		Historical: pallet_session_historical::{Module},
+		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
+		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
@@ -755,6 +840,9 @@ pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signatu
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
+/// Executive: handles dispatch to the various modules.
+pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules>;
+
 /// Custom runtime upgrade to execute the balances migration before the account migration.
 mod custom_migration {
 	use super::*;
@@ -773,9 +861,6 @@ mod custom_migration {
 		}
 	}
 }
-
-/// Executive: handles dispatch to the various modules.
-pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules, custom_migration::Upgrade>;
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
