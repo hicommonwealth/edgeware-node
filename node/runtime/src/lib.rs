@@ -840,8 +840,6 @@ pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signatu
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
-/// Executive: handles dispatch to the various modules.
-pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules>;
 
 /// Custom runtime upgrade to execute the balances migration before the account migration.
 mod custom_migration {
@@ -861,6 +859,9 @@ mod custom_migration {
 		}
 	}
 }
+
+/// Executive: handles dispatch to the various modules.
+pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules, custom_migration::Upgrade>;
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
