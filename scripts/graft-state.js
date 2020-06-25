@@ -1,5 +1,5 @@
 // Edgeware pallet prefixes
-let prefixes = [
+const PREFIXES = [
     '26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9', /* System.Account */
     'bd2a529379475088d3e29a918cd47872', /* RandomnessCollectiveFlip */
     'f0c365c3cf59d671eb72da0e7a4113c4', /* Timestamp */
@@ -33,23 +33,45 @@ let prefixes = [
     '1da53b775b270400e7e61ed5cbc5a146', /* EVM */
 ];
 
+// read and write json specs
+const fs = require('fs');
+function loadSpec(path) {
+  return JSON.parse(fs.readFileSync(path, 'utf8'));
+}
+function writeSpec(path, spec) {
+  fs.writeFile(path, JSON.stringify(spec, null, 4), () => {});
+}
+
+// default to live and dev chainspecs in the repo
+console.log("usage: node scripts/graft-state.js /path/to/live.json /path/to/dev.json /path/for/output.json");
+let livePath = process.argv[2] || './chains/live-state.chainspec.json';
+let oldDevPath = process.argv[3] || './chains/old-dev.chainspec.json';
+let newSpecPath = process.argv[4] || './chains/hybrid-mainnet-dev.json';
 // load chain specs
-let edgeware = JSON.parse(require('fs').readFileSync('./live-state.json', 'utf8'));
-var spec = JSON.parse(require('fs').readFileSync('./old-dev-spec.json', 'utf8'));
+let edgeware = loadSpec(livePath);
+let spec = loadSpec(oldDevPath);
 // adjust name and ids (for the UI)
 spec.name = edgeware.name;
 spec.id = edgeware.id;
 spec.protocolId = edgeware.protocolId;
 
 // TODO migration flags and or storage versions
-Object.keys(edgeware.genesis.raw.top).filter(key => prefixes.some(prefix => key.startsWith('0x'+prefix))).forEach(key => spec.genesis.raw.top[key] = edgeware.genesis.raw.top[key]);
-  // replace dev code with edgeware code
+// graft data under chosen prefixes into the new spec
+Object.keys(edgeware.genesis.raw.top).filter(key => PREFIXES.some(prefix => key.startsWith('0x'+prefix))).forEach(key => spec.genesis.raw.top[key] = edgeware.genesis.raw.top[key]);
+// replace dev code with edgeware code
 const CODE_HASH = '0x3a636f6465';
 spec.genesis.raw.top[CODE_HASH] = edgeware.genesis.raw.top[CODE_HASH];
+// set ForceEra to None to keep producing blocks
 const StakingForceEra = '0x5f3e4907f716ac89b6347d15ececedcaf7dad0317324aecae8744b87fc95f2f3';
 const ForceNone = '0x02';
 spec.genesis.raw.top[StakingForceEra] = ForceNone;
 // delete System.LastRuntimeUpgrade
 const SystemLastRuntimeUpgrade = '0x26aa394eea5630e07c48ae0c9558cef7f9cce9c888469bb1a0dceaa129672ef8';
 delete spec.genesis.raw.top[SystemLastRuntimeUpgrade];
-require('fs').writeFile('./hybrid-live-old-dev.json', JSON.stringify(spec, null, 4), () => {});
+// delete old `childen` entry and replace it with new `childrenDefault`
+delete spec.genesis.raw.children;
+spec.genesis.raw.childrenDefault = edgeware.genesis.raw.childrenDefault;
+
+// write out the new spec
+writeSpec(newSpecPath, spec);
+console.log(`Done. Wrote new spec to '${newSpecPath}'.`);
