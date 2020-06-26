@@ -254,6 +254,8 @@ pub fn testnet_genesis(
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
+			recipient_percentages: vec![],
+			recipients: vec![],
 		}),
 	}
 }
@@ -522,6 +524,8 @@ pub fn mainnet_genesis(
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
+			recipient_percentages: vec![],
+			recipients: vec![],
 		}),
 	}
 }
