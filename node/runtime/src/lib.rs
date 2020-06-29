@@ -848,12 +848,14 @@ mod custom_migration {
 	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
 	use pallet_balances::migration::on_runtime_upgrade as balances_upgrade;
 	use frame_system::migration::migrate_accounts as accounts_upgrade;
+	use pallet_staking::migration::migrate_to_simple_payouts as staking_upgrade;
 
 	pub struct Upgrade;
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
 			let mut weight = 0;
 			weight += balances_upgrade::<Runtime, pallet_balances::DefaultInstance>();
+			weight += staking_upgrade::<Runtime>();
 			weight += accounts_upgrade::<Runtime>();
 			weight
 		}
