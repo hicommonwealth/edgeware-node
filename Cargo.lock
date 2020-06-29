@@ -20,6 +20,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "adler"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ccc9a9dd069569f212bc4330af9f17c4afb5e8ce185e83dbb14f1349dda18b10"
+
+[[package]]
 name = "adler32"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -287,7 +293,7 @@ dependencies = [
  "addr2line",
  "cfg-if",
  "libc",
- "miniz_oxide",
+ "miniz_oxide 0.3.7",
  "object 0.20.0",
  "rustc-demangle",
 ]
@@ -552,9 +558,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.55"
+version = "1.0.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b1be3409f94d7bdceeb5f5fac551039d9b3f00e25da7a74fc4d33400a0d96368"
+checksum = "77c1f1d60091c1b73e2b1f4560ab419204b178e625fa945ded7b660becd2bd46"
 dependencies = [
  "jobserver",
 ]
@@ -1652,15 +1658,15 @@ checksum = "37ab347416e802de484e4d03c7316c48f1ecb56574dfd4a46a80f173ce1de04d"
 
 [[package]]
 name = "flate2"
-version = "1.0.14"
+version = "1.0.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2cfff41391129e0a856d6d822600b8d71179d46879e310417eb9c762eb178b42"
+checksum = "68c90b0fc46cf89d227cc78b40e494ff81287a92dd07631e5af0d06fe3cf885e"
 dependencies = [
  "cfg-if",
  "crc32fast",
  "libc",
  "libz-sys",
- "miniz_oxide",
+ "miniz_oxide 0.4.0",
 ]
 
 [[package]]
@@ -1687,7 +1693,7 @@ checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 [[package]]
 name = "fork-tree"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
 ]
@@ -1695,7 +1701,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1712,7 +1718,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "parity-scale-codec",
@@ -1730,7 +1736,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1745,7 +1751,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "11.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -1756,7 +1762,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "bitmask",
  "frame-metadata",
@@ -1781,7 +1787,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support-procedural-tools",
  "proc-macro2",
@@ -1792,7 +1798,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate",
@@ -1804,7 +1810,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -1814,7 +1820,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -1830,7 +1836,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -2638,9 +2644,9 @@ dependencies = [
 
 [[package]]
 name = "js-sys"
-version = "0.3.40"
+version = "0.3.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ce10c23ad2ea25ceca0093bd3192229da4c5b3c0f2de499c1ecac0d98d452177"
+checksum = "c4b9172132a62451e56142bff9afc91c8e4a4500aa5b847da36815b63bfda916"
 dependencies = [
  "wasm-bindgen",
 ]
@@ -3414,6 +3420,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "miniz_oxide"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "be0f75932c1f6cfae3c04000e40114adf955636e19040f9c0a2c380702aa1c7f"
+dependencies = [
+ "adler",
+]
+
+[[package]]
 name = "mio"
 version = "0.6.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3615,7 +3630,7 @@ dependencies = [
 [[package]]
 name = "node-executor"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "node-primitives",
@@ -3632,7 +3647,7 @@ dependencies = [
 [[package]]
 name = "node-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
@@ -3644,7 +3659,7 @@ dependencies = [
 [[package]]
 name = "node-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "frame-executive",
@@ -3899,7 +3914,7 @@ dependencies = [
 [[package]]
 name = "pallet-aura"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3918,7 +3933,7 @@ dependencies = [
 [[package]]
 name = "pallet-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3934,7 +3949,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3949,7 +3964,7 @@ dependencies = [
 [[package]]
 name = "pallet-babe"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3971,7 +3986,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -3986,7 +4001,7 @@ dependencies = [
 [[package]]
 name = "pallet-collective"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4001,7 +4016,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4022,7 +4037,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -4032,7 +4047,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4051,7 +4066,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc-runtime-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "pallet-contracts-primitives",
  "parity-scale-codec",
@@ -4063,7 +4078,7 @@ dependencies = [
 [[package]]
 name = "pallet-democracy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4078,7 +4093,7 @@ dependencies = [
 [[package]]
 name = "pallet-elections-phragmen"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4092,7 +4107,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "evm",
  "frame-support",
@@ -4113,7 +4128,7 @@ dependencies = [
 [[package]]
 name = "pallet-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4129,7 +4144,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4149,7 +4164,7 @@ dependencies = [
 [[package]]
 name = "pallet-identity"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "enumflags2",
  "frame-benchmarking",
@@ -4165,7 +4180,7 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4184,7 +4199,7 @@ dependencies = [
 [[package]]
 name = "pallet-indices"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4200,7 +4215,7 @@ dependencies = [
 [[package]]
 name = "pallet-membership"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4214,7 +4229,7 @@ dependencies = [
 [[package]]
 name = "pallet-multisig"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4229,7 +4244,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4244,7 +4259,7 @@ dependencies = [
 [[package]]
 name = "pallet-proxy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4259,7 +4274,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4272,7 +4287,7 @@ dependencies = [
 [[package]]
 name = "pallet-recovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -4287,7 +4302,7 @@ dependencies = [
 [[package]]
 name = "pallet-scheduler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4302,7 +4317,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4322,7 +4337,7 @@ dependencies = [
 [[package]]
 name = "pallet-society"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4336,7 +4351,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4356,7 +4371,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking-reward-curve"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -4367,7 +4382,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4381,7 +4396,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4398,7 +4413,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4413,7 +4428,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4431,7 +4446,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -4444,7 +4459,7 @@ dependencies = [
 [[package]]
 name = "pallet-treasury"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4458,7 +4473,7 @@ dependencies = [
 [[package]]
 name = "pallet-utility"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4473,7 +4488,7 @@ dependencies = [
 [[package]]
 name = "pallet-vesting"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -5014,9 +5029,9 @@ dependencies = [
 
 [[package]]
 name = "protobuf"
-version = "2.15.0"
+version = "2.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3e2ccb6b8f7e175f2d2401e7a5988b0630000164d221262c4fe50ae729513202"
+checksum = "e4951a8253c06334be9fe320bbcf73f14949fde62a0c8128d697eec1ff0fa8cd"
 
 [[package]]
 name = "pwasm-utils"
@@ -5587,7 +5602,7 @@ dependencies = [
 [[package]]
 name = "sc-authority-discovery"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "bytes 0.5.5",
  "derive_more",
@@ -5614,7 +5629,7 @@ dependencies = [
 [[package]]
 name = "sc-basic-authorship"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5638,7 +5653,7 @@ dependencies = [
 [[package]]
 name = "sc-block-builder"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sc-client-api",
@@ -5654,7 +5669,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "impl-trait-for-tuples",
  "sc-chain-spec-derive",
@@ -5670,7 +5685,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -5681,7 +5696,7 @@ dependencies = [
 [[package]]
 name = "sc-cli"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
@@ -5721,7 +5736,7 @@ dependencies = [
 [[package]]
 name = "sc-client-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "fnv",
@@ -5757,7 +5772,7 @@ dependencies = [
 [[package]]
 name = "sc-client-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "blake2-rfc",
  "hash-db",
@@ -5786,7 +5801,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
@@ -5797,7 +5812,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -5828,7 +5843,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-slots"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5850,7 +5865,7 @@ dependencies = [
 [[package]]
 name = "sc-executor"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "lazy_static",
@@ -5878,7 +5893,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-common"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -5895,7 +5910,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmi"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -5910,7 +5925,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmtime"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "cranelift-codegen",
  "cranelift-wasm",
@@ -5931,7 +5946,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -5969,7 +5984,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "finality-grandpa",
@@ -5986,7 +6001,7 @@ dependencies = [
 [[package]]
 name = "sc-informant"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "ansi_term 0.12.1",
  "futures 0.3.5",
@@ -6005,7 +6020,7 @@ dependencies = [
 [[package]]
 name = "sc-keystore"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "hex 0.4.2",
@@ -6021,7 +6036,7 @@ dependencies = [
 [[package]]
 name = "sc-light"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "hash-db",
  "lazy_static",
@@ -6040,7 +6055,7 @@ dependencies = [
 [[package]]
 name = "sc-network"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "bitflags",
  "bs58",
@@ -6092,7 +6107,7 @@ dependencies = [
 [[package]]
 name = "sc-network-gossip"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -6107,7 +6122,7 @@ dependencies = [
 [[package]]
 name = "sc-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "bytes 0.5.5",
  "fnv",
@@ -6134,7 +6149,7 @@ dependencies = [
 [[package]]
 name = "sc-peerset"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "libp2p",
@@ -6147,7 +6162,7 @@ dependencies = [
 [[package]]
 name = "sc-proposer-metrics"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "log 0.4.8",
  "substrate-prometheus-endpoint",
@@ -6156,7 +6171,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -6188,7 +6203,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6212,7 +6227,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-server"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-http-server",
@@ -6228,7 +6243,7 @@ dependencies = [
 [[package]]
 name = "sc-service"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "directories",
@@ -6291,7 +6306,7 @@ dependencies = [
 [[package]]
 name = "sc-service-test"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "env_logger",
  "fdlimit",
@@ -6328,7 +6343,7 @@ dependencies = [
 [[package]]
 name = "sc-state-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -6342,7 +6357,7 @@ dependencies = [
 [[package]]
 name = "sc-telemetry"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "bytes 0.5.5",
  "futures 0.3.5",
@@ -6364,7 +6379,7 @@ dependencies = [
 [[package]]
 name = "sc-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "erased-serde",
  "log 0.4.8",
@@ -6381,7 +6396,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-graph"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6401,7 +6416,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6764,7 +6779,7 @@ dependencies = [
 [[package]]
 name = "sp-allocator"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -6776,7 +6791,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -6791,7 +6806,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate",
@@ -6803,7 +6818,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -6815,7 +6830,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.12",
@@ -6828,7 +6843,7 @@ dependencies = [
 [[package]]
 name = "sp-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6840,7 +6855,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -6851,7 +6866,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6863,7 +6878,7 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -6879,7 +6894,7 @@ dependencies = [
 [[package]]
 name = "sp-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "serde",
  "serde_json",
@@ -6888,7 +6903,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6912,7 +6927,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6926,7 +6941,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-babe"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "merlin",
  "parity-scale-codec",
@@ -6944,7 +6959,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -6956,7 +6971,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -6998,7 +7013,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "kvdb",
  "parking_lot 0.10.2",
@@ -7007,7 +7022,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -7017,7 +7032,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7028,7 +7043,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "finality-grandpa",
  "log 0.4.8",
@@ -7044,7 +7059,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -7054,7 +7069,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "parity-scale-codec",
@@ -7066,7 +7081,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7087,7 +7102,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -7098,7 +7113,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -7110,7 +7125,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections-compact"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -7121,7 +7136,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -7131,7 +7146,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "backtrace",
  "log 0.4.8",
@@ -7140,7 +7155,7 @@ dependencies = [
 [[package]]
 name = "sp-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "serde",
  "sp-core",
@@ -7149,7 +7164,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -7171,7 +7186,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -7186,7 +7201,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -7198,7 +7213,7 @@ dependencies = [
 [[package]]
 name = "sp-sandbox"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -7211,7 +7226,7 @@ dependencies = [
 [[package]]
 name = "sp-serializer"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "serde",
  "serde_json",
@@ -7220,7 +7235,7 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7233,7 +7248,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -7243,7 +7258,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "hash-db",
  "itertools 0.9.0",
@@ -7264,12 +7279,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 
 [[package]]
 name = "sp-storage"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "impl-serde 0.2.3",
  "ref-cast",
@@ -7281,7 +7296,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7295,7 +7310,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "log 0.4.8",
  "rental",
@@ -7305,7 +7320,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -7321,7 +7336,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -7335,7 +7350,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "futures-core",
@@ -7347,7 +7362,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "impl-serde 0.2.3",
  "parity-scale-codec",
@@ -7359,7 +7374,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7487,7 +7502,7 @@ dependencies = [
 [[package]]
 name = "substrate-browser-utils"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "chrono",
  "clear_on_drop",
@@ -7514,7 +7529,7 @@ dependencies = [
 [[package]]
 name = "substrate-build-script-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "platforms",
 ]
@@ -7522,7 +7537,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.5",
@@ -7545,7 +7560,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "async-std",
  "derive_more",
@@ -7559,7 +7574,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7581,7 +7596,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "cfg-if",
  "frame-executive",
@@ -7621,7 +7636,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 dependencies = [
  "futures 0.3.5",
  "parity-scale-codec",
@@ -7642,7 +7657,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder-runner"
 version = "1.0.6"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=drew-migrations-after-staking#642d3851ca50860c6a82b188fe1e09382573db2c"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-democracy-migration#6f57659c32ab557717e8f83988940f72cc1664a0"
 
 [[package]]
 name = "substrate-wasmtime"
@@ -8584,9 +8599,9 @@ checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
 
 [[package]]
 name = "wasm-bindgen"
-version = "0.2.63"
+version = "0.2.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c2dc4aa152834bc334f506c1a06b866416a8b6697d5c9f75b9a689c8486def0"
+checksum = "6a634620115e4a229108b71bde263bb4220c483b3f07f5ba514ee8d15064c4c2"
 dependencies = [
  "cfg-if",
  "wasm-bindgen-macro",
@@ -8594,9 +8609,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-backend"
-version = "0.2.63"
+version = "0.2.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ded84f06e0ed21499f6184df0e0cb3494727b0c5da89534e0fcc55c51d812101"
+checksum = "3e53963b583d18a5aa3aaae4b4c1cb535218246131ba22a71f05b518098571df"
 dependencies = [
  "bumpalo",
  "lazy_static",
@@ -8609,9 +8624,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-futures"
-version = "0.4.13"
+version = "0.4.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64487204d863f109eb77e8462189d111f27cb5712cc9fdb3461297a76963a2f6"
+checksum = "dba48d66049d2a6cc8488702e7259ab7afc9043ad0dc5448444f46f2a453b362"
 dependencies = [
  "cfg-if",
  "js-sys",
@@ -8621,9 +8636,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro"
-version = "0.2.63"
+version = "0.2.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "838e423688dac18d73e31edce74ddfac468e37b1506ad163ffaf0a46f703ffe3"
+checksum = "3fcfd5ef6eec85623b4c6e844293d4516470d8f19cd72d0d12246017eb9060b8"
 dependencies = [
  "quote 1.0.7",
  "wasm-bindgen-macro-support",
@@ -8631,9 +8646,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro-support"
-version = "0.2.63"
+version = "0.2.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3156052d8ec77142051a533cdd686cba889537b213f948cd1d20869926e68e92"
+checksum = "9adff9ee0e94b926ca81b57f57f86d5545cdcb1d259e21ec9bdd95b901754c75"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -8644,9 +8659,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-shared"
-version = "0.2.63"
+version = "0.2.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c9ba19973a58daf4db6f352eda73dc0e289493cd29fb2632eb172085b6521acd"
+checksum = "7f7b90ea6c632dd06fd765d44542e234d5e63d9bb917ecd64d79778a13bd79ae"
 
 [[package]]
 name = "wasm-timer"
@@ -8765,9 +8780,9 @@ dependencies = [
 
 [[package]]
 name = "web-sys"
-version = "0.3.40"
+version = "0.3.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7b72fe77fd39e4bd3eaa4412fd299a0be6b3dfe9d2597e2f1c20beb968f41d17"
+checksum = "863539788676619aac1a23e2df3655e96b32b0e05eb72ca34ba045ad573c625d"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
