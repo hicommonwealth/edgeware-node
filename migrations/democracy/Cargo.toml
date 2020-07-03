@@ -1,0 +1,18 @@
+[package]
+name = "democracy-migrations"
+version = "0.1.0"
+authors = ["Alexander Popiak <alexander.popiak@parity.io>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+current-democracy = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-migrations-extraction", default-features = false, package = "pallet-democracy" }
+deprecated-democracy = { git = "https://github.com/hicommonwealth/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c", default-features = false, package = "pallet-democracy" }
+
+[features]
+default = ["std"]
+std = [
+    "current-democracy/std",
+    "deprecated-democracy/std",
+]

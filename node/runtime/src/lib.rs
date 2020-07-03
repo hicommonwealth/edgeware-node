@@ -857,6 +857,7 @@ mod custom_migration {
 			weight += balances_upgrade::<Runtime, pallet_balances::DefaultInstance>();
 			weight += staking_upgrade::<Runtime>();
 			weight += accounts_upgrade::<Runtime>();
+			weight += democracy_migrations::migrate_all::<Runtime>();
 			weight
 		}
 	}

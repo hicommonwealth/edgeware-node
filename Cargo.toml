@@ -1,5 +1,6 @@
 [workspace]
 members = [
+	"migrations/democracy",
 	"modules/edge-signaling",
 	"modules/edge-voting",
 	"modules/edge-treasury-reward",
