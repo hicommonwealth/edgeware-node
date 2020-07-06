@@ -1,5 +1,7 @@
-use democracy_current::*;
-use democracy_deprecated as deprecated;
+use current_democracy::*;
+use deprecated_democracy as deprecated;
+
+use frame_support::{storage::{StorageMap, StoragePrefixedMap, StorageValue}, traits::Get, weights::Weight};
 
 pub fn migrate_account<T: Trait>(a: &T::AccountId) {
 	Locks::<T>::migrate_key_from_blake(a);
@@ -53,6 +55,14 @@ pub fn migrate_remove_unused_storage<T: Trait>() -> Weight {
 	0
 }
 
+fn convert(t: deprecated::VoteThreshold) -> VoteThreshold {
+	match t {
+		deprecated::VoteThreshold::SuperMajorityApprove => VoteThreshold::SuperMajorityApprove,
+		deprecated::VoteThreshold::SuperMajorityAgainst => VoteThreshold::SuperMajorityAgainst,
+		deprecated::VoteThreshold::SimpleMajority => VoteThreshold::SimpleMajority,
+	}
+}
+
 // migration based on [substrate/#5294](https://github.com/paritytech/substrate/pull/5294)
 pub fn migrate_referendum_info<T: Trait>() -> Weight {
 	use frame_support::{Twox64Concat, migration::{StorageKeyIterator}};
@@ -61,10 +71,11 @@ pub fn migrate_referendum_info<T: Trait>() -> Weight {
 	for (index, deprecated::ReferendumInfo { end, proposal_hash, threshold, delay})
 		in StorageKeyIterator::<
 			ReferendumIndex,
-			deprecated::ReferendumInfo,
+			deprecated::ReferendumInfo<T::BlockNumber, T::Hash>,
 			Twox64Concat,
 		>::new(b"Democracy", b"ReferendumInfoOf").drain()
 	{
+		let threshold = convert(threshold);
 		if range.contains(&index) {
 			let status = ReferendumStatus {
 				end, proposal_hash, threshold, delay, tally: Tally::default()
