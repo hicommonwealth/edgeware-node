@@ -9,13 +9,13 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "1.3.0", default-features = false, features = ["derive"] }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-more-migration-fixes", default-features = false }
-sp-application-crypto = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-more-migration-fixes", default-features = false }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-more-migration-fixes", default-features = false }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-more-migration-fixes", default-features = false }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sp-application-crypto = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel", default-features = false }
 
 [dev-dependencies]
-sp-serializer = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-more-migration-fixes" }
+sp-serializer = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
 pretty_assertions = "0.6.1"
 
 [features]
