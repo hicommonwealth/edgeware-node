@@ -913,6 +913,8 @@ impl_runtime_apis! {
 			source: TransactionSource,
 			tx: <Block as BlockT>::Extrinsic,
 		) -> TransactionValidity {
+			sp_runtime::print("runtime/lib/validate_transaction");
+			panic!("runtime/lib/validate_transaction");
 			Executive::validate_transaction(source, tx)
 		}
 	}
