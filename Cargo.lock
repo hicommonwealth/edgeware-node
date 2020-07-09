@@ -1740,7 +1740,7 @@ checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 [[package]]
 name = "fork-tree"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "parity-scale-codec",
 ]
@@ -1748,7 +1748,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1765,7 +1765,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-benchmarking",
  "parity-scale-codec",
@@ -1783,7 +1783,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1798,7 +1798,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "11.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -1809,7 +1809,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "bitmask",
  "frame-metadata",
@@ -1834,7 +1834,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support-procedural-tools",
  "proc-macro2",
@@ -1845,7 +1845,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate",
@@ -1857,7 +1857,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -1867,7 +1867,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -1883,7 +1883,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -3684,7 +3684,7 @@ dependencies = [
 [[package]]
 name = "node-executor"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-benchmarking",
  "node-primitives",
@@ -3701,7 +3701,7 @@ dependencies = [
 [[package]]
 name = "node-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
@@ -3713,7 +3713,7 @@ dependencies = [
 [[package]]
 name = "node-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-benchmarking",
  "frame-executive",
@@ -3974,7 +3974,7 @@ dependencies = [
 [[package]]
 name = "pallet-aura"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3993,7 +3993,7 @@ dependencies = [
 [[package]]
 name = "pallet-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4009,7 +4009,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4024,7 +4024,7 @@ dependencies = [
 [[package]]
 name = "pallet-babe"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4046,7 +4046,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4061,7 +4061,7 @@ dependencies = [
 [[package]]
 name = "pallet-collective"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4076,7 +4076,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4097,7 +4097,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -4107,7 +4107,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4126,7 +4126,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc-runtime-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "pallet-contracts-primitives",
  "parity-scale-codec",
@@ -4138,7 +4138,7 @@ dependencies = [
 [[package]]
 name = "pallet-democracy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4153,7 +4153,7 @@ dependencies = [
 [[package]]
 name = "pallet-elections-phragmen"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4167,7 +4167,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "evm",
  "frame-support",
@@ -4188,7 +4188,7 @@ dependencies = [
 [[package]]
 name = "pallet-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4204,7 +4204,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4224,7 +4224,7 @@ dependencies = [
 [[package]]
 name = "pallet-identity"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "enumflags2",
  "frame-benchmarking",
@@ -4240,7 +4240,7 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4259,7 +4259,7 @@ dependencies = [
 [[package]]
 name = "pallet-indices"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4275,7 +4275,7 @@ dependencies = [
 [[package]]
 name = "pallet-membership"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4289,7 +4289,7 @@ dependencies = [
 [[package]]
 name = "pallet-multisig"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4304,7 +4304,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4319,7 +4319,7 @@ dependencies = [
 [[package]]
 name = "pallet-proxy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4334,7 +4334,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4347,7 +4347,7 @@ dependencies = [
 [[package]]
 name = "pallet-recovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -4362,7 +4362,7 @@ dependencies = [
 [[package]]
 name = "pallet-scheduler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4377,7 +4377,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4397,7 +4397,7 @@ dependencies = [
 [[package]]
 name = "pallet-society"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4411,7 +4411,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4431,7 +4431,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking-reward-curve"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -4442,7 +4442,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4456,7 +4456,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4473,7 +4473,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4488,7 +4488,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4506,7 +4506,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -4519,7 +4519,7 @@ dependencies = [
 [[package]]
 name = "pallet-treasury"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4533,7 +4533,7 @@ dependencies = [
 [[package]]
 name = "pallet-utility"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4548,7 +4548,7 @@ dependencies = [
 [[package]]
 name = "pallet-vesting"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -5662,7 +5662,7 @@ dependencies = [
 [[package]]
 name = "sc-authority-discovery"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "bytes 0.5.5",
  "derive_more",
@@ -5689,7 +5689,7 @@ dependencies = [
 [[package]]
 name = "sc-basic-authorship"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5713,7 +5713,7 @@ dependencies = [
 [[package]]
 name = "sc-block-builder"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "parity-scale-codec",
  "sc-client-api",
@@ -5729,7 +5729,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "impl-trait-for-tuples",
  "sc-chain-spec-derive",
@@ -5745,7 +5745,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -5756,7 +5756,7 @@ dependencies = [
 [[package]]
 name = "sc-cli"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
@@ -5796,7 +5796,7 @@ dependencies = [
 [[package]]
 name = "sc-client-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "fnv",
@@ -5832,7 +5832,7 @@ dependencies = [
 [[package]]
 name = "sc-client-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "blake2-rfc",
  "hash-db",
@@ -5861,7 +5861,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
@@ -5872,7 +5872,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -5903,7 +5903,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-slots"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5925,7 +5925,7 @@ dependencies = [
 [[package]]
 name = "sc-executor"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "lazy_static",
@@ -5953,7 +5953,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-common"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -5970,7 +5970,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmi"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -5985,7 +5985,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmtime"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "cranelift-codegen",
  "cranelift-wasm",
@@ -6006,7 +6006,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -6044,7 +6044,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "finality-grandpa",
@@ -6061,7 +6061,7 @@ dependencies = [
 [[package]]
 name = "sc-informant"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "ansi_term 0.12.1",
  "futures 0.3.5",
@@ -6080,7 +6080,7 @@ dependencies = [
 [[package]]
 name = "sc-keystore"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "hex 0.4.2",
@@ -6096,7 +6096,7 @@ dependencies = [
 [[package]]
 name = "sc-light"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "hash-db",
  "lazy_static",
@@ -6115,7 +6115,7 @@ dependencies = [
 [[package]]
 name = "sc-network"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "bitflags",
  "bs58",
@@ -6167,7 +6167,7 @@ dependencies = [
 [[package]]
 name = "sc-network-gossip"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -6182,7 +6182,7 @@ dependencies = [
 [[package]]
 name = "sc-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "bytes 0.5.5",
  "fnv",
@@ -6209,7 +6209,7 @@ dependencies = [
 [[package]]
 name = "sc-peerset"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "libp2p",
@@ -6222,7 +6222,7 @@ dependencies = [
 [[package]]
 name = "sc-proposer-metrics"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "log 0.4.8",
  "substrate-prometheus-endpoint",
@@ -6231,7 +6231,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -6263,7 +6263,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6287,7 +6287,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-server"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-http-server",
@@ -6303,7 +6303,7 @@ dependencies = [
 [[package]]
 name = "sc-service"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "directories",
@@ -6366,7 +6366,7 @@ dependencies = [
 [[package]]
 name = "sc-service-test"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "env_logger",
  "fdlimit",
@@ -6403,7 +6403,7 @@ dependencies = [
 [[package]]
 name = "sc-state-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -6417,7 +6417,7 @@ dependencies = [
 [[package]]
 name = "sc-telemetry"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "bytes 0.5.5",
  "futures 0.3.5",
@@ -6439,7 +6439,7 @@ dependencies = [
 [[package]]
 name = "sc-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "erased-serde",
  "log 0.4.8",
@@ -6456,7 +6456,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-graph"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6476,7 +6476,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6862,7 +6862,7 @@ dependencies = [
 [[package]]
 name = "sp-allocator"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -6874,7 +6874,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -6889,7 +6889,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate",
@@ -6901,7 +6901,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -6913,7 +6913,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.12",
@@ -6926,7 +6926,7 @@ dependencies = [
 [[package]]
 name = "sp-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6938,7 +6938,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -6949,7 +6949,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6961,7 +6961,7 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -6977,7 +6977,7 @@ dependencies = [
 [[package]]
 name = "sp-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "serde",
  "serde_json",
@@ -6986,7 +6986,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -7010,7 +7010,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7024,7 +7024,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-babe"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "merlin",
  "parity-scale-codec",
@@ -7042,7 +7042,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -7054,7 +7054,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -7096,7 +7096,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "kvdb",
  "parking_lot 0.10.2",
@@ -7105,7 +7105,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -7115,7 +7115,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7126,7 +7126,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "finality-grandpa",
  "log 0.4.8",
@@ -7142,7 +7142,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -7152,7 +7152,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "derive_more",
  "parity-scale-codec",
@@ -7164,7 +7164,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7185,7 +7185,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -7196,7 +7196,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -7208,7 +7208,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections-compact"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -7219,7 +7219,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -7229,7 +7229,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "backtrace",
  "log 0.4.8",
@@ -7238,7 +7238,7 @@ dependencies = [
 [[package]]
 name = "sp-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "serde",
  "sp-core",
@@ -7247,7 +7247,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -7269,7 +7269,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -7284,7 +7284,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -7296,7 +7296,7 @@ dependencies = [
 [[package]]
 name = "sp-sandbox"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -7309,7 +7309,7 @@ dependencies = [
 [[package]]
 name = "sp-serializer"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "serde",
  "serde_json",
@@ -7318,7 +7318,7 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7331,7 +7331,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -7341,7 +7341,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "hash-db",
  "itertools 0.9.0",
@@ -7362,12 +7362,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 
 [[package]]
 name = "sp-storage"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "impl-serde 0.2.3",
  "ref-cast",
@@ -7379,7 +7379,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7393,7 +7393,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "log 0.4.8",
  "rental",
@@ -7403,7 +7403,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -7419,7 +7419,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -7433,7 +7433,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "futures 0.3.5",
  "futures-core",
@@ -7445,7 +7445,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "impl-serde 0.2.3",
  "parity-scale-codec",
@@ -7457,7 +7457,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7585,7 +7585,7 @@ dependencies = [
 [[package]]
 name = "substrate-browser-utils"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "chrono",
  "clear_on_drop",
@@ -7612,7 +7612,7 @@ dependencies = [
 [[package]]
 name = "substrate-build-script-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "platforms",
 ]
@@ -7620,7 +7620,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.5",
@@ -7643,7 +7643,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 dependencies = [
  "async-std",
  "derive_more",
@@ -7657,7 +7657,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7679,7 +7679,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "cfg-if",
  "frame-executive",
@@ -7719,7 +7719,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
 dependencies = [
  "futures 0.3.5",
  "parity-scale-codec",
@@ -7740,7 +7740,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder-runner"
 version = "1.0.6"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=time-travel#fc1e1a48ff2f74bec379887b7963564cecf1d6e1"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#7dcf8a0bfead130358768c7bce4d555d3d384224"
 
 [[package]]
 name = "substrate-wasmtime"
@@ -8433,7 +8433,7 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bfd5b7557925ce778ff9b9ef90e3ade34c524b5ff10e239c69a42d546d2af56"
 dependencies = [
- "rand 0.7.3",
+ "rand 0.3.23",
 ]
 
 [[package]]
