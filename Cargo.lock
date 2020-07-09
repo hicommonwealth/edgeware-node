@@ -579,9 +579,9 @@ dependencies = [
 
 [[package]]
 name = "cc"
-version = "1.0.57"
+version = "1.0.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fde55d2a2bfaa4c9668bbc63f531fbdeee3ffe188f4662511ce2c22b3eedebe"
+checksum = "f9a06fb2e53271d7c279ec1efea6ab691c35a2ae67ec0d91d7acec0caf13b518"
 dependencies = [
  "jobserver",
 ]
@@ -1740,7 +1740,7 @@ checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 [[package]]
 name = "fork-tree"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "parity-scale-codec",
 ]
@@ -1765,7 +1765,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-benchmarking",
  "parity-scale-codec",
@@ -2946,9 +2946,9 @@ checksum = "3576a87f2ba00f6f106fdfcd16db1d698d648a26ad8e0573cad8537c3c362d2a"
 
 [[package]]
 name = "libc"
-version = "0.2.71"
+version = "0.2.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9457b06509d27052635f90d6466700c65095fdf75409b3fbdd903e988b886f49"
+checksum = "a9f8082297d534141b30c8d39e9b1773713ab50fdbe4ff30f750d063b3bfd701"
 
 [[package]]
 name = "libflate"
@@ -3684,7 +3684,7 @@ dependencies = [
 [[package]]
 name = "node-executor"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-benchmarking",
  "node-primitives",
@@ -3701,7 +3701,7 @@ dependencies = [
 [[package]]
 name = "node-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
@@ -3713,7 +3713,7 @@ dependencies = [
 [[package]]
 name = "node-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-benchmarking",
  "frame-executive",
@@ -4024,7 +4024,7 @@ dependencies = [
 [[package]]
 name = "pallet-babe"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4107,7 +4107,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4275,7 +4275,7 @@ dependencies = [
 [[package]]
 name = "pallet-membership"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4397,7 +4397,7 @@ dependencies = [
 [[package]]
 name = "pallet-society"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4488,7 +4488,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -5662,7 +5662,7 @@ dependencies = [
 [[package]]
 name = "sc-authority-discovery"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "bytes 0.5.5",
  "derive_more",
@@ -5689,7 +5689,7 @@ dependencies = [
 [[package]]
 name = "sc-basic-authorship"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5713,7 +5713,7 @@ dependencies = [
 [[package]]
 name = "sc-block-builder"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "parity-scale-codec",
  "sc-client-api",
@@ -5729,7 +5729,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "impl-trait-for-tuples",
  "sc-chain-spec-derive",
@@ -5745,7 +5745,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -5756,7 +5756,7 @@ dependencies = [
 [[package]]
 name = "sc-cli"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
@@ -5796,7 +5796,7 @@ dependencies = [
 [[package]]
 name = "sc-client-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "fnv",
@@ -5832,7 +5832,7 @@ dependencies = [
 [[package]]
 name = "sc-client-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "blake2-rfc",
  "hash-db",
@@ -5861,7 +5861,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
@@ -5872,7 +5872,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -5903,7 +5903,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-slots"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5925,7 +5925,7 @@ dependencies = [
 [[package]]
 name = "sc-executor"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "lazy_static",
@@ -5953,7 +5953,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-common"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -5970,7 +5970,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmi"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -5985,7 +5985,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmtime"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "cranelift-codegen",
  "cranelift-wasm",
@@ -6006,7 +6006,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -6044,7 +6044,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "finality-grandpa",
@@ -6061,7 +6061,7 @@ dependencies = [
 [[package]]
 name = "sc-informant"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "ansi_term 0.12.1",
  "futures 0.3.5",
@@ -6080,7 +6080,7 @@ dependencies = [
 [[package]]
 name = "sc-keystore"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "hex 0.4.2",
@@ -6096,7 +6096,7 @@ dependencies = [
 [[package]]
 name = "sc-light"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "hash-db",
  "lazy_static",
@@ -6115,7 +6115,7 @@ dependencies = [
 [[package]]
 name = "sc-network"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "bitflags",
  "bs58",
@@ -6167,7 +6167,7 @@ dependencies = [
 [[package]]
 name = "sc-network-gossip"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -6182,7 +6182,7 @@ dependencies = [
 [[package]]
 name = "sc-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "bytes 0.5.5",
  "fnv",
@@ -6209,7 +6209,7 @@ dependencies = [
 [[package]]
 name = "sc-peerset"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "libp2p",
@@ -6222,7 +6222,7 @@ dependencies = [
 [[package]]
 name = "sc-proposer-metrics"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "log 0.4.8",
  "substrate-prometheus-endpoint",
@@ -6231,7 +6231,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -6263,7 +6263,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6287,7 +6287,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-server"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-http-server",
@@ -6303,7 +6303,7 @@ dependencies = [
 [[package]]
 name = "sc-service"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "directories",
@@ -6366,7 +6366,7 @@ dependencies = [
 [[package]]
 name = "sc-service-test"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "env_logger",
  "fdlimit",
@@ -6403,7 +6403,7 @@ dependencies = [
 [[package]]
 name = "sc-state-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "log 0.4.8",
  "parity-scale-codec",
@@ -6417,7 +6417,7 @@ dependencies = [
 [[package]]
 name = "sc-telemetry"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "bytes 0.5.5",
  "futures 0.3.5",
@@ -6439,7 +6439,7 @@ dependencies = [
 [[package]]
 name = "sc-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "erased-serde",
  "log 0.4.8",
@@ -6456,7 +6456,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-graph"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6476,7 +6476,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6862,7 +6862,7 @@ dependencies = [
 [[package]]
 name = "sp-allocator"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "derive_more",
  "log 0.4.8",
@@ -6977,7 +6977,7 @@ dependencies = [
 [[package]]
 name = "sp-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "serde",
  "serde_json",
@@ -7024,7 +7024,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-babe"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "merlin",
  "parity-scale-codec",
@@ -7042,7 +7042,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -7096,7 +7096,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "kvdb",
  "parking_lot 0.10.2",
@@ -7238,7 +7238,7 @@ dependencies = [
 [[package]]
 name = "sp-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "serde",
  "sp-core",
@@ -7585,7 +7585,7 @@ dependencies = [
 [[package]]
 name = "substrate-browser-utils"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "chrono",
  "clear_on_drop",
@@ -7612,7 +7612,7 @@ dependencies = [
 [[package]]
 name = "substrate-build-script-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "platforms",
 ]
@@ -7620,7 +7620,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.5",
@@ -7657,7 +7657,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7679,7 +7679,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "cfg-if",
  "frame-executive",
@@ -7719,7 +7719,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#24e8b2e9111ffc8bbf2edeaf2368c5a270190938"
+source = "git+https://github.com/hicommonwealth/substrate.git?branch=apopiak-multisig-migration#a8aa9bba85d8a6b3432bed15f03cffdd95021125"
 dependencies = [
  "futures 0.3.5",
  "parity-scale-codec",
@@ -8358,9 +8358,9 @@ checksum = "e987b6bf443f4b5b3b6f38704195592cca41c5bb7aedd3c3693c7081f8289860"
 
 [[package]]
 name = "tracing"
-version = "0.1.15"
+version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a41f40ed0e162c911ac6fcb53ecdc8134c46905fdbbae8c50add462a538b495f"
+checksum = "c2e2a2de6b0d5cbb13fc21193a2296888eaab62b6044479aafb3c54c01c29fcd"
 dependencies = [
  "cfg-if",
  "tracing-attributes",
@@ -8369,9 +8369,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-attributes"
-version = "0.1.8"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99bbad0de3fd923c9c3232ead88510b783e5a4d16a6154adffa3d53308de984c"
+checksum = "f0693bf8d6f2bf22c690fc61a9d21ac69efdbb894a17ed596b9af0f01e64b84b"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -8380,9 +8380,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-core"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0aa83a9a47081cd522c09c81b31aec2c9273424976f922ad61c053b58350b715"
+checksum = "94ae75f0d28ae10786f3b1895c55fe72e79928fd5ccdebb5438c75e93fec178f"
 dependencies = [
  "lazy_static",
 ]
@@ -8433,7 +8433,7 @@ version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3bfd5b7557925ce778ff9b9ef90e3ade34c524b5ff10e239c69a42d546d2af56"
 dependencies = [
- "rand 0.3.23",
+ "rand 0.7.3",
 ]
 
 [[package]]
