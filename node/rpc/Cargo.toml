@@ -6,13 +6,13 @@ edition = "2018"
 
 [dependencies]
 jsonrpc-core = "14.0.3"
-sp-api = { git = "https://github.com/paritytech/substrate.git" }
-sc-client = { git = "https://github.com/paritytech/substrate.git" }
-sp-runtime = { git = "https://github.com/paritytech/substrate.git" }
-pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git" }
-pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git" }
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git" }
+sp-api = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sc-client = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

@@ -5,15 +5,15 @@ authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
-sp-block-builder = { git = "https://github.com/paritytech/substrate.git" }
-sc-cli = { git = "https://github.com/paritytech/substrate.git" }
-sc-client-api = { git = "https://github.com/paritytech/substrate.git" }
-sc-client = { git = "https://github.com/paritytech/substrate.git" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sc-cli = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sc-client-api = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sc-client = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
 codec = { package = "parity-scale-codec", version = "1.0.0", features = ["derive"] }
-sp-consensus = { git = "https://github.com/paritytech/substrate.git" }
+sp-consensus = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
 log = "0.4.8"
-sp-core = { git = "https://github.com/paritytech/substrate.git" }
-sp-api = { git = "https://github.com/paritytech/substrate.git" }
-sp-runtime = { git = "https://github.com/paritytech/substrate.git" }
-sc-service = { git = "https://github.com/paritytech/substrate.git" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate.git" }
+sp-core = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sp-api = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sc-service = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate.git", rev = "00a400f82539e2f78e8ddbcd98aea512c87c5f3c" }
