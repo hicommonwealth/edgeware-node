@@ -11,10 +11,10 @@ targets = ["x86_64-unknown-linux-gnu"]
 codec = { package = "parity-scale-codec", version = "1.3.0" }
 derive_more = "0.99"
 log = "0.4.8"
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sc-service = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "time-travel" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sc-service = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
 structopt = "0.3.8"
