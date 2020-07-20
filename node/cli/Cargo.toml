@@ -42,49 +42,49 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
 
 # client dependencies
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-network = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-network = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
 
 
 # frame dependencies
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false }
-pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -94,23 +94,23 @@ edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", optional = true }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", optional = true }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
 
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", optional = true }
+browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", optional = true }
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
-node-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", features = [ "wasmtime" ] }
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", optional = true, features = [ "wasmtime" ] }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", default-features = false, features = [ "wasmtime" ] }
+node-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", features = [ "wasmtime" ] }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", optional = true, features = [ "wasmtime" ] }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", default-features = false, features = [ "wasmtime" ] }
 
 [dev-dependencies]
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
-sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
+sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
 futures = "0.3.4"
 tempfile = "3.1.0"
 assert_cmd = "1.0"
@@ -120,11 +120,11 @@ regex = "1"
 platforms = "0.2.1"
 
 [build-dependencies]
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", optional = true }
-substrate-build-script-utils = { git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration", optional = true }
+sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", optional = true }
+substrate-build-script-utils = { git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix", optional = true }
 structopt = { version = "0.3.8", optional = true }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "apopiak-fix-session-migration" }
+frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "session-migration-ed25519-fix" }
 
 
 [features]
