@@ -103,8 +103,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 36,
-	impl_version: 36,
+	spec_version: 38,
+	impl_version: 38,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -176,7 +176,7 @@ impl frame_system::Trait for Runtime {
 	type Version = Version;
 	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
-	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Session, Staking, Vesting);
+	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Staking, Session, Vesting);
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 }
