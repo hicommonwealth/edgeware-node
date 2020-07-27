@@ -67,7 +67,7 @@ pub use sp_version::RuntimeVersion;
 
 pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
 pub use pallet_session::{historical as pallet_session_historical};
-pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
+// pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -715,7 +715,7 @@ impl pallet_recovery::Trait for Runtime {
 
 parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
-	pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
+	// pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
 }
 
 impl pallet_vesting::Trait for Runtime {
@@ -730,23 +730,23 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
-// EVM structs
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
+// // EVM structs
+// pub struct FixedGasPrice;
+// impl FeeCalculator for FixedGasPrice {
+// 	fn min_gas_price() -> U256 {
+// 		// Gas price is always one token per gas.
+// 		1.into()
+// 	}
+// }
 
-impl pallet_evm::Trait for Runtime {
-	type FeeCalculator = FixedGasPrice;
-	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
-	type Currency = Balances;
-	type Precompiles = ();
-	type ModuleId = EVMModuleId;
-	type Event = Event;
-}
+// impl pallet_evm::Trait for Runtime {
+// 	type FeeCalculator = FixedGasPrice;
+// 	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
+// 	type Currency = Balances;
+// 	type Precompiles = ();
+// 	type ModuleId = EVMModuleId;
+// 	type Event = Event;
+// }
 
 impl signaling::Trait for Runtime {
 	type Event = Event;
@@ -798,7 +798,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
+		// EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 		Historical: pallet_session_historical::{Module},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
