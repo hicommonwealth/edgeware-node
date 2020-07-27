@@ -370,13 +370,15 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-  // 1 hour session, 6 hour era
+	// 1 hour session, 6 hour era
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
+	// 2 * 28 eras * 6 hours/era = 14 day bonding duration
 	pub const BondingDuration: pallet_staking::EraIndex = 2 * 28;
+	// 28 eras * 6 hours/era = 7 day slash duration
 	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &CURVE;
 	pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
-	pub const MaxNominatorRewardedPerValidator: u32 = 64;
+	pub const MaxNominatorRewardedPerValidator: u32 = 128;
 	pub const MaxIterations: u32 = 5;
 	// 0.05%. The higher the value, the more strict solution acceptance becomes.
 	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
