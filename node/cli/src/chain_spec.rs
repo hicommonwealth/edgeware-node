@@ -20,7 +20,7 @@ use edgeware_runtime::constants::currency::*;
 use edgeware_runtime::Block;
 use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig,
-	DemocracyConfig, EVMConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
+	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
 	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
 	TreasuryRewardConfig, VestingConfig, WASM_BINARY,
 };
@@ -244,9 +244,9 @@ pub fn testnet_genesis(
 		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(SudoConfig { key: _root_key }),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(EVMConfig {
-			accounts: std::collections::BTreeMap::new(),
-		}),
+		// pallet_evm: Some(EVMConfig {
+		// 	accounts: std::collections::BTreeMap::new(),
+		// }),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
@@ -512,9 +512,9 @@ pub fn mainnet_genesis(
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		}),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(EVMConfig {
-			accounts: std::collections::BTreeMap::new(),
-		}),
+		// pallet_evm: Some(EVMConfig {
+		// 	accounts: std::collections::BTreeMap::new(),
+		// }),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,

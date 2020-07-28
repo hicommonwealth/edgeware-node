@@ -67,7 +67,7 @@ pub use sp_version::RuntimeVersion;
 
 pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
 pub use pallet_session::{historical as pallet_session_historical};
-pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
+// pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -103,8 +103,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 36,
-	impl_version: 36,
+	spec_version: 38,
+	impl_version: 38,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -176,7 +176,7 @@ impl frame_system::Trait for Runtime {
 	type Version = Version;
 	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
-	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Session, Staking, Vesting);
+	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Staking, Session, Vesting);
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 }
@@ -370,13 +370,15 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-  // 1 hour session, 6 hour era
+	// 1 hour session, 6 hour era
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
+	// 2 * 28 eras * 6 hours/era = 14 day bonding duration
 	pub const BondingDuration: pallet_staking::EraIndex = 2 * 28;
+	// 28 eras * 6 hours/era = 7 day slash duration
 	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &CURVE;
 	pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
-	pub const MaxNominatorRewardedPerValidator: u32 = 64;
+	pub const MaxNominatorRewardedPerValidator: u32 = 128;
 	pub const MaxIterations: u32 = 5;
 	// 0.05%. The higher the value, the more strict solution acceptance becomes.
 	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
@@ -715,7 +717,7 @@ impl pallet_recovery::Trait for Runtime {
 
 parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
-	pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
+	// pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
 }
 
 impl pallet_vesting::Trait for Runtime {
@@ -730,23 +732,23 @@ impl pallet_sudo::Trait for Runtime {
 	type Call = Call;
 }
 
-// EVM structs
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
+// // EVM structs
+// pub struct FixedGasPrice;
+// impl FeeCalculator for FixedGasPrice {
+// 	fn min_gas_price() -> U256 {
+// 		// Gas price is always one token per gas.
+// 		1.into()
+// 	}
+// }
 
-impl pallet_evm::Trait for Runtime {
-	type FeeCalculator = FixedGasPrice;
-	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
-	type Currency = Balances;
-	type Precompiles = ();
-	type ModuleId = EVMModuleId;
-	type Event = Event;
-}
+// impl pallet_evm::Trait for Runtime {
+// 	type FeeCalculator = FixedGasPrice;
+// 	type ConvertAccountId = HashTruncateConvertAccountId<BlakeTwo256>;
+// 	type Currency = Balances;
+// 	type Precompiles = ();
+// 	type ModuleId = EVMModuleId;
+// 	type Event = Event;
+// }
 
 impl signaling::Trait for Runtime {
 	type Event = Event;
@@ -798,7 +800,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
+		// EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 		Historical: pallet_session_historical::{Module},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
