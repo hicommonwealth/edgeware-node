@@ -47,7 +47,7 @@ pub use pallet_transaction_payment::{Multiplier, TargetedFeeAdjustment};
 pub use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 pub use sp_core::{
 	crypto::KeyTypeId,
-	u32_trait::{_1, _2, _3, _4, _8},
+	u32_trait::{_1, _2, _3, _4, _5},
 	OpaqueMetadata, U256,
 };
 use sp_runtime::{
@@ -336,7 +336,7 @@ impl_opaque_keys! {
 }
 
 parameter_types! {
-	pub const Period: BlockNumber = 1 * HOURS;
+	pub const Period: BlockNumber = 1 * MINUTES;
 	pub const Offset: BlockNumber = 0;
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 }
@@ -435,7 +435,7 @@ impl pallet_democracy::Trait for Runtime {
 	/// A straight majority of the council can decide what their next motion is.
 	type ExternalOrigin = pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
 	/// A super-majority can have the next scheduled referendum be a straight majority-carries vote.
-	type ExternalMajorityOrigin = pallet_collective::EnsureProportionAtLeast<_4, _4, AccountId, CouncilCollective>;
+	type ExternalMajorityOrigin = pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>;
 	type FastTrackOrigin = pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>;
 	type InstantOrigin = frame_system::EnsureNever<AccountId>;
 	type InstantAllowed = InstantAllowed;
@@ -471,7 +471,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 parameter_types! {
 	pub const CandidacyBond: Balance = 1_000 * DOLLARS;
 	pub const VotingBond: Balance = 10 * DOLLARS;
-	pub const TermDuration: BlockNumber = 14 * DAYS;
+	pub const TermDuration: BlockNumber = 28 * DAYS;
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
@@ -513,8 +513,16 @@ parameter_types! {
 
 impl pallet_treasury::Trait for Runtime {
 	type Currency = Balances;
-	type ApproveOrigin = pallet_collective::EnsureMembers<_8, AccountId, CouncilCollective>;
-	type RejectOrigin = pallet_collective::EnsureMembers<_2, AccountId, CouncilCollective>;
+	type ApproveOrigin = EnsureOneOf<
+		AccountId,
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>
+	>;
+	type RejectOrigin = EnsureOneOf<
+		AccountId,
+		EnsureRoot<AccountId>,
+		pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>
+	>;
 	type Tippers = Elections;
 	type TipCountdown = TipCountdown;
 	type TipFindersFee = TipFindersFee;

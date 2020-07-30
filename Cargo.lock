@@ -1350,7 +1350,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "3.0.0"
+version = "3.0.8"
 dependencies = [
  "edge-signaling",
  "edge-treasury-reward",
