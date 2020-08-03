@@ -54,11 +54,11 @@ impl SubstrateCli for Cli {
 			"multi-dev" | "multi" => Box::new(chain_spec::multi_development_config()),
 			"local" => Box::new(chain_spec::local_testnet_config()),
 			"testnet-conf" => Box::new(chain_spec::edgeware_testnet_config(
-				"Berlin".to_string(),
-				"berlin_edgeware_testnet".to_string(),
+				"Beresheet".to_string(),
+				"beresheet_edgeware_testnet".to_string(),
 			)),
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
-			"berlin" => Box::new(chain_spec::edgeware_berlin_official()),
+			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
 			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
 			path => Box::new(chain_spec::ChainSpec::from_json_file(
 				std::path::PathBuf::from(path),

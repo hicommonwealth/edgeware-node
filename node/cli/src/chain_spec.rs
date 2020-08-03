@@ -92,9 +92,9 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 	}
 }
 
-/// 1.0.0 Berlin Testnet configuration
-pub fn edgeware_berlin_official() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/berlin.chainspec.json")[..]) {
+/// Beresheet Testnet configuration
+pub fn edgeware_beresheet_official() -> ChainSpec {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheet.chainspec.json")[..]) {
 		Ok(spec) => spec,
 		Err(e) => panic!(e),
 	}

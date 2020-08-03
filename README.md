@@ -63,10 +63,10 @@ cargo build --release
 
 Ensure you have a fresh start if updating from another version:
 ```
-./scripts/purge-chain.sh berlin
+./scripts/purge-chain.sh beresheet
 ```
 
-To start up the Edgeware node and connect to the Berlin testnet, run:
+To start up the Edgeware node and connect to the Beresheet testnet, run:
 ```
-./target/release/edgeware --chain=berlin --name <INSERT_NAME>
+./target/release/edgeware --chain=beresheet --name <INSERT_NAME>
 ```

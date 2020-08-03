@@ -1,6 +1,6 @@
 {
-  "name": "Berlin",
-  "id": "berlin_edgeware_testnet",
+  "name": "Beresheet",
+  "id": "beresheet_edgeware_testnet",
   "bootNodes": [
     "/ip4/45.77.148.197/tcp/30333/p2p/QmUeUUGWMthMvmqKVRPKdXsuDMynCQfmZ7sjVMvce9VU7V",
     "/ip4/45.77.106.16/tcp/30333/p2p/QmcfVBingGpGxZX34KW5JNmknTvPXPP5n6yV6VC9sLot4o",
