@@ -336,7 +336,7 @@ impl_opaque_keys! {
 }
 
 parameter_types! {
-	pub const Period: BlockNumber = 1 * MINUTES;
+	pub const Period: BlockNumber = 1 * HOURS;
 	pub const Offset: BlockNumber = 0;
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(33);
 }
