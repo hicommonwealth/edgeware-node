@@ -25,7 +25,7 @@ use sp_std::prelude::*;
 use sp_runtime::traits::{Zero};
 
 use frame_support::{decl_event, decl_module, decl_storage};
-use frame_system::{self as system, ensure_root};
+use frame_system::ensure_root;
 pub type BalanceOf<T> = <<T as pallet_staking::Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
 
 pub trait Trait: pallet_staking::Trait + pallet_treasury::Trait + pallet_balances::Trait {

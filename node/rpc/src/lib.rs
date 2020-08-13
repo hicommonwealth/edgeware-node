@@ -27,15 +27,11 @@
 //! are part of it. Therefore all node-runtime-specific RPCs can
 //! be placed here or imported from corresponding `SRML` RPC definitions.
 
-#![warn(missing_docs)]
-
 use std::{sync::Arc, fmt};
 
-use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use edgeware_primitives::{AccountId, Balance, Block, Hash, Index};
 use edgeware_runtime::UncheckedExtrinsic;
 use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
-use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState};
-use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sp_api::ProvideRuntimeApi;
 use sp_transaction_pool::TransactionPool;
 use sp_blockchain::{Error as BlockChainError, HeaderMetadata, HeaderBackend};
@@ -99,9 +95,9 @@ pub fn create_full<C, P, M, SC, BE>(
 	let FullDeps {
 		client,
 		pool,
-		select_chain,
+		select_chain: _,
 		deny_unsafe,
-		is_authority,
+		is_authority: _,
 		command_sink
 	} = deps;
 

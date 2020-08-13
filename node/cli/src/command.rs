@@ -16,9 +16,7 @@
 
 use crate::{chain_spec, service};
 use crate::cli::Cli;
-use edgeware_executor::Executor;
-use edgeware_runtime::{Block, RuntimeApi};
-use sc_cli::{Result, SubstrateCli, RuntimeVersion, ChainSpec, Role};
+use sc_cli::{SubstrateCli, RuntimeVersion, ChainSpec, Role};
 use sc_service::ServiceParams;
 use crate::service::new_full_params;
 
