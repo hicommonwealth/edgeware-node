@@ -19,7 +19,7 @@
 use crate::keyring::*;
 use edgeware_runtime::constants::currency::*;
 use edgeware_runtime::{
-	BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
+	BalancesConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
 	StakingConfig, SystemConfig, WASM_BINARY,
 };
 use sp_core::ChangesTrieConfiguration;

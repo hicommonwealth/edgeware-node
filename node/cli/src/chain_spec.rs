@@ -19,7 +19,7 @@
 use edgeware_runtime::constants::currency::*;
 use edgeware_runtime::Block;
 use edgeware_runtime::{
-	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, ContractsConfig, CouncilConfig,
+	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
 	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
 	TreasuryRewardConfig, VestingConfig, WASM_BINARY,
