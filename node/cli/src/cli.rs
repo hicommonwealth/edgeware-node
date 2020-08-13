@@ -14,35 +14,27 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use sc_cli::RunCmd;
+use sc_cli::{Subcommand};
 use structopt::StructOpt;
 
-/// An overarching CLI command definition.
+
+#[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
-pub struct Cli {
-	/// Possible subcommand with parameters.
-	#[structopt(subcommand)]
-	pub subcommand: Option<Subcommand>,
+pub struct RunCmd {
 	#[allow(missing_docs)]
 	#[structopt(flatten)]
-	pub run: RunCmd,
+	pub base: sc_cli::RunCmd,
+
+	/// Force using Kusama native runtime.
+	#[structopt(long = "manual-seal")]
+	pub manual_seal: bool,
 }
 
-/// Possible subcommands of the main binary.
 #[derive(Debug, StructOpt)]
-pub enum Subcommand {
-	/// A set of base subcommands handled by `sc_cli`.
+pub struct Cli {
+	#[structopt(subcommand)]
+	pub subcommand: Option<Subcommand>,
+
 	#[structopt(flatten)]
-	Base(sc_cli::Subcommand),
-
-	/// The custom inspect subcommmand for decoding blocks and extrinsics.
-	#[structopt(
-		name = "inspect",
-		about = "Decode given block or extrinsic using current native runtime."
-	)]
-	Inspect(edgeware_inspect::cli::InspectCmd),
-
-	/// The custom benchmark subcommmand benchmarking runtime pallets.
-	#[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
-	Benchmark(frame_benchmarking_cli::BenchmarkCmd),
+	pub run: RunCmd,
 }

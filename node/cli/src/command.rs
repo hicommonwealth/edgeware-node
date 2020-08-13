@@ -14,38 +14,45 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{chain_spec, service, Cli, Subcommand};
+use crate::{chain_spec, service};
+use crate::cli::Cli;
 use edgeware_executor::Executor;
 use edgeware_runtime::{Block, RuntimeApi};
-use sc_cli::{Result, SubstrateCli};
+use sc_cli::{Result, SubstrateCli, RuntimeVersion, ChainSpec, Role};
+use sc_service::ServiceParams;
+use crate::service::new_full_params;
 
 impl SubstrateCli for Cli {
-	fn impl_name() -> &'static str {
-		"Edgeware Node"
+	fn impl_name() -> String {
+		"Edgeware Node".into()
 	}
 
-	fn impl_version() -> &'static str {
-		env!("SUBSTRATE_CLI_IMPL_VERSION")
+	fn impl_version() -> String {
+		env!("SUBSTRATE_CLI_IMPL_VERSION").into()
 	}
 
-	fn description() -> &'static str {
-		env!("CARGO_PKG_DESCRIPTION")
+	fn description() -> String {
+		env!("CARGO_PKG_DESCRIPTION").into()
 	}
 
-	fn author() -> &'static str {
-		env!("CARGO_PKG_AUTHORS")
+	fn author() -> String {
+		env!("CARGO_PKG_AUTHORS").into()
 	}
 
-	fn support_url() -> &'static str {
-		"https://github.com/hicommonwealth/edgeware-node/issues/new"
+	fn support_url() -> String {
+		"https://github.com/hicommonwealth/edgeware-node/issues/new".into()
 	}
 
 	fn copyright_start_year() -> i32 {
 		2019
 	}
 
-	fn executable_name() -> &'static str {
-		"edgeware"
+	fn executable_name() -> String {
+		"edgeware".into()
+	}
+
+	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
+		&edgeware_runtime::VERSION
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
@@ -67,41 +74,25 @@ impl SubstrateCli for Cli {
 	}
 }
 
-/// Parse command line arguments into service configuration.
-pub fn run() -> Result<()> {
+/// Parse and run command line arguments
+pub fn run() -> sc_cli::Result<()> {
 	let cli = Cli::from_args();
 
 	match &cli.subcommand {
-		None => {
-			let runner = cli.create_runner(&cli.run)?;
-			runner.run_node(
-				service::new_light,
-				service::new_full,
-				edgeware_runtime::VERSION,
-			)
-		}
-		Some(Subcommand::Inspect(cmd)) => {
-			let runner = cli.create_runner(cmd)?;
-
-			runner.sync_run(|config| cmd.run::<Block, RuntimeApi, Executor>(config))
-		}
-		Some(Subcommand::Benchmark(cmd)) => {
-			if cfg!(feature = "runtime-benchmarks") {
-				let runner = cli.create_runner(cmd)?;
-
-				runner.sync_run(|config| cmd.run::<Block, Executor>(config))
-			} else {
-				println!(
-					"Benchmarking wasn't enabled when building the node. \
-				You can enable it with `--features runtime-benchmarks`."
-				);
-				Ok(())
-			}
-		}
-		Some(Subcommand::Base(subcommand)) => {
+		Some(subcommand) => {
 			let runner = cli.create_runner(subcommand)?;
-
-			runner.run_subcommand(subcommand, |config| Ok(new_full_start!(config).0))
+			runner.run_subcommand(subcommand, |config| {
+				let (ServiceParams { client, backend, task_manager, import_queue, .. }, ..)
+					= new_full_params(config, cli.run.manual_seal)?;
+				Ok((client, backend, import_queue, task_manager))
+			})
+		}
+		None => {
+			let runner = cli.create_runner(&cli.run.base)?;
+			runner.run_node_until_exit(|config| match config.role {
+				Role::Light => service::new_light(config),
+				_ => service::new_full(config, cli.run.manual_seal),
+			})
 		}
 	}
 }

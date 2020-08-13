@@ -29,18 +29,23 @@
 
 #![warn(missing_docs)]
 
-use std::sync::Arc;
+use std::{sync::Arc, fmt};
 
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use edgeware_runtime::UncheckedExtrinsic;
+use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
 use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sp_api::ProvideRuntimeApi;
-use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
-use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
+use sp_blockchain::{Error as BlockChainError, HeaderMetadata, HeaderBackend};
+use sp_consensus::SelectChain;
 use sc_rpc_api::DenyUnsafe;
+use sc_client_api::backend::{StorageProvider, Backend, StateBackend};
+use sp_runtime::traits::BlakeTwo256;
 use sp_block_builder::BlockBuilder;
+
+pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {
@@ -54,14 +59,6 @@ pub struct LightDeps<C, F, P> {
 	pub fetcher: Arc<F>,
 }
 
-/// Extra dependencies for GRANDPA
-pub struct GrandpaDeps {
-	/// Voting round info.
-	pub shared_voter_state: SharedVoterState,
-	/// Authority set info.
-	pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
-}
-
 /// Full client dependencies.
 pub struct FullDeps<C, P, SC> {
 	/// The client instance to use.
@@ -72,20 +69,26 @@ pub struct FullDeps<C, P, SC> {
 	pub select_chain: SC,
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
-	/// GRANDPA specific dependencies.
-	pub grandpa: GrandpaDeps,
+	/// The Node authority flag
+	pub is_authority: bool,
+	/// Manual seal command sink
+	pub command_sink: Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, M, SC>(deps: FullDeps<C, P, SC>) -> jsonrpc_core::IoHandler<M>
-where
-	C: ProvideRuntimeApi<Block>,
+pub fn create_full<C, P, M, SC, BE>(
+	deps: FullDeps<C, P, SC>,
+) -> jsonrpc_core::IoHandler<M> where
+	BE: Backend<Block> + 'static,
+	BE::State: StateBackend<BlakeTwo256>,
+	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE>,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
-	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
 	C::Api: BlockBuilder<Block>,
-	P: TransactionPool + 'static,
+	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
+	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
+	P: TransactionPool<Block=Block> + 'static,
 	M: jsonrpc_core::Metadata + Default,
 	SC: SelectChain<Block> +'static,
 {
@@ -96,29 +99,30 @@ where
 	let FullDeps {
 		client,
 		pool,
-		select_chain: _,
+		select_chain,
 		deny_unsafe,
-		grandpa,
+		is_authority,
+		command_sink
 	} = deps;
-	let GrandpaDeps {
-		shared_voter_state,
-		shared_authority_set,
-	} = grandpa;
 
 	io.extend_with(
-		SystemApi::to_delegate(FullSystem::new(client.clone(), pool, deny_unsafe))
+		SystemApi::to_delegate(FullSystem::new(client.clone(), pool.clone(), deny_unsafe))
 	);
-	// Making synchronous calls in light client freezes the browser currently,
-	// more context: https://github.com/paritytech/substrate/pull/3480
-	// These RPCs should use an asynchronous caller instead.
 	io.extend_with(
 		TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone()))
 	);
-	io.extend_with(
-		sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
-			GrandpaRpcHandler::new(shared_authority_set, shared_voter_state)
-		)
-	);
+
+	match command_sink {
+		Some(command_sink) => {
+			io.extend_with(
+				// We provide the rpc handler with the sending end of the channel to allow the rpc
+				// send EngineCommands to the background block authorship task.
+				ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+			);
+		}
+		_ => {}
+	}
+
 	io
 }
 
@@ -142,7 +146,9 @@ pub fn create_light<C, P, M, F>(
 	} = deps;
 	let mut io = jsonrpc_core::IoHandler::default();
 	io.extend_with(
-		SystemApi::<Hash, AccountId, Index>::to_delegate(LightSystem::new(client, remote_blockchain, fetcher, pool))
+		SystemApi::<Hash, AccountId, Index>::to_delegate(
+			LightSystem::new(client, remote_blockchain, fetcher, pool)
+		)
 	);
 
 	io

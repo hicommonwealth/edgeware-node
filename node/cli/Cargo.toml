@@ -30,7 +30,7 @@ crate-type = ["cdylib", "rlib"]
 # third-party dependencies
 codec = { package = "parity-scale-codec", version = "1.3.0" }
 serde = { version = "1.0.102", features = ["derive"] }
-futures = { version = "0.3.1", features = ["compat"] }
+futures = { version = "0.3.4", features = ["compat"] }
 hex-literal = "0.2.1"
 jsonrpc-core = "14.0.3"
 log = "0.4.8"
@@ -42,6 +42,8 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
+sp-api = { path = "../../vendor/frontier/vendor/substrate/primitives/api" }
+sp-blockchain = { path = "../../vendor/frontier/vendor/substrate/primitives/blockchain" }
 sp-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/primitives/authority-discovery" }
 sp-consensus-aura = { path = "../../vendor/frontier/vendor/substrate/primitives/consensus/aura" }
 sp-finality-grandpa = { path = "../../vendor/frontier/vendor/substrate/primitives/finality-grandpa" }
@@ -66,12 +68,13 @@ sc-finality-grandpa = { path = "../../vendor/frontier/vendor/substrate/client/fi
 sc-client-db = { path = "../../vendor/frontier/vendor/substrate/client/db", default-features = false }
 sc-offchain = { path = "../../vendor/frontier/vendor/substrate/client/offchain" }
 sc-rpc = { path = "../../vendor/frontier/vendor/substrate/client/rpc" }
+sc-rpc-api = { path = "../../vendor/frontier/vendor/substrate/client/rpc-api" }
 sc-basic-authorship = { path = "../../vendor/frontier/vendor/substrate/client/basic-authorship" }
-sc-service = { path = "../../vendor/frontier/vendor/substrate/client/service", default-features = false }
+sc-service = { path = "../../vendor/frontier/vendor/substrate/client/service" }
 sc-tracing = { path = "../../vendor/frontier/vendor/substrate/client/tracing" }
 sc-telemetry = { path = "../../vendor/frontier/vendor/substrate/client/telemetry" }
 sc-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/client/authority-discovery" }
-
+sc-consensus-manual-seal = { path = "../../vendor/frontier/vendor/substrate/client/consensus/manual-seal" }
 
 # frame dependencies
 pallet-indices = { path = "../../vendor/frontier/vendor/substrate/frame/indices" }
