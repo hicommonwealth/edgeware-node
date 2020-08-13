@@ -83,7 +83,6 @@ where
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
-	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
 	C::Api: BlockBuilder<Block>,
 	P: TransactionPool + 'static,
@@ -91,7 +90,6 @@ where
 	SC: SelectChain<Block> +'static,
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
-	use pallet_contracts_rpc::{Contracts, ContractsApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -113,9 +111,6 @@ where
 	// Making synchronous calls in light client freezes the browser currently,
 	// more context: https://github.com/paritytech/substrate/pull/3480
 	// These RPCs should use an asynchronous caller instead.
-	io.extend_with(
-		ContractsApi::to_delegate(Contracts::new(client.clone()))
-	);
 	io.extend_with(
 		TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone()))
 	);

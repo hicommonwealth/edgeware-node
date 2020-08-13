@@ -9,19 +9,18 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 jsonrpc-core = "14.0.3"
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-contracts-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-transaction-payment-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-frame-rpc-system = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-finality-grandpa-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-rpc-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-client-api = { path = "../../vendor/frontier/vendor/substrate/client/api" }
+sp-api = { path = "../../vendor/frontier/vendor/substrate/primitives/api" }
+sp-runtime = { path = "../../vendor/frontier/vendor/substrate/primitives/runtime" }
+pallet-transaction-payment-rpc = { path = "../../vendor/frontier/vendor/substrate/frame/transaction-payment/rpc" }
+substrate-frame-rpc-system = { path = "../../vendor/frontier/vendor/substrate/utils/frame/rpc/system" }
+sp-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/primitives/transaction-pool" }
+sc-keystore = { path = "../../vendor/frontier/vendor/substrate/client/keystore" }
+sp-consensus = { path = "../../vendor/frontier/vendor/substrate/primitives/consensus/common" }
+sp-blockchain = { path = "../../vendor/frontier/vendor/substrate/primitives/blockchain" }
+sc-finality-grandpa = { path = "../../vendor/frontier/vendor/substrate/client/finality-grandpa" }
+sc-finality-grandpa-rpc = { path = "../../vendor/frontier/vendor/substrate/client/finality-grandpa/rpc" }
+sc-rpc-api = { path = "../../vendor/frontier/vendor/substrate/client/rpc-api" }
+sp-block-builder = { path = "../../vendor/frontier/vendor/substrate/primitives/block-builder" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

@@ -99,9 +99,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 			invulnerables: vec![alice(), bob(), charlie()],
 			..Default::default()
 		}),
-		pallet_contracts: Some(ContractsConfig {
-			current_schedule: Default::default(),
-		}),
 		pallet_aura: Some(Default::default()),
 		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],

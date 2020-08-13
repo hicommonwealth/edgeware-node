@@ -226,12 +226,6 @@ pub fn testnet_genesis(
 			members: crate::testnet_fixtures::get_testnet_election_members(),
 			phantom: Default::default(),
 		}),
-		pallet_contracts: Some(ContractsConfig {
-			current_schedule: pallet_contracts::Schedule {
-				enable_println, // this should only be enabled on development chains
-				..Default::default()
-			},
-		}),
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
@@ -491,12 +485,6 @@ pub fn mainnet_genesis(
 		pallet_collective_Instance1: Some(CouncilConfig {
 			members: crate::mainnet_fixtures::get_mainnet_election_members(),
 			phantom: Default::default(),
-		}),
-		pallet_contracts: Some(ContractsConfig {
-			current_schedule: pallet_contracts::Schedule {
-				enable_println, // this should only be enabled on development chains
-				..Default::default()
-			},
 		}),
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],

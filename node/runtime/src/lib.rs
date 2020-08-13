@@ -65,7 +65,6 @@ pub use sp_runtime::transaction_validity::{TransactionValidity, TransactionSourc
 pub use sp_version::NativeVersion;
 pub use sp_version::RuntimeVersion;
 
-pub use pallet_contracts_rpc_runtime_api::ContractExecResult;
 pub use pallet_session::{historical as pallet_session_historical};
 // pub use pallet_evm::{FeeCalculator, HashTruncateConvertAccountId};
 
@@ -176,14 +175,15 @@ impl frame_system::Trait for Runtime {
 	type Version = Version;
 	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
-	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Staking, Session, Vesting);
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
+	type SystemWeightInfo = ();
 }
 
 impl pallet_utility::Trait for Runtime {
 	type Event = Event;
 	type Call = Call;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -201,6 +201,7 @@ impl pallet_multisig::Trait for Runtime {
 	type DepositBase = DepositBase;
 	type DepositFactor = DepositFactor;
 	type MaxSignatories = MaxSignatories;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -253,6 +254,7 @@ impl pallet_proxy::Trait for Runtime {
 	type ProxyDepositBase = ProxyDepositBase;
 	type ProxyDepositFactor = ProxyDepositFactor;
 	type MaxProxies = MaxProxies;
+	type WeightInfo = ();
 }
 
 impl pallet_scheduler::Trait for Runtime {
@@ -260,6 +262,9 @@ impl pallet_scheduler::Trait for Runtime {
 	type Origin = Origin;
 	type Call = Call;
 	type MaximumWeight = MaximumSchedulerWeight;
+	type ScheduleOrigin = EnsureRoot<AccountId>;
+	type PalletsOrigin = OriginCaller;
+	type WeightInfo = ();
 }
 
 impl pallet_aura::Trait for Runtime {
@@ -275,6 +280,7 @@ impl pallet_indices::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
 	type Deposit = IndexDeposit;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -287,6 +293,7 @@ impl pallet_balances::Trait for Runtime {
 	type Event = Event;
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Runtime>;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -313,6 +320,7 @@ impl pallet_timestamp::Trait for Runtime {
 	type Moment = Moment;
 	type OnTimestampSet = Aura;
 	type MinimumPeriod = MinimumPeriod;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -351,6 +359,7 @@ impl pallet_session::Trait for Runtime {
 	type Keys = SessionKeys;
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type WeightInfo = ();
 }
 
 impl pallet_session::historical::Trait for Runtime {
@@ -410,6 +419,7 @@ impl pallet_staking::Trait for Runtime {
 	type MinSolutionScoreBump = MinSolutionScoreBump;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type UnsignedPriority = StakingUnsignedPriority;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -467,6 +477,8 @@ impl pallet_democracy::Trait for Runtime {
 	type Slash = Treasury;
 	type Scheduler = Scheduler;
 	type MaxVotes = MaxVotes;
+	type PalletsOrigin = OriginCaller;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -481,6 +493,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 	type Event = Event;
 	type MotionDuration = CouncilMotionDuration;
 	type MaxProposals = CouncilMaxProposals;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -512,6 +525,7 @@ impl pallet_elections_phragmen::Trait for Runtime {
 	type DesiredMembers = DesiredMembers;
 	type DesiredRunnersUp = DesiredRunnersUp;
 	type TermDuration = TermDuration;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -550,6 +564,8 @@ impl pallet_treasury::Trait for Runtime {
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
 	type ModuleId = TreasuryModuleId;
+	type BurnDestination = ();
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -557,24 +573,6 @@ parameter_types! {
 	pub const RentByteFee: Balance = 1 * DOLLARS;
 	pub const RentDepositOffset: Balance = 1000 * DOLLARS;
 	pub const SurchargeReward: Balance = 150 * DOLLARS;
-}
-
-impl pallet_contracts::Trait for Runtime {
-	type Time = Timestamp;
-	type Randomness = RandomnessCollectiveFlip;
-	type Call = Call;
-	type Event = Event;
-	type DetermineContractAddress = pallet_contracts::SimpleAddressDeterminer<Runtime>;
-	type TrieIdGenerator = pallet_contracts::TrieIdFromParentCounter<Runtime>;
-	type RentPayment = ();
-	type SignedClaimHandicap = pallet_contracts::DefaultSignedClaimHandicap;
-	type TombstoneDeposit = TombstoneDeposit;
-	type StorageSizeOffset = pallet_contracts::DefaultStorageSizeOffset;
-	type RentByteFee = RentByteFee;
-	type RentDepositOffset = RentDepositOffset;
-	type SurchargeReward = SurchargeReward;
-	type MaxDepth = pallet_contracts::DefaultMaxDepth;
-	type MaxValueSize = pallet_contracts::DefaultMaxValueSize;
 }
 
 parameter_types! {
@@ -616,7 +614,6 @@ where
 			frame_system::CheckNonce::<Runtime>::from(nonce),
 			frame_system::CheckWeight::<Runtime>::new(),
 			pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
-			pallet_grandpa::ValidateEquivocationReport::<Runtime>::new(),
 		);
 		let raw_payload = SignedPayload::new(call, extra)
 			.map_err(|e| {
@@ -649,6 +646,7 @@ impl pallet_im_online::Trait for Runtime {
 	type SessionDuration = SessionDuration;
 	type ReportUnresponsiveness = Offences;
 	type UnsignedPriority = ImOnlineUnsignedPriority;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -660,6 +658,7 @@ impl pallet_offences::Trait for Runtime {
 	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
 	type OnOffenceHandler = Staking;
 	type WeightSoftLimit = OffencesWeightSoftLimit;
+	type WeightInfo = ();
 }
 
 impl pallet_authority_discovery::Trait for Runtime {}
@@ -680,8 +679,6 @@ impl pallet_grandpa::Trait for Runtime {
 
 	type HandleEquivocation = pallet_grandpa::EquivocationHandler<
 		Self::KeyOwnerIdentification,
-		edgeware_primitives::report::ReporterAppCrypto,
-		Runtime,
 		Offences,
 	>;
 }
@@ -718,6 +715,7 @@ impl pallet_identity::Trait for Runtime {
 	type Slashed = Treasury;
 	type ForceOrigin = pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>;
 	type RegistrarOrigin = pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -747,6 +745,7 @@ impl pallet_vesting::Trait for Runtime {
 	type Currency = Balances;
 	type BlockNumberToBalance = ConvertInto;
 	type MinVestedTransfer = MinVestedTransfer;
+	type WeightInfo = ();
 }
 
 impl pallet_sudo::Trait for Runtime {
@@ -794,7 +793,7 @@ construct_runtime!(
 	{
 		System: frame_system::{Module, Call, Config, Storage, Event<T>},
 		Utility: pallet_utility::{Module, Call, Event},
-		Aura: pallet_aura::{Module, Config<T>, Inherent(Timestamp)},
+		Aura: pallet_aura::{Module, Config<T>, Inherent},
 
 		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
 		Authorship: pallet_authorship::{Module, Call, Storage, Inherent},
@@ -811,7 +810,6 @@ construct_runtime!(
 		FinalityTracker: pallet_finality_tracker::{Module, Call, Inherent},
 		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
 		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
-		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
 
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
@@ -856,7 +854,6 @@ pub type SignedExtra = (
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
-	pallet_grandpa::ValidateEquivocationReport<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
@@ -865,29 +862,8 @@ pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
 
-/// Custom runtime upgrade to execute the balances migration before the account migration.
-mod custom_migration {
-	use super::*;
-
-	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
-	use pallet_balances::migration::on_runtime_upgrade as balances_upgrade;
-	use frame_system::migration::migrate_accounts as accounts_upgrade;
-	use pallet_staking::migration::migrate_to_simple_payouts as staking_upgrade;
-
-	pub struct Upgrade;
-	impl OnRuntimeUpgrade for Upgrade {
-		fn on_runtime_upgrade() -> Weight {
-			let mut weight = 0;
-			weight += balances_upgrade::<Runtime, pallet_balances::DefaultInstance>();
-			weight += staking_upgrade::<Runtime>();
-			weight += accounts_upgrade::<Runtime>();
-			weight
-		}
-	}
-}
-
 /// Executive: handles dispatch to the various modules.
-pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules, custom_migration::Upgrade>;
+pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules>;
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
@@ -952,7 +928,7 @@ impl_runtime_apis! {
 			Grandpa::grandpa_authorities()
 		}
 
-		fn submit_report_equivocation_extrinsic(
+		fn submit_report_equivocation_unsigned_extrinsic(
 			equivocation_proof: fg_primitives::EquivocationProof<
 				<Block as BlockT>::Hash,
 				NumberFor<Block>,
@@ -961,7 +937,7 @@ impl_runtime_apis! {
 		) -> Option<()> {
 			let key_owner_proof = key_owner_proof.decode()?;
 
-			Grandpa::submit_report_equivocation_extrinsic(
+			Grandpa::submit_unsigned_equivocation_report(
 				equivocation_proof,
 				key_owner_proof,
 			)
@@ -998,41 +974,6 @@ impl_runtime_apis! {
 	impl frame_system_rpc_runtime_api::AccountNonceApi<Block, AccountId, Index> for Runtime {
 		fn account_nonce(account: AccountId) -> Index {
 			System::account_nonce(account)
-		}
-	}
-
-	impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber>
-		for Runtime
-	{
-		fn call(
-			origin: AccountId,
-			dest: AccountId,
-			value: Balance,
-			gas_limit: u64,
-			input_data: Vec<u8>,
-		) -> ContractExecResult {
-			let exec_result =
-				Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data);
-			match exec_result {
-				Ok(v) => ContractExecResult::Success {
-					status: v.status,
-					data: v.data,
-				},
-				Err(_) => ContractExecResult::Error,
-			}
-		}
-
-		fn get_storage(
-			address: AccountId,
-			key: [u8; 32],
-		) -> pallet_contracts_primitives::GetStorageResult {
-			Contracts::get_storage(address, key)
-		}
-
-		fn rent_projection(
-			address: AccountId,
-		) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
-			Contracts::rent_projection(address)
 		}
 	}
 

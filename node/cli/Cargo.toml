@@ -42,49 +42,48 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sp-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sp-inherents = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
+sp-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/primitives/authority-discovery" }
+sp-consensus-aura = { path = "../../vendor/frontier/vendor/substrate/primitives/consensus/aura" }
+sp-finality-grandpa = { path = "../../vendor/frontier/vendor/substrate/primitives/finality-grandpa" }
+sp-core = { path = "../../vendor/frontier/vendor/substrate/primitives/core" }
+sp-runtime = { path = "../../vendor/frontier/vendor/substrate/primitives/runtime" }
+sp-timestamp = { path = "../../vendor/frontier/vendor/substrate/primitives/timestamp", default-features = false }
+sp-finality-tracker = { path = "../../vendor/frontier/vendor/substrate/primitives/finality-tracker", default-features = false }
+sp-inherents = { path = "../../vendor/frontier/vendor/substrate/primitives/inherents" }
+sp-keyring = { path = "../../vendor/frontier/vendor/substrate/primitives/keyring" }
+sp-io = { path = "../../vendor/frontier/vendor/substrate/primitives/io" }
+sp-consensus = { path = "../../vendor/frontier/vendor/substrate/primitives/consensus/common" }
+sp-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/primitives/transaction-pool" }
 
 # client dependencies
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-chain-spec = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-network = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-client-db = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sc-offchain = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-basic-authorship = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-sc-tracing = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-telemetry = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-client-api = { path = "../../vendor/frontier/vendor/substrate/client/api" }
+sc-chain-spec = { path = "../../vendor/frontier/vendor/substrate/client/chain-spec" }
+sc-consensus = { path = "../../vendor/frontier/vendor/substrate/client/consensus/common" }
+sc-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/client/transaction-pool" }
+sc-network = { path = "../../vendor/frontier/vendor/substrate/client/network" }
+sc-consensus-aura = { path = "../../vendor/frontier/vendor/substrate/client/consensus/aura" }
+sc-finality-grandpa = { path = "../../vendor/frontier/vendor/substrate/client/finality-grandpa" }
+sc-client-db = { path = "../../vendor/frontier/vendor/substrate/client/db", default-features = false }
+sc-offchain = { path = "../../vendor/frontier/vendor/substrate/client/offchain" }
+sc-rpc = { path = "../../vendor/frontier/vendor/substrate/client/rpc" }
+sc-basic-authorship = { path = "../../vendor/frontier/vendor/substrate/client/basic-authorship" }
+sc-service = { path = "../../vendor/frontier/vendor/substrate/client/service", default-features = false }
+sc-tracing = { path = "../../vendor/frontier/vendor/substrate/client/tracing" }
+sc-telemetry = { path = "../../vendor/frontier/vendor/substrate/client/telemetry" }
+sc-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/client/authority-discovery" }
 
 
 # frame dependencies
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false }
-pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git" }
-frame-system-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-indices = { path = "../../vendor/frontier/vendor/substrate/frame/indices" }
+pallet-timestamp = { path = "../../vendor/frontier/vendor/substrate/frame/timestamp", default-features = false }
+frame-system = { path = "../../vendor/frontier/vendor/substrate/frame/system" }
+pallet-balances = { path = "../../vendor/frontier/vendor/substrate/frame/balances" }
+pallet-transaction-payment = { path = "../../vendor/frontier/vendor/substrate/frame/transaction-payment" }
+pallet-transaction-payment-rpc-runtime-api = { path = "../../vendor/frontier/vendor/substrate/frame/transaction-payment/rpc/runtime-api" }
+frame-support = { path = "../../vendor/frontier/vendor/substrate/frame/support", default-features = false }
+pallet-im-online = { path = "../../vendor/frontier/vendor/substrate/frame/im-online", default-features = false }
+pallet-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/frame/authority-discovery" }
+frame-system-rpc-runtime-api = { path = "../../vendor/frontier/vendor/substrate/frame/system/rpc/runtime-api" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -94,23 +93,23 @@ edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git" }
+sc-cli = { path = "../../vendor/frontier/vendor/substrate/client/cli", optional = true }
+frame-benchmarking-cli = { optional = true, path = "../../vendor/frontier/vendor/substrate/utils/frame/benchmarking-cli" }
 
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", optional = true }
+browser-utils = { package = "substrate-browser-utils", path = "../../vendor/frontier/vendor/substrate/utils/browser", optional = true }
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
-node-executor = { git = "https://github.com/hicommonwealth/substrate.git", features = [ "wasmtime" ] }
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true, features = [ "wasmtime" ] }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", default-features = false, features = [ "wasmtime" ] }
+node-executor = { path = "../../vendor/frontier/vendor/substrate/bin/node/executor", features = [ "wasmtime" ] }
+sc-cli = { path = "../../vendor/frontier/vendor/substrate/client/cli", optional = true, features = [ "wasmtime" ] }
+sc-service = { path = "../../vendor/frontier/vendor/substrate/client/service", default-features = false, features = [ "wasmtime" ] }
 
 [dev-dependencies]
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-service-test = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-keystore = { path = "../../vendor/frontier/vendor/substrate/client/keystore" }
+sc-service-test = { path = "../../vendor/frontier/vendor/substrate/client/service/test" }
 futures = "0.3.4"
 tempfile = "3.1.0"
 assert_cmd = "1.0"
@@ -120,11 +119,11 @@ regex = "1"
 platforms = "0.2.1"
 
 [build-dependencies]
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
-substrate-build-script-utils = { git = "https://github.com/hicommonwealth/substrate.git", optional = true }
+sc-cli = { path = "../../vendor/frontier/vendor/substrate/client/cli", optional = true }
+substrate-build-script-utils = { path = "../../vendor/frontier/vendor/substrate/utils/build-script-utils", optional = true }
 structopt = { version = "0.3.8", optional = true }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
-frame-benchmarking-cli = { optional = true, git = "https://github.com/hicommonwealth/substrate.git" }
+frame-benchmarking-cli = { optional = true, path = "../../vendor/frontier/vendor/substrate/utils/frame/benchmarking-cli" }
 
 
 [features]
