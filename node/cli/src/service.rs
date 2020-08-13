@@ -13,7 +13,7 @@ use sc_finality_grandpa::{
 
 use edgeware_executor::Executor;
 use edgeware_primitives::Block;
-use edgeware_runtime::RuntimeApi;
+use edgeware_runtime::{RuntimeApi, Hash};
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
