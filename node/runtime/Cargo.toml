@@ -20,6 +20,7 @@ serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
 
 # primitives
+sp-application-crypto = { path = "../../vendor/frontier/vendor/substrate/primitives/application-crypto", default-features = false }
 sp-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/primitives/authority-discovery", default-features = false }
 sp-consensus-aura = { path = "../../vendor/frontier/vendor/substrate/primitives/consensus/aura", default-features = false }
 sp-block-builder = { path = "../../vendor/frontier/vendor/substrate/primitives/block-builder", default-features = false}
@@ -38,7 +39,7 @@ sp-offchain = { path = "../../vendor/frontier/vendor/substrate/primitives/offcha
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
 frontier-rpc-primitives = { default-features = false, path = "../../vendor/frontier/rpc/primitives" }
-ethereum = { version = "0.1.0", default-features = false, package = "pallet-ethereum", path = "../../vendor/frontier/frame/ethereum" }
+ethereum = { default-features = false, package = "pallet-ethereum", path = "../../vendor/frontier/frame/ethereum" }
 
 # pallet dependencies
 pallet-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/frame/authority-discovery", default-features = false }

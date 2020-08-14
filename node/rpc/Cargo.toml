@@ -10,6 +10,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 [dependencies]
 jsonrpc-core = "14.0.3"
 sc-client-api = { path = "../../vendor/frontier/vendor/substrate/client/api" }
+sc-rpc = { path = "../../vendor/frontier/vendor/substrate/client/rpc" }
 sp-api = { path = "../../vendor/frontier/vendor/substrate/primitives/api" }
 sp-runtime = { path = "../../vendor/frontier/vendor/substrate/primitives/runtime" }
 pallet-contracts-rpc = { path = "../../vendor/frontier/vendor/substrate/frame/contracts/rpc/" }

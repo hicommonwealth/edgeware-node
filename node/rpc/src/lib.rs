@@ -29,8 +29,7 @@
 
 #![warn(missing_docs)]
 
-use std::sync::Arc;
-
+use std::{sync::Arc, fmt};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use edgeware_runtime::UncheckedExtrinsic;
 use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState};
@@ -76,26 +75,25 @@ pub struct FullDeps<C, P, SC> {
 	pub deny_unsafe: DenyUnsafe,
 	/// The Node authority flag
 	pub is_authority: bool,
-	/// Manual seal command sink
-	pub command_sink: Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
+	// /// Manual seal command sink
+	// pub command_sink: Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
 	/// GRANDPA specific dependencies.
 	pub grandpa: GrandpaDeps,
 }
 
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, M, SC, BE>(
+pub fn create_full<C, P, M, SC>(
 	deps: FullDeps<C, P, SC>,
 ) -> jsonrpc_core::IoHandler<M> where
-	BE: Backend<Block> + 'static,
-	BE::State: StateBackend<BlakeTwo256>,
-	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE>,
+	C: ProvideRuntimeApi<Block>,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
-	C::Api: BlockBuilder<Block>,
+	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
 	C::Api: frontier_rpc_primitives::EthereumRuntimeApi<Block>,
+	C::Api: BlockBuilder<Block>,
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
 	P: TransactionPool<Block=Block> + 'static,
 	M: jsonrpc_core::Metadata + Default,
@@ -104,6 +102,7 @@ pub fn create_full<C, P, M, SC, BE>(
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 	use frontier_rpc::{EthApi, EthApiServer};
+	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
 	let FullDeps {
@@ -112,7 +111,7 @@ pub fn create_full<C, P, M, SC, BE>(
 		select_chain,
 		deny_unsafe,
 		is_authority,
-		command_sink,
+		// command_sink,
 		grandpa
 	} = deps;
 	let GrandpaDeps {
@@ -137,7 +136,7 @@ pub fn create_full<C, P, M, SC, BE>(
 			client.clone(),
 			select_chain,
 			pool.clone(),
-			frontier_template_runtime::TransactionConverter,
+			edgeware_runtime::TransactionConverter,
 			is_authority,
 		))
 	);
@@ -148,16 +147,16 @@ pub fn create_full<C, P, M, SC, BE>(
 		)
 	);
 
-	match command_sink {
-		Some(command_sink) => {
-			io.extend_with(
-				// We provide the rpc handler with the sending end of the channel to allow the rpc
-				// send EngineCommands to the background block authorship task.
-				ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
-			);
-		}
-		_ => {}
-	}
+	// match command_sink {
+	// 	Some(command_sink) => {
+	// 		io.extend_with(
+	// 			// We provide the rpc handler with the sending end of the channel to allow the rpc
+	// 			// send EngineCommands to the background block authorship task.
+	// 			ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+	// 		);
+	// 	}
+	// 	_ => {}
+	// }
 
 	io
 }
