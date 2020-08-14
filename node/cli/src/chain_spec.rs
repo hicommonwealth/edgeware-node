@@ -239,6 +239,7 @@ pub fn testnet_genesis(
 		pallet_sudo: Some(SudoConfig { key: _root_key }),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(Default::default()),
+		pallet_contracts: Some(Default::default()),
 		ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
@@ -500,6 +501,7 @@ pub fn mainnet_genesis(
 		}),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(Default::default()),
+		pallet_contracts: Some(Default::default()),
 		ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,

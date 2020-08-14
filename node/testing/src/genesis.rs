@@ -112,9 +112,8 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		pallet_sudo: Some(Default::default()),
 		pallet_vesting: Some(Default::default()),
 		pallet_evm: Some(Default::default()),
+		pallet_contracts: Some(Default::default()),
 		ethereum: Some(Default::default()),
-
-		// pallet_evm: Some(Default::default()),
 		signaling: Some(Default::default()),
 		treasury_reward: Some(Default::default()),
 	}

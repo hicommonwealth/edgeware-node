@@ -47,6 +47,9 @@ pallet-authorship = { path = "../../vendor/frontier/vendor/substrate/frame/autho
 pallet-aura = { path = "../../vendor/frontier/vendor/substrate/frame/aura", default-features = false }
 pallet-balances = { path = "../../vendor/frontier/vendor/substrate/frame/balances", default-features = false }
 pallet-collective = { path = "../../vendor/frontier/vendor/substrate/frame/collective", default-features = false }
+pallet-contracts = { default-features = false, path = "../../vendor/frontier/vendor/substrate/frame/contracts" }
+pallet-contracts-primitives = { default-features = false, path = "../../vendor/frontier/vendor/substrate/frame/contracts/common/" }
+pallet-contracts-rpc-runtime-api = { default-features = false, path = "../../vendor/frontier/vendor/substrate/frame/contracts/rpc/runtime-api/" }
 pallet-democracy = { path = "../../vendor/frontier/vendor/substrate/frame/democracy", default-features = false }
 pallet-elections-phragmen = { path = "../../vendor/frontier/vendor/substrate/frame/elections-phragmen", default-features = false }
 pallet-evm = { path = "../../vendor/frontier/vendor/substrate/frame/evm", default-features = false }
@@ -99,6 +102,9 @@ std = [
 	"sp-block-builder/std",
 	"codec/std",
 	"pallet-collective/std",
+	"pallet-contracts/std",
+	"pallet-contracts-primitives/std",
+	"pallet-contracts-rpc-runtime-api/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
 	"pallet-evm/std",
