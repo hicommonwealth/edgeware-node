@@ -238,9 +238,8 @@ pub fn testnet_genesis(
 		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(SudoConfig { key: _root_key }),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		// pallet_evm: Some(EVMConfig {
-		// 	accounts: std::collections::BTreeMap::new(),
-		// }),
+		pallet_evm: Some(Default::default()),
+		ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
@@ -500,9 +499,8 @@ pub fn mainnet_genesis(
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		}),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		// pallet_evm: Some(EVMConfig {
-		// 	accounts: std::collections::BTreeMap::new(),
-		// }),
+		pallet_evm: Some(Default::default()),
+		ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
