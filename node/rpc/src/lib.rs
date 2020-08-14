@@ -94,7 +94,7 @@ pub fn create_full<C, P, M, SC, BE>(
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
-	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
+	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: frontier_rpc_primitives::EthereumRuntimeApi<Block>,
 	C::Api: BlockBuilder<Block>,
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,

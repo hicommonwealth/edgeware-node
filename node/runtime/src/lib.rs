@@ -1052,9 +1052,11 @@ impl_runtime_apis! {
 	impl pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<
 		Block,
 		Balance,
-		UncheckedExtrinsic,
 	> for Runtime {
-		fn query_info(uxt: UncheckedExtrinsic, len: u32) -> RuntimeDispatchInfo<Balance> {
+		fn query_info(
+			uxt: <Block as BlockT>::Extrinsic,
+			len: u32
+		) -> pallet_transaction_payment_rpc_runtime_api::RuntimeDispatchInfo<Balance> {
 			TransactionPayment::query_info(uxt, len)
 		}
 	}
@@ -1139,13 +1141,13 @@ impl_runtime_apis! {
 			data: Vec<u8>,
 			value: U256,
 			gas_limit: U256,
-			gas_price: U256,
+			gas_price: Option<U256>,
 			nonce: Option<U256>,
 			action: ethereum::TransactionAction,
 		) -> Option<(Vec<u8>, U256)> {
 			match action {
 				ethereum::TransactionAction::Call(to) =>
-					pallet_evm::Module::<Runtime>::execute_call(
+					EVM::execute_call(
 						from,
 						to,
 						data,
@@ -1156,7 +1158,7 @@ impl_runtime_apis! {
 						false,
 					).ok().map(|(_, ret, gas)| (ret, gas)),
 				ethereum::TransactionAction::Create =>
-					pallet_evm::Module::<Runtime>::execute_create(
+					EVM::execute_create(
 						from,
 						data,
 						value,
