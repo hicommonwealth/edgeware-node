@@ -1256,6 +1256,7 @@ dependencies = [
  "node-executor",
  "pallet-authority-discovery",
  "pallet-balances",
+ "pallet-evm",
  "pallet-im-online",
  "pallet-indices",
  "pallet-timestamp",

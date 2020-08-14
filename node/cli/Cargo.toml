@@ -84,6 +84,7 @@ frame-support = { path = "../../vendor/frontier/vendor/substrate/frame/support",
 pallet-im-online = { path = "../../vendor/frontier/vendor/substrate/frame/im-online", default-features = false }
 pallet-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/frame/authority-discovery" }
 frame-system-rpc-runtime-api = { path = "../../vendor/frontier/vendor/substrate/frame/system/rpc/runtime-api" }
+pallet-evm = { path = "../../vendor/frontier/vendor/substrate/frame/evm" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }

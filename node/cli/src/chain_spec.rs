@@ -31,7 +31,7 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public};
+use sp_core::{sr25519, Pair, Public, U256, H160};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
 	traits::{IdentifyAccount, One, Verify},
@@ -47,6 +47,7 @@ use serde_json::Result;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+use std::collections::BTreeMap;
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -158,6 +159,18 @@ pub fn testnet_genesis(
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
 ) -> GenesisConfig {
+	let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
+	let mut evm_accounts = BTreeMap::new();
+	evm_accounts.insert(
+		alice_evm_account_id,
+		pallet_evm::GenesisAccount {
+			nonce: 0.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		},
+	);
+
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
