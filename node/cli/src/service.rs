@@ -51,7 +51,7 @@ pub fn new_full_params(config: Configuration) -> Result<(
 		Block, FullClient,
 		sc_consensus_aura::AuraImportQueue<Block, FullClient>,
 		sc_transaction_pool::FullPool<Block, FullClient>,
-		(), FullBackend,
+		edgeware_rpc::IoHandler, FullBackend,
 	>,
 	(
 		sc_consensus_aura::AuraBlockImport<Block, FullClient, FullGrandpaBlockImport, sp_consensus_aura::ed25519::AuthorityPair>,
@@ -92,7 +92,7 @@ pub fn new_full_params(config: Configuration) -> Result<(
 
 	let import_queue = sc_consensus_aura::import_queue::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair, _>(
 		sc_consensus_aura::slot_duration(&*client)?,
-		aura_block_import,
+		aura_block_import.clone(),
 		Some(Box::new(grandpa_block_import.clone())),
 		None,
 		client.clone(),
@@ -101,7 +101,7 @@ pub fn new_full_params(config: Configuration) -> Result<(
 		config.prometheus_registry(),
 	)?;
 
-	let import_setup = (aura_block_import, grandpa_link);
+	let import_setup = (aura_block_import.clone(), grandpa_link);
 
 	let (rpc_extensions_builder, rpc_setup) = {
 		let (_, grandpa_link) = &import_setup;
@@ -115,22 +115,25 @@ pub fn new_full_params(config: Configuration) -> Result<(
 		let pool = transaction_pool.clone();
 		let select_chain = select_chain.clone();
 		let keystore = keystore.clone();
+		let is_authority = config.role.clone().is_authority();
 
-		let rpc_extensions_builder = Box::new(move |deny_unsafe| {
-			let deps = edgeware_rpc::FullDeps {
-				client: client.clone(),
-				pool: pool.clone(),
-				select_chain: select_chain.clone(),
-				deny_unsafe,
-				grandpa: edgeware_rpc::GrandpaDeps {
-					shared_voter_state: shared_voter_state.clone(),
-					shared_authority_set: shared_authority_set.clone(),
-				},
-				is_authority: config.role.clone().is_authority(),
-			};
+		let rpc_extensions_builder = {
+			Box::new(move |deny_unsafe| {
+				let deps = edgeware_rpc::FullDeps {
+					client: client.clone(),
+					pool: pool.clone(),
+					select_chain: select_chain.clone(),
+					deny_unsafe,
+					grandpa: edgeware_rpc::GrandpaDeps {
+						shared_voter_state: shared_voter_state.clone(),
+						shared_authority_set: shared_authority_set.clone(),
+					},
+					is_authority: is_authority,
+				};
 
-			edgeware_rpc::create_full(deps)
-		});
+				edgeware_rpc::create_full(deps)
+			})
+		};
 
 		(rpc_extensions_builder, rpc_setup)
 	};
@@ -140,14 +143,13 @@ pub fn new_full_params(config: Configuration) -> Result<(
 		Arc::new(sc_finality_grandpa::FinalityProofProvider::new(backend.clone(), provider));
 
 	let params = sc_service::ServiceParams {
-		backend, client, import_queue, keystore, task_manager, transaction_pool,
+		backend, client, import_queue, keystore, task_manager, transaction_pool, rpc_extensions_builder,
 		config,
 		block_announce_validator_builder: None,
 		finality_proof_request_builder: None,
 		finality_proof_provider: Some(finality_proof_provider),
 		on_demand: None,
 		remote_blockchain: None,
-		rpc_extensions_builder: Box::new(|_| ()),
 	};
 
 	Ok((params, import_setup, rpc_setup, select_chain, inherent_data_providers))
