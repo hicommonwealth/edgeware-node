@@ -37,6 +37,8 @@ sp-offchain = { path = "../../vendor/frontier/vendor/substrate/primitives/offcha
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
+frontier-rpc-primitives = { default-features = false, path = "../../vendor/frontier/rpc/primitives" }
+ethereum = { version = "0.1.0", default-features = false, package = "pallet-ethereum", path = "../../vendor/frontier/frame/ethereum" }
 
 # pallet dependencies
 pallet-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/frame/authority-discovery", default-features = false }
@@ -141,4 +143,6 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
+	"frontier-rpc-primitives/std",
+	"ethereum/std",
 ]

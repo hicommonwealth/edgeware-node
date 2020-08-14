@@ -1374,6 +1374,7 @@ dependencies = [
  "edgeware-primitives",
  "edgeware-runtime",
  "jsonrpc-core",
+ "pallet-contracts-rpc",
  "pallet-transaction-payment-rpc",
  "sc-client-api",
  "sc-finality-grandpa",
@@ -4116,6 +4117,24 @@ dependencies = [
  "parity-scale-codec",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-contracts-rpc"
+version = "0.8.0-rc5"
+dependencies = [
+ "jsonrpc-core",
+ "jsonrpc-core-client",
+ "jsonrpc-derive",
+ "pallet-contracts-primitives",
+ "pallet-contracts-rpc-runtime-api",
+ "parity-scale-codec",
+ "serde",
+ "sp-api",
+ "sp-blockchain",
+ "sp-core",
+ "sp-rpc",
+ "sp-runtime",
 ]
 
 [[package]]

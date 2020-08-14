@@ -12,7 +12,9 @@ jsonrpc-core = "14.0.3"
 sc-client-api = { path = "../../vendor/frontier/vendor/substrate/client/api" }
 sp-api = { path = "../../vendor/frontier/vendor/substrate/primitives/api" }
 sp-runtime = { path = "../../vendor/frontier/vendor/substrate/primitives/runtime" }
+pallet-contracts-rpc = { path = "../../vendor/frontier/vendor/substrate/frame/contracts/rpc/" }
 pallet-transaction-payment-rpc = { path = "../../vendor/frontier/vendor/substrate/frame/transaction-payment/rpc" }
+pallet-ethereum = { version = "0.1.0", path = "../../vendor/frontier/frame/ethereum" }
 substrate-frame-rpc-system = { path = "../../vendor/frontier/vendor/substrate/utils/frame/rpc/system" }
 sp-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/primitives/transaction-pool" }
 sc-keystore = { path = "../../vendor/frontier/vendor/substrate/client/keystore" }
@@ -24,3 +26,6 @@ sc-rpc-api = { path = "../../vendor/frontier/vendor/substrate/client/rpc-api" }
 sp-block-builder = { path = "../../vendor/frontier/vendor/substrate/primitives/block-builder" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
+
+frontier-rpc = { version = "0.1.0", path = "../../vendor/frontier/rpc" }
+frontier-rpc-primitives = { version = "0.1.0", path = "../../vendor/frontier/rpc/primitives" }
