@@ -39,6 +39,9 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 use sc_rpc_api::DenyUnsafe;
+use sp_runtime::traits::BlakeTwo256;
+use sc_client_api::backend::{StorageProvider, Backend, StateBackend};
+
 use sp_block_builder::BlockBuilder;
 
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
@@ -81,10 +84,12 @@ pub struct FullDeps<C, P, SC> {
 
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, M, SC>(
+pub fn create_full<C, P, M, SC, BE>(
 	deps: FullDeps<C, P, SC>,
 ) -> jsonrpc_core::IoHandler<M> where
-	C: ProvideRuntimeApi<Block>,
+	BE: Backend<Block> + 'static,
+	BE::State: StateBackend<BlakeTwo256>,
+	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE>,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,

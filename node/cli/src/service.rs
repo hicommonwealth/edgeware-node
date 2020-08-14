@@ -126,6 +126,7 @@ pub fn new_full_params(config: Configuration) -> Result<(
 					shared_voter_state: shared_voter_state.clone(),
 					shared_authority_set: shared_authority_set.clone(),
 				},
+				is_authority: config.role.clone().is_authority(),
 			};
 
 			edgeware_rpc::create_full(deps)
