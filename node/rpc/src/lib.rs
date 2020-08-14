@@ -75,8 +75,6 @@ pub struct FullDeps<C, P, SC> {
 	pub deny_unsafe: DenyUnsafe,
 	/// The Node authority flag
 	pub is_authority: bool,
-	// /// Manual seal command sink
-	// pub command_sink: Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
 	/// GRANDPA specific dependencies.
 	pub grandpa: GrandpaDeps,
 }
@@ -146,17 +144,6 @@ pub fn create_full<C, P, M, SC>(
 			GrandpaRpcHandler::new(shared_authority_set, shared_voter_state)
 		)
 	);
-
-	// match command_sink {
-	// 	Some(command_sink) => {
-	// 		io.extend_with(
-	// 			// We provide the rpc handler with the sending end of the channel to allow the rpc
-	// 			// send EngineCommands to the background block authorship task.
-	// 			ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
-	// 		);
-	// 	}
-	// 	_ => {}
-	// }
 
 	io
 }
