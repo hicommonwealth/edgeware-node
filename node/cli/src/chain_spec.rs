@@ -160,18 +160,6 @@ pub fn testnet_genesis(
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
 ) -> GenesisConfig {
-	let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
-	let mut evm_accounts = BTreeMap::new();
-	evm_accounts.insert(
-		alice_evm_account_id,
-		pallet_evm::GenesisAccount {
-			nonce: 0.into(),
-			balance: U256::from(123456_123_000_000_000_000_000u128),
-			storage: BTreeMap::new(),
-			code: vec![],
-		},
-	);
-
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -315,6 +303,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
 	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
+
 	ChainSpec::from_genesis(
 		&testnet_name,
 		&testnet_node_name,
@@ -371,6 +360,19 @@ pub fn development_config() -> ChainSpec {
 			"tokenSymbol": "tEDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
+
+	let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
+	let mut evm_accounts = BTreeMap::new();
+	evm_accounts.insert(
+		alice_evm_account_id,
+		pallet_evm::GenesisAccount {
+			nonce: 0.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		},
+	);
+
 	ChainSpec::from_genesis(
 		"Development",
 		"dev",
@@ -393,6 +395,19 @@ pub fn multi_development_config() -> ChainSpec {
 			"tokenSymbol": "tEDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
+
+	let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
+	let mut evm_accounts = BTreeMap::new();
+	evm_accounts.insert(
+		alice_evm_account_id,
+		pallet_evm::GenesisAccount {
+			nonce: 0.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		},
+	);
+
 	ChainSpec::from_genesis(
 		"Multi Development",
 		"multi-dev",
@@ -423,6 +438,18 @@ fn local_testnet_genesis() -> GenesisConfig {
 
 /// Local testnet config (multivalidator Alice + Bob)
 pub fn local_testnet_config() -> ChainSpec {
+	let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
+	let mut evm_accounts = BTreeMap::new();
+	evm_accounts.insert(
+		alice_evm_account_id,
+		pallet_evm::GenesisAccount {
+			nonce: 0.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		},
+	);
+
 	ChainSpec::from_genesis(
 		"Local Testnet",
 		"local_testnet",
