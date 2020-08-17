@@ -1392,6 +1392,7 @@ dependencies = [
  "frontier-rpc",
  "frontier-rpc-primitives",
  "jsonrpc-core",
+ "jsonrpc-pubsub",
  "pallet-contracts-rpc",
  "pallet-ethereum 0.1.0",
  "pallet-transaction-payment-rpc",

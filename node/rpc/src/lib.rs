@@ -32,7 +32,8 @@
 use std::{sync::Arc, fmt};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use edgeware_runtime::UncheckedExtrinsic;
-use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState};
+use jsonrpc_pubsub::manager::SubscriptionManager;
+use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState, GrandpaJustificationStream};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sp_api::ProvideRuntimeApi;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
@@ -64,6 +65,10 @@ pub struct GrandpaDeps {
 	pub shared_voter_state: SharedVoterState,
 	/// Authority set info.
 	pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
+	/// Receives notifications about justification events from Grandpa.
+	pub justification_stream: GrandpaJustificationStream<Block>,
+	/// Subscription manager to keep track of pubsub subscribers.
+	pub subscriptions: SubscriptionManager,
 }
 
 /// Full client dependencies.
@@ -84,22 +89,21 @@ pub struct FullDeps<C, P, SC> {
 
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, M, SC, BE>(
+pub fn create_full<C, P, SC, BE>(
 	deps: FullDeps<C, P, SC>,
-) -> jsonrpc_core::IoHandler<M> where
+) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata> where
 	BE: Backend<Block> + 'static,
 	BE::State: StateBackend<BlakeTwo256>,
 	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE>,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
-	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
+	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,	
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
+	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: frontier_rpc_primitives::EthereumRuntimeApi<Block>,
-	C::Api: BlockBuilder<Block>,
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
 	P: TransactionPool<Block=Block> + 'static,
-	M: jsonrpc_core::Metadata + Default,
 	SC: SelectChain<Block> +'static,
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
@@ -121,6 +125,8 @@ pub fn create_full<C, P, M, SC, BE>(
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
+		justification_stream,
+		subscriptions,
 	} = grandpa;
 
 	io.extend_with(
@@ -147,7 +153,12 @@ pub fn create_full<C, P, M, SC, BE>(
 
 	io.extend_with(
 		sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
-			GrandpaRpcHandler::new(shared_authority_set, shared_voter_state)
+			GrandpaRpcHandler::new(
+				shared_authority_set,
+				shared_voter_state,
+				justification_stream,
+				subscriptions,
+			)
 		)
 	);
 
