@@ -623,9 +623,9 @@ dependencies = [
 
 [[package]]
 name = "chrono"
-version = "0.4.13"
+version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c74d84029116787153e02106bf53e66828452a4b325cc8652b788b5967c0a0b6"
+checksum = "942f72db697d8767c22d46a598e01f2d3b475501ea43d0db4f16d90259182d0b"
 dependencies = [
  "js-sys",
  "num-integer",
@@ -647,9 +647,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "2.33.2"
+version = "2.33.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10040cdf04294b565d9e0319955430099ec3813a64c952b86a41200ad714ae48"
+checksum = "37e58ac78573c40708d45522f0d80fa2f01cc4f9b4e2bf749807255454312002"
 dependencies = [
  "ansi_term 0.11.0",
  "atty",
@@ -779,7 +779,7 @@ dependencies = [
  "log 0.4.11",
  "regalloc",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "target-lexicon",
  "thiserror",
 ]
@@ -817,7 +817,7 @@ checksum = "e45f82e3446dd1ebb8c2c2f6a6b0e6cd6cd52965c7e5f7b1b35e9a9ace31ccde"
 dependencies = [
  "cranelift-codegen",
  "log 0.4.11",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "target-lexicon",
 ]
 
@@ -1737,7 +1737,7 @@ checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
 [[package]]
 name = "fork-tree"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
 ]
@@ -1745,7 +1745,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1762,7 +1762,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "parity-scale-codec",
@@ -1780,7 +1780,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1795,7 +1795,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "11.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -1806,7 +1806,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "bitmask",
  "frame-metadata",
@@ -1817,7 +1817,7 @@ dependencies = [
  "parity-scale-codec",
  "paste",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "sp-arithmetic",
  "sp-core",
  "sp-inherents",
@@ -1831,7 +1831,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support-procedural-tools",
  "proc-macro2",
@@ -1842,7 +1842,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate",
@@ -1854,7 +1854,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -1864,7 +1864,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -1880,7 +1880,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -2194,7 +2194,7 @@ dependencies = [
  "byteorder",
  "fallible-iterator",
  "indexmap",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "stable_deref_trait",
 ]
 
@@ -2865,7 +2865,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e763b2a9b500ba47948061d1e8bc3b5f03a8a1f067dbcf822a4d2c84d2b54a3a"
 dependencies = [
  "parity-util-mem",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
 ]
 
 [[package]]
@@ -2894,7 +2894,7 @@ dependencies = [
  "parking_lot 0.10.2",
  "regex",
  "rocksdb",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
 ]
 
 [[package]]
@@ -2928,9 +2928,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "lazycell"
-version = "1.2.1"
+version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b294d6fa9ee409a054354afc4352b0b9ef7ca222c69b8812cbea9e7d2bf3783f"
+checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 
 [[package]]
 name = "leb128"
@@ -3005,7 +3005,7 @@ dependencies = [
  "parity-multiaddr 0.9.1",
  "parking_lot 0.10.2",
  "pin-project",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "wasm-timer",
 ]
 
@@ -3036,7 +3036,7 @@ dependencies = [
  "ring",
  "rw-stream-sink",
  "sha2 0.8.2",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "thiserror",
  "unsigned-varint 0.4.0",
  "void",
@@ -3076,7 +3076,7 @@ dependencies = [
  "log 0.4.11",
  "prost",
  "prost-build",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "wasm-timer",
 ]
 
@@ -3100,7 +3100,7 @@ dependencies = [
  "prost-build",
  "rand 0.7.3",
  "sha2 0.8.2",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "uint",
  "unsigned-varint 0.3.3",
  "void",
@@ -3124,7 +3124,7 @@ dependencies = [
  "log 0.4.11",
  "net2",
  "rand 0.7.3",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "void",
  "wasm-timer",
 ]
@@ -3191,7 +3191,7 @@ dependencies = [
  "libp2p-core",
  "log 0.4.11",
  "rand 0.7.3",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "void",
  "wasm-timer",
 ]
@@ -3290,9 +3290,9 @@ dependencies = [
 
 [[package]]
 name = "libz-sys"
-version = "1.0.25"
+version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2eb5e43362e38e2bca2fd5f5134c4d4564a23a5c28e9b95411652021a8675ebe"
+checksum = "6ca8894883d250240341478bf987467332fbdd5da5c42426c69a8f93dbc302f2"
 dependencies = [
  "cc",
  "libc",
@@ -3578,7 +3578,7 @@ dependencies = [
  "futures 0.3.5",
  "log 0.4.11",
  "pin-project",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "unsigned-varint 0.4.0",
 ]
 
@@ -3667,7 +3667,7 @@ dependencies = [
 [[package]]
 name = "node-executor"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "node-primitives",
@@ -3684,7 +3684,7 @@ dependencies = [
 [[package]]
 name = "node-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
@@ -3696,7 +3696,7 @@ dependencies = [
 [[package]]
 name = "node-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "frame-executive",
@@ -3957,7 +3957,7 @@ dependencies = [
 [[package]]
 name = "pallet-aura"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3976,7 +3976,7 @@ dependencies = [
 [[package]]
 name = "pallet-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -3992,7 +3992,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4007,7 +4007,7 @@ dependencies = [
 [[package]]
 name = "pallet-babe"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4029,7 +4029,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4044,7 +4044,7 @@ dependencies = [
 [[package]]
 name = "pallet-collective"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4059,7 +4059,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4080,7 +4080,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -4090,7 +4090,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4109,7 +4109,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc-runtime-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "pallet-contracts-primitives",
  "parity-scale-codec",
@@ -4121,7 +4121,7 @@ dependencies = [
 [[package]]
 name = "pallet-democracy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4136,7 +4136,7 @@ dependencies = [
 [[package]]
 name = "pallet-elections-phragmen"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4150,7 +4150,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "evm",
  "frame-support",
@@ -4171,7 +4171,7 @@ dependencies = [
 [[package]]
 name = "pallet-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4187,7 +4187,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4207,7 +4207,7 @@ dependencies = [
 [[package]]
 name = "pallet-identity"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "enumflags2",
  "frame-benchmarking",
@@ -4223,7 +4223,7 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4242,7 +4242,7 @@ dependencies = [
 [[package]]
 name = "pallet-indices"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4258,7 +4258,7 @@ dependencies = [
 [[package]]
 name = "pallet-membership"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4272,7 +4272,7 @@ dependencies = [
 [[package]]
 name = "pallet-multisig"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4287,7 +4287,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4302,7 +4302,7 @@ dependencies = [
 [[package]]
 name = "pallet-proxy"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4317,7 +4317,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4330,7 +4330,7 @@ dependencies = [
 [[package]]
 name = "pallet-recovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -4345,7 +4345,7 @@ dependencies = [
 [[package]]
 name = "pallet-scheduler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4360,7 +4360,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4380,7 +4380,7 @@ dependencies = [
 [[package]]
 name = "pallet-society"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4394,7 +4394,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4414,7 +4414,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking-reward-curve"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -4425,7 +4425,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4439,7 +4439,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4456,14 +4456,14 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
  "serde",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "sp-runtime",
  "sp-std",
 ]
@@ -4471,7 +4471,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-core-client",
@@ -4489,7 +4489,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -4502,7 +4502,7 @@ dependencies = [
 [[package]]
 name = "pallet-treasury"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4516,7 +4516,7 @@ dependencies = [
 [[package]]
 name = "pallet-utility"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4531,7 +4531,7 @@ dependencies = [
 [[package]]
 name = "pallet-vesting"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -4668,7 +4668,7 @@ dependencies = [
  "parity-util-mem-derive",
  "parking_lot 0.10.2",
  "primitive-types",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "winapi 0.3.9",
 ]
 
@@ -4735,7 +4735,7 @@ dependencies = [
  "cloudabi",
  "libc",
  "redox_syscall",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "winapi 0.3.9",
 ]
 
@@ -5070,9 +5070,9 @@ dependencies = [
 
 [[package]]
 name = "protobuf"
-version = "2.16.2"
+version = "2.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d883f78645c21b7281d21305181aa1f4dd9e9363e7cf2566c93121552cff003e"
+checksum = "cb14183cc7f213ee2410067e1ceeadba2a7478a59432ff0747a335202798b1e2"
 
 [[package]]
 name = "pwasm-utils"
@@ -5413,7 +5413,7 @@ checksum = "b27b256b41986ac5141b37b8bbba85d314fbf546c182eb255af6720e07e4f804"
 dependencies = [
  "log 0.4.11",
  "rustc-hash",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
 ]
 
 [[package]]
@@ -5643,7 +5643,7 @@ dependencies = [
 [[package]]
 name = "sc-authority-discovery"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "bytes 0.5.6",
  "derive_more",
@@ -5670,7 +5670,7 @@ dependencies = [
 [[package]]
 name = "sc-basic-authorship"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5694,7 +5694,7 @@ dependencies = [
 [[package]]
 name = "sc-block-builder"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sc-client-api",
@@ -5710,7 +5710,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "impl-trait-for-tuples",
  "sc-chain-spec-derive",
@@ -5726,7 +5726,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -5737,7 +5737,7 @@ dependencies = [
 [[package]]
 name = "sc-cli"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "ansi_term 0.12.1",
  "atty",
@@ -5777,7 +5777,7 @@ dependencies = [
 [[package]]
 name = "sc-client-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "fnv",
@@ -5813,7 +5813,7 @@ dependencies = [
 [[package]]
 name = "sc-client-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "blake2-rfc",
  "hash-db",
@@ -5842,7 +5842,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
@@ -5853,7 +5853,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -5884,7 +5884,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-slots"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -5906,7 +5906,7 @@ dependencies = [
 [[package]]
 name = "sc-executor"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "lazy_static",
@@ -5934,7 +5934,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-common"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "log 0.4.11",
@@ -5951,7 +5951,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmi"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "log 0.4.11",
  "parity-scale-codec",
@@ -5966,7 +5966,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmtime"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "cranelift-codegen",
  "cranelift-wasm",
@@ -5987,7 +5987,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "assert_matches",
  "derive_more",
@@ -6025,7 +6025,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa-rpc"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "finality-grandpa",
@@ -6042,7 +6042,7 @@ dependencies = [
 [[package]]
 name = "sc-informant"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "ansi_term 0.12.1",
  "futures 0.3.5",
@@ -6061,7 +6061,7 @@ dependencies = [
 [[package]]
 name = "sc-keystore"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "hex 0.4.2",
@@ -6077,7 +6077,7 @@ dependencies = [
 [[package]]
 name = "sc-light"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "hash-db",
  "lazy_static",
@@ -6096,7 +6096,7 @@ dependencies = [
 [[package]]
 name = "sc-network"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "bitflags",
  "bs58",
@@ -6148,7 +6148,7 @@ dependencies = [
 [[package]]
 name = "sc-network-gossip"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "futures-timer 3.0.2",
@@ -6163,7 +6163,7 @@ dependencies = [
 [[package]]
 name = "sc-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "bytes 0.5.6",
  "fnv",
@@ -6190,7 +6190,7 @@ dependencies = [
 [[package]]
 name = "sc-peerset"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "libp2p",
@@ -6203,7 +6203,7 @@ dependencies = [
 [[package]]
 name = "sc-proposer-metrics"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "log 0.4.11",
  "substrate-prometheus-endpoint",
@@ -6212,7 +6212,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -6244,7 +6244,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-api"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6268,7 +6268,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-server"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "jsonrpc-core",
  "jsonrpc-http-server",
@@ -6284,7 +6284,7 @@ dependencies = [
 [[package]]
 name = "sc-service"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "directories",
@@ -6347,7 +6347,7 @@ dependencies = [
 [[package]]
 name = "sc-service-test"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "env_logger",
  "fdlimit",
@@ -6384,7 +6384,7 @@ dependencies = [
 [[package]]
 name = "sc-state-db"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "log 0.4.11",
  "parity-scale-codec",
@@ -6398,7 +6398,7 @@ dependencies = [
 [[package]]
 name = "sc-telemetry"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "bytes 0.5.6",
  "futures 0.3.5",
@@ -6420,7 +6420,7 @@ dependencies = [
 [[package]]
 name = "sc-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "erased-serde",
  "log 0.4.11",
@@ -6437,7 +6437,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-graph"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6457,7 +6457,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6780,9 +6780,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.4.1"
+version = "1.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3757cb9d89161a2f24e1cf78efa0c1fcff485d18e3f55e0aa3480824ddaa0f3f"
+checksum = "fbee7696b84bbf3d89a1c2eccff0850e3047ed46bfcd2e92c29a2d074d57e252"
 
 [[package]]
 name = "snow"
@@ -6829,7 +6829,7 @@ dependencies = [
  "log 0.4.11",
  "rand 0.7.3",
  "sha1",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "static_assertions",
  "thiserror",
 ]
@@ -6837,7 +6837,7 @@ dependencies = [
 [[package]]
 name = "sp-allocator"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "log 0.4.11",
@@ -6849,7 +6849,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -6864,7 +6864,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate",
@@ -6876,7 +6876,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -6888,7 +6888,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "integer-sqrt",
  "num-traits 0.2.12",
@@ -6901,7 +6901,7 @@ dependencies = [
 [[package]]
 name = "sp-authority-discovery"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6913,7 +6913,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -6924,7 +6924,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6936,7 +6936,7 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "log 0.4.11",
@@ -6952,7 +6952,7 @@ dependencies = [
 [[package]]
 name = "sp-chain-spec"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "serde",
  "serde_json",
@@ -6961,7 +6961,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -6985,7 +6985,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -6999,7 +6999,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-babe"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "merlin",
  "parity-scale-codec",
@@ -7017,7 +7017,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -7029,7 +7029,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -7071,7 +7071,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "kvdb",
  "parking_lot 0.10.2",
@@ -7080,7 +7080,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "proc-macro2",
  "quote 1.0.7",
@@ -7090,7 +7090,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7101,7 +7101,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "finality-grandpa",
  "log 0.4.11",
@@ -7117,7 +7117,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-tracker"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -7127,7 +7127,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "parity-scale-codec",
@@ -7139,7 +7139,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7160,7 +7160,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -7171,7 +7171,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -7183,7 +7183,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections-compact"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -7194,7 +7194,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -7204,7 +7204,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "backtrace",
  "log 0.4.11",
@@ -7213,7 +7213,7 @@ dependencies = [
 [[package]]
 name = "sp-rpc"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "serde",
  "sp-core",
@@ -7222,7 +7222,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -7244,7 +7244,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -7259,7 +7259,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -7271,7 +7271,7 @@ dependencies = [
 [[package]]
 name = "sp-sandbox"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -7284,7 +7284,7 @@ dependencies = [
 [[package]]
 name = "sp-serializer"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "serde",
  "serde_json",
@@ -7293,7 +7293,7 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7306,7 +7306,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -7316,7 +7316,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "hash-db",
  "itertools 0.9.0",
@@ -7325,7 +7325,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.10.2",
  "rand 0.7.3",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
@@ -7337,12 +7337,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 
 [[package]]
 name = "sp-storage"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "impl-serde 0.2.3",
  "ref-cast",
@@ -7354,7 +7354,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7368,7 +7368,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "log 0.4.11",
  "rental",
@@ -7378,7 +7378,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "derive_more",
  "futures 0.3.5",
@@ -7394,7 +7394,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -7408,7 +7408,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "futures-core",
@@ -7420,7 +7420,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "impl-serde 0.2.3",
  "parity-scale-codec",
@@ -7432,7 +7432,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -7560,7 +7560,7 @@ dependencies = [
 [[package]]
 name = "substrate-browser-utils"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "chrono",
  "clear_on_drop",
@@ -7587,7 +7587,7 @@ dependencies = [
 [[package]]
 name = "substrate-build-script-utils"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "platforms",
 ]
@@ -7595,7 +7595,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.5",
@@ -7618,7 +7618,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.8.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "async-std",
  "derive_more",
@@ -7632,7 +7632,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "hash-db",
@@ -7654,7 +7654,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "cfg-if",
  "frame-executive",
@@ -7694,7 +7694,7 @@ dependencies = [
 [[package]]
 name = "substrate-test-runtime-client"
 version = "2.0.0-rc3"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 dependencies = [
  "futures 0.3.5",
  "parity-scale-codec",
@@ -7715,7 +7715,7 @@ dependencies = [
 [[package]]
 name = "substrate-wasm-builder-runner"
 version = "1.0.6"
-source = "git+https://github.com/hicommonwealth/substrate.git#7249e1213ea6b540701a80d4ad53a72351a17f61"
+source = "git+https://github.com/hicommonwealth/substrate.git#57bfa83d2e5d8af08f1034ad065602552a9d6209"
 
 [[package]]
 name = "substrate-wasmtime"
@@ -8374,7 +8374,7 @@ dependencies = [
  "hashbrown 0.6.3",
  "log 0.4.11",
  "rustc-hex",
- "smallvec 1.4.1",
+ "smallvec 1.4.2",
 ]
 
 [[package]]
@@ -8415,9 +8415,9 @@ checksum = "373c8a200f9e67a0c95e62a4f52fbf80c23b4381c05a17845531982fa99e6b33"
 
 [[package]]
 name = "uint"
-version = "0.8.4"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "429ffcad8c8c15f874578c7337d156a3727eb4a1c2374c0ae937ad9a9b748c80"
+checksum = "9db035e67dfaf7edd9aebfe8676afcd63eed53c8a4044fed514c8cccf1835177"
 dependencies = [
  "byteorder",
  "crunchy",
