@@ -39,7 +39,7 @@ use sp_api::ProvideRuntimeApi;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
-use sc_rpc_api::DenyUnsafe;
+pub use sc_rpc_api::DenyUnsafe;
 use sp_runtime::traits::BlakeTwo256;
 use sc_client_api::backend::{StorageProvider, Backend, StateBackend};
 
