@@ -789,7 +789,7 @@ impl FeeCalculator for FixedGasPrice {
 }
 
 parameter_types! {
-	pub const ChainId: u64 = 7;
+	pub const ChainId: u64 = 42;
 }
 
 impl pallet_evm::Trait for Runtime {
