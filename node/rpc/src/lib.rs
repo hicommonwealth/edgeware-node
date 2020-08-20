@@ -31,7 +31,6 @@
 
 use std::{sync::Arc, fmt};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-use edgeware_runtime::UncheckedExtrinsic;
 use jsonrpc_pubsub::manager::SubscriptionManager;
 use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState, GrandpaJustificationStream};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
@@ -45,6 +44,7 @@ use sc_client_api::backend::{StorageProvider, Backend, StateBackend};
 
 use sp_block_builder::BlockBuilder;
 
+/// Public io handler for exporting into other modules
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Light client extra dependencies.

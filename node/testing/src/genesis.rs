@@ -20,7 +20,7 @@ use crate::keyring::*;
 use edgeware_runtime::constants::currency::*;
 use edgeware_runtime::{
 	BalancesConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
-	StakingConfig, SystemConfig, WASM_BINARY,
+	StakingConfig, SystemConfig, wasm_binary_unwrap,
 };
 use sp_core::ChangesTrieConfiguration;
 use sp_keyring::{Ed25519Keyring, Sr25519Keyring};
@@ -39,17 +39,11 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
-			changes_trie_config: if support_changes_trie {
-				Some(ChangesTrieConfiguration {
-					digest_interval: 2,
-					digest_levels: 2,
-				})
-			} else {
-				None
-			},
-			code: code
-				.map(|x| x.to_vec())
-				.unwrap_or_else(|| WASM_BINARY.to_vec()),
+			changes_trie_config: if support_changes_trie { Some(ChangesTrieConfiguration {
+				digest_interval: 2,
+				digest_levels: 2,
+			}) } else { None },
+			code: code.map(|x| x.to_vec()).unwrap_or_else(|| wasm_binary_unwrap().to_vec()),
 		}),
 		pallet_indices: Some(IndicesConfig { indices: vec![] }),
 		pallet_balances: Some(BalancesConfig { balances: endowed }),

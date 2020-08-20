@@ -22,7 +22,7 @@ use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
 	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TreasuryRewardConfig, VestingConfig, WASM_BINARY, EVMConfig
+	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -155,7 +155,7 @@ pub fn testnet_genesis(
 	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)>,
 	_root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
-	enable_println: bool,
+	_enable_println: bool,
 	balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
@@ -193,7 +193,7 @@ pub fn testnet_genesis(
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
-			code: WASM_BINARY.to_vec(),
+			code: wasm_binary_unwrap().to_vec(),
 			changes_trie_config: Default::default(),
 		}),
 		pallet_balances: Some(BalancesConfig {
@@ -453,10 +453,9 @@ pub fn mainnet_genesis(
 	balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 ) -> GenesisConfig {
-	let enable_println = false;
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
-			code: WASM_BINARY.to_vec(),
+			code: wasm_binary_unwrap().to_vec(),
 			changes_trie_config: Default::default(),
 		}),
 		pallet_balances: Some(BalancesConfig {

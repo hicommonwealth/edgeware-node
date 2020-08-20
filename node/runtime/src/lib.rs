@@ -96,9 +96,20 @@ use impls::{CurrencyToVoteHandler, Author};
 pub mod constants;
 use constants::{currency::*, time::*};
 
+/// Weights for pallets used in the runtime.
+mod weights;
+
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
+
+#[cfg(feature = "std")]
+/// Wasm binary unwrapped. If built with `BUILD_DUMMY_WASM_BINARY`, the function panics.
+pub fn wasm_binary_unwrap() -> &'static [u8] {
+	WASM_BINARY.expect("Development wasm binary is not available. This means the client is \
+						built with `BUILD_DUMMY_WASM_BINARY` flag and it is only usable for \
+						production chains. Please rebuild with the flag disabled.")
+}
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
@@ -109,8 +120,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 38,
-	impl_version: 38,
+	spec_version: 40,
+	impl_version: 40,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -300,7 +311,7 @@ impl pallet_balances::Trait for Runtime {
 	type Event = Event;
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Runtime>;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_balances::WeightInfo;
 }
 
 parameter_types! {
@@ -485,7 +496,7 @@ impl pallet_democracy::Trait for Runtime {
 	type Scheduler = Scheduler;
 	type MaxVotes = MaxVotes;
 	type PalletsOrigin = OriginCaller;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_democracy::WeightInfo;
 }
 
 parameter_types! {

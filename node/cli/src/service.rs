@@ -22,13 +22,13 @@ use std::sync::Arc;
 
 use sc_consensus_aura;
 use sc_finality_grandpa::{
-	self, FinalityProofProvider as GrandpaFinalityProofProvider, StorageAndProofProvider,
+	self, FinalityProofProvider as GrandpaFinalityProofProvider,
 };
 use edgeware_primitives::Block;
 use edgeware_runtime::RuntimeApi;
 use sc_service::{
 	config::{Role, Configuration}, error::{Error as ServiceError},
-	RpcHandlers, PartialComponents, TaskManager,
+	RpcHandlers, TaskManager,
 };
 use sp_inherents::InherentDataProviders;
 use sc_network::{Event, NetworkService};
@@ -45,23 +45,6 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
 	sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
-
-// pub fn new_partial(config: Configuration) -> Result<(
-// 	sc_service::ServiceParams<
-// 		Block, FullClient,
-// 		sc_consensus_aura::AuraImportQueue<Block, FullClient>,
-// 		sc_transaction_pool::FullPool<Block, FullClient>,
-// 		edgeware_rpc::IoHandler, FullBackend,
-// 	>,
-// 	(
-// 		sc_consensus_aura::AuraBlockImport<Block, FullClient, FullGrandpaBlockImport, sp_consensus_aura::ed25519::AuthorityPair>,
-// 		sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
-// 	),
-// 	sc_finality_grandpa::SharedVoterState,
-// 	FullSelectChain,
-// 	sp_inherents::InherentDataProviders,
-// ), ServiceError> {
-
 
 pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponents<
 	FullClient, FullBackend, FullSelectChain,
@@ -130,7 +113,6 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		let client = client.clone();
 		let pool = transaction_pool.clone();
 		let select_chain = select_chain.clone();
-		let keystore = keystore.clone();
 		let is_authority = config.role.clone().is_authority();
 
 		let rpc_extensions_builder = move |deny_unsafe, subscriptions| {
@@ -154,21 +136,6 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		(rpc_extensions_builder, rpc_setup)
 	};
 
-	// let provider = client.clone() as Arc<dyn sc_finality_grandpa::StorageAndProofProvider<_, _>>;
-	// let finality_proof_provider =
-	// 	Arc::new(sc_finality_grandpa::FinalityProofProvider::new(backend.clone(), provider));
-
-	// let params = sc_service::ServiceParams {
-	// 	backend, client, import_queue, keystore, task_manager, transaction_pool, rpc_extensions_builder,
-	// 	config,
-	// 	block_announce_validator_builder: None,
-	// 	finality_proof_request_builder: None,
-	// 	finality_proof_provider: Some(finality_proof_provider),
-	// 	on_demand: None,
-	// 	remote_blockchain: None,
-	// };
-
-	// Ok((params, import_setup, rpc_setup, select_chain, inherent_data_providers))
 	Ok(sc_service::PartialComponents {
 		client, backend, task_manager, keystore, select_chain, import_queue, transaction_pool,
 		inherent_data_providers,
@@ -374,8 +341,6 @@ pub fn new_light_base(config: Configuration) -> Result<(
 ), ServiceError> {
 	let (client, backend, keystore, mut task_manager, on_demand) =
 		sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
-
-	let select_chain = sc_consensus::LongestChain::new(backend.clone());
 
 	let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
 		config.transaction_pool.clone(),

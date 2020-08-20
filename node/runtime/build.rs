@@ -19,7 +19,7 @@ use wasm_builder_runner::WasmBuilder;
 fn main() {
 	WasmBuilder::new()
 		.with_current_project()
-		.with_wasm_builder_from_crates("1.0.9")
+		.with_wasm_builder_from_crates_or_path("2.0.0", "../../vendor/frontier/vendor/substrate/utils/wasm-builder")
 		.export_heap_base()
 		.import_memory()
 		.build()
