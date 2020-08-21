@@ -1278,7 +1278,6 @@ dependencies = [
  "jsonrpc-pubsub",
  "log 0.4.11",
  "nix",
- "node-executor",
  "pallet-authority-discovery",
  "pallet-balances",
  "pallet-evm",
@@ -3813,97 +3812,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "node-executor"
-version = "2.0.0-rc5"
-dependencies = [
- "frame-benchmarking",
- "node-primitives",
- "node-runtime",
- "parity-scale-codec",
- "sc-executor",
- "sp-core",
- "sp-io",
- "sp-state-machine",
- "sp-trie",
- "trie-root",
-]
-
-[[package]]
-name = "node-primitives"
-version = "2.0.0-rc5"
-dependencies = [
- "frame-system",
- "parity-scale-codec",
- "sp-application-crypto",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
-name = "node-runtime"
-version = "2.0.0-rc5"
-dependencies = [
- "frame-benchmarking",
- "frame-executive",
- "frame-support",
- "frame-system",
- "frame-system-rpc-runtime-api",
- "integer-sqrt",
- "node-primitives",
- "pallet-authority-discovery",
- "pallet-authorship",
- "pallet-babe",
- "pallet-balances",
- "pallet-collective",
- "pallet-contracts",
- "pallet-contracts-primitives",
- "pallet-contracts-rpc-runtime-api",
- "pallet-democracy",
- "pallet-elections-phragmen",
- "pallet-finality-tracker",
- "pallet-grandpa",
- "pallet-identity",
- "pallet-im-online",
- "pallet-indices",
- "pallet-membership",
- "pallet-multisig",
- "pallet-offences",
- "pallet-proxy",
- "pallet-randomness-collective-flip",
- "pallet-recovery",
- "pallet-scheduler",
- "pallet-session",
- "pallet-society",
- "pallet-staking",
- "pallet-staking-reward-curve",
- "pallet-sudo",
- "pallet-timestamp",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "pallet-treasury",
- "pallet-utility",
- "pallet-vesting",
- "parity-scale-codec",
- "serde",
- "sp-api",
- "sp-authority-discovery",
- "sp-block-builder",
- "sp-consensus-babe",
- "sp-core",
- "sp-inherents",
- "sp-keyring",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-staking",
- "sp-std",
- "sp-transaction-pool",
- "sp-version",
- "static_assertions",
- "substrate-wasm-builder-runner",
-]
-
-[[package]]
 name = "nodrop"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4402,19 +4310,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-membership"
-version = "2.0.0-rc5"
-dependencies = [
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "serde",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-multisig"
 version = "2.0.0-rc5"
 dependencies = [
@@ -4513,19 +4408,6 @@ dependencies = [
  "sp-staking",
  "sp-std",
  "sp-trie",
-]
-
-[[package]]
-name = "pallet-society"
-version = "2.0.0-rc5"
-dependencies = [
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "rand_chacha 0.2.2",
- "serde",
- "sp-runtime",
- "sp-std",
 ]
 
 [[package]]

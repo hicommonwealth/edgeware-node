@@ -105,7 +105,7 @@ wasm-bindgen-futures = { version = "0.4.7", optional = true }
 browser-utils = { package = "substrate-browser-utils", path = "../../vendor/frontier/vendor/substrate/utils/browser", optional = true }
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
-node-executor = { path = "../../vendor/frontier/vendor/substrate/bin/node/executor", features = [ "wasmtime" ] }
+edgeware-executor = { path = "../executor", features = [ "wasmtime" ] }
 sc-cli = { path = "../../vendor/frontier/vendor/substrate/client/cli", optional = true, features = [ "wasmtime" ] }
 sc-service = { path = "../../vendor/frontier/vendor/substrate/client/service", default-features = false, features = [ "wasmtime" ] }
 
