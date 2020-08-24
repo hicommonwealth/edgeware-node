@@ -19,8 +19,8 @@
 use crate::keyring::*;
 use edgeware_runtime::constants::currency::*;
 use edgeware_runtime::{
-	BalancesConfig, ContractsConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
-	StakingConfig, SystemConfig, WASM_BINARY,
+	BalancesConfig, GenesisConfig, GrandpaConfig, IndicesConfig, SessionConfig,
+	StakingConfig, SystemConfig, wasm_binary_unwrap,
 };
 use sp_core::ChangesTrieConfiguration;
 use sp_keyring::{Ed25519Keyring, Sr25519Keyring};
@@ -39,17 +39,11 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
-			changes_trie_config: if support_changes_trie {
-				Some(ChangesTrieConfiguration {
-					digest_interval: 2,
-					digest_levels: 2,
-				})
-			} else {
-				None
-			},
-			code: code
-				.map(|x| x.to_vec())
-				.unwrap_or_else(|| WASM_BINARY.to_vec()),
+			changes_trie_config: if support_changes_trie { Some(ChangesTrieConfiguration {
+				digest_interval: 2,
+				digest_levels: 2,
+			}) } else { None },
+			code: code.map(|x| x.to_vec()).unwrap_or_else(|| wasm_binary_unwrap().to_vec()),
 		}),
 		pallet_indices: Some(IndicesConfig { indices: vec![] }),
 		pallet_balances: Some(BalancesConfig { balances: endowed }),
@@ -99,9 +93,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 			invulnerables: vec![alice(), bob(), charlie()],
 			..Default::default()
 		}),
-		pallet_contracts: Some(ContractsConfig {
-			current_schedule: Default::default(),
-		}),
 		pallet_aura: Some(Default::default()),
 		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
@@ -115,6 +106,8 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		pallet_sudo: Some(Default::default()),
 		pallet_vesting: Some(Default::default()),
 		// pallet_evm: Some(Default::default()),
+		pallet_contracts: Some(Default::default()),
+		// ethereum: Some(Default::default()),
 		signaling: Some(Default::default()),
 		treasury_reward: Some(Default::default()),
 	}

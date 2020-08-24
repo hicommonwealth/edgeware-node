@@ -1,30 +1,30 @@
 [package]
 name = "edgeware-testing"
-version = "3.0.0"
+version = "3.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Test utilities for Edgeware."
 edition = "2018"
 
 [dependencies]
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git" }
+pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
 codec = { package = "parity-scale-codec", version = "1.3.0" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", features = ["test-helpers", "db"] }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-session = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-test-client = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-treasury = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up", features = ["test-helpers", "db"] }
+pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+substrate-test-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-treasury = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
 wabt = "0.10.0"
 
 edgeware-executor = { path = "../executor" }
