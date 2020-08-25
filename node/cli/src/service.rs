@@ -115,7 +115,7 @@ pub fn new_full_params(config: Configuration) -> Result<(
 		let client = client.clone();
 		let pool = transaction_pool.clone();
 		let select_chain = select_chain.clone();
-		let keystore = keystore.clone();
+		let _keystore = keystore.clone();
 
 		let rpc_extensions_builder = Box::new(move |deny_unsafe| {
 			let deps = edgeware_rpc::FullDeps {
@@ -325,7 +325,7 @@ pub fn new_light_base(config: Configuration) -> Result<(
 	let (client, backend, keystore, task_manager, on_demand) =
 		sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
-	let select_chain = sc_consensus::LongestChain::new(backend.clone());
+	let _select_chain = sc_consensus::LongestChain::new(backend.clone());
 
 	let transaction_pool_api = Arc::new(sc_transaction_pool::LightChainApi::new(
 		client.clone(),
