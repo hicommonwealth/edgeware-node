@@ -10,20 +10,20 @@ targets = ["x86_64-unknown-linux-gnu"]
 [dependencies]
 jsonrpc-core = "14.2.0"
 jsonrpc-pubsub = "14.2.0"
-sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-contracts-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-transaction-payment-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-substrate-frame-rpc-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sc-finality-grandpa-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sc-rpc-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sc-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sp-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+pallet-contracts-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+pallet-transaction-payment-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+substrate-frame-rpc-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sc-finality-grandpa-rpc = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sc-rpc-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
+sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-tt-rc5" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

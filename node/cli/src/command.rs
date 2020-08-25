@@ -18,8 +18,8 @@ use crate::{chain_spec, service, Cli, Subcommand};
 use edgeware_executor::Executor;
 use edgeware_runtime::{Block, RuntimeApi};
 use sc_cli::{Result, SubstrateCli, RuntimeVersion, Role, ChainSpec};
-use sc_service::PartialComponents;
-use crate::service::new_partial;
+use sc_service::ServiceParams;
+use crate::service::new_full_params;
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -101,15 +101,11 @@ pub fn run() -> Result<()> {
 				Ok(())
 			}
 		}
-		Some(Subcommand::Key(cmd)) => cmd.run(),
-		Some(Subcommand::Sign(cmd)) => cmd.run(),
-		Some(Subcommand::Verify(cmd)) => cmd.run(),
-		Some(Subcommand::Vanity(cmd)) => cmd.run(),
 		Some(Subcommand::Base(subcommand)) => {
 			let runner = cli.create_runner(subcommand)?;
 			runner.run_subcommand(subcommand, |config| {
-				let PartialComponents { client, backend, task_manager, import_queue, ..}
-					= new_partial(&config)?;
+				let (ServiceParams { client, backend, import_queue, task_manager, .. }, ..)
+					= new_full_params(config)?;
 				Ok((client, backend, import_queue, task_manager))
 			})
 		}
