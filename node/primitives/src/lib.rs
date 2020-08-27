@@ -66,21 +66,21 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
 
-/// App-specific crypto used for reporting equivocation/misbehavior in BABE and
+/// App-specific crypto used for reporting equivocation/misbehavior in AURA and
 /// GRANDPA. Any rewards for misbehavior reporting will be paid out to this
 /// account.
 pub mod report {
 	use super::{Signature, Verify};
 	use frame_system::offchain::AppCrypto;
-	use sp_core::crypto::KeyTypeId;
+	use sp_core::crypto::{key_types, KeyTypeId};
 
-	/// Key type for the reporting module. Used for reporting GRANDPA
+	/// Key type for the reporting module. Used for reporting AURA and GRANDPA
 	/// equivocations.
-	pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"fish");
+	pub const KEY_TYPE: KeyTypeId = key_types::REPORTING;
 
 	mod app {
-		use sp_application_crypto::{app_crypto, sr25519};
-		app_crypto!(sr25519, super::KEY_TYPE);
+		use sp_application_crypto::{app_crypto, ed25519};
+		app_crypto!(ed25519, super::KEY_TYPE);
 	}
 
 	/// Identity of the equivocation/misbehavior reporter.
@@ -92,7 +92,7 @@ pub mod report {
 
 	impl AppCrypto<<Signature as Verify>::Signer, Signature> for ReporterAppCrypto {
 		type RuntimeAppPublic = ReporterId;
-		type GenericSignature = sp_core::sr25519::Signature;
-		type GenericPublic = sp_core::sr25519::Public;
+		type GenericSignature = sp_core::ed25519::Signature;
+		type GenericPublic = sp_core::ed25519::Public;
 	}
 }
