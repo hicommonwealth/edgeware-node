@@ -63,9 +63,12 @@ cargo build --release
 
 Ensure you have a fresh start if updating from another version:
 ```
-./scripts/purge-chain.sh beresheet
+./scripts/purge-chain.sh <NETWORK_NAME_ID>
 ```
-
+To start up the Edgeware node and connect to the Mainnet, run:
+```
+./target/release/edgeware --chain=edgeware --name <INSERT_NAME> --wasm-execution Compiled
+```
 To start up the Edgeware node and connect to the Beresheet testnet, run:
 ```
 ./target/release/edgeware --chain=beresheet --name <INSERT_NAME>
