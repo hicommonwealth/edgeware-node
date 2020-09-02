@@ -21,6 +21,9 @@ serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
 byteorder = { version = "1.0", features = ["i128"], default-features = false }
 num = { version = "0.3", features = ["alloc"], default-features = false }
+evm = { version = "0.17", default-features = false }
+blake2-rfc = { version = "0.2.18", default-features = false }
+ed25519-dalek = { version = "1.0.0", features = ["alloc", "u64_backend"], default-features = false }
 
 # primitives
 sp-application-crypto = { path = "../../vendor/frontier/vendor/substrate/primitives/application-crypto", default-features = false }
@@ -38,8 +41,6 @@ sp-session = { path = "../../vendor/frontier/vendor/substrate/primitives/session
 sp-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/primitives/transaction-pool", default-features = false }
 sp-version = { path = "../../vendor/frontier/vendor/substrate/primitives/version", default-features = false }
 sp-offchain = { path = "../../vendor/frontier/vendor/substrate/primitives/offchain", default-features = false }
-evm = { version = "0.17", default-features = false }
-blake2-rfc = { version = "0.2.18", default-features = false }
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }

@@ -98,7 +98,10 @@ use constants::{currency::*, time::*};
 
 /// Precompiles for the EVM module
 mod precompiles;
-use precompiles::{Ed25519, Blake2F, Ripemd160, Sha256, ECRecover};
+use precompiles::{
+	Ripemd160, Sha256, ECRecover, Modexp,
+	Ed25519, Blake2F,
+};
 
 /// Weights for pallets used in the runtime.
 mod weights;

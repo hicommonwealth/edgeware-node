@@ -29,4 +29,4 @@ pub use bls::{
 	Bls12G2MultiExp, Bls12Pairing, Bls12MapFpToG1, Bls12MapFp2ToG2,
 };
 pub use blake2::Blake2F;
-pub use modexp::ModExp;
+pub use modexp::Modexp;

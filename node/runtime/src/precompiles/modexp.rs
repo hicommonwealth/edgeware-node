@@ -1,14 +1,12 @@
 use sp_std::{cmp::max, vec::Vec};
-use sp_core::H160;
 use evm::{ExitError, ExitSucceed};
 use pallet_evm::{Precompile};
 use pallet_evm::precompiles::ensure_linear_cost;
 use num::{BigUint, Zero, One};
 
-/// The Bn128Add builtin
-pub struct ModExp;
+pub struct Modexp;
 
-impl Precompile for ModExp {
+impl Precompile for Modexp {
 	fn execute(
 		input: &[u8],
 		target_gas: Option<usize>,
