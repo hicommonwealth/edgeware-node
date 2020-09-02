@@ -15,13 +15,14 @@
 
 //! A list of the different weight modules for our runtime.
 
-use evm::{ExitError, ExitSucceed};
+
 pub use pallet_evm::precompiles::{ECRecover, Ripemd160, Sha256};
 
 pub mod ed25519;
 pub mod bls;
 pub mod blake2;
 pub mod modexp;
+pub mod bn128;
 
 pub use ed25519::Ed25519;
 pub use bls::{
@@ -30,3 +31,4 @@ pub use bls::{
 };
 pub use blake2::Blake2F;
 pub use modexp::Modexp;
+pub use bn128::{Bn128Add, Bn128Mul, Bn128Pairing};

@@ -3,6 +3,7 @@ use sp_core::H160;
 use evm::{ExitError, ExitSucceed};
 use pallet_evm::{Precompile};
 use pallet_evm::precompiles::ensure_linear_cost;
+// use eth_pairings::public_interface::eip2537::{EIP2537Executor};
 
 /// The Bls12G1Add builtin.
 pub struct Bls12G1Add;
@@ -38,7 +39,17 @@ impl Precompile for Bls12G1Add {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
-		Ok((ExitSucceed::Returned, input.to_vec(), cost))
+		// let result = EIP2537Executor::g1_add(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12G1Add error"))
+		// 	}
+		
+		Ok((ExitSucceed::Returned, input.to_vec(), cost))// }
 	}
 }
 
@@ -49,6 +60,16 @@ impl Precompile for Bls12G1Mul {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::g1_mul(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12G1Mul error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -60,6 +81,16 @@ impl Precompile for Bls12G1MultiExp {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::g1_multiexp(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12G1MultiExp error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -71,6 +102,16 @@ impl Precompile for Bls12G2Add {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::g2_add(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12G2Add error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -82,6 +123,16 @@ impl Precompile for Bls12G2Mul {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::g2_mul(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12G2Mul error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -93,6 +144,16 @@ impl Precompile for Bls12G2MultiExp {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::g2_multiexp(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12G2MultiExp error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -104,6 +165,16 @@ impl Precompile for Bls12Pairing {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::pair(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12Pairing error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -115,6 +186,16 @@ impl Precompile for Bls12MapFpToG1 {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::map_fp_to_g1(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12MapFpToG1 error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }
@@ -126,6 +207,16 @@ impl Precompile for Bls12MapFp2ToG2 {
 	) -> core::result::Result<(ExitSucceed, Vec<u8>, usize), ExitError> {
 		let cost = ensure_linear_cost(target_gas, input.len(), 15, 3)?;
 
+		// let result = EIP2537Executor::map_fp_to_g2(input);
+
+		// match result {
+		// 	Ok(result_bytes) => {
+		// 		Ok((ExitSucceed::Returned, result_bytes.to_vec(), cost))
+		// 	},
+		// 	Err(e) => {
+		// 		Err(ExitError::Other("Bls12MapFp2ToG2 error"))
+		// 	}
+		// }
 		Ok((ExitSucceed::Returned, input.to_vec(), cost))
 	}
 }

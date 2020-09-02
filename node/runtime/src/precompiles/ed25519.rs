@@ -1,5 +1,4 @@
 use sp_std::{cmp::min, vec::Vec};
-use sp_core::H160;
 use evm::{ExitError, ExitSucceed};
 use pallet_evm::{Precompile};
 use pallet_evm::precompiles::ensure_linear_cost;
