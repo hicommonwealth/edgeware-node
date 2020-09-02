@@ -1,10 +1,9 @@
-use sp_std::{cmp::min, vec::Vec};
+use sp_std::{cmp::max, vec::Vec};
 use sp_core::H160;
 use evm::{ExitError, ExitSucceed};
 use pallet_evm::{Precompile};
 use pallet_evm::precompiles::ensure_linear_cost;
 use num::{BigUint, Zero, One};
-use core::cmp::max;
 
 /// The Bn128Add builtin
 pub struct ModExp;
@@ -38,15 +37,15 @@ impl Precompile for ModExp {
 			BigUint::zero()
 		} else {
 			// read the numbers themselves.
-			let mut buf = [0; max(mod_len, max(base_len, exp_len))];
+			let mut buf = Vec::with_capacity(max(mod_len, max(base_len, exp_len)));
 			buf.copy_from_slice(&input[0..base_len]);
 			let base = BigUint::from_bytes_be(&buf[..base_len]);
 
-			buf = [0; max(mod_len, max(base_len, exp_len))];
+			buf = Vec::with_capacity(max(mod_len, max(base_len, exp_len)));
 			buf.copy_from_slice(&input[base_len..base_len + exp_len]);
 			let exponent = BigUint::from_bytes_be(&buf[..exp_len]);
 
-			buf = [0; max(mod_len, max(base_len, exp_len))];
+			buf = Vec::with_capacity(max(mod_len, max(base_len, exp_len)));
 			buf.copy_from_slice(&input[(base_len + exp_len)..(base_len + exp_len + mod_len)]);
 			let modulus = BigUint::from_bytes_be(&buf[..mod_len]);
 
@@ -64,7 +63,7 @@ impl Precompile for ModExp {
 		// output of length and value 1.
 		if bytes.len() <= mod_len {
 			let res_start = mod_len - bytes.len();
-			let ret = [0; bytes.len() - mod_len];
+			let mut ret = Vec::with_capacity(bytes.len() - mod_len);
 			ret.copy_from_slice(&bytes[res_start..bytes.len()]);
 			Ok((ExitSucceed::Returned, ret.to_vec(), cost))
 		} else {
