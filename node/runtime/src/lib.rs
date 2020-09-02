@@ -96,6 +96,10 @@ use impls::{CurrencyToVoteHandler, Author};
 pub mod constants;
 use constants::{currency::*, time::*};
 
+/// Precompiles for the EVM module
+mod precompiles;
+use precompiles::{Ed25519, Blake2F, Ripemd160, Sha256, ECRecover};
+
 /// Weights for pallets used in the runtime.
 mod weights;
 
@@ -810,7 +814,7 @@ impl pallet_evm::Trait for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type Currency = Balances;
 	type Event = Event;
-	type Precompiles = ();
+	type Precompiles = (Ed25519, Sha256, Blake2F, Ripemd160, ECRecover);
 	type ChainId = ChainId;
 }
 
