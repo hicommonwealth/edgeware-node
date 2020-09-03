@@ -87,7 +87,7 @@ pub use frame_system::Call as SystemCall;
 #[cfg(any(feature = "std", test))]
 pub use pallet_staking::StakerStatus;
 
-
+pub use pallet_evm::precompiles::{Sha256, Ripemd160, ECRecover};
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
 use impls::{CurrencyToVoteHandler, Author};
@@ -810,7 +810,7 @@ impl pallet_evm::Trait for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type Currency = Balances;
 	type Event = Event;
-	type Precompiles = ();
+	type Precompiles = (Sha256, Ripemd160, ECRecover);
 	type ChainId = ChainId;
 }
 
