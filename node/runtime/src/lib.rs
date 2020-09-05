@@ -847,6 +847,16 @@ impl voting::Trait for Runtime {
 	type Event = Event;
 }
 
+// Cumulus Pallets
+
+impl cumulus_parachain_upgrade::Trait for Runtime {
+	type Event = Event;
+	type OnValidationFunctionParams = (); // Not providing a function to be called on the Parachain when runtime upgrade is scheduled
+}
+
+// Pallet for getting parachain ID
+impl parachain_info::Trait for Runtime {}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -894,6 +904,8 @@ construct_runtime!(
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
+
+        ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
 	}
 );
 
@@ -1281,3 +1293,5 @@ impl_runtime_apis! {
 		}
 	}
 }
+
+cumulus_runtime::register_validate_block!(Block, Executive);

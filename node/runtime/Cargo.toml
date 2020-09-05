@@ -84,6 +84,13 @@ signaling = { package = "edge-signaling", path = "../../modules/edge-signaling",
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
+# Cumulus dependencies
+cumulus-primitives = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-message-broker = { git = "https://github.com/paritytech/cumulus",  default-features = false }
+parachain-info = { git = "https://github.com/paritytech/cumulus", default-features = false }
+
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", path = "../../vendor/frontier/vendor/substrate/utils/wasm-builder-runner", version = "1.0.4" }
 
@@ -152,4 +159,9 @@ std = [
 	"voting/std",
 	"frontier-rpc-primitives/std",
 	"ethereum/std",
+  "cumulus-runtime/std",
+  "cumulus-parachain-upgrade/std",
+  "cumulus-primitives/std",
+  "cumulus-message-broker/std",
+  "parachain-info/std",
 ]
