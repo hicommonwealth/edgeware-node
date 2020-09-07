@@ -1,4 +1,4 @@
-FROM phusion/baseimage:0.11 AS builder
+FROM phusion/baseimage:focal-1.0.0alpha1-amd64 AS builder
 LABEL maintainer="jake@commonwealth.im"
 LABEL description="This is the build stage. Here we create the binary."
 
@@ -10,7 +10,7 @@ RUN /edgeware/setup.sh
 
 # ===== SECOND STAGE ======
 
-FROM phusion/baseimage:0.11
+FROM phusion/baseimage:focal-1.0.0alpha1-amd64
 LABEL maintainer="hello@commonwealth.im"
 LABEL description="This is the 2nd stage: a very small image where we copy the Edgeware binary."
 ARG PROFILE=release
