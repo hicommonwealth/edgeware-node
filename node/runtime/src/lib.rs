@@ -241,6 +241,7 @@ pub enum ProxyType {
 	Governance,
 	Staking,
 }
+
 impl Default for ProxyType { fn default() -> Self { Self::Any } }
 impl InstanceFilter<Call> for ProxyType {
 	fn filter(&self, c: &Call) -> bool {

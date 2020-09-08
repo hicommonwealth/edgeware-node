@@ -1,4 +1,4 @@
 [submodule "vendor/frontier"]
 	path = vendor/frontier
 	url = https://github.com/hicommonwealth/frontier.git
-	branch = master
+	branch = time-travel
