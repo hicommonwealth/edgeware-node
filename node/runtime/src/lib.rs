@@ -854,6 +854,23 @@ impl cumulus_parachain_upgrade::Trait for Runtime {
 	type OnValidationFunctionParams = (); // Not providing a function to be called on the Parachain when runtime upgrade is scheduled
 }
 
+impl cumulus_message_broker::Trait for Runtime {
+    type Event = Event;
+    type DownwardMessageHandlers = TokenDealer;
+    type UpwardMessage = cumulus_upward_message::RococoUpwardMessage;
+    type ParachainId = ParachainInfo;
+    type XCMPMessage = cumulus_token_dealer::XCMPMessage<AccountId, Balance>;
+    type XCMPMessageHandlers = TokenDealer;
+}
+
+impl cumulus_token_dealer::Trait for Runtime {
+    type Event = Event;
+    type UpwardMessageSender = MessageBroker;
+    type UpwardMessage = cumulus_upward_message::RococoUpwardMessage;
+    type Currency = Balances;
+    type XCMPMessageSender = MessageBroker;
+}
+
 // Pallet for getting parachain ID
 impl parachain_info::Trait for Runtime {}
 
@@ -905,7 +922,10 @@ construct_runtime!(
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 
-        ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
+		ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
+		ParachainInfo: parachain_info::{Module, Storage, Config},
+		MessageBroker: cumulus_message_broker::{Module, Call, Inherent, Event<T>},
+		TokenDealer: cumulus_token_dealer::{Module, Call, Event<T>},
 	}
 );
 

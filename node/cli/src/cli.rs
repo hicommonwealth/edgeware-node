@@ -46,3 +46,22 @@ pub enum Subcommand {
 	#[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
 	Benchmark(frame_benchmarking_cli::BenchmarkCmd),
 }
+
+/// Command for exporting the genesis state of the parachain
+#[derive(Debug, StructOpt)]
+pub struct ExportGenesisStateCommand {
+	/// Output file name or stdout if unspecified.
+	#[structopt(parse(from_os_str))]
+	pub output: Option<PathBuf>,
+
+	/// Id of the parachain this state is for.
+	#[structopt(long, default_value = "100")]
+	pub parachain_id: u32,
+
+	/// The name of the chain for that the genesis state should be exported.
+	#[structopt(long)]
+	pub chain: Option<String>,
+}
+
+
+

@@ -85,10 +85,12 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
 # Cumulus dependencies
+cumulus-message-broker = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", default-features = false }
 cumulus-primitives = { git = "https://github.com/paritytech/cumulus", default-features = false }
 cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false }
-cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", default-features = false }
-cumulus-message-broker = { git = "https://github.com/paritytech/cumulus",  default-features = false }
+cumulus-token-dealer = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-upward-message = { git = "https://github.com/paritytech/cumulus", default-features = false }
 parachain-info = { git = "https://github.com/paritytech/cumulus", default-features = false }
 
 [build-dependencies]
@@ -159,9 +161,11 @@ std = [
 	"voting/std",
 	"frontier-rpc-primitives/std",
 	"ethereum/std",
-  "cumulus-runtime/std",
-  "cumulus-parachain-upgrade/std",
-  "cumulus-primitives/std",
-  "cumulus-message-broker/std",
-  "parachain-info/std",
+	"cumulus-message-broker/std",
+	"cumulus-parachain-upgrade/std",
+	"cumulus-token-dealer/std",
+	"cumulus-primitives/std",
+	"cumulus-runtime/std",
+	"cumulus-upward-message/std",
+	"parachain-info/std",
 ]
