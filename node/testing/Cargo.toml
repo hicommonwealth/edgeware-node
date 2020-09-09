@@ -6,25 +6,25 @@ description = "Test utilities for Edgeware."
 edition = "2018"
 
 [dependencies]
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+pallet-balances = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 codec = { package = "parity-scale-codec", version = "1.3.0" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up", features = ["test-helpers", "db"] }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-substrate-test-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-pallet-treasury = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sc-service = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch", features = ["test-helpers", "db"] }
+pallet-contracts = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-indices = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-keyring = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-io = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+frame-support = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-session = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-staking = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sc-executor = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+frame-system = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+substrate-test-client = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+pallet-treasury = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 wabt = "0.10.0"
 
 edgeware-executor = { path = "../executor" }

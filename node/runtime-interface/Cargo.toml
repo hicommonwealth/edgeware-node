@@ -7,9 +7,9 @@ edition = "2018"
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "1.3.0" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-runtime-interface = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
-sp-runtime-interface-proc-macro = { git = "https://github.com/hicommonwealth/substrate.git", branch = "drew-time-travel-up" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-runtime-interface-proc-macro = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 edgeware-primitives = { path = "../primitives" }
 
 [features]
