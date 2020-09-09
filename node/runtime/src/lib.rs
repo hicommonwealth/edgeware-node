@@ -71,7 +71,7 @@ pub use sp_version::RuntimeVersion;
 pub use pallet_session::{historical as pallet_session_historical};
 
 use pallet_contracts_rpc_runtime_api::ContractExecResult;
-use ethereum::{Block as EthereumBlock, Transaction as EthereumTransaction, Receipt as EthereumReceipt};
+use pallet_ethereum::{Block as EthereumBlock, Transaction as EthereumTransaction, Receipt as EthereumReceipt};
 use pallet_evm::{Account as EVMAccount, FeeCalculator, HashedAddressMapping, EnsureAddressTruncated};
 use frontier_rpc_primitives::{TransactionStatus};
 
@@ -835,7 +835,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for EthereumFindAuthor<F>
 	}
 }
 
-impl ethereum::Trait for Runtime {
+impl pallet_ethereum::Trait for Runtime {
 	type Event = Event;
 	type FindAuthor = EthereumFindAuthor<Aura>;
 }
@@ -891,7 +891,7 @@ construct_runtime!(
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 
 		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
-		Ethereum: ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
+		Ethereum: pallet_ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 
 		Historical: pallet_session_historical::{Module},
@@ -908,14 +908,14 @@ construct_runtime!(
 pub struct TransactionConverter;
 
 impl frontier_rpc_primitives::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
-	fn convert_transaction(&self, transaction: ethereum::Transaction) -> UncheckedExtrinsic {
-		UncheckedExtrinsic::new_unsigned(ethereum::Call::<Runtime>::transact(transaction).into())
+	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> UncheckedExtrinsic {
+		UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact(transaction).into())
 	}
 }
 
 impl frontier_rpc_primitives::ConvertTransaction<sp_runtime::OpaqueExtrinsic> for TransactionConverter {
-	fn convert_transaction(&self, transaction: ethereum::Transaction) -> sp_runtime::OpaqueExtrinsic {
-		let extrinsic = UncheckedExtrinsic::new_unsigned(ethereum::Call::<Runtime>::transact(transaction).into());
+	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> sp_runtime::OpaqueExtrinsic {
+		let extrinsic = UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact(transaction).into());
 		let encoded = extrinsic.encode();
 		sp_runtime::OpaqueExtrinsic::decode(&mut &encoded[..]).expect("Encoded extrinsic is always valid")
 	}
@@ -1127,13 +1127,13 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl frontier_rpc_primitives::EthereumRuntimeApi<Block> for Runtime {
+	impl frontier_rpc_primitives::EthereumRuntimeRPCApi<Block> for Runtime {
 		fn chain_id() -> u64 {
 			ChainId::get()
 		}
 
 		fn account_basic(address: H160) -> EVMAccount {
-			pallet_evm::Module::<Runtime>::account_basic(&address)
+			EVM::account_basic(&address)
 		}
 
 		fn gas_price() -> U256 {
@@ -1141,17 +1141,17 @@ impl_runtime_apis! {
 		}
 
 		fn account_code_at(address: H160) -> Vec<u8> {
-			pallet_evm::Module::<Runtime>::account_codes(address)
+			EVM::account_codes(address)
 		}
 
 		fn author() -> H160 {
-			<ethereum::Module<Runtime>>::find_author()
+			<pallet_ethereum::Module<Runtime>>::find_author()
 		}
 
 		fn storage_at(address: H160, index: U256) -> H256 {
 			let mut tmp = [0u8; 32];
 			index.to_big_endian(&mut tmp);
-			pallet_evm::Module::<Runtime>::account_storages(address, H256::from_slice(&tmp[..]))
+			EVM::account_storages(address, H256::from_slice(&tmp[..]))
 		}
 
 		fn call(
@@ -1161,10 +1161,10 @@ impl_runtime_apis! {
 			gas_limit: U256,
 			gas_price: Option<U256>,
 			nonce: Option<U256>,
-			action: ethereum::TransactionAction,
+			action: pallet_ethereum::TransactionAction,
 		) -> Option<(Vec<u8>, U256)> {
 			match action {
-				ethereum::TransactionAction::Call(to) =>
+				pallet_ethereum::TransactionAction::Call(to) =>
 					EVM::execute_call(
 						from,
 						to,
@@ -1175,7 +1175,7 @@ impl_runtime_apis! {
 						nonce,
 						false,
 					).ok().map(|(_, ret, gas)| (ret, gas)),
-				ethereum::TransactionAction::Create =>
+				pallet_ethereum::TransactionAction::Create =>
 					EVM::execute_create(
 						from,
 						data,
@@ -1188,103 +1188,16 @@ impl_runtime_apis! {
 			}
 		}
 
-		fn block_by_number(number: u32) -> (
-			Option<EthereumBlock>, Vec<Option<ethereum::TransactionStatus>>
-		) {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_number(number) {
-				let statuses = <ethereum::Module<Runtime>>::block_transaction_statuses(&block);
-				return (
-					Some(block),
-					statuses
-				);
-			}
-			(None,vec![])
+		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
+			Ethereum::current_transaction_statuses()
 		}
 
-		fn block_transaction_count_by_number(number: u32) -> Option<U256> {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_number(number) {
-				return Some(U256::from(block.transactions.len()))
-			}
-			None
+		fn current_block() -> Option<pallet_ethereum::Block> {
+			Ethereum::current_block()
 		}
 
-		fn block_transaction_count_by_hash(hash: H256) -> Option<U256> {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_hash(hash) {
-				return Some(U256::from(block.transactions.len()))
-			}
-			None
-		}
-
-		fn block_by_hash(hash: H256) -> Option<EthereumBlock> {
-			<ethereum::Module<Runtime>>::block_by_hash(hash)
-		}
-
-		fn block_by_hash_with_statuses(hash: H256) -> (
-			Option<EthereumBlock>, Vec<Option<ethereum::TransactionStatus>>
-		) {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_hash(hash) {
-				let statuses = <ethereum::Module<Runtime>>::block_transaction_statuses(&block);
-				return (
-					Some(block),
-					statuses
-				);
-			}
-			(None, vec![])
-		}
-
-		fn transaction_by_hash(hash: H256) -> Option<(
-			EthereumTransaction,
-			EthereumBlock,
-			TransactionStatus,
-			Vec<EthereumReceipt>)> {
-			<ethereum::Module<Runtime>>::transaction_by_hash(hash)
-		}
-
-		fn transaction_by_block_hash_and_index(hash: H256, index: u32) -> Option<(
-			EthereumTransaction,
-			EthereumBlock,
-			TransactionStatus)> {
-			<ethereum::Module<Runtime>>::transaction_by_block_hash_and_index(hash, index)
-		}
-
-		fn transaction_by_block_number_and_index(number: u32, index: u32) -> Option<(
-			EthereumTransaction,
-			EthereumBlock,
-			TransactionStatus)> {
-			<ethereum::Module<Runtime>>::transaction_by_block_number_and_index(
-				number,
-				index
-			)
-		}
-
-		fn logs(
-			from_block: Option<u32>,
-			to_block: Option<u32>,
-			block_hash: Option<H256>,
-			address: Option<H160>,
-			topic: Option<Vec<H256>>
-		) -> Vec<(
-			H160, // address
-			Vec<H256>, // topics
-			Vec<u8>, // data
-			Option<H256>, // block_hash
-			Option<U256>, // block_number
-			Option<H256>, // transaction_hash
-			Option<U256>, // transaction_index
-			Option<U256>, // log index in block
-			Option<U256>, // log index in transaction
-		)> {
-			let output = <ethereum::Module<Runtime>>::filtered_logs(
-				from_block,
-				to_block,
-				block_hash,
-				address,
-				topic
-			);
-			if let Some(output) = output {
-				return output;
-			}
-			return vec![];
+		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
+			Ethereum::current_receipts()
 		}
 	}
 }

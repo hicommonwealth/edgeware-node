@@ -254,7 +254,7 @@ pub fn testnet_genesis(
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(EVMConfig { accounts: evm_accounts }),
 		pallet_contracts: Some(Default::default()),
-		ethereum: Some(Default::default()),
+		pallet_ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
@@ -517,7 +517,7 @@ pub fn mainnet_genesis(
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
 		pallet_evm: Some(Default::default()),
 		pallet_contracts: Some(Default::default()),
-		ethereum: Some(Default::default()),
+		pallet_ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,

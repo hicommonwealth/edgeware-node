@@ -35,11 +35,10 @@ sp-session = { path = "../../vendor/frontier/vendor/substrate/primitives/session
 sp-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/primitives/transaction-pool", default-features = false }
 sp-version = { path = "../../vendor/frontier/vendor/substrate/primitives/version", default-features = false }
 sp-offchain = { path = "../../vendor/frontier/vendor/substrate/primitives/offchain", default-features = false }
+frontier-rpc-primitives = { default-features = false, path = "../../vendor/frontier/rpc/primitives" }
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
-frontier-rpc-primitives = { default-features = false, path = "../../vendor/frontier/rpc/primitives" }
-ethereum = { default-features = false, package = "pallet-ethereum", path = "../../vendor/frontier/frame/ethereum" }
 
 # pallet dependencies
 pallet-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/frame/authority-discovery", default-features = false }
@@ -53,6 +52,7 @@ pallet-contracts-rpc-runtime-api = { default-features = false, path = "../../ven
 pallet-democracy = { path = "../../vendor/frontier/vendor/substrate/frame/democracy", default-features = false }
 pallet-elections-phragmen = { path = "../../vendor/frontier/vendor/substrate/frame/elections-phragmen", default-features = false }
 pallet-evm = { path = "../../vendor/frontier/vendor/substrate/frame/evm", default-features = false }
+pallet-ethereum = { default-features = false, package = "pallet-ethereum", path = "../../vendor/frontier/frame/ethereum" }
 frame-executive = { path = "../../vendor/frontier/vendor/substrate/frame/executive", default-features = false }
 pallet-finality-tracker = { path = "../../vendor/frontier/vendor/substrate/frame/finality-tracker", default-features = false }
 pallet-grandpa = { path = "../../vendor/frontier/vendor/substrate/frame/grandpa", default-features = false }
@@ -151,5 +151,5 @@ std = [
 	"treasury-reward/std",
 	"voting/std",
 	"frontier-rpc-primitives/std",
-	"ethereum/std",
+	"pallet-ethereum/std",
 ]
