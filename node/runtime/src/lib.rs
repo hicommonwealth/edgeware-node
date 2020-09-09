@@ -186,16 +186,15 @@ impl frame_system::Trait for Runtime {
 	type Version = Version;
 	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
-	type MigrateAccount = (Balances, Identity, Democracy, Elections, ImOnline, Recovery, Staking, Session, Vesting);
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
-	type SystemWeightInfo = weights::frame_system::WeightInfo;
+	type SystemWeightInfo = ();
 }
 
 impl pallet_utility::Trait for Runtime {
 	type Event = Event;
 	type Call = Call;
-	type WeightInfo = weights::pallet_utility::WeightInfo;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -332,7 +331,7 @@ impl pallet_timestamp::Trait for Runtime {
 	type Moment = Moment;
 	type OnTimestampSet = Aura;
 	type MinimumPeriod = MinimumPeriod;
-	type WeightInfo = weights::pallet_timestamp::WeightInfo;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -490,7 +489,7 @@ impl pallet_democracy::Trait for Runtime {
 	type Scheduler = Scheduler;
 	type PalletsOrigin = OriginCaller;
 	type MaxVotes = MaxVotes;
-	type WeightInfo = weights::pallet_democracy::WeightInfo;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -893,30 +892,8 @@ pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signatu
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
-
-/// Custom runtime upgrade to execute the balances migration before the account migration.
-mod custom_migration {
-	use super::*;
-
-	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
-	use pallet_balances::migration::on_runtime_upgrade as balances_upgrade;
-	use frame_system::migration::migrate_accounts as accounts_upgrade;
-	use pallet_staking::migration::migrate_to_simple_payouts as staking_upgrade;
-
-	pub struct Upgrade;
-	impl OnRuntimeUpgrade for Upgrade {
-		fn on_runtime_upgrade() -> Weight {
-			let mut weight = 0;
-			weight += balances_upgrade::<Runtime, pallet_balances::DefaultInstance>();
-			weight += staking_upgrade::<Runtime>();
-			weight += accounts_upgrade::<Runtime>();
-			weight
-		}
-	}
-}
-
 /// Executive: handles dispatch to the various modules.
-pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules, custom_migration::Upgrade>;
+pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules>;
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
