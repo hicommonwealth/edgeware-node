@@ -108,7 +108,7 @@ pub fn create_full<C, P, SC, BE>(
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use frontier_rpc::{EthApi, EthApiServer};
+	use frontier_rpc::{EthApi, EthApiServer, NetApi, NetApiServer};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -149,6 +149,9 @@ pub fn create_full<C, P, SC, BE>(
 			edgeware_runtime::TransactionConverter,
 			is_authority,
 		))
+	);
+	io.extend_with(
+		NetApiServer::to_delegate(NetApi)
 	);
 
 	io.extend_with(

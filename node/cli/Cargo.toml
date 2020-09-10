@@ -97,7 +97,7 @@ edgeware-executor = { path = "../executor" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
 sc-cli = { path = "../../vendor/frontier/vendor/substrate/client/cli", optional = true }
 frame-benchmarking-cli = { optional = true, path = "../../vendor/frontier/vendor/substrate/utils/frame/benchmarking-cli" }
-
+frontier-consensus = { version = "0.1.0", path = "../../vendor/frontier/consensus" }
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }

@@ -1402,6 +1402,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
+ "frontier-consensus",
  "futures 0.3.5",
  "hex 0.3.2",
  "hex-literal 0.2.1",
