@@ -57,7 +57,16 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 			jsonrpc_pubsub::manager::SubscriptionManager
 		) -> edgeware_rpc::IoHandler,
 		(
-			sc_consensus_aura::AuraBlockImport<Block, FullClient, FullGrandpaBlockImport, sp_consensus_aura::ed25519::AuthorityPair>,
+			sc_consensus_aura::AuraBlockImport<
+				Block,
+				FullClient,
+				FrontierBlockImport<
+					Block,
+					FullGrandpaBlockImport,
+					FullClient
+				>,
+				sp_consensus_aura::ed25519::AuthorityPair
+			>,
 			sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 		),
 		sc_finality_grandpa::SharedVoterState,
@@ -153,7 +162,16 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 pub fn new_full_base(
 	config: Configuration,
 	with_startup_data: impl FnOnce(
-		&sc_consensus_aura::AuraBlockImport<Block, FullClient, FullGrandpaBlockImport, sp_consensus_aura::ed25519::AuthorityPair>,
+		&sc_consensus_aura::AuraBlockImport<
+			Block,
+			FullClient,
+			FrontierBlockImport<
+				Block,
+				FullGrandpaBlockImport,
+				FullClient
+			>,
+			sp_consensus_aura::ed25519::AuthorityPair
+		>,
 		&sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 	)
 ) -> Result<(
