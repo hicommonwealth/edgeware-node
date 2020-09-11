@@ -20,64 +20,64 @@ serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
 
 # primitives
-sp-application-crypto = { path = "../../vendor/frontier/vendor/substrate/primitives/application-crypto", default-features = false }
-sp-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/primitives/authority-discovery", default-features = false }
-sp-consensus-aura = { path = "../../vendor/frontier/vendor/substrate/primitives/consensus/aura", default-features = false }
-sp-block-builder = { path = "../../vendor/frontier/vendor/substrate/primitives/block-builder", default-features = false}
-sp-inherents = { path = "../../vendor/frontier/vendor/substrate/primitives/inherents", default-features = false }
-sp-core = { path = "../../vendor/frontier/vendor/substrate/primitives/core", default-features = false }
-sp-std = { path = "../../vendor/frontier/vendor/substrate/primitives/std", default-features = false }
-sp-api = { path = "../../vendor/frontier/vendor/substrate/primitives/api", default-features = false }
-sp-runtime = { path = "../../vendor/frontier/vendor/substrate/primitives/runtime", default-features = false }
-sp-staking = { path = "../../vendor/frontier/vendor/substrate/primitives/staking", default-features = false }
-sp-keyring = { path = "../../vendor/frontier/vendor/substrate/primitives/keyring", optional = true }
-sp-session = { path = "../../vendor/frontier/vendor/substrate/primitives/session", default-features = false }
-sp-transaction-pool = { path = "../../vendor/frontier/vendor/substrate/primitives/transaction-pool", default-features = false }
-sp-version = { path = "../../vendor/frontier/vendor/substrate/primitives/version", default-features = false }
-sp-offchain = { path = "../../vendor/frontier/vendor/substrate/primitives/offchain", default-features = false }
+sp-application-crypto = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-authority-discovery = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-block-builder = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false}
+sp-inherents = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-staking = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-keyring = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", optional = true }
+sp-session = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-version = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+sp-offchain = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
 frontier-rpc-primitives = { default-features = false, path = "../../vendor/frontier/rpc/primitives" }
 
 # pallet dependencies
-pallet-authority-discovery = { path = "../../vendor/frontier/vendor/substrate/frame/authority-discovery", default-features = false }
-pallet-authorship = { path = "../../vendor/frontier/vendor/substrate/frame/authorship", default-features = false }
-pallet-aura = { path = "../../vendor/frontier/vendor/substrate/frame/aura", default-features = false }
-pallet-balances = { path = "../../vendor/frontier/vendor/substrate/frame/balances", default-features = false }
-pallet-collective = { path = "../../vendor/frontier/vendor/substrate/frame/collective", default-features = false }
-pallet-contracts = { default-features = false, path = "../../vendor/frontier/vendor/substrate/frame/contracts" }
-pallet-contracts-primitives = { default-features = false, path = "../../vendor/frontier/vendor/substrate/frame/contracts/common/" }
-pallet-contracts-rpc-runtime-api = { default-features = false, path = "../../vendor/frontier/vendor/substrate/frame/contracts/rpc/runtime-api/" }
-pallet-democracy = { path = "../../vendor/frontier/vendor/substrate/frame/democracy", default-features = false }
-pallet-elections-phragmen = { path = "../../vendor/frontier/vendor/substrate/frame/elections-phragmen", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-authorship = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-aura = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-balances = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-collective = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-contracts = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-contracts-primitives = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-democracy = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-ethereum = { default-features = false, path = "../../vendor/frontier/frame/ethereum" }
-pallet-evm = { path = "../../vendor/frontier/vendor/substrate/frame/evm", default-features = false }
-frame-executive = { path = "../../vendor/frontier/vendor/substrate/frame/executive", default-features = false }
-pallet-finality-tracker = { path = "../../vendor/frontier/vendor/substrate/frame/finality-tracker", default-features = false }
-pallet-grandpa = { path = "../../vendor/frontier/vendor/substrate/frame/grandpa", default-features = false }
-pallet-identity = { path = "../../vendor/frontier/vendor/substrate/frame/identity", default-features = false }
-pallet-im-online = { path = "../../vendor/frontier/vendor/substrate/frame/im-online", default-features = false }
-pallet-indices = { path = "../../vendor/frontier/vendor/substrate/frame/indices", default-features = false }
-pallet-multisig = { path = "../../vendor/frontier/vendor/substrate/frame/multisig", default-features = false }
-pallet-offences = { path = "../../vendor/frontier/vendor/substrate/frame/offences", default-features = false }
-pallet-proxy = { path = "../../vendor/frontier/vendor/substrate/frame/proxy", default-features = false }
-pallet-randomness-collective-flip = { path = "../../vendor/frontier/vendor/substrate/frame/randomness-collective-flip", default-features = false }
-pallet-recovery = { path = "../../vendor/frontier/vendor/substrate/frame/recovery", default-features = false }
-pallet-scheduler = { path = "../../vendor/frontier/vendor/substrate/frame/scheduler", default-features = false }
-pallet-session = { path = "../../vendor/frontier/vendor/substrate/frame/session", default-features = false, features = ["historical"] }
-pallet-staking = { path = "../../vendor/frontier/vendor/substrate/frame/staking", default-features = false }
-pallet-staking-reward-curve = { path = "../../vendor/frontier/vendor/substrate/frame/staking/reward-curve" }
-pallet-sudo = { path = "../../vendor/frontier/vendor/substrate/frame/sudo", default-features = false }
-frame-support = { path = "../../vendor/frontier/vendor/substrate/frame/support", default-features = false }
-frame-system = { path = "../../vendor/frontier/vendor/substrate/frame/system", default-features = false }
-frame-system-rpc-runtime-api = { path = "../../vendor/frontier/vendor/substrate/frame/system/rpc/runtime-api", default-features = false }
-pallet-timestamp = { path = "../../vendor/frontier/vendor/substrate/frame/timestamp", default-features = false }
-pallet-treasury = { path = "../../vendor/frontier/vendor/substrate/frame/treasury", default-features = false }
-pallet-utility = { path = "../../vendor/frontier/vendor/substrate/frame/utility", default-features = false }
-pallet-transaction-payment = { path = "../../vendor/frontier/vendor/substrate/frame/transaction-payment", default-features = false }
-pallet-transaction-payment-rpc-runtime-api = { path = "../../vendor/frontier/vendor/substrate/frame/transaction-payment/rpc/runtime-api", default-features = false }
-pallet-vesting = { path = "../../vendor/frontier/vendor/substrate/frame/vesting", default-features = false }
+pallet-evm = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+frame-executive = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-finality-tracker = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-identity = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-im-online = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-indices = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-multisig = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-offences = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-proxy = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-randomness-collective-flip = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-recovery = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-scheduler = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-session = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false, features = ["historical"] }
+pallet-staking = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-staking-reward-curve = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-sudo = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+frame-support = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+frame-system = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-treasury = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-utility = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-vesting = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 
 
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
@@ -85,10 +85,10 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", path = "../../vendor/frontier/vendor/substrate/utils/wasm-builder-runner", version = "1.0.4" }
+wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", branch = "frontier", version = "1.0.4" }
 
 [dev-dependencies]
-sp-io = { path = "../../vendor/frontier/vendor/substrate/primitives/io" }
+sp-io = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 
 [features]
 default = ["std"]

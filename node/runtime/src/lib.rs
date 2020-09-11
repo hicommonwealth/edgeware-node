@@ -519,6 +519,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 	type MotionDuration = CouncilMotionDuration;
 	type MaxProposals = CouncilMaxProposals;
 	type WeightInfo = ();
+	type MaxMembers = CouncilMaxMembers;
 }
 
 parameter_types! {
@@ -528,10 +529,10 @@ parameter_types! {
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
+	pub const CouncilMaxMembers: u32 = 100;
 }
 
-// Make sure that there are no more than `MAX_MEMBERS` members elected via phragmen.
-const_assert!(DesiredMembers::get() <= pallet_collective::MAX_MEMBERS);
+const_assert!(DesiredMembers::get() <= CouncilMaxMembers::get());
 
 impl pallet_elections_phragmen::Trait for Runtime {
 	type ModuleId = ElectionsPhragmenModuleId;
@@ -1171,7 +1172,7 @@ impl_runtime_apis! {
 						data,
 						value,
 						gas_limit.low_u32(),
-						gas_price,
+						gas_price.unwrap(),
 						nonce,
 						false,
 					).ok().map(|(_, ret, gas)| (ret, gas)),
@@ -1181,7 +1182,7 @@ impl_runtime_apis! {
 						data,
 						value,
 						gas_limit.low_u32(),
-						gas_price,
+						gas_price.unwrap(),
 						nonce,
 						false,
 					).ok().map(|(_, _, gas)| (vec![], gas)),
