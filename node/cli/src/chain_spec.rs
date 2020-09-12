@@ -20,7 +20,7 @@ use edgeware_runtime::constants::currency::*;
 use edgeware_runtime::Block;
 use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
-	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
+	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, ParachainInfoConfig, SessionConfig,
 	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
 	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap,
 	// EVMConfig
@@ -266,6 +266,9 @@ pub fn testnet_genesis(
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
+		}),
+		parachain_info: Some(ParachainInfoConfig {
+			parachain_id: 5000.into(),
 		}),
 	}
 }
@@ -529,6 +532,9 @@ pub fn mainnet_genesis(
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
+		}),
+		parachain_info: Some(ParachainInfoConfig {
+			parachain_id: 5000.into(),
 		}),
 	}
 }

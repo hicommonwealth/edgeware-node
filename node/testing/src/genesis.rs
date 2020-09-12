@@ -110,5 +110,6 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 		// ethereum: Some(Default::default()),
 		signaling: Some(Default::default()),
 		treasury_reward: Some(Default::default()),
+		parachain_info: Some(Default::default()),
 	}
 }

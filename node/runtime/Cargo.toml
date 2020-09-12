@@ -81,6 +81,16 @@ signaling = { package = "edge-signaling", path = "../../modules/edge-signaling",
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
+# Cumulus dependencies
+cumulus-message-broker = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-primitives = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-upward-message = { git = "https://github.com/paritytech/cumulus", default-features = false }
+cumulus-token-dealer = { git = "https://github.com/paritytech/cumulus", default-features = false }
+parachain-info = { git = "https://github.com/paritytech/cumulus", default-features = false }
+
+
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch", version = "1.0.4" }
 
@@ -147,4 +157,16 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
+	"cumulus-message-broker/std",
+	"cumulus-parachain-upgrade/std",
+	"cumulus-primitives/std",
+	"cumulus-runtime/std",
+	"cumulus-upward-message/std",
+	"cumulus-token-dealer/std",
+	"parachain-info/std",
+]
+
+# Will be enabled by the `wasm-builder` when building the runtime for WASM.
+runtime-wasm = [
+	"cumulus-upward-message/runtime-wasm",
 ]
