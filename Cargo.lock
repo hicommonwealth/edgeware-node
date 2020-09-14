@@ -1573,6 +1573,7 @@ dependencies = [
  "edge-treasury-reward",
  "edge-voting",
  "edgeware-primitives",
+ "evm",
  "frame-executive",
  "frame-support",
  "frame-system",

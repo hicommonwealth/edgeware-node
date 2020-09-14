@@ -18,6 +18,7 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
+evm = { version = "0.17", default-features = false }
 
 # primitives
 sp-application-crypto = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
@@ -152,4 +153,5 @@ std = [
 	"voting/std",
 	"frontier-rpc-primitives/std",
 	"pallet-ethereum/std",
+	"evm/std",
 ]
