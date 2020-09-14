@@ -2185,6 +2185,7 @@ dependencies = [
  "sha3 0.8.2",
  "sp-api",
  "sp-consensus",
+ "sp-io",
  "sp-runtime",
  "sp-storage",
  "sp-transaction-pool",
@@ -4578,6 +4579,7 @@ version = "0.1.0"
 dependencies = [
  "ethereum",
  "ethereum-types",
+ "evm",
  "frame-support",
  "frame-system",
  "frontier-consensus-primitives",

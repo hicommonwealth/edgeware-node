@@ -144,14 +144,17 @@ pub fn create_full<C, P, SC, BE>(
 	io.extend_with(
 		EthApiServer::to_delegate(EthApi::new(
 			client.clone(),
-			select_chain,
+			select_chain.clone(),
 			pool.clone(),
 			edgeware_runtime::TransactionConverter,
 			is_authority,
 		))
 	);
 	io.extend_with(
-		NetApiServer::to_delegate(NetApi)
+		NetApiServer::to_delegate(NetApi::new(
+			client.clone(),
+			select_chain.clone(),
+		))
 	);
 
 	io.extend_with(
