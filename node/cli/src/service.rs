@@ -91,7 +91,8 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 
 	let frontier_block_import = FrontierBlockImport::new(
 		grandpa_block_import.clone(),
-		client.clone()
+		client.clone(),
+		true
 	);
 
 	let aura_block_import =
