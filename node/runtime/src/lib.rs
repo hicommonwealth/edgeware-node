@@ -925,26 +925,26 @@ fn get_precompiled_func_from_address(address: &H160) -> Option<PrecompiledCallab
 	// bls12_381_fp_to_g1
 	let addr_bls12_381_fp2_to_g2 = H160::from_str("0000000000000000000000000000000000000011").expect("Invalid address at precompiles generation");
 
-	match *address {
-		addr_ecrecover => Some(ECRecover::execute),
-		addr_sha256 => Some(Sha256::execute),
-		addr_ripemd160 => Some(Ripemd160::execute),
-		// addr_modexp => Some(Modexp::execute),
-		// addr_alt_bn128_add => Some(Bn128Add::execute),
-		// addr_alt_bn128_mul => Some(Bn128Mul::execute),
-		// addr_alt_bn128_pairing => Some(Bn128Pairing::execute),
-		// addr_blake2_f => Some(Blake2F::execute),
-		// addr_bls12_381_g1_add => Some(Bls12G1Add::execute),
-		// addr_bls12_381_g1_mul => Some(Bls12G1Mul::execute),
-		// addr_bls12_381_g1_multiexp => Some(Bls12G1MultiExp::execute),
-		// addr_bls12_381_g2_add => Some(Bls12G2Add::execute),
-		// addr_bls12_381_g2_mul => Some(Bls12G2Mul::execute),
-		// addr_bls12_381_g2_multiexp => Some(Bls12G2MultiExp::execute),
-		// addr_bls12_381_pairing => Some(Bls12Pairing::execute),
-		// addr_bls12_381_fp_to_g1 => Some(Bls12MapFpToG1::execute),
-		// addr_bls12_381_fp2_to_g2 => Some(Bls12MapFp2ToG2::execute),
-		_ => None
-	}
+	let exec: Option<PrecompiledCallable> = if *address == addr_ecrecover { Some(ECRecover::execute) }
+		else if *address == addr_sha256 { Some(Sha256::execute) }
+		else if *address == addr_ripemd160 { Some(Ripemd160::execute) }
+		// else if *address == addr_modexp { Some(Modexp::execute) }
+		// else if *address == addr_alt_bn128_add { Some(Bn128Add::execute) }
+		// else if *address == addr_alt_bn128_mul { Some(Bn128Mul::execute) }
+		// else if *address == addr_alt_bn128_pairing { Some(Bn128Pairing::execute) }
+		// else if *address == addr_blake2_f { Some(Blake2F::execute) }
+		// else if *address == addr_bls12_381_g1_add { Some(Bls12G1Add::execute) }
+		// else if *address == addr_bls12_381_g1_mul { Some(Bls12G1Mul::execute) }
+		// else if *address == addr_bls12_381_g1_multiexp { Some(Bls12G1MultiExp::execute) }
+		// else if *address == addr_bls12_381_g2_add { Some(Bls12G2Add::execute) }
+		// else if *address == addr_bls12_381_g2_mul { Some(Bls12G2Mul::execute) }
+		// else if *address == addr_bls12_381_g2_multiexp { Some(Bls12G2MultiExp::execute) }
+		// else if *address == addr_bls12_381_pairing { Some(Bls12Pairing::execute) }
+		// else if *address == addr_bls12_381_fp_to_g1 { Some(Bls12MapFpToG1::execute) }
+		// else if *address == addr_bls12_381_fp2_to_g2 { Some(Bls12MapFp2ToG2::execute) }
+		else { None };
+
+	exec
 }
 
 pub struct EthereumFindAuthor<F>(PhantomData<F>);
