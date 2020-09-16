@@ -897,33 +897,33 @@ fn get_precompiled_func_from_address(address: &H160) -> Option<PrecompiledCallab
 	// sha256
 	let addr_ripemd160 = H160::from_str("0000000000000000000000000000000000000003").expect("Invalid address at precompiles generation");
 	// ripemd160
-	let addr_modexp = H160::from_str("0000000000000000000000000000000000000004").expect("Invalid address at precompiles generation");
+	let _addr_modexp = H160::from_str("0000000000000000000000000000000000000004").expect("Invalid address at precompiles generation");
 	// modexp
-	let addr_alt_bn128_add = H160::from_str("0000000000000000000000000000000000000005").expect("Invalid address at precompiles generation");
+	let _addr_alt_bn128_add = H160::from_str("0000000000000000000000000000000000000005").expect("Invalid address at precompiles generation");
 	// alt_bn128_add
-	let addr_alt_bn128_mul = H160::from_str("0000000000000000000000000000000000000006").expect("Invalid address at precompiles generation");
+	let _addr_alt_bn128_mul = H160::from_str("0000000000000000000000000000000000000006").expect("Invalid address at precompiles generation");
 	// alt_bn128_mul
-	let addr_alt_bn128_pairing = H160::from_str("0000000000000000000000000000000000000007").expect("Invalid address at precompiles generation");
+	let _addr_alt_bn128_pairing = H160::from_str("0000000000000000000000000000000000000007").expect("Invalid address at precompiles generation");
 	// alt_bn128_pairing
-	let addr_blake2_f = H160::from_str("0000000000000000000000000000000000000008").expect("Invalid address at precompiles generation");
+	let _addr_blake2_f = H160::from_str("0000000000000000000000000000000000000008").expect("Invalid address at precompiles generation");
 	// blake2_f
-	let addr_bls12_381_g1_add = H160::from_str("0000000000000000000000000000000000000009").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_g1_add = H160::from_str("0000000000000000000000000000000000000009").expect("Invalid address at precompiles generation");
 	// bls12_381_g1_add
-	let addr_bls12_381_g1_mul = H160::from_str("000000000000000000000000000000000000000A").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_g1_mul = H160::from_str("000000000000000000000000000000000000000A").expect("Invalid address at precompiles generation");
 	// bls12_381_g1_mul
-	let addr_bls12_381_g1_multiexp = H160::from_str("000000000000000000000000000000000000000b").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_g1_multiexp = H160::from_str("000000000000000000000000000000000000000b").expect("Invalid address at precompiles generation");
 	// bls12_381_g1_multiexp
-	let addr_bls12_381_g2_add = H160::from_str("000000000000000000000000000000000000000c").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_g2_add = H160::from_str("000000000000000000000000000000000000000c").expect("Invalid address at precompiles generation");
 	// bls12_381_g2_add
-	let addr_bls12_381_g2_mul = H160::from_str("000000000000000000000000000000000000000d").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_g2_mul = H160::from_str("000000000000000000000000000000000000000d").expect("Invalid address at precompiles generation");
 	// bls12_381_g2_mul
-	let addr_bls12_381_g2_multiexp = H160::from_str("000000000000000000000000000000000000000e").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_g2_multiexp = H160::from_str("000000000000000000000000000000000000000e").expect("Invalid address at precompiles generation");
 	// bls12_381_g2_multiexp
-	let addr_bls12_381_pairing = H160::from_str("000000000000000000000000000000000000000f").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_pairing = H160::from_str("000000000000000000000000000000000000000f").expect("Invalid address at precompiles generation");
 	// bls12_381_pairing
-	let addr_bls12_381_fp_to_g1 = H160::from_str("0000000000000000000000000000000000000010").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_fp_to_g1 = H160::from_str("0000000000000000000000000000000000000010").expect("Invalid address at precompiles generation");
 	// bls12_381_fp_to_g1
-	let addr_bls12_381_fp2_to_g2 = H160::from_str("0000000000000000000000000000000000000011").expect("Invalid address at precompiles generation");
+	let _addr_bls12_381_fp2_to_g2 = H160::from_str("0000000000000000000000000000000000000011").expect("Invalid address at precompiles generation");
 
 	let exec: Option<PrecompiledCallable> = if *address == addr_ecrecover { Some(ECRecover::execute) }
 		else if *address == addr_sha256 { Some(Sha256::execute) }
