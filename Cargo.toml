@@ -10,7 +10,6 @@ members = [
 	"node/rpc-client",
 	"node/runtime",
 ]
-exclude = ["vendor"]
 
 [profile.release]
 # Edgeware runtime requires unwinding.

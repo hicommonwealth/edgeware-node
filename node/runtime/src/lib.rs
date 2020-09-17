@@ -71,9 +71,6 @@ pub use sp_version::RuntimeVersion;
 pub use pallet_session::{historical as pallet_session_historical};
 
 use pallet_contracts_rpc_runtime_api::ContractExecResult;
-use ethereum::{Block as EthereumBlock, Transaction as EthereumTransaction, Receipt as EthereumReceipt};
-use pallet_evm::{Account as EVMAccount, FeeCalculator, HashedAddressMapping, EnsureAddressTruncated};
-use frontier_rpc_primitives::{TransactionStatus};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -86,8 +83,6 @@ pub use pallet_balances::Call as BalancesCall;
 pub use frame_system::Call as SystemCall;
 #[cfg(any(feature = "std", test))]
 pub use pallet_staking::StakerStatus;
-
-pub use pallet_evm::precompiles::{Sha256, Ripemd160, ECRecover};
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
 use impls::{CurrencyToVoteHandler, Author};
@@ -520,6 +515,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 	type MotionDuration = CouncilMotionDuration;
 	type MaxProposals = CouncilMaxProposals;
 	type WeightInfo = ();
+	type MaxMembers = CouncilMaxMembers;
 }
 
 parameter_types! {
@@ -529,10 +525,10 @@ parameter_types! {
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
+	pub const CouncilMaxMembers: u32 = 100;
 }
 
-// Make sure that there are no more than `MAX_MEMBERS` members elected via phragmen.
-const_assert!(DesiredMembers::get() <= pallet_collective::MAX_MEMBERS);
+const_assert!(DesiredMembers::get() <= CouncilMaxMembers::get());
 
 impl pallet_elections_phragmen::Trait for Runtime {
 	type ModuleId = ElectionsPhragmenModuleId;
@@ -756,7 +752,6 @@ impl pallet_recovery::Trait for Runtime {
 
 parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
-	pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
 }
 
 impl pallet_vesting::Trait for Runtime {
@@ -796,49 +791,6 @@ impl pallet_contracts::Trait for Runtime {
 	type MaxDepth = pallet_contracts::DefaultMaxDepth;
 	type MaxValueSize = pallet_contracts::DefaultMaxValueSize;
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
-}
-
-// EVM structs
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
-
-parameter_types! {
-	pub const ChainId: u64 = 42;
-}
-
-impl pallet_evm::Trait for Runtime {
-	type FeeCalculator = FixedGasPrice;
-	type CallOrigin = EnsureAddressTruncated;
-	type WithdrawOrigin = EnsureAddressTruncated;
-	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
-	type Currency = Balances;
-	type Event = Event;
-	type Precompiles = (Sha256, Ripemd160, ECRecover);
-	type ChainId = ChainId;
-}
-
-pub struct EthereumFindAuthor<F>(PhantomData<F>);
-impl<F: FindAuthor<u32>> FindAuthor<H160> for EthereumFindAuthor<F>
-{
-	fn find_author<'a, I>(digests: I) -> Option<H160> where
-		I: 'a + IntoIterator<Item=(ConsensusEngineId, &'a [u8])>
-	{
-		if let Some(author_index) = F::find_author(digests) {
-			let authority_id = Aura::authorities()[author_index as usize].clone();
-			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]));
-		}
-		None
-	}
-}
-
-impl ethereum::Trait for Runtime {
-	type Event = Event;
-	type FindAuthor = EthereumFindAuthor<Aura>;
 }
 
 impl signaling::Trait for Runtime {
@@ -892,8 +844,6 @@ construct_runtime!(
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 
 		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
-		Ethereum: ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
-		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 
 		Historical: pallet_session_historical::{Module},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
@@ -904,23 +854,6 @@ construct_runtime!(
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );
-
-
-pub struct TransactionConverter;
-
-impl frontier_rpc_primitives::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
-	fn convert_transaction(&self, transaction: ethereum::Transaction) -> UncheckedExtrinsic {
-		UncheckedExtrinsic::new_unsigned(ethereum::Call::<Runtime>::transact(transaction).into())
-	}
-}
-
-impl frontier_rpc_primitives::ConvertTransaction<sp_runtime::OpaqueExtrinsic> for TransactionConverter {
-	fn convert_transaction(&self, transaction: ethereum::Transaction) -> sp_runtime::OpaqueExtrinsic {
-		let extrinsic = UncheckedExtrinsic::new_unsigned(ethereum::Call::<Runtime>::transact(transaction).into());
-		let encoded = extrinsic.encode();
-		sp_runtime::OpaqueExtrinsic::decode(&mut &encoded[..]).expect("Encoded extrinsic is always valid")
-	}
-}
 
 /// The address format for describing accounts.
 pub type Address = <Indices as StaticLookup>::Source;
@@ -1125,80 +1058,6 @@ impl_runtime_apis! {
 			address: AccountId,
 		) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
 			Contracts::rent_projection(address)
-		}
-	}
-
-	impl frontier_rpc_primitives::EthereumRuntimeRPCApi<Block> for Runtime {
-		fn chain_id() -> u64 {
-			ChainId::get()
-		}
-
-		fn account_basic(address: H160) -> EVMAccount {
-			pallet_evm::Module::<Runtime>::account_basic(&address)
-		}
-
-		fn gas_price() -> U256 {
-			FixedGasPrice::min_gas_price()
-		}
-
-		fn account_code_at(address: H160) -> Vec<u8> {
-			pallet_evm::Module::<Runtime>::account_codes(address)
-		}
-
-		fn author() -> H160 {
-			<ethereum::Module<Runtime>>::find_author()
-		}
-
-		fn storage_at(address: H160, index: U256) -> H256 {
-			let mut tmp = [0u8; 32];
-			index.to_big_endian(&mut tmp);
-			pallet_evm::Module::<Runtime>::account_storages(address, H256::from_slice(&tmp[..]))
-		}
-
-		fn call(
-			from: H160,
-			data: Vec<u8>,
-			value: U256,
-			gas_limit: U256,
-			gas_price: Option<U256>,
-			nonce: Option<U256>,
-			action: ethereum::TransactionAction,
-		) -> Option<(Vec<u8>, U256)> {
-			match action {
-				ethereum::TransactionAction::Call(to) =>
-					pallet_evm::Module::<Runtime>::execute_call(
-						from,
-						to,
-						data,
-						value,
-						gas_limit.low_u32(),
-						gas_price,
-						nonce,
-						false,
-					).ok().map(|(_, ret, gas)| (ret, gas)),
-				ethereum::TransactionAction::Create =>
-					pallet_evm::Module::<Runtime>::execute_create(
-						from,
-						data,
-						value,
-						gas_limit.low_u32(),
-						gas_price,
-						nonce,
-						false,
-					).ok().map(|(_, _, gas)| (vec![], gas)),
-			}
-		}
-
-		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
-			Ethereum::current_transaction_statuses()
-		}
-
-		fn current_block() -> Option<ethereum::Block> {
-			Ethereum::current_block()
-		}
-
-		fn current_receipts() -> Option<Vec<ethereum::Receipt>> {
-			Ethereum::current_receipts()
 		}
 	}
 }

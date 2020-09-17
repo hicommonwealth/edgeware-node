@@ -31,10 +31,6 @@ pub struct Cli {
 /// Possible subcommands of the main binary.
 #[derive(Debug, StructOpt)]
 pub enum Subcommand {
-	/// A set of base subcommands handled by `sc_cli`.
-	#[structopt(flatten)]
-	Base(sc_cli::Subcommand),
-
 	/// The custom inspect subcommmand for decoding blocks and extrinsics.
 	#[structopt(
 		name = "inspect",

@@ -22,7 +22,7 @@ use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
 	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig
+	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap,
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -160,18 +160,6 @@ pub fn testnet_genesis(
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
 ) -> GenesisConfig {
-	let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
-	let mut evm_accounts = BTreeMap::new();
-	evm_accounts.insert(
-		alice_evm_account_id,
-		pallet_evm::GenesisAccount {
-			nonce: 0.into(),
-			balance: U256::from(123456_123_000_000_000_000_000u128),
-			storage: BTreeMap::new(),
-			code: vec![],
-		},
-	);
-
 	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
@@ -252,9 +240,7 @@ pub fn testnet_genesis(
 		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(SudoConfig { key: _root_key }),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(EVMConfig { accounts: evm_accounts }),
 		pallet_contracts: Some(Default::default()),
-		ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,
@@ -515,9 +501,7 @@ pub fn mainnet_genesis(
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		}),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(Default::default()),
 		pallet_contracts: Some(Default::default()),
-		ethereum: Some(Default::default()),
 		signaling: Some(SignalingConfig {
 			voting_length: 7 * DAYS,
 			proposal_creation_bond: 1 * DOLLARS,

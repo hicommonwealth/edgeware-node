@@ -101,14 +101,12 @@ pub fn create_full<C, P, SC, BE>(
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-	C::Api: frontier_rpc_primitives::EthereumRuntimeRPCApi<Block>,
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
 	P: TransactionPool<Block=Block> + 'static,
 	SC: SelectChain<Block> +'static,
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use frontier_rpc::{EthApi, EthApiServer};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -116,10 +114,9 @@ pub fn create_full<C, P, SC, BE>(
 	let FullDeps {
 		client,
 		pool,
-		select_chain,
+		select_chain: _,
 		deny_unsafe,
-		is_authority,
-		// command_sink,
+		is_authority: _,
 		grandpa
 	} = deps;
 	let GrandpaDeps {
@@ -140,15 +137,6 @@ pub fn create_full<C, P, SC, BE>(
 	);
 	io.extend_with(
 		TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone()))
-	);
-	io.extend_with(
-		EthApiServer::to_delegate(EthApi::new(
-			client.clone(),
-			select_chain,
-			pool.clone(),
-			edgeware_runtime::TransactionConverter,
-			is_authority,
-		))
 	);
 
 	io.extend_with(
