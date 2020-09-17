@@ -1297,7 +1297,7 @@ impl_runtime_apis! {
 						data,
 						value,
 						gas_limit.low_u32(),
-						gas_price.unwrap(),
+						gas_price.unwrap_or(U256::from(150000000)),
 						nonce,
 						false,
 					)
@@ -1309,7 +1309,7 @@ impl_runtime_apis! {
 						data,
 						value,
 						gas_limit.low_u32(),
-						gas_price.unwrap(),
+						gas_price.unwrap_or(U256::from(150000000)),
 						nonce,
 						false,
 					)
