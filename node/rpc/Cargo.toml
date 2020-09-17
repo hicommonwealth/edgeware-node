@@ -8,20 +8,22 @@ edition = "2018"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
-jsonrpc-core = "14.0.3"
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-contracts-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-pallet-transaction-payment-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-substrate-frame-rpc-system = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-transaction-pool = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-keystore = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-consensus = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-finality-grandpa = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-finality-grandpa-rpc = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-rpc-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git" }
+jsonrpc-core = "14.2.0"
+jsonrpc-pubsub = "14.2.0"
+sc-client-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-keystore = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-consensus = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-finality-grandpa-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-rpc-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

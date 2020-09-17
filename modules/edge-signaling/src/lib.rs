@@ -23,7 +23,7 @@ mod tests;
 use frame_support::traits::{Currency, Get, ReservableCurrency,};
 use sp_std::prelude::*;
 
-use frame_system::{self as system, ensure_signed};
+use frame_system::{ensure_signed};
 use frame_support::{dispatch::DispatchResult, weights::Weight};
 use codec::{Decode, Encode};
 

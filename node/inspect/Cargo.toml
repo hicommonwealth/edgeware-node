@@ -11,10 +11,10 @@ targets = ["x86_64-unknown-linux-gnu"]
 codec = { package = "parity-scale-codec", version = "1.3.0" }
 derive_more = "0.99"
 log = "0.4.8"
-sc-cli = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-client-api = { git = "https://github.com/hicommonwealth/substrate.git" }
-sc-service = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git" }
-sp-blockchain = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git" }
+sc-cli = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-client-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-service = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 structopt = "0.3.8"
