@@ -1,0 +1,17 @@
+version: '3.6'
+services: 
+  edgeware:
+    container_name: 'edgeware_local_node'
+    image: cwl/edgeware
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100M"
+        max-file: "2"
+    volumes:
+      - ./data_edgeware:/data/chains
+    ports:
+      - "127.0.0.1:9933:9933"
+      - "127.0.0.1:9944:9944"
+      - "127.0.0.1:30333:30333"
+    command: ['--dev']

@@ -73,3 +73,18 @@ To start up the Edgeware node and connect to the Beresheet testnet, run:
 ```
 ./target/release/edgeware --chain=beresheet --name <INSERT_NAME>
 ```
+
+### Docker
+
+When you are using Remote Cargo, you can use
+```
+docker build -t cwl/edgeware -f RemoteCargo.dockerfile .
+```
+then you can run built image with
+```
+docker run -it cwl/edgeware --dev
+```
+also you can use docker-compose to start image
+```
+docker-compose up edgeware
+```
