@@ -42,6 +42,8 @@ parking_lot = "0.10.0"
 hex = "0.3.2"
 serde_json = "1.0"
 
+ansi_term = "0.12.1"
+
 # primitives
 sp-authority-discovery = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
@@ -54,7 +56,13 @@ sp-inherents = { git = "https://github.com/paritytech/substrate.git", branch = "
 sp-keyring = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 sp-io = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 sp-consensus = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-api = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
+sp-trie = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-offchain = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sp-session = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
 # client dependencies
 sc-client-api = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
@@ -72,7 +80,8 @@ sc-service = { git = "https://github.com/paritytech/substrate.git", branch = "ro
 sc-tracing = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 sc-telemetry = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
 sc-authority-discovery = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
-
+sc-executor = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
+sc-informant = { git = "https://github.com/paritytech/substrate", branch = "rococo-branch" }
 
 # frame dependencies
 pallet-indices = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch" }
@@ -92,6 +101,20 @@ edgeware-runtime = { path = "../runtime" }
 edgeware-rpc = { path = "../rpc" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
+
+# Cumulus dependencies
+cumulus-consensus = { git = "https://github.com/paritytech/cumulus" }
+cumulus-collator = { git = "https://github.com/paritytech/cumulus" }
+cumulus-network = { git = "https://github.com/paritytech/cumulus" }
+cumulus-service = { git = "https://github.com/paritytech/cumulus" }
+cumulus-primitives = { git = "https://github.com/paritytech/cumulus" }
+
+# Polkadot dependencies
+polkadot-primitives = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch" }
+polkadot-collator = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch" }
+polkadot-service = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch" }
+polkadot-cli = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch" }
+polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch" }
 
 # CLI-specific dependencies
 edgeware-inspect = { optional = true, path = "../inspect" }
@@ -122,6 +145,7 @@ platforms = "0.2.1"
 
 [build-dependencies]
 sc-cli = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch", optional = true }
+polkadot-cli = { git = "https://github.com/paritytech/polkadot", branch = "rococo-branch", optional = true }
 substrate-build-script-utils = { git = "https://github.com/paritytech/substrate.git", branch = "rococo-branch", optional = true }
 structopt = { version = "0.3.8", optional = true }
 edgeware-inspect = { optional = true, path = "../inspect" }
@@ -140,6 +164,7 @@ cli = [
 	"edgeware-executor/wasmi-errno",
 	"sc-cli",
 	"frame-benchmarking-cli",
+	"polkadot-cli",
 	"sc-service/db",
 	"structopt",
 	"substrate-build-script-utils",
