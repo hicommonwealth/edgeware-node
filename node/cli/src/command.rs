@@ -79,6 +79,7 @@ impl SubstrateCli for Cli {
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
 			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
 			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
+			"rococo" => Box::new(chain_spec::edgeware_parachain()),
 			path => Box::new(chain_spec::ChainSpec::from_json_file(
 				std::path::PathBuf::from(path),
 			)?),

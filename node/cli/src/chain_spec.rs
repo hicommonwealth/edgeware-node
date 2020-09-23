@@ -99,6 +99,14 @@ impl Extensions {
 /// Specialized `ChainSpec`.
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
+// Rococo config
+pub fn edgeware_parachain() -> ChainSpec {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/rococo-local.json")[..]) {
+		Ok(spec) => spec,
+		Err(e) => panic!(e),
+	}
+}
+
 /// Mainnet configuration
 pub fn edgeware_mainnet_official() -> ChainSpec {
 	match ChainSpec::from_json_bytes(&include_bytes!("../res/mainnet.chainspec.json")[..]) {
@@ -400,7 +408,7 @@ pub fn development_config() -> ChainSpec {
 		properties,
 		Extensions {
 			relay_chain: "rococo-local".into(),
-			para_id: 5000u32.into(),
+			para_id: 200u32.into(),
 		},
 	)
 }
