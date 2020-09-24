@@ -29,20 +29,17 @@
 
 #![warn(missing_docs)]
 
-use std::{sync::Arc, fmt};
+use std::{sync::Arc};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-use sc_consensus_epochs::SharedEpochChanges;
 use sc_finality_grandpa::{
 	SharedVoterState, SharedAuthoritySet, FinalityProofProvider, GrandpaJustificationStream
 };
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
-use sc_keystore::KeyStorePtr;
 pub use sc_rpc_api::DenyUnsafe;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderMetadata, HeaderBackend};
 use sp_consensus::SelectChain;
-use sp_consensus_babe::BabeApi;
 use sc_rpc::SubscriptionTaskExecutor;
 use sp_transaction_pool::TransactionPool;
 
@@ -114,7 +111,7 @@ pub fn create_full<C, P, SC, B>(
 	let FullDeps {
 		client,
 		pool,
-		select_chain,
+		select_chain: _,
 		deny_unsafe,
 		grandpa,
 	} = deps;

@@ -23,6 +23,7 @@
 use frame_support::weights::{Weight, constants::RocksDbWeight as DbWeight};
 
 pub struct WeightInfo;
+
 impl pallet_utility::WeightInfo for WeightInfo {
 	fn batch(c: u32, ) -> Weight {
 		(16461000 as Weight)

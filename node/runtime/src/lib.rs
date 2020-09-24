@@ -20,7 +20,7 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
-use sp_std::{prelude::*, marker::PhantomData};
+use sp_std::{prelude::*};
 
 pub use edgeware_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
@@ -31,8 +31,7 @@ use frame_support::{
 		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 	},
-	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier, FindAuthor},
-	ConsensusEngineId,
+	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier},
 };
 
 use frame_system::{EnsureRoot, EnsureOneOf};
@@ -56,7 +55,7 @@ use sp_runtime::{
 	Permill, Perbill, Perquintill, Percent, ApplyExtrinsicResult,
 	impl_opaque_keys, generic, create_runtime_str, ModuleId, FixedPointNumber,
 };
-use sp_application_crypto::Public;
+
 pub use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
@@ -195,7 +194,7 @@ impl frame_system::Trait for Runtime {
 impl pallet_utility::Trait for Runtime {
 	type Event = Event;
 	type Call = Call;
-	type WeightInfo = ();
+	type WeightInfo = weights::pallet_utility::WeightInfo;
 }
 
 parameter_types! {
@@ -915,8 +914,41 @@ pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signatu
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
+/// Custom runtime upgrade to execute the balances migration before the account migration.
+mod custom_migration {
+	use super::*;
+	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
+	use pallet_identity::IdentityInfo;
+
+	pub struct Upgrade;
+	impl OnRuntimeUpgrade for Upgrade {
+		fn on_runtime_upgrade() -> Weight {
+			let mut weight = 0;
+			weight
+		}
+	}
+
+	fn identity_migration() {
+		sp_runtime::print("🕊️  Migrating Identities...");
+		let mut count = 0u32;
+		if let Ok(identities) = Vec::<IdentityInfo>::decode(&mut &include_bytes!("identities.scale")[..]) {
+			for iden in &identities {
+				// TODO: Check if identity exists in storage, else migrate
+				if true {
+					count += 1;
+					if count % 1000 == 0 {
+						sp_runtime::print(count);
+					}
+				}
+			}
+		}
+		sp_runtime::print(count);
+		sp_runtime::print("🕊️  Done Identities.");
+		T::MaximumBlockWeight::get()
+	}
+}
 /// Executive: handles dispatch to the various modules.
-pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules>;
+pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules, custom_migration::Upgrade>;
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
