@@ -17,6 +17,7 @@ frame-benchmarking = { git = "https://github.com/hicommonwealth/substrate.git", 
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
+edgeware-runtime-interface = { path = "../runtime-interface" }
 
 [dev-dependencies]
 test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }

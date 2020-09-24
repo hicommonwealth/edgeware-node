@@ -19,12 +19,12 @@
 
 pub use sc_executor::NativeExecutor;
 use sc_executor::native_executor_instance;
-
+use edgeware_runtime_interface;
 // Declare an instance of the native executor named `Executor`. Include the wasm binary as the
 // equivalent wasm code.
 native_executor_instance!(
 	pub Executor,
 	edgeware_runtime::api::dispatch,
 	edgeware_runtime::native_version,
-	frame_benchmarking::benchmarking::HostFunctions,
+	(frame_benchmarking::benchmarking::HostFunctions, edgeware_runtime_interface::storage::HostFunctions),
 );

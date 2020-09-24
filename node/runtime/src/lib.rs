@@ -917,7 +917,7 @@ pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExt
 /// Custom runtime upgrade to execute the balances migration before the account migration.
 mod custom_migration {
 	use super::*;
-	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
+	use frame_support::{traits::{OnRuntimeUpgrade, Get}, weights::Weight};
 	use pallet_identity::IdentityInfo;
 
 	pub struct Upgrade;
@@ -928,7 +928,7 @@ mod custom_migration {
 		}
 	}
 
-	fn identity_migration() {
+	fn identity_migration<T: frame_system::Trait>() -> Weight{
 		sp_runtime::print("🕊️  Migrating Identities...");
 		let mut count = 0u32;
 		if let Ok(identities) = Vec::<IdentityInfo>::decode(&mut &include_bytes!("identities.scale")[..]) {

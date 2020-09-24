@@ -1418,6 +1418,7 @@ dependencies = [
  "criterion",
  "edgeware-primitives",
  "edgeware-runtime",
+ "edgeware-runtime-interface",
  "edgeware-testing",
  "frame-benchmarking",
  "frame-support",
@@ -1577,6 +1578,17 @@ dependencies = [
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder-runner",
+]
+
+[[package]]
+name = "edgeware-runtime-interface"
+version = "3.0.0"
+dependencies = [
+ "edgeware-primitives",
+ "parity-scale-codec",
+ "sp-runtime",
+ "sp-runtime-interface",
+ "sp-runtime-interface-proc-macro",
 ]
 
 [[package]]
