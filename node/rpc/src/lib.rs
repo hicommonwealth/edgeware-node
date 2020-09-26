@@ -40,7 +40,7 @@ use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 pub use sc_rpc_api::DenyUnsafe;
 use sp_runtime::traits::BlakeTwo256;
-use sc_client_api::backend::{StorageProvider, Backend, StateBackend};
+use sc_client_api::backend::{StorageProvider, Backend, StateBackend, AuxStore};
 
 use sp_block_builder::BlockBuilder;
 
@@ -94,21 +94,21 @@ pub fn create_full<C, P, SC, BE>(
 ) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata> where
 	BE: Backend<Block> + 'static,
 	BE::State: StateBackend<BlakeTwo256>,
-	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE>,
+	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,	
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-	C::Api: frontier_rpc_primitives::EthereumRuntimeApi<Block>,
+	C::Api: frontier_rpc_primitives::EthereumRuntimeRPCApi<Block>,
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
 	P: TransactionPool<Block=Block> + 'static,
 	SC: SelectChain<Block> +'static,
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use frontier_rpc::{EthApi, EthApiServer};
+	use frontier_rpc::{EthApi, EthApiServer, NetApi, NetApiServer};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -144,10 +144,16 @@ pub fn create_full<C, P, SC, BE>(
 	io.extend_with(
 		EthApiServer::to_delegate(EthApi::new(
 			client.clone(),
-			select_chain,
+			select_chain.clone(),
 			pool.clone(),
 			edgeware_runtime::TransactionConverter,
 			is_authority,
+		))
+	);
+	io.extend_with(
+		NetApiServer::to_delegate(NetApi::new(
+			client.clone(),
+			select_chain.clone(),
 		))
 	);
 

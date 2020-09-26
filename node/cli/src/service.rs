@@ -24,6 +24,7 @@ use sc_consensus_aura;
 use sc_finality_grandpa::{
 	self, FinalityProofProvider as GrandpaFinalityProofProvider,
 };
+use frontier_consensus::FrontierBlockImport;
 use edgeware_primitives::Block;
 use edgeware_runtime::RuntimeApi;
 use sc_service::{
@@ -56,7 +57,16 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 			jsonrpc_pubsub::manager::SubscriptionManager
 		) -> edgeware_rpc::IoHandler,
 		(
-			sc_consensus_aura::AuraBlockImport<Block, FullClient, FullGrandpaBlockImport, sp_consensus_aura::ed25519::AuthorityPair>,
+			sc_consensus_aura::AuraBlockImport<
+				Block,
+				FullClient,
+				FrontierBlockImport<
+					Block,
+					FullGrandpaBlockImport,
+					FullClient
+				>,
+				sp_consensus_aura::ed25519::AuthorityPair
+			>,
 			sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 		),
 		sc_finality_grandpa::SharedVoterState,
@@ -78,11 +88,16 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 	let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
 		client.clone(), &(client.clone() as Arc<_>), select_chain.clone(),
 	)?;
-	let justification_import = grandpa_block_import.clone();
+
+	let frontier_block_import = FrontierBlockImport::new(
+		grandpa_block_import.clone(),
+		client.clone(),
+		true
+	);
 
 	let aura_block_import =
 		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
-			justification_import.clone(),
+			frontier_block_import,
 			client.clone()
 		);
 
@@ -148,7 +163,16 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 pub fn new_full_base(
 	config: Configuration,
 	with_startup_data: impl FnOnce(
-		&sc_consensus_aura::AuraBlockImport<Block, FullClient, FullGrandpaBlockImport, sp_consensus_aura::ed25519::AuthorityPair>,
+		&sc_consensus_aura::AuraBlockImport<
+			Block,
+			FullClient,
+			FrontierBlockImport<
+				Block,
+				FullGrandpaBlockImport,
+				FullClient
+			>,
+			sp_consensus_aura::ed25519::AuthorityPair
+		>,
 		&sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 	)
 ) -> Result<(

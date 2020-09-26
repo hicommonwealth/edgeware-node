@@ -71,8 +71,9 @@ pub use sp_version::RuntimeVersion;
 pub use pallet_session::{historical as pallet_session_historical};
 
 use pallet_contracts_rpc_runtime_api::ContractExecResult;
-use ethereum::{Block as EthereumBlock, Transaction as EthereumTransaction, Receipt as EthereumReceipt};
+use pallet_ethereum::{Block as EthereumBlock, Transaction as EthereumTransaction, Receipt as EthereumReceipt};
 use pallet_evm::{Account as EVMAccount, FeeCalculator, HashedAddressMapping, EnsureAddressTruncated};
+use evm::Config;
 use frontier_rpc_primitives::{TransactionStatus};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
@@ -86,7 +87,7 @@ pub use pallet_balances::Call as BalancesCall;
 pub use frame_system::Call as SystemCall;
 #[cfg(any(feature = "std", test))]
 pub use pallet_staking::StakerStatus;
-
+/// Public precompiles from evm module
 pub use pallet_evm::precompiles::{Sha256, Ripemd160, ECRecover};
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
@@ -519,6 +520,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 	type MotionDuration = CouncilMotionDuration;
 	type MaxProposals = CouncilMaxProposals;
 	type WeightInfo = ();
+	type MaxMembers = CouncilMaxMembers;
 }
 
 parameter_types! {
@@ -528,10 +530,10 @@ parameter_types! {
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
+	pub const CouncilMaxMembers: u32 = 100;
 }
 
-// Make sure that there are no more than `MAX_MEMBERS` members elected via phragmen.
-const_assert!(DesiredMembers::get() <= pallet_collective::MAX_MEMBERS);
+const_assert!(DesiredMembers::get() <= CouncilMaxMembers::get());
 
 impl pallet_elections_phragmen::Trait for Runtime {
 	type ModuleId = ElectionsPhragmenModuleId;
@@ -810,6 +812,44 @@ parameter_types! {
 	pub const ChainId: u64 = 42;
 }
 
+/// Clone of Istanbul config with `create_contract_limit` raised.
+static EVM_CONFIG: Config = Config {
+	gas_ext_code: 700,
+	gas_ext_code_hash: 700,
+	gas_balance: 700,
+	gas_sload: 800,
+	gas_sstore_set: 20000,
+	gas_sstore_reset: 5000,
+	refund_sstore_clears: 15000,
+	gas_suicide: 5000,
+	gas_suicide_new_account: 25000,
+	gas_call: 700,
+	gas_expbyte: 50,
+	gas_transaction_create: 53000,
+	gas_transaction_call: 21000,
+	gas_transaction_zero_data: 4,
+	gas_transaction_non_zero_data: 16,
+	sstore_gas_metering: true,
+	sstore_revert_under_stipend: true,
+	err_on_call_with_more_gas: false,
+	empty_considered_exists: false,
+	create_increase_nonce: true,
+	call_l64_after_gas: true,
+	stack_limit: 1024,
+	memory_limit: usize::max_value(),
+	call_stack_limit: 1024,
+	create_contract_limit: Some(0x6000000),
+	call_stipend: 2300,
+	has_delegate_call: true,
+	has_create2: true,
+	has_revert: true,
+	has_return_data: true,
+	has_bitwise_shifting: true,
+	has_chain_id: true,
+	has_self_balance: true,
+	has_ext_code_hash: true,
+};
+
 impl pallet_evm::Trait for Runtime {
 	type FeeCalculator = FixedGasPrice;
 	type CallOrigin = EnsureAddressTruncated;
@@ -817,8 +857,94 @@ impl pallet_evm::Trait for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type Currency = Balances;
 	type Event = Event;
-	type Precompiles = (Sha256, Ripemd160, ECRecover);
+	type Precompiles = EdgewarePrecompiles;
 	type ChainId = ChainId;
+
+	/// EVM config used in the module.
+	fn config() -> &'static Config {
+		&EVM_CONFIG
+	}
+}
+
+pub struct EdgewarePrecompiles;
+
+type PrecompiledCallable = fn(&[u8], Option<usize>)
+	-> core::result::Result<(pallet_evm::ExitSucceed, Vec<u8>, usize), pallet_evm::ExitError>;
+
+impl pallet_evm::Precompiles for EdgewarePrecompiles {
+	fn execute(
+		address: H160,
+		input: &[u8],
+		target_gas: Option<usize>
+	) -> Option<core::result::Result<(pallet_evm::ExitSucceed, Vec<u8>, usize), pallet_evm::ExitError>> {
+		match get_precompiled_func_from_address(&address) {
+		   Some(func) => return Some(func(input, target_gas)),
+		   _ => {},
+		};
+
+		None
+	}
+}
+
+fn get_precompiled_func_from_address(address: &H160) -> Option<PrecompiledCallable> {
+	use core::str::FromStr;
+	use pallet_evm::Precompile;
+
+	// identity
+	let addr_ecrecover = H160::from_str("0000000000000000000000000000000000000001").expect("Invalid address at precompiles generation");
+	// ecrecover
+	let addr_sha256 = H160::from_str("0000000000000000000000000000000000000002").expect("Invalid address at precompiles generation");
+	// sha256
+	let addr_ripemd160 = H160::from_str("0000000000000000000000000000000000000003").expect("Invalid address at precompiles generation");
+	// ripemd160
+	let _addr_modexp = H160::from_str("0000000000000000000000000000000000000004").expect("Invalid address at precompiles generation");
+	// modexp
+	let _addr_alt_bn128_add = H160::from_str("0000000000000000000000000000000000000005").expect("Invalid address at precompiles generation");
+	// alt_bn128_add
+	let _addr_alt_bn128_mul = H160::from_str("0000000000000000000000000000000000000006").expect("Invalid address at precompiles generation");
+	// alt_bn128_mul
+	let _addr_alt_bn128_pairing = H160::from_str("0000000000000000000000000000000000000007").expect("Invalid address at precompiles generation");
+	// alt_bn128_pairing
+	let _addr_blake2_f = H160::from_str("0000000000000000000000000000000000000008").expect("Invalid address at precompiles generation");
+	// blake2_f
+	let _addr_bls12_381_g1_add = H160::from_str("0000000000000000000000000000000000000009").expect("Invalid address at precompiles generation");
+	// bls12_381_g1_add
+	let _addr_bls12_381_g1_mul = H160::from_str("000000000000000000000000000000000000000A").expect("Invalid address at precompiles generation");
+	// bls12_381_g1_mul
+	let _addr_bls12_381_g1_multiexp = H160::from_str("000000000000000000000000000000000000000b").expect("Invalid address at precompiles generation");
+	// bls12_381_g1_multiexp
+	let _addr_bls12_381_g2_add = H160::from_str("000000000000000000000000000000000000000c").expect("Invalid address at precompiles generation");
+	// bls12_381_g2_add
+	let _addr_bls12_381_g2_mul = H160::from_str("000000000000000000000000000000000000000d").expect("Invalid address at precompiles generation");
+	// bls12_381_g2_mul
+	let _addr_bls12_381_g2_multiexp = H160::from_str("000000000000000000000000000000000000000e").expect("Invalid address at precompiles generation");
+	// bls12_381_g2_multiexp
+	let _addr_bls12_381_pairing = H160::from_str("000000000000000000000000000000000000000f").expect("Invalid address at precompiles generation");
+	// bls12_381_pairing
+	let _addr_bls12_381_fp_to_g1 = H160::from_str("0000000000000000000000000000000000000010").expect("Invalid address at precompiles generation");
+	// bls12_381_fp_to_g1
+	let _addr_bls12_381_fp2_to_g2 = H160::from_str("0000000000000000000000000000000000000011").expect("Invalid address at precompiles generation");
+
+	let exec: Option<PrecompiledCallable> = if *address == addr_ecrecover { Some(ECRecover::execute) }
+		else if *address == addr_sha256 { Some(Sha256::execute) }
+		else if *address == addr_ripemd160 { Some(Ripemd160::execute) }
+		// else if *address == addr_modexp { Some(Modexp::execute) }
+		// else if *address == addr_alt_bn128_add { Some(Bn128Add::execute) }
+		// else if *address == addr_alt_bn128_mul { Some(Bn128Mul::execute) }
+		// else if *address == addr_alt_bn128_pairing { Some(Bn128Pairing::execute) }
+		// else if *address == addr_blake2_f { Some(Blake2F::execute) }
+		// else if *address == addr_bls12_381_g1_add { Some(Bls12G1Add::execute) }
+		// else if *address == addr_bls12_381_g1_mul { Some(Bls12G1Mul::execute) }
+		// else if *address == addr_bls12_381_g1_multiexp { Some(Bls12G1MultiExp::execute) }
+		// else if *address == addr_bls12_381_g2_add { Some(Bls12G2Add::execute) }
+		// else if *address == addr_bls12_381_g2_mul { Some(Bls12G2Mul::execute) }
+		// else if *address == addr_bls12_381_g2_multiexp { Some(Bls12G2MultiExp::execute) }
+		// else if *address == addr_bls12_381_pairing { Some(Bls12Pairing::execute) }
+		// else if *address == addr_bls12_381_fp_to_g1 { Some(Bls12MapFpToG1::execute) }
+		// else if *address == addr_bls12_381_fp2_to_g2 { Some(Bls12MapFp2ToG2::execute) }
+		else { None };
+
+	exec
 }
 
 pub struct EthereumFindAuthor<F>(PhantomData<F>);
@@ -835,7 +961,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for EthereumFindAuthor<F>
 	}
 }
 
-impl ethereum::Trait for Runtime {
+impl pallet_ethereum::Trait for Runtime {
 	type Event = Event;
 	type FindAuthor = EthereumFindAuthor<Aura>;
 }
@@ -891,7 +1017,7 @@ construct_runtime!(
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 
 		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
-		Ethereum: ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
+		Ethereum: pallet_ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 
 		Historical: pallet_session_historical::{Module},
@@ -908,14 +1034,14 @@ construct_runtime!(
 pub struct TransactionConverter;
 
 impl frontier_rpc_primitives::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
-	fn convert_transaction(&self, transaction: ethereum::Transaction) -> UncheckedExtrinsic {
-		UncheckedExtrinsic::new_unsigned(ethereum::Call::<Runtime>::transact(transaction).into())
+	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> UncheckedExtrinsic {
+		UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact(transaction).into())
 	}
 }
 
 impl frontier_rpc_primitives::ConvertTransaction<sp_runtime::OpaqueExtrinsic> for TransactionConverter {
-	fn convert_transaction(&self, transaction: ethereum::Transaction) -> sp_runtime::OpaqueExtrinsic {
-		let extrinsic = UncheckedExtrinsic::new_unsigned(ethereum::Call::<Runtime>::transact(transaction).into());
+	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> sp_runtime::OpaqueExtrinsic {
+		let extrinsic = UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact(transaction).into());
 		let encoded = extrinsic.encode();
 		sp_runtime::OpaqueExtrinsic::decode(&mut &encoded[..]).expect("Encoded extrinsic is always valid")
 	}
@@ -1127,13 +1253,13 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl frontier_rpc_primitives::EthereumRuntimeApi<Block> for Runtime {
+	impl frontier_rpc_primitives::EthereumRuntimeRPCApi<Block> for Runtime {
 		fn chain_id() -> u64 {
 			ChainId::get()
 		}
 
 		fn account_basic(address: H160) -> EVMAccount {
-			pallet_evm::Module::<Runtime>::account_basic(&address)
+			EVM::account_basic(&address)
 		}
 
 		fn gas_price() -> U256 {
@@ -1141,17 +1267,17 @@ impl_runtime_apis! {
 		}
 
 		fn account_code_at(address: H160) -> Vec<u8> {
-			pallet_evm::Module::<Runtime>::account_codes(address)
+			EVM::account_codes(address)
 		}
 
 		fn author() -> H160 {
-			<ethereum::Module<Runtime>>::find_author()
+			<pallet_ethereum::Module<Runtime>>::find_author()
 		}
 
 		fn storage_at(address: H160, index: U256) -> H256 {
 			let mut tmp = [0u8; 32];
 			index.to_big_endian(&mut tmp);
-			pallet_evm::Module::<Runtime>::account_storages(address, H256::from_slice(&tmp[..]))
+			EVM::account_storages(address, H256::from_slice(&tmp[..]))
 		}
 
 		fn call(
@@ -1161,130 +1287,47 @@ impl_runtime_apis! {
 			gas_limit: U256,
 			gas_price: Option<U256>,
 			nonce: Option<U256>,
-			action: ethereum::TransactionAction,
-		) -> Option<(Vec<u8>, U256)> {
+			action: pallet_ethereum::TransactionAction,
+		) -> Result<(Vec<u8>, U256), sp_runtime::DispatchError> {
 			match action {
-				ethereum::TransactionAction::Call(to) =>
+				pallet_ethereum::TransactionAction::Call(to) =>
 					EVM::execute_call(
 						from,
 						to,
 						data,
 						value,
 						gas_limit.low_u32(),
-						gas_price,
+						gas_price.unwrap_or(U256::from(150000000)),
 						nonce,
 						false,
-					).ok().map(|(_, ret, gas)| (ret, gas)),
-				ethereum::TransactionAction::Create =>
+					)
+					.map(|(_, ret, gas)| (ret, gas))
+					.map_err(|err| err.into()),
+				pallet_ethereum::TransactionAction::Create =>
 					EVM::execute_create(
 						from,
 						data,
 						value,
 						gas_limit.low_u32(),
-						gas_price,
+						gas_price.unwrap_or(U256::from(150000000)),
 						nonce,
 						false,
-					).ok().map(|(_, _, gas)| (vec![], gas)),
+					)
+					.map(|(_, _, gas)| (vec![], gas))
+					.map_err(|err| err.into()),
 			}
 		}
 
-		fn block_by_number(number: u32) -> (
-			Option<EthereumBlock>, Vec<Option<ethereum::TransactionStatus>>
-		) {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_number(number) {
-				let statuses = <ethereum::Module<Runtime>>::block_transaction_statuses(&block);
-				return (
-					Some(block),
-					statuses
-				);
-			}
-			(None,vec![])
+		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
+			Ethereum::current_transaction_statuses()
 		}
 
-		fn block_transaction_count_by_number(number: u32) -> Option<U256> {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_number(number) {
-				return Some(U256::from(block.transactions.len()))
-			}
-			None
+		fn current_block() -> Option<pallet_ethereum::Block> {
+			Ethereum::current_block()
 		}
 
-		fn block_transaction_count_by_hash(hash: H256) -> Option<U256> {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_hash(hash) {
-				return Some(U256::from(block.transactions.len()))
-			}
-			None
-		}
-
-		fn block_by_hash(hash: H256) -> Option<EthereumBlock> {
-			<ethereum::Module<Runtime>>::block_by_hash(hash)
-		}
-
-		fn block_by_hash_with_statuses(hash: H256) -> (
-			Option<EthereumBlock>, Vec<Option<ethereum::TransactionStatus>>
-		) {
-			if let Some(block) = <ethereum::Module<Runtime>>::block_by_hash(hash) {
-				let statuses = <ethereum::Module<Runtime>>::block_transaction_statuses(&block);
-				return (
-					Some(block),
-					statuses
-				);
-			}
-			(None, vec![])
-		}
-
-		fn transaction_by_hash(hash: H256) -> Option<(
-			EthereumTransaction,
-			EthereumBlock,
-			TransactionStatus,
-			Vec<EthereumReceipt>)> {
-			<ethereum::Module<Runtime>>::transaction_by_hash(hash)
-		}
-
-		fn transaction_by_block_hash_and_index(hash: H256, index: u32) -> Option<(
-			EthereumTransaction,
-			EthereumBlock,
-			TransactionStatus)> {
-			<ethereum::Module<Runtime>>::transaction_by_block_hash_and_index(hash, index)
-		}
-
-		fn transaction_by_block_number_and_index(number: u32, index: u32) -> Option<(
-			EthereumTransaction,
-			EthereumBlock,
-			TransactionStatus)> {
-			<ethereum::Module<Runtime>>::transaction_by_block_number_and_index(
-				number,
-				index
-			)
-		}
-
-		fn logs(
-			from_block: Option<u32>,
-			to_block: Option<u32>,
-			block_hash: Option<H256>,
-			address: Option<H160>,
-			topic: Option<Vec<H256>>
-		) -> Vec<(
-			H160, // address
-			Vec<H256>, // topics
-			Vec<u8>, // data
-			Option<H256>, // block_hash
-			Option<U256>, // block_number
-			Option<H256>, // transaction_hash
-			Option<U256>, // transaction_index
-			Option<U256>, // log index in block
-			Option<U256>, // log index in transaction
-		)> {
-			let output = <ethereum::Module<Runtime>>::filtered_logs(
-				from_block,
-				to_block,
-				block_hash,
-				address,
-				topic
-			);
-			if let Some(output) = output {
-				return output;
-			}
-			return vec![];
+		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
+			Ethereum::current_receipts()
 		}
 	}
 }
