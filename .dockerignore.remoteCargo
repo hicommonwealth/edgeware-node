@@ -1,5 +1,5 @@
 doc
-# target/
+target/release/.fingerprint/
 target/release/build/
 target/release/completion-scripts//
 target/release/deps/
@@ -7,7 +7,6 @@ target/release/incremental/
 target/release/examples/
 target/release/wbuild/
 target/release/wbuild-runner/
-
 modules/*/target/
 node/runtime/wasm/target/
 .idea/
