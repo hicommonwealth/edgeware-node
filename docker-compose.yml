@@ -1,7 +1,6 @@
 version: '3.6'
-services: 
+services:
   edgeware:
-    container_name: 'edgeware_local_node'
     image: cwl/edgeware
     logging:
       driver: "json-file"
@@ -11,7 +10,7 @@ services:
     volumes:
       - ./data_edgeware:/data/chains
     ports:
-      - "127.0.0.1:9933:9933"
-      - "127.0.0.1:9944:9944"
-      - "127.0.0.1:30333:30333"
-    command: ['--dev']
+      - "0.0.0.0:9933:9933"
+      - "0.0.0.0:9944:9944"
+      - "0.0.0.0:30333:30333"
+    command: ['--dev','--ws-external','--rpc-cors','all', '--rpc-methods=Unsafe']
