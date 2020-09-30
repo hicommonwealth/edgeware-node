@@ -41,15 +41,6 @@ use sp_runtime::traits::BlakeTwo256;
 use sp_trie::PrefixedMemoryDB;
 use std::sync::Arc;
 
-
-// use sp_inherents::InherentDataProviders;
-// use sc_network::{Event, NetworkService};
-// use sp_runtime::traits::Block as BlockT;
-// use futures::prelude::*;
-// use sc_client_api::{ExecutorProvider, RemoteBackend};
-// use sp_core::traits::BareCryptoStorePtr;
-// use edgeware_executor::Executor;
-
 // Native executor instance.
 native_executor_instance!(
     pub Executor,
@@ -60,7 +51,7 @@ native_executor_instance!(
 pub fn new_partial<RuntimeApi, Executor>(
 	config: &mut Configuration,
 ) -> Result<
-	sc_service::PartialComponents<
+	PartialComponents<
 		TFullClient<Block, RuntimeApi, Executor>,	
 		TFullBackend<Block>,	
 		(),	
