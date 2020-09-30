@@ -22,8 +22,8 @@ mod tests;
 
 use sp_std::prelude::*;
 use sp_std::result;
-use frame_system::{self as system, ensure_signed};
-use frame_support::dispatch::DispatchResult;
+use frame_system::{ensure_signed};
+use frame_support::{dispatch::DispatchResult, traits::Get, weights::Weight};
 use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
@@ -110,11 +110,17 @@ decl_module! {
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
+		fn on_runtime_upgrade() -> Weight {
+			migration::migrate::<T>();
+			T::MaximumBlockWeight::get()
+		}
+
 		/// A function for commit-reveal voting schemes that adds a vote commitment.
 		///
 		/// A vote commitment is formatted using the native hash function. There
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
+		#[weight = 0]
 		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -134,6 +140,7 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
+		#[weight = 0]
 		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
@@ -288,8 +295,18 @@ decl_event!(
 decl_storage! {
 	trait Store for Module<T: Trait> as Voting {
 		/// The map of all vote records indexed by id
-		pub VoteRecords get(fn vote_records): map  hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
+		pub VoteRecords get(fn vote_records): map hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
 		pub VoteRecordCount get(fn vote_record_count): u64;
+	}
+}
+
+mod migration {
+	use super::*;
+
+	pub fn migrate<T: Trait>() {
+		for idx in 0..(VoteRecordCount::get() + 1) {
+			VoteRecords::<T>::migrate_key_from_blake(idx);
+		}
 	}
 }

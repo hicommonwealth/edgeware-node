@@ -16,134 +16,48 @@
 
 //! Command ran by the CLI
 
-use std::{
-	fmt::Debug,
-	str::FromStr,
-};
-
 use crate::cli::{InspectCmd, InspectSubCmd};
-use crate::{Inspector, PrettyPrinter};
+use crate::Inspector;
+use sc_cli::{CliConfiguration, ImportParams, Result, SharedParams};
+use sc_service::{new_full_client, Configuration, NativeExecutionDispatch};
+use sp_runtime::traits::Block;
+use std::str::FromStr;
 
 impl InspectCmd {
-	/// Initialize
-	pub fn init(&self, version: &sc_cli::VersionInfo) -> sc_cli::Result<()> {
-		self.shared_params.init(version)
-	}
-
-	/// Parse CLI arguments and initialize given config.
-	pub fn update_config(
-		&self,
-		mut config: &mut sc_service::config::Configuration,
-		spec_factory: impl FnOnce(&str) -> Result<Box<dyn sc_service::ChainSpec>, String>,
-		version: &sc_cli::VersionInfo,
-	) -> sc_cli::Result<()> {
-		self.shared_params.update_config(config, spec_factory, version)?;
-
-		// make sure to configure keystore
-		config.use_in_memory_keystore()?;
-
-		// and all import params (especially pruning that has to match db meta)
-		self.import_params.update_config(
-			&mut config,
-			sc_service::Roles::FULL,
-			self.shared_params.dev,
-		)?;
-
-		Ok(())
-	}
-
 	/// Run the inspect command, passing the inspector.
-	pub fn run<B, P>(
-		self,
-		inspect: Inspector<B, P>,
-	) -> sc_cli::Result<()> where
-		B: sp_runtime::traits::Block,
+	pub fn run<B, RA, EX>(&self, config: Configuration) -> Result<()>
+	where
+		B: Block,
 		B::Hash: FromStr,
-		P: PrettyPrinter<B>,
+		RA: Send + Sync + 'static,
+		EX: NativeExecutionDispatch + 'static,
 	{
-		match self.command {
+		let client = new_full_client::<B, RA, EX>(&config)?;
+		let inspect = Inspector::<B>::new(client);
+
+		match &self.command {
 			InspectSubCmd::Block { input } => {
 				let input = input.parse()?;
-				let res = inspect.block(input)
-					.map_err(|e| format!("{}", e))?;
+				let res = inspect.block(input).map_err(|e| format!("{}", e))?;
 				println!("{}", res);
 				Ok(())
-			},
+			}
 			InspectSubCmd::Extrinsic { input } => {
 				let input = input.parse()?;
-				let res = inspect.extrinsic(input)
-					.map_err(|e| format!("{}", e))?;
+				let res = inspect.extrinsic(input).map_err(|e| format!("{}", e))?;
 				println!("{}", res);
 				Ok(())
-			},
+			}
 		}
 	}
 }
 
-/// A block to retrieve.
-#[derive(Debug, Clone, PartialEq)]
-pub enum BlockAddress<Hash, Number> {
-	/// Get block by hash.
-	Hash(Hash),
-	/// Get block by number.
-	Number(Number),
-	/// Raw SCALE-encoded bytes.
-	Bytes(Vec<u8>),
-}
-
-impl<Hash: FromStr, Number: FromStr> FromStr for BlockAddress<Hash, Number> {
-	type Err = String;
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		// try to parse hash first
-		if let Ok(hash) = s.parse() {
-			return Ok(Self::Hash(hash))
-		}
-
-		// then number
-		if let Ok(number) = s.parse() {
-			return Ok(Self::Number(number))
-		}
-
-		// then assume it's bytes (hex-encoded)
-		sp_core::bytes::from_hex(s)
-			.map(Self::Bytes)
-			.map_err(|e| format!(
-				"Given string does not look like hash or number. It could not be parsed as bytes either: {}",
-				e
-			))
+impl CliConfiguration for InspectCmd {
+	fn shared_params(&self) -> &SharedParams {
+		&self.shared_params
 	}
-}
 
-/// An extrinsic address to decode and print out.
-#[derive(Debug, Clone, PartialEq)]
-pub enum ExtrinsicAddress<Hash, Number> {
-	/// Extrinsic as part of existing block.
-	Block(BlockAddress<Hash, Number>, usize),
-	/// Raw SCALE-encoded extrinsic bytes.
-	Bytes(Vec<u8>),
-}
-
-impl<Hash: FromStr + Debug, Number: FromStr + Debug> FromStr for ExtrinsicAddress<Hash, Number> {
-	type Err = String;
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		// first try raw bytes
-		if let Ok(bytes) = sp_core::bytes::from_hex(s).map(Self::Bytes) {
-			return Ok(bytes)
-		}
-
-		// split by a bunch of different characters
-		let mut it = s.split(|c| c == '.' || c == ':' || c == ' ');
-		let block = it.next()
-			.expect("First element of split iterator is never empty; qed")
-			.parse()?;
-
-		let index = it.next()
-			.ok_or_else(|| format!("Extrinsic index missing: example \"5:0\""))?
-			.parse()
-			.map_err(|e| format!("Invalid index format: {}", e))?;
-
-		Ok(Self::Block(block, index))
+	fn import_params(&self) -> Option<&ImportParams> {
+		Some(&self.import_params)
 	}
 }

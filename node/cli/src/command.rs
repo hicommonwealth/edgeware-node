@@ -14,102 +14,153 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use sc_cli::VersionInfo;
-use sc_service::{Roles as ServiceRoles};
-use edgeware_transaction_factory::RuntimeAdapter;
-use crate::{Cli, service, ChainSpec, load_spec, Subcommand, factory_impl::FactoryState};
+use crate::{chain_spec, service, Cli, Subcommand};
+use edgeware_executor::Executor;
+use edgeware_runtime::{Block, RuntimeApi};
+use sc_cli::{Result, SubstrateCli, RuntimeVersion, Role, ChainSpec};
+use sc_service::PartialComponents;
+use crate::service::{new_partial, new_full_base, NewFullBase};
+
+impl SubstrateCli for Cli {
+	fn impl_name() -> String {
+		"Edgeware Node".into()
+	}
+
+	fn impl_version() -> String {
+		env!("SUBSTRATE_CLI_IMPL_VERSION").into()
+	}
+
+	fn description() -> String {
+		env!("CARGO_PKG_DESCRIPTION").into()
+	}
+
+	fn author() -> String {
+		env!("CARGO_PKG_AUTHORS").into()
+	}
+
+	fn support_url() -> String {
+		"https://github.com/hicommonwealth/edgeware-node/issues/new".into()
+	}
+
+	fn copyright_start_year() -> i32 {
+		2017
+	}
+
+	fn executable_name() -> String {
+		"edgeware".into()
+	}
+
+	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+		Ok(match id {
+			"dev" => Box::new(chain_spec::development_config()),
+			"multi-dev" | "multi" => Box::new(chain_spec::multi_development_config()),
+			"local" => Box::new(chain_spec::local_testnet_config()),
+			"testnet-conf" => Box::new(chain_spec::edgeware_testnet_config(
+				"Beresheet".to_string(),
+				"beresheet_edgeware_testnet".to_string(),
+			)),
+			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
+			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
+			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
+			path => Box::new(chain_spec::ChainSpec::from_json_file(
+				std::path::PathBuf::from(path),
+			)?),
+		})
+	}
+	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
+		&edgeware_runtime::VERSION
+	}
+}
 
 /// Parse command line arguments into service configuration.
-pub fn run<I, T>(args: I, version: VersionInfo) -> sc_cli::Result<()>
-where
-	I: Iterator<Item = T>,
-	T: Into<std::ffi::OsString> + Clone,
-{
-	let args: Vec<_> = args.collect();
-	let opt = sc_cli::from_iter::<Cli, _>(args.clone(), &version);
+pub fn run() -> Result<()> {
+	let cli = Cli::from_args();
 
-	let mut config = sc_service::Configuration::from_version(&version);
-
-	match opt.subcommand {
+	match &cli.subcommand {
 		None => {
-			opt.run.init(&version)?;
-			opt.run.update_config(&mut config, load_spec, &version)?;
-			opt.run.run(
-				config,
-				service::new_light,
-				service::new_full,
-				&version,
-			)
-		},
+			let runner = cli.create_runner(&cli.run)?;
+			runner.run_node_until_exit(|config| match config.role {
+				Role::Light => service::new_light(config),
+				_ => service::new_full(config),
+			})
+		}
 		Some(Subcommand::Inspect(cmd)) => {
-			cmd.init(&version)?;
-			cmd.update_config(&mut config, load_spec, &version)?;
+			let runner = cli.create_runner(cmd)?;
 
-			let client = sc_service::new_full_client::<
-				edgeware_runtime::Block, edgeware_runtime::RuntimeApi, edgeware_executor::Executor,
-			>(&config)?;
-			let inspect = edgeware_inspect::Inspector::<edgeware_runtime::Block>::new(client);
-
-			cmd.run(inspect)
-		},
+			runner.sync_run(|config| cmd.run::<Block, RuntimeApi, Executor>(config))
+		}
 		Some(Subcommand::Benchmark(cmd)) => {
-			cmd.init(&version)?;
-			cmd.update_config(&mut config, load_spec, &version)?;
+			if cfg!(feature = "runtime-benchmarks") {
+				let runner = cli.create_runner(cmd)?;
 
-			cmd.run::<edgeware_runtime::Block, edgeware_executor::Executor>(config)
-		},
-		Some(Subcommand::Factory(cli_args)) => {
-			cli_args.shared_params.init(&version)?;
-			cli_args.shared_params.update_config(&mut config, load_spec, &version)?;
-			cli_args.import_params.update_config(
-				&mut config,
-				ServiceRoles::FULL,
-				cli_args.shared_params.dev,
-			)?;
-
-			config.use_in_memory_keystore()?;
-
-			match ChainSpec::from(config.expect_chain_spec().id()) {
-				Some(ref c) if c == &ChainSpec::Development || c == &ChainSpec::LocalTestnet => {},
-				_ => return Err(
-					"Factory is only supported for development and local testnet.".into()
-				),
+				runner.sync_run(|config| cmd.run::<Block, Executor>(config))
+			} else {
+				Err("Benchmarking wasn't enabled when building the node. \
+				You can enable it with `--features runtime-benchmarks`.".into())
 			}
-
-			// Setup tracing.
-			if let Some(tracing_targets) = cli_args.import_params.tracing_targets.as_ref() {
-				let subscriber = sc_tracing::ProfilingSubscriber::new(
-					cli_args.import_params.tracing_receiver.into(), tracing_targets
-				);
-				if let Err(e) = tracing::subscriber::set_global_default(subscriber) {
-					return Err(
-						format!("Unable to set global default subscriber {}", e).into()
-					);
-				}
-			}
-
-			let factory_state = FactoryState::new(
-				cli_args.blocks,
-				cli_args.transactions,
-			);
-
-			let service_builder = new_full_start!(config).0;
-			edgeware_transaction_factory::factory(
-				factory_state,
-				service_builder.client(),
-				service_builder.select_chain()
-					.expect("The select_chain is always initialized by new_full_start!; QED")
-			).map_err(|e| format!("Error in transaction factory: {}", e))?;
-
-			Ok(())
+		}
+		Some(Subcommand::Key(cmd)) => cmd.run(),
+		Some(Subcommand::Sign(cmd)) => cmd.run(),
+		Some(Subcommand::Verify(cmd)) => cmd.run(),
+		Some(Subcommand::Vanity(cmd)) => cmd.run(),
+		Some(Subcommand::BuildSpec(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
 		},
-		Some(Subcommand::Base(subcommand)) => {
-			subcommand.init(&version)?;
-			subcommand.update_config(&mut config, load_spec, &version)?;
-			subcommand.run(
-				config,
-				|config: sc_service::Configuration| Ok(new_full_start!(config).0),
-			)
+		Some(Subcommand::BuildSyncSpec(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.async_run(|config| {
+				let chain_spec = config.chain_spec.cloned_box();
+				let network_config = config.network.clone();
+				let NewFullBase { task_manager, client, network_status_sinks, .. }
+					= new_full_base(config, |_, _| ())?;
+
+				Ok((cmd.run(chain_spec, network_config, client, network_status_sinks), task_manager))
+			})
+		},
+		Some(Subcommand::CheckBlock(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.async_run(|config| {
+				let PartialComponents { client, task_manager, import_queue, ..}
+					= new_partial(&config)?;
+				Ok((cmd.run(client, import_queue), task_manager))
+			})
+		},
+		Some(Subcommand::ExportBlocks(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.async_run(|config| {
+				let PartialComponents { client, task_manager, ..}
+					= new_partial(&config)?;
+				Ok((cmd.run(client, config.database), task_manager))
+			})
+		},
+		Some(Subcommand::ExportState(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.async_run(|config| {
+				let PartialComponents { client, task_manager, ..}
+					= new_partial(&config)?;
+				Ok((cmd.run(client, config.chain_spec), task_manager))
+			})
+		},
+		Some(Subcommand::ImportBlocks(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.async_run(|config| {
+				let PartialComponents { client, task_manager, import_queue, ..}
+					= new_partial(&config)?;
+				Ok((cmd.run(client, import_queue), task_manager))
+			})
+		},
+		Some(Subcommand::PurgeChain(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.sync_run(|config| cmd.run(config.database))
+		},
+		Some(Subcommand::Revert(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.async_run(|config| {
+				let PartialComponents { client, task_manager, backend, ..}
+					= new_partial(&config)?;
+				Ok((cmd.run(client, backend), task_manager))
+			})
 		},
 	}
 }

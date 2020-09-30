@@ -9,7 +9,7 @@ members = [
 	"node/rpc",
 	"node/rpc-client",
 	"node/runtime",
-	"node/transaction-factory",
+	"node/testing",
 ]
 
 [profile.release]

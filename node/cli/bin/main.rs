@@ -14,23 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Substrate Node CLI
+//! Edgeware Node CLI
 
 #![warn(missing_docs)]
 
-use sc_cli::VersionInfo;
-
 fn main() -> sc_cli::Result<()> {
-	let version = VersionInfo {
-		name: "Edgeware Node",
-		commit: env!("VERGEN_SHA_SHORT"),
-		version: env!("CARGO_PKG_VERSION"),
-		executable_name: "edgeware",
-		author: "Commonwealth Labs <hello@commonwealth.im>",
-		description: "Edgeware node",
-		support_url: "https://github.com/hicommonwealth/edgeware-node/issues/new",
-		copyright_start_year: 2018,
-	};
-
-	edgeware_cli::run(std::env::args(), version)
+	edgeware_cli::run()
 }

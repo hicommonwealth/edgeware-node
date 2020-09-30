@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "3.0.0"
+version = "3.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
@@ -17,8 +17,10 @@ integer-sqrt = { version = "0.1.2" }
 safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
+static_assertions = "1.1.0"
 
 # primitives
+sp-application-crypto = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 sp-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 sp-consensus-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 sp-block-builder = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false}
@@ -43,20 +45,23 @@ pallet-authorship = { git = "https://github.com/hicommonwealth/substrate.git", b
 pallet-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-collective = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-contracts = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-contracts-primitives = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-contracts-rpc-runtime-api = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+pallet-contracts = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+pallet-contracts-primitives = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 pallet-democracy = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
-pallet-evm = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 frame-executive = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-finality-tracker = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-identity = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-im-online = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+pallet-multisig = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-offences = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+pallet-proxy = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-randomness-collective-flip = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+pallet-recovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
+pallet-scheduler = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false, features = ["historical"] }
 pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-staking-reward-curve = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
@@ -94,20 +99,22 @@ std = [
 	"sp-block-builder/std",
 	"codec/std",
 	"pallet-collective/std",
-	"pallet-contracts-rpc-runtime-api/std",
-	"pallet-contracts-primitives/std",
 	"pallet-contracts/std",
+	"pallet-contracts-primitives/std",
+	"pallet-contracts-rpc-runtime-api/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
-	"pallet-evm/std",
 	"frame-executive/std",
 	"pallet-finality-tracker/std",
 	"pallet-grandpa/std",
 	"pallet-identity/std",
 	"pallet-im-online/std",
 	"pallet-indices/std",
+	"pallet-multisig/std",
 	"sp-inherents/std",
 	"pallet-offences/std",
+	"pallet-proxy/std",
+	"pallet-recovery/std",
 	"sp-core/std",
 	"pallet-randomness-collective-flip/std",
 	"sp-std/std",
@@ -122,6 +129,7 @@ std = [
 	"sp-keyring",
 	"sp-session/std",
 	"pallet-sudo/std",
+	"pallet-scheduler/std",
 	"frame-support/std",
 	"frame-system-rpc-runtime-api/std",
 	"frame-system/std",

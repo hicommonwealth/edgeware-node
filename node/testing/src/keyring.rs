@@ -16,11 +16,11 @@
 
 //! Test accounts.
 
-use sp_keyring::{AccountKeyring, Sr25519Keyring, Ed25519Keyring};
-use edgeware_primitives::{AccountId, Balance, Index};
-use edgeware_runtime::{CheckedExtrinsic, UncheckedExtrinsic, SessionKeys, SignedExtra};
-use sp_runtime::generic::Era;
 use codec::Encode;
+use edgeware_primitives::{AccountId, Balance, Index};
+use edgeware_runtime::{CheckedExtrinsic, SessionKeys, SignedExtra, UncheckedExtrinsic};
+use sp_keyring::{AccountKeyring, Ed25519Keyring, Sr25519Keyring};
+use sp_runtime::generic::Era;
 
 /// Alice's account id.
 pub fn alice() -> AccountId {
@@ -68,31 +68,49 @@ pub fn to_session_keys(
 /// Returns transaction extra.
 pub fn signed_extra(nonce: Index, extra_fee: Balance) -> SignedExtra {
 	(
-		frame_system::CheckVersion::new(),
+		frame_system::CheckSpecVersion::new(),
+		frame_system::CheckTxVersion::new(),
 		frame_system::CheckGenesis::new(),
 		frame_system::CheckEra::from(Era::mortal(256, 0)),
 		frame_system::CheckNonce::from(nonce),
 		frame_system::CheckWeight::new(),
 		pallet_transaction_payment::ChargeTransactionPayment::from(extra_fee),
-		Default::default(),
 	)
 }
 
 /// Sign given `CheckedExtrinsic`.
-pub fn sign(xt: CheckedExtrinsic, version: u32, genesis_hash: [u8; 32]) -> UncheckedExtrinsic {
+pub fn sign(
+	xt: CheckedExtrinsic,
+	spec_version: u32,
+	tx_version: u32,
+	genesis_hash: [u8; 32],
+) -> UncheckedExtrinsic {
 	match xt.signed {
 		Some((signed, extra)) => {
-			let payload = (xt.function, extra.clone(), version, genesis_hash, genesis_hash);
+			let payload = (
+				xt.function,
+				extra.clone(),
+				spec_version,
+				tx_version,
+				genesis_hash,
+				genesis_hash,
+			);
 			let key = AccountKeyring::from_account_id(&signed).unwrap();
-			let signature = payload.using_encoded(|b| {
-				if b.len() > 256 {
-					key.sign(&sp_io::hashing::blake2_256(b))
-				} else {
-					key.sign(b)
-				}
-			}).into();
+			let signature = payload
+				.using_encoded(|b| {
+					if b.len() > 256 {
+						key.sign(&sp_io::hashing::blake2_256(b))
+					} else {
+						key.sign(b)
+					}
+				})
+				.into();
 			UncheckedExtrinsic {
-				signature: Some((pallet_indices::address::Address::Id(signed), signature, extra)),
+				signature: Some((
+					pallet_indices::address::Address::Id(signed),
+					signature,
+					extra,
+				)),
 				function: payload.0,
 			}
 		}

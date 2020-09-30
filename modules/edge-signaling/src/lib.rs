@@ -20,11 +20,11 @@
 #[cfg(test)]
 mod tests;
 
-use frame_support::traits::{Currency, ReservableCurrency,};
+use frame_support::traits::{Currency, Get, ReservableCurrency,};
 use sp_std::prelude::*;
 
-use frame_system::{self as system, ensure_signed};
-use frame_support::dispatch::DispatchResult;
+use frame_system::{ensure_signed};
+use frame_support::{dispatch::DispatchResult, weights::Weight};
 use codec::{Decode, Encode};
 
 use sp_runtime::RuntimeDebug;
@@ -61,13 +61,18 @@ decl_error! {
 	}
 }
 
-
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
+		fn on_runtime_upgrade() -> Weight {
+			migration::migrate::<T>();
+			T::MaximumBlockWeight::get()
+		}
+
 		/// Creates a new signaling proposal.
+		#[weight = 0]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -117,6 +122,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
+		#[weight = 0]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
@@ -256,5 +262,21 @@ decl_storage! {
 		pub ProposalOf get(fn proposal_of): map hasher(twox_64_concat) T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 		/// Registration bond
 		pub ProposalCreationBond get(fn proposal_creation_bond) config(): BalanceOf<T>;
+	}
+}
+
+mod migration {
+	use super::*;
+
+	pub fn migrate<T: Trait>() {
+		for (hash, _n) in InactiveProposals::<T>::get() {
+			ProposalOf::<T>::migrate_key_from_blake(hash);
+		}
+		for (hash, _n) in ActiveProposals::<T>::get() {
+			ProposalOf::<T>::migrate_key_from_blake(hash);
+		}
+		for (hash, _n) in CompletedProposals::<T>::get() {
+			ProposalOf::<T>::migrate_key_from_blake(hash);
+		}
 	}
 }

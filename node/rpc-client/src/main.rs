@@ -34,7 +34,7 @@ use jsonrpc_core_client::{
 };
 
 fn main() {
-	env_logger::init();
+	sp_tracing::try_init_simple();
 
 	rt::run(rt::lazy(|| {
 		let uri = "http://localhost:9933";
@@ -68,3 +68,4 @@ fn remove_all_extrinsics(client: AuthorClient<Hash, Hash>) -> impl Future<Item=(
 			println!("Removed extrinsics: {:?}", removed);
 		})
 }
+

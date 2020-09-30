@@ -20,14 +20,13 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 };
 use sp_core::H256;
-use frame_support::{parameter_types, impl_outer_origin, assert_err};
+use frame_support::{
+	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
+	traits::{OnFinalize}
+};
 
 use super::*;
 use crate::{Trait, Module, VoteType, TallyType};
-
-use frame_support::{
-	assert_ok
-};
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
@@ -40,31 +39,38 @@ pub struct Test;
 
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
-	pub const MaximumBlockWeight: u32 = 1024;
+	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 
 impl frame_system::Trait for Test {
+	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = u64;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = ::sp_runtime::traits::BlakeTwo256;
+	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type MaximumBlockWeight = MaximumBlockWeight;
+	type DbWeight = ();
+	type BlockExecutionWeight = ();
+	type ExtrinsicBaseWeight = ();
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
 	type ModuleToIndex = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
+	type MigrateAccount = ();
 	type OnKilledAccount = ();
+	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 }
 
 impl Trait for Test {
@@ -556,5 +562,65 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 		assert_ok!(commit(public, 1, hash.into()));
 		assert_ok!(advance_stage(1));
 		assert_ok!(reveal(public, 1, vote.3.to_vec(), Some(SECRET)));
+	});
+}
+
+#[test]
+fn change_hasher_migration() {
+	mod deprecated {
+		use sp_std::prelude::*;
+
+		use codec::{Encode, Decode};
+		use frame_support::{decl_module, decl_storage};
+
+		use crate::{Trait, VoteRecord};
+
+		decl_module! {
+			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
+		}
+		decl_storage! {
+			trait Store for Module<T: Trait> as Voting {
+				pub VoteRecords get(fn vote_records): map hasher(opaque_blake2_256)
+					u64 => Option<VoteRecord<T::AccountId>>;
+			}
+		}
+	}
+
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		// build vote record
+		let public = get_test_key();
+		let yes_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+		let no_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		let outcomes = vec![yes_vote, no_vote];
+		let id = VoteRecordCount::get() + 1;
+		let record = VoteRecord {
+			id: id,
+			commitments: vec![],
+			reveals: vec![],
+			outcomes: outcomes,
+			data: VoteData {
+				initiator: public.clone(),
+				stage: VoteStage::PreVoting,
+				vote_type: VoteType::Binary,
+				tally_type: TallyType::OneCoin,
+				is_commit_reveal: false,
+			},
+		};
+
+		// insert the record with the old hasher
+		deprecated::VoteRecords::<Test>::insert(id, &record);
+		VoteRecordCount::mutate(|i| *i += 1);
+		assert!(
+			Voting::vote_records(id).is_none(),
+			"proposal should not (yet) be available with the new hasher"
+		);
+		// do the migration
+		crate::migration::migrate::<Test>();
+		let maybe_vote = Voting::vote_records(id);
+		// check that it was successfull
+		assert!(maybe_vote.is_some());
+		let vote = maybe_vote.unwrap();
+		assert_eq!(vote, record);
 	});
 }
