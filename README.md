@@ -76,13 +76,15 @@ To start up the Edgeware node and connect to the Beresheet testnet, run:
 
 ### Docker
 
-When you are using Remote Cargo, you can run this script
+To make it easier run Edgeware node on OSX, we have script that will use right `.dockerignore.remotecargo`, use binary we have compiled in `/target/release`, build image and then run it. You can read more about [Remote Cargo](https://medium.com/@yangWao/build-substrate-in-few-minutes-with-fraction-costs-26fce6aa5066?sk=514e94de6c702b92f5078860623168cc), what we are doing to use this script.
+
 ```
 ./build_and_run_devnet.sh
 ```
-It will on background create symlink from `.dockerignore.remoteCargo` to `.dockerignore`
+It will on background create symlink from `.dockerignore.remotecargo` to `.dockerignore`
 
 If you previously build image `cwl/edgeware`, you can use docker-compose as well
 ```
 docker-compose up edgeware
 ```
+You will have exposed ports 9933,9944 and 30333.
