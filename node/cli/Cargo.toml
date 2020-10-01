@@ -42,6 +42,7 @@ serde_json = "1.0"
 
 # primitives
 sp-authority-discovery = { version = "2.0.0",   git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
 sp-consensus-aura = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sp-finality-grandpa = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sp-core = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }

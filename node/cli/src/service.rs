@@ -18,6 +18,7 @@
 
 //! Service implementation. Specialized wrapper over substrate service.
 
+use sc_service::ChainSpec;
 use std::sync::Arc;
 use sc_consensus_aura;
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
@@ -34,7 +35,7 @@ use futures::prelude::*;
 use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sp_core::traits::BareCryptoStorePtr;
 use edgeware_executor::Executor;
-
+use crate::grandpa_support;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -42,6 +43,25 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
 	sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
+
+/// Can be called for a `Configuration` to check if it is a configuration for the `Kusama` network.
+pub trait IdentifyVariant {
+	/// Returns if this is a configuration for the `Kusama` network.
+	fn is_mainnet(&self) -> bool;
+
+	/// Returns if this is a configuration for the `Westend` network.
+	fn is_beresheet(&self) -> bool;
+}
+
+impl IdentifyVariant for Box<dyn ChainSpec> {
+	fn is_mainnet(&self) -> bool {
+		self.id().starts_with("edgeware") || self.id().starts_with("edg")
+	}
+
+	fn is_beresheet(&self) -> bool {
+		self.id().starts_with("beresheet") || self.id().starts_with("tedg")
+	}
+}
 
 pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponents<
 	FullClient, FullBackend, FullSelectChain,
@@ -80,9 +100,20 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		client.clone(),
 	);
 
-	let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
-		client.clone(), &(client.clone() as Arc<_>), select_chain.clone(),
-	)?;
+
+	let grandpa_hard_forks = if config.chain_spec.is_mainnet() {
+		grandpa_support::edgeware_hard_forks()
+	} else {
+		Vec::new()
+	};
+
+	let (grandpa_block_import, grandpa_link) =
+		sc_finality_grandpa::block_import_with_authority_set_hard_forks(
+			client.clone(),
+			&(client.clone() as Arc<_>),
+			select_chain.clone(),
+			grandpa_hard_forks,
+		)?;
 
 	let aura_block_import =
 		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
