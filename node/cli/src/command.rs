@@ -76,12 +76,20 @@ impl SubstrateCli for Cli {
 pub fn run() -> Result<()> {
 	let cli = Cli::from_args();
 
+	let grandpa_pause = if cli.grandpa_pause.is_empty() {
+		None
+	} else {
+		// should be enforced by cli parsing
+		assert_eq!(cli.grandpa_pause.len(), 2);
+		Some((cli.grandpa_pause[0], cli.grandpa_pause[1]))
+	};
+
 	match &cli.subcommand {
 		None => {
 			let runner = cli.create_runner(&cli.run)?;
 			runner.run_node_until_exit(|config| match config.role {
 				Role::Light => service::new_light(config),
-				_ => service::new_full(config),
+				_ => service::new_full(config, grandpa_pause),
 			})
 		}
 		Some(Subcommand::Inspect(cmd)) => {
@@ -113,7 +121,7 @@ pub fn run() -> Result<()> {
 				let chain_spec = config.chain_spec.cloned_box();
 				let network_config = config.network.clone();
 				let NewFullBase { task_manager, client, network_status_sinks, .. }
-					= new_full_base(config, |_, _| ())?;
+					= new_full_base(config, |_, _| (), grandpa_pause)?;
 
 				Ok((cmd.run(chain_spec, network_config, client, network_status_sinks), task_manager))
 			})
