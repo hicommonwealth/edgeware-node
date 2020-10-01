@@ -26,6 +26,7 @@ sc-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", bra
 sc-finality-grandpa-rpc = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 sc-rpc-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 sp-block-builder = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+sc-network = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 
