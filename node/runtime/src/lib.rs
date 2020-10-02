@@ -8,11 +8,11 @@
 
 // Edgeware is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
+// along with Edgeware.	If not, see <http://www.gnu.org/licenses/>.
 
 //! The Substrate runtime. This can be compiled with ``#[no_std]`, ready for Wasm.
 
@@ -569,12 +569,12 @@ parameter_types! {
 	pub const TipReportDepositBase: Balance = 1 * DOLLARS;
 	pub const DataDepositPerByte: Balance = 1 * CENTS;
 	pub const BountyDepositBase: Balance = 1 * DOLLARS;
-  pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
-  pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
-  pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
-  pub const MaximumReasonLength: u32 = 16384;
-  pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
-  pub const BountyValueMinimum: Balance = 5 * DOLLARS;
+	pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
+	pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
+	pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
+	pub const MaximumReasonLength: u32 = 16384;
+	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
+	pub const BountyValueMinimum: Balance = 5 * DOLLARS;
 
 }
 
@@ -598,18 +598,18 @@ impl pallet_treasury::Trait for Runtime {
 	type Event = Event;
 	type ModuleId = TreasuryModuleId;
 	type OnSlash = ();
-  type ProposalBond = ProposalBond;
-  type ProposalBondMinimum = ProposalBondMinimum;
-  type SpendPeriod = SpendPeriod;
-  type Burn = Burn;
-  type BountyDepositBase = BountyDepositBase;
-  type BountyDepositPayoutDelay = BountyDepositPayoutDelay;
-  type BountyUpdatePeriod = BountyUpdatePeriod;
-  type BountyCuratorDeposit = BountyCuratorDeposit;
-  type BountyValueMinimum = BountyValueMinimum;
-  type MaximumReasonLength = MaximumReasonLength;
-  type BurnDestination = ();
-  type WeightInfo = ();
+	type ProposalBond = ProposalBond;
+	type ProposalBondMinimum = ProposalBondMinimum;
+	type SpendPeriod = SpendPeriod;
+	type Burn = Burn;
+	type BountyDepositBase = BountyDepositBase;
+	type BountyDepositPayoutDelay = BountyDepositPayoutDelay;
+	type BountyUpdatePeriod = BountyUpdatePeriod;
+	type BountyCuratorDeposit = BountyCuratorDeposit;
+	type BountyValueMinimum = BountyValueMinimum;
+	type MaximumReasonLength = MaximumReasonLength;
+	type BurnDestination = ();
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -732,9 +732,9 @@ impl pallet_finality_tracker::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
-	pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
-	pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
+	pub const BasicDeposit: Balance = 10 * DOLLARS;			 // 258 bytes on-chain
+	pub const FieldDeposit: Balance = 250 * CENTS;				// 66 bytes on-chain
+	pub const SubAccountDeposit: Balance = 2 * DOLLARS;	 // 53 bytes on-chain
 	pub const MaxSubAccounts: u32 = 100;
 	pub const MaxAdditionalFields: u32 = 100;
 	pub const MaxRegistrars: u32 = 20;
@@ -895,8 +895,8 @@ impl pallet_evm::Precompiles for EdgewarePrecompiles {
 		target_gas: Option<usize>
 	) -> Option<core::result::Result<(pallet_evm::ExitSucceed, Vec<u8>, usize), pallet_evm::ExitError>> {
 		match get_precompiled_func_from_address(&address) {
-		   Some(func) => return Some(func(input, target_gas)),
-		   _ => {},
+			 Some(func) => return Some(func(input, target_gas)),
+			 _ => {},
 		};
 
 		None
