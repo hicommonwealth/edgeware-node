@@ -1,0 +1,24 @@
+[package]
+name = "edgeware-test-runtime-client"
+version = "3.1.0"
+authors = ["Parity Technologies <admin@parity.io>"]
+edition = "2018"
+license = "GPL-3.0"
+
+[dependencies]
+sc-block-builder = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+sc-consensus = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+sc-light = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+sc-service = { git = "https://github.com/hicommonwealth/substrate", branch = "develop", features = ["test-helpers"],  default-features = false }
+substrate-test-client = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+sp-core = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+edgeware-cli = { path = "../../cli" }
+edgeware-runtime = { path = "../" }
+edgeware-primitives = { path = "../../primitives" }
+sp-runtime = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+sp-api = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+sp-blockchain = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+codec = { package = "parity-scale-codec", version = "1.0.0" }
+sc-client-api = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
+futures = "0.3.1"

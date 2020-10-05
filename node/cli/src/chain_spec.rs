@@ -335,7 +335,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 	)
 }
 
-fn development_config_genesis() -> GenesisConfig {
+pub fn development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![get_authority_keys_from_seed("Alice")],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),

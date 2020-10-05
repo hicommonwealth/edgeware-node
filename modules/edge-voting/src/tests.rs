@@ -65,13 +65,15 @@ impl frame_system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
-	type ModuleToIndex = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type MigrateAccount = ();
 	type OnKilledAccount = ();
 	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
+	type PalletInfo = ();
+	type SystemWeightInfo = ();
 }
+
 
 impl Trait for Test {
 	type Event = ();
@@ -83,7 +85,7 @@ pub type Voting = Module<Test>;
 // This function basically just builds a genesis storage key/value store according to
 // our desired mockup.
 fn new_test_ext() -> sp_io::TestExternalities {
-	let t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 	// We use default for brevity, but you can configure as desired if needed.
 	t.into()
 }
