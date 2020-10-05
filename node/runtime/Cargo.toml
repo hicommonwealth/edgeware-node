@@ -40,6 +40,7 @@ sp-offchain = { git = "https://github.com/hicommonwealth/substrate.git", branch 
 edgeware-primitives = { path = "../primitives", default-features = false }
 
 # pallet dependencies
+pallet-assets = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-authority-discovery = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-authorship = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
 pallet-aura = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", default-features = false }
@@ -91,6 +92,7 @@ sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "dev
 default = ["std"]
 std = [
 	"sp-authority-discovery/std",
+	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"sp-consensus-aura/std",

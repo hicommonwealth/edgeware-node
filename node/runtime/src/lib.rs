@@ -23,7 +23,7 @@
 use sp_std::{prelude::*};
 
 pub use edgeware_primitives::{
-	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature,
+	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature, Nonce,
 };
 use frame_support::{
 	construct_runtime, parameter_types, debug, RuntimeDebug,
@@ -59,7 +59,7 @@ use sp_runtime::{
 pub use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
-	ConvertInto, OpaqueKeys, NumberFor, Saturating, Zero,
+	ConvertInto, OpaqueKeys, NumberFor, Saturating,
 };
 pub use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource, TransactionPriority};
 
@@ -189,6 +189,7 @@ impl frame_system::Trait for Runtime {
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = weights::frame_system::WeightInfo;
+	type MigrateAccount = (Balances, Democracy, Elections, ImOnline, Recovery, Staking, Session, Vesting);
 }
 
 impl pallet_utility::Trait for Runtime {
@@ -824,6 +825,12 @@ impl pallet_contracts::Trait for Runtime {
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
 }
 
+impl pallet_assets::Trait for Runtime {
+	type Event = Event;
+	type Balance = Balance;
+	type AssetId = Nonce;
+}
+
 impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
@@ -877,6 +884,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
+		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
