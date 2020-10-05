@@ -591,7 +591,7 @@ impl pallet_treasury::Trait for Runtime {
 		EnsureRoot<AccountId>,
 		pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>
 	>;
-	type RejectOrigin = EnsureRootOrHalfCouncil
+	type RejectOrigin = EnsureRootOrHalfCouncil;
 	type Tippers = Elections;
 	type TipCountdown = TipCountdown;
 	type TipFindersFee = TipFindersFee;
