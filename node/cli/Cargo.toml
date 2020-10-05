@@ -56,7 +56,6 @@ sp-consensus = { version = "0.8.0",  git = "https://github.com/hicommonwealth/su
 sp-transaction-pool = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 
 # client dependencies
-sc-block-builder = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sc-client-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sc-chain-spec = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sc-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
@@ -110,7 +109,6 @@ sc-service = { version = "0.8.0", default-features = false, git = "https://githu
 sp-trie = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", features = ["memory-tracker"] }
 
 [dev-dependencies]
-edgeware-test-runtime-client = { path = "../runtime/client" }
 sc-keystore = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sc-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
 sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }

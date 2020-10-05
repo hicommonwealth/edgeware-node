@@ -46,7 +46,5 @@ pub use cli::*;
 #[cfg(feature = "cli")]
 pub use command::*;
 
-pub mod grandpa_support;
-
 pub mod mainnet_fixtures;
 pub mod testnet_fixtures;

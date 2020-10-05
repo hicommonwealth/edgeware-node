@@ -35,8 +35,6 @@ use futures::prelude::*;
 use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sp_core::traits::BareCryptoStorePtr;
 use edgeware_executor::Executor;
-use crate::grandpa_support;
-use log::info;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -101,20 +99,11 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		client.clone(),
 	);
 
-
-	let grandpa_hard_forks = if config.chain_spec.is_mainnet() {
-		grandpa_support::edgeware_hard_forks()
-	} else {
-		Vec::new()
-	};
-
-	let (grandpa_block_import, grandpa_link) =
-		sc_finality_grandpa::block_import_with_authority_set_hard_forks(
-			client.clone(),
-			&(client.clone() as Arc<_>),
-			select_chain.clone(),
-			grandpa_hard_forks,
-		)?;
+	let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
+		client.clone(),
+		&(client.clone() as Arc<_>),
+		select_chain.clone(),
+	)?;
 
 	let aura_block_import =
 		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
@@ -193,7 +182,6 @@ pub fn new_full_base(
 		>,
 		&sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 	),
-	grandpa_pause: Option<(u32, u32)>,
 ) -> Result<NewFullBase, ServiceError> {
 	let sc_service::PartialComponents {
 		client, backend, mut task_manager, import_queue, keystore, select_chain, transaction_pool,
@@ -337,33 +325,13 @@ pub fn new_full_base(
 		// and vote data availability than the observer. The observer has not
 		// been tested extensively yet and having most nodes in a network run it
 		// could lead to finality stalls.
-
-		// add a custom voting rule to temporarily stop voting for new blocks
-		// after the given pause block is finalized and restarting after the
-		// given delay.
-		let voting_rule = match grandpa_pause {
-			Some((block, delay)) => {
-				info!("GRANDPA scheduled voting pause set for block #{} with a duration of {} blocks.",
-					block.clone(),
-					delay.clone(),
-				);
-
-				sc_finality_grandpa::VotingRulesBuilder::default()
-					.add(grandpa_support::PauseAfterBlockFor(block, delay))
-					.build()
-			},
-			None =>
-				sc_finality_grandpa::VotingRulesBuilder::default()
-					.build(),
-		};
-
 		let grandpa_config = sc_finality_grandpa::GrandpaParams {
 			config,
 			link: grandpa_link,
 			network: network.clone(),
 			inherent_data_providers: inherent_data_providers.clone(),
 			telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
-			voting_rule: voting_rule,
+			voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
 			prometheus_registry,
 			shared_voter_state,
 		};
@@ -399,9 +367,9 @@ pub struct NewFullBase {
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(config: Configuration, grandpa_pause: Option<(u32, u32)>)
+pub fn new_full(config: Configuration)
 -> Result<TaskManager, ServiceError> {
-	new_full_base(config, |_, _| (), grandpa_pause).map(|NewFullBase { task_manager, .. }| {
+	new_full_base(config, |_, _| ()).map(|NewFullBase { task_manager, .. }| {
 		task_manager
 	})
 }
