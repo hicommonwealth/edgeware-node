@@ -32,7 +32,7 @@
 use std::{sync::Arc, fmt};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use jsonrpc_pubsub::manager::SubscriptionManager;
-use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState, GrandpaJustificationStream};
+use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState, GrandpaJustificationStream, FinalityProofProvider};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sp_api::ProvideRuntimeApi;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
@@ -40,8 +40,12 @@ use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 pub use sc_rpc_api::DenyUnsafe;
 use sp_runtime::traits::BlakeTwo256;
-use sc_client_api::backend::{StorageProvider, Backend, StateBackend, AuxStore};
-
+use sc_network::NetworkService;
+use sc_client_api::{
+	backend::{StorageProvider, Backend, StateBackend, AuxStore},
+	client::BlockchainEvents,
+};
+use sc_rpc::SubscriptionTaskExecutor;
 use sp_block_builder::BlockBuilder;
 
 /// Public io handler for exporting into other modules
@@ -60,19 +64,21 @@ pub struct LightDeps<C, F, P> {
 }
 
 /// Extra dependencies for GRANDPA
-pub struct GrandpaDeps {
+pub struct GrandpaDeps<B> {
 	/// Voting round info.
 	pub shared_voter_state: SharedVoterState,
 	/// Authority set info.
 	pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
 	/// Receives notifications about justification events from Grandpa.
 	pub justification_stream: GrandpaJustificationStream<Block>,
-	/// Subscription manager to keep track of pubsub subscribers.
-	pub subscriptions: SubscriptionManager,
+	/// Executor to drive the subscription manager in the Grandpa RPC handler.
+	pub subscription_executor: SubscriptionTaskExecutor,
+	/// Finality proof provider.
+	pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC> {
+pub struct FullDeps<C, P, SC, B> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
@@ -83,20 +89,22 @@ pub struct FullDeps<C, P, SC> {
 	pub deny_unsafe: DenyUnsafe,
 	/// The Node authority flag
 	pub is_authority: bool,
+	/// Network service
+	pub network: Arc<NetworkService<Block, Hash>>,
 	/// GRANDPA specific dependencies.
-	pub grandpa: GrandpaDeps,
+	pub grandpa: GrandpaDeps<B>,
 }
 
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, BE>(
-	deps: FullDeps<C, P, SC>,
+pub fn create_full<C, P, SC, B>(
+	deps: FullDeps<C, P, SC, B>,
+	subscription_task_executor: SubscriptionTaskExecutor,
 ) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata> where
-	BE: Backend<Block> + 'static,
-	BE::State: StateBackend<BlakeTwo256>,
-	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
+	C: ProvideRuntimeApi<Block> + StorageProvider<Block, B> + AuxStore,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
+	C: BlockchainEvents<Block>,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,	
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
 	C::Api: BlockBuilder<Block>,
@@ -105,10 +113,12 @@ pub fn create_full<C, P, SC, BE>(
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
 	P: TransactionPool<Block=Block> + 'static,
 	SC: SelectChain<Block> +'static,
+	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
+	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use frontier_rpc::{EthApi, EthApiServer, NetApi, NetApiServer};
+	use frontier_rpc::{EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -120,13 +130,15 @@ pub fn create_full<C, P, SC, BE>(
 		deny_unsafe,
 		is_authority,
 		// command_sink,
-		grandpa
+		grandpa,
+		network,
 	} = deps;
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
 		justification_stream,
-		subscriptions,
+		subscription_executor,
+		finality_provider,
 	} = grandpa;
 
 	io.extend_with(
@@ -156,14 +168,23 @@ pub fn create_full<C, P, SC, BE>(
 			select_chain.clone(),
 		))
 	);
-
+	io.extend_with(
+		EthPubSubApiServer::to_delegate(EthPubSubApi::new(
+			pool.clone(),
+			client.clone(),
+			select_chain.clone(),
+			network.clone(),
+			SubscriptionManager::new(Arc::new(subscription_task_executor)),
+		))
+	);
 	io.extend_with(
 		sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
 			GrandpaRpcHandler::new(
 				shared_authority_set,
 				shared_voter_state,
 				justification_stream,
-				subscriptions,
+				subscription_executor,
+				finality_provider,
 			)
 		)
 	);

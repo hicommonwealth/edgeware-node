@@ -8,11 +8,11 @@
 
 // Edgeware is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
+// along with Edgeware.	If not, see <http://www.gnu.org/licenses/>.
 
 //! The Substrate runtime. This can be compiled with ``#[no_std]`, ready for Wasm.
 
@@ -291,6 +291,7 @@ impl pallet_scheduler::Trait for Runtime {
 	type ScheduleOrigin = EnsureRoot<AccountId>;
 	type PalletsOrigin = OriginCaller;
 	type WeightInfo = ();
+	type MaxScheduledPerBlock = ();
 }
 
 impl pallet_aura::Trait for Runtime {
@@ -311,9 +312,11 @@ impl pallet_indices::Trait for Runtime {
 
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 1 * MILLICENTS;
+	pub const MaxLocks: u32 = 50;
 }
 
 impl pallet_balances::Trait for Runtime {
+	type MaxLocks = MaxLocks;
 	type Balance = Balance;
 	type DustRemoval = ();
 	type Event = Event;
@@ -510,6 +513,7 @@ impl pallet_democracy::Trait for Runtime {
 parameter_types! {
 	pub const CouncilMotionDuration: BlockNumber = 14 * DAYS;
 	pub const CouncilMaxProposals: u32 = 100;
+	pub const CouncilMaxMembers: u32 = 100;
 }
 
 type CouncilCollective = pallet_collective::Instance1;
@@ -521,6 +525,7 @@ impl pallet_collective::Trait<CouncilCollective> for Runtime {
 	type MaxProposals = CouncilMaxProposals;
 	type WeightInfo = ();
 	type MaxMembers = CouncilMaxMembers;
+	type DefaultVote = pallet_collective::PrimeDefaultVote;
 }
 
 parameter_types! {
@@ -530,7 +535,6 @@ parameter_types! {
 	pub const DesiredMembers: u32 = 13;
 	pub const DesiredRunnersUp: u32 = 7;
 	pub const ElectionsPhragmenModuleId: LockIdentifier = *b"phrelect";
-	pub const CouncilMaxMembers: u32 = 100;
 }
 
 const_assert!(DesiredMembers::get() <= CouncilMaxMembers::get());
@@ -563,8 +567,15 @@ parameter_types! {
 	pub const TipCountdown: BlockNumber = 1 * DAYS;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
 	pub const TipReportDepositBase: Balance = 1 * DOLLARS;
-	pub const TipReportDepositPerByte: Balance = 1 * CENTS;
+	pub const DataDepositPerByte: Balance = 1 * CENTS;
+	pub const BountyDepositBase: Balance = 1 * DOLLARS;
+	pub const BountyDepositPayoutDelay: BlockNumber = 1 * DAYS;
 	pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
+	pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
+	pub const MaximumReasonLength: u32 = 16384;
+	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
+	pub const BountyValueMinimum: Balance = 5 * DOLLARS;
+
 }
 
 impl pallet_treasury::Trait for Runtime {
@@ -583,14 +594,20 @@ impl pallet_treasury::Trait for Runtime {
 	type TipCountdown = TipCountdown;
 	type TipFindersFee = TipFindersFee;
 	type TipReportDepositBase = TipReportDepositBase;
-	type TipReportDepositPerByte = TipReportDepositPerByte;
+	type DataDepositPerByte = DataDepositPerByte;
 	type Event = Event;
-	type ProposalRejection = ();
+	type ModuleId = TreasuryModuleId;
+	type OnSlash = ();
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
-	type ModuleId = TreasuryModuleId;
+	type BountyDepositBase = BountyDepositBase;
+	type BountyDepositPayoutDelay = BountyDepositPayoutDelay;
+	type BountyUpdatePeriod = BountyUpdatePeriod;
+	type BountyCuratorDeposit = BountyCuratorDeposit;
+	type BountyValueMinimum = BountyValueMinimum;
+	type MaximumReasonLength = MaximumReasonLength;
 	type BurnDestination = ();
 	type WeightInfo = ();
 }
@@ -678,7 +695,6 @@ impl pallet_offences::Trait for Runtime {
 	type IdentificationTuple = pallet_session::historical::IdentificationTuple<Self>;
 	type OnOffenceHandler = Staking;
 	type WeightSoftLimit = OffencesWeightSoftLimit;
-	type WeightInfo = ();
 }
 
 impl pallet_authority_discovery::Trait for Runtime {}
@@ -701,6 +717,7 @@ impl pallet_grandpa::Trait for Runtime {
 		Self::KeyOwnerIdentification,
 		Offences,
 	>;
+	type WeightInfo = ();
 }
 
 parameter_types! {
@@ -715,9 +732,9 @@ impl pallet_finality_tracker::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const BasicDeposit: Balance = 10 * DOLLARS;       // 258 bytes on-chain
-	pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
-	pub const SubAccountDeposit: Balance = 2 * DOLLARS;   // 53 bytes on-chain
+	pub const BasicDeposit: Balance = 10 * DOLLARS;			 // 258 bytes on-chain
+	pub const FieldDeposit: Balance = 250 * CENTS;				// 66 bytes on-chain
+	pub const SubAccountDeposit: Balance = 2 * DOLLARS;	 // 53 bytes on-chain
 	pub const MaxSubAccounts: u32 = 100;
 	pub const MaxAdditionalFields: u32 = 100;
 	pub const MaxRegistrars: u32 = 20;
@@ -878,8 +895,8 @@ impl pallet_evm::Precompiles for EdgewarePrecompiles {
 		target_gas: Option<usize>
 	) -> Option<core::result::Result<(pallet_evm::ExitSucceed, Vec<u8>, usize), pallet_evm::ExitError>> {
 		match get_precompiled_func_from_address(&address) {
-		   Some(func) => return Some(func(input, target_gas)),
-		   _ => {},
+			 Some(func) => return Some(func(input, target_gas)),
+			 _ => {},
 		};
 
 		None
@@ -1301,7 +1318,7 @@ impl_runtime_apis! {
 						nonce,
 						false,
 					)
-					.map(|(_, ret, gas)| (ret, gas))
+					.map(|(_, ret, gas, _)| (ret, gas))
 					.map_err(|err| err.into()),
 				pallet_ethereum::TransactionAction::Create =>
 					EVM::execute_create(
@@ -1313,7 +1330,7 @@ impl_runtime_apis! {
 						nonce,
 						false,
 					)
-					.map(|(_, _, gas)| (vec![], gas))
+					.map(|(_, _, gas, _)| (vec![], gas))
 					.map_err(|err| err.into()),
 			}
 		}
