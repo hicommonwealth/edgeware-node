@@ -22,7 +22,7 @@ mod tests;
 
 use sp_std::prelude::*;
 use sp_std::result;
-use frame_system::{self as system, ensure_signed};
+use frame_system::{ensure_signed};
 use frame_support::{dispatch::DispatchResult, traits::Get, weights::Weight};
 use codec::{Decode, Encode};
 

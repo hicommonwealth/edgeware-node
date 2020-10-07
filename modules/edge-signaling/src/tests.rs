@@ -68,12 +68,13 @@ impl frame_system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
-	type ModuleToIndex = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type MigrateAccount = ();
 	type OnKilledAccount = ();
 	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
+	type PalletInfo = ();
+	type SystemWeightInfo = ();
 }
 
 parameter_types! {
@@ -86,6 +87,8 @@ impl pallet_balances::Trait for Test {
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Test>;
+	type WeightInfo = ();
+	type MaxLocks = ();
 }
 
 impl voting::Trait for Test {

@@ -14,66 +14,83 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use super::*;
-use sp_staking::SessionIndex;
-use sp_runtime::traits::OpaqueKeys;
-use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::testing::{UintAuthorityId, TestXt};
 
+
+
+use frame_support::traits::OnUnbalanced;
+use pallet_staking::EraIndex;
+use super::*;
+use sp_runtime::curve::PiecewiseLinear;
+use sp_runtime::traits::{Convert, SaturatedConversion, Zero};
+use sp_runtime::testing::{UintAuthorityId, TestXt};
+use sp_staking::{SessionIndex};
+use frame_support::{
+	impl_outer_origin, parameter_types, impl_outer_dispatch, impl_outer_event,
+	StorageValue, StorageMap, StorageDoubleMap,
+	traits::{Currency, Get, FindAuthor, OnFinalize},
+	weights::{Weight, constants::RocksDbWeight},
+};
 #[cfg(feature = "std")]
 use std::{collections::HashSet, cell::RefCell};
 
-use sp_core::{H256, crypto::key_types};
+use sp_core::{H256};
 
-use frame_support::{parameter_types, impl_outer_origin, impl_outer_dispatch, weights::Weight};
-use frame_support::{traits::{Contains, ContainsLengthBound, OnFinalize}};
+use frame_support::{traits::{Contains, ContainsLengthBound}};
 
 use sp_runtime::{
-	Perbill, Permill, KeyTypeId, ModuleId,
+	Perbill, Permill, ModuleId,
 	testing::{Header}, Percent,
-	traits::{BlakeTwo256, IdentityLookup, One},
+	traits::{IdentityLookup, One},
 };
 
 use crate::GenesisConfig;
 
 /// The AccountId alias in this test module.
-pub type AccountId = u64;
-pub type Balance = u128;
+pub(crate) type AccountId = u64;
+pub(crate) type AccountIndex = u64;
+pub(crate) type BlockNumber = u64;
+pub(crate) type Balance = u128;
 
 /// Simple structure that exposes how u64 currency can be represented as... u64.
 pub struct CurrencyToVoteHandler;
-impl sp_runtime::traits::Convert<u64, u64> for CurrencyToVoteHandler {
-	fn convert(x: u64) -> u64 { x }
+impl Convert<Balance, u64> for CurrencyToVoteHandler {
+	fn convert(x: Balance) -> u64 {
+		x.saturated_into()
+	}
 }
-impl sp_runtime::traits::Convert<u128, u64> for CurrencyToVoteHandler {
-	fn convert(x: u128) -> u64 { x as u64 }
-}
-impl sp_runtime::traits::Convert<u128, u128> for CurrencyToVoteHandler {
-	fn convert(x: u128) -> u128 { x }
-}
-impl sp_runtime::traits::Convert<u64, u128> for CurrencyToVoteHandler {
-	fn convert(x: u64) -> u128 { x as u128 }
+impl Convert<u128, Balance> for CurrencyToVoteHandler {
+	fn convert(x: u128) -> Balance {
+		x
+	}
 }
 
 thread_local! {
 	static SESSION: RefCell<(Vec<AccountId>, HashSet<AccountId>)> = RefCell::new(Default::default());
-	static EXISTENTIAL_DEPOSIT: RefCell<u64> = RefCell::new(0);
+	static SESSION_PER_ERA: RefCell<SessionIndex> = RefCell::new(3);
+	static EXISTENTIAL_DEPOSIT: RefCell<Balance> = RefCell::new(0);
+	static SLASH_DEFER_DURATION: RefCell<EraIndex> = RefCell::new(0);
+	static ELECTION_LOOKAHEAD: RefCell<BlockNumber> = RefCell::new(0);
+	static PERIOD: RefCell<BlockNumber> = RefCell::new(1);
+	static MAX_ITERATIONS: RefCell<u32> = RefCell::new(0);
 }
 
-pub struct TestSessionHandler;
-impl pallet_session::SessionHandler<AccountId> for TestSessionHandler {
-	const KEY_TYPE_IDS: &'static [KeyTypeId] = &[key_types::DUMMY];
+/// Another session handler struct to test on_disabled.
+pub struct OtherSessionHandler;
+impl pallet_session::OneSessionHandler<AccountId> for OtherSessionHandler {
+	type Key = UintAuthorityId;
 
-	fn on_genesis_session<Ks: OpaqueKeys>(_validators: &[(AccountId, Ks)]) {}
+	fn on_genesis_session<'a, I: 'a>(_: I)
+		where I: Iterator<Item=(&'a AccountId, Self::Key)>, AccountId: 'a {}
 
-	fn on_new_session<Ks: OpaqueKeys>(
-		_changed: bool,
-		validators: &[(AccountId, Ks)],
-		_queued_validators: &[(AccountId, Ks)],
-	) {
-		SESSION.with(|x|
-			*x.borrow_mut() = (validators.iter().map(|x| x.0.clone()).collect(), HashSet::new())
-		);
+	fn on_new_session<'a, I: 'a>(_: bool, validators: I, _: I,)
+		where I: Iterator<Item=(&'a AccountId, Self::Key)>, AccountId: 'a
+	{
+		SESSION.with(|x| {
+			*x.borrow_mut() = (
+				validators.map(|x| x.0.clone()).collect(),
+				HashSet::new(),
+			)
+		});
 	}
 
 	fn on_disabled(validator_index: usize) {
@@ -85,17 +102,84 @@ impl pallet_session::SessionHandler<AccountId> for TestSessionHandler {
 	}
 }
 
+impl sp_runtime::BoundToRuntimeAppPublic for OtherSessionHandler {
+	type Public = UintAuthorityId;
+}
+
+pub fn is_disabled(controller: AccountId) -> bool {
+	let stash = Staking::ledger(&controller).unwrap().stash;
+	SESSION.with(|d| d.borrow().1.contains(&stash))
+}
+
+pub struct ExistentialDeposit;
+impl Get<Balance> for ExistentialDeposit {
+	fn get() -> Balance {
+		EXISTENTIAL_DEPOSIT.with(|v| *v.borrow())
+	}
+}
+
+pub struct SessionsPerEra;
+impl Get<SessionIndex> for SessionsPerEra {
+	fn get() -> SessionIndex {
+		SESSION_PER_ERA.with(|v| *v.borrow())
+	}
+}
+impl Get<BlockNumber> for SessionsPerEra {
+	fn get() -> BlockNumber {
+		SESSION_PER_ERA.with(|v| *v.borrow() as BlockNumber)
+	}
+}
+
+pub struct ElectionLookahead;
+impl Get<BlockNumber> for ElectionLookahead {
+	fn get() -> BlockNumber {
+		ELECTION_LOOKAHEAD.with(|v| *v.borrow())
+	}
+}
+
+pub struct Period;
+impl Get<BlockNumber> for Period {
+	fn get() -> BlockNumber {
+		PERIOD.with(|v| *v.borrow())
+	}
+}
+
+pub struct SlashDeferDuration;
+impl Get<EraIndex> for SlashDeferDuration {
+	fn get() -> EraIndex {
+		SLASH_DEFER_DURATION.with(|v| *v.borrow())
+	}
+}
+
+pub struct MaxIterations;
+impl Get<u32> for MaxIterations {
+	fn get() -> u32 {
+		MAX_ITERATIONS.with(|v| *v.borrow())
+	}
+}
+
 impl_outer_origin! {
-	pub enum Origin for Test  where system = frame_system { }
+	pub enum Origin for Test where system = frame_system {}
 }
 
 impl_outer_dispatch! {
 	pub enum Call for Test where origin: Origin {
-		pallet_staking::Staking,
+		staking::Staking,
 	}
 }
 
-#[derive(Clone, PartialEq, Eq, Debug)]
+/// Author of block is always 11
+pub struct Author11;
+impl FindAuthor<AccountId> for Author11 {
+	fn find_author<'a, I>(_digests: I) -> Option<AccountId>
+		where I: 'a + IntoIterator<Item = (frame_support::ConsensusEngineId, &'a [u8])>,
+	{
+		Some(11)
+	}
+}
+
+// Workaround for https://github.com/rust-lang/rust/issues/26925 . Remove when sorted.
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Test;
 
 parameter_types! {
@@ -103,73 +187,77 @@ parameter_types! {
 	pub const MaximumBlockWeight: Weight = 1024;
 	pub const MaximumBlockLength: u32 = 2 * 1024;
 	pub const AvailableBlockRatio: Perbill = Perbill::one();
-	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
-
 impl frame_system::Trait for Test {
 	type BaseCallFilter = ();
 	type Origin = Origin;
-	type Index = u64;
-	type BlockNumber = u64;
+	type Index = AccountIndex;
+	type BlockNumber = BlockNumber;
 	type Call = Call;
 	type Hash = H256;
-	type Hashing = BlakeTwo256;
+	type Hashing = ::sp_runtime::traits::BlakeTwo256;
 	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = ();
+	type DbWeight = RocksDbWeight;
 	type BlockExecutionWeight = ();
 	type ExtrinsicBaseWeight = ();
-	type MaximumBlockLength = MaximumBlockLength;
+	type MaximumExtrinsicWeight = MaximumBlockWeight;
 	type AvailableBlockRatio = AvailableBlockRatio;
+	type MaximumBlockLength = MaximumBlockLength;
 	type Version = ();
-	type ModuleToIndex = ();
-	type AccountData = pallet_balances::AccountData<u128>;
+	type PalletInfo = ();
+	type AccountData = pallet_balances::AccountData<Balance>;
 	type OnNewAccount = ();
-	type MigrateAccount = ();
 	type OnKilledAccount = ();
-	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
+	type SystemWeightInfo = ();
+	type MigrateAccount = ();
 }
-
-parameter_types! {
-	pub const ExistentialDeposit: u128 = 1;
-}
-
 impl pallet_balances::Trait for Test {
-	type Balance = u128;
-	type DustRemoval = ();
+	type MaxLocks = ();
+	type Balance = Balance;
 	type Event = ();
+	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
-	type AccountStore = frame_system::Module<Test>;
+	type AccountStore = System;
+	type WeightInfo = ();
 }
-
 parameter_types! {
-	pub const Period: u64 = 1;
-	pub const Offset: u64 = 0;
+	pub const Offset: BlockNumber = 0;
 	pub const UncleGenerations: u64 = 0;
 	pub const DisabledValidatorsThreshold: Perbill = Perbill::from_percent(25);
 }
-
+sp_runtime::impl_opaque_keys! {
+	pub struct SessionKeys {
+		pub other: OtherSessionHandler,
+	}
+}
 impl pallet_session::Trait for Test {
-	type Keys = UintAuthorityId;
+	type SessionManager = pallet_session::historical::NoteHistoricalRoot<Test, Staking>;
+	type Keys = SessionKeys;
 	type ShouldEndSession = pallet_session::PeriodicSessions<Period, Offset>;
-	type SessionHandler = TestSessionHandler;
+	type SessionHandler = (OtherSessionHandler,);
 	type Event = ();
 	type ValidatorId = AccountId;
 	type ValidatorIdOf = pallet_staking::StashOf<Test>;
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
-	type SessionManager = Staking;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type WeightInfo = ();
 }
 
 impl pallet_session::historical::Trait for Test {
 	type FullIdentification = pallet_staking::Exposure<AccountId, Balance>;
 	type FullIdentificationOf = pallet_staking::ExposureOf<Test>;
 }
-
+impl pallet_authorship::Trait for Test {
+	type FindAuthor = Author11;
+	type UncleGenerations = UncleGenerations;
+	type FilterUncle = ();
+	type EventHandler = pallet_staking::Module<Test>;
+}
 parameter_types! {
 	pub const MinimumPeriod: u64 = 5;
 }
@@ -177,17 +265,52 @@ impl pallet_timestamp::Trait for Test {
 	type Moment = u64;
 	type OnTimestampSet = ();
 	type MinimumPeriod = MinimumPeriod;
+	type WeightInfo = ();
 }
-
 pallet_staking_reward_curve::build! {
 	const I_NPOS: PiecewiseLinear<'static> = curve!(
 		min_inflation: 0_025_000,
 		max_inflation: 0_100_000,
-		ideal_stake: 0_800_000,
+		ideal_stake: 0_500_000,
 		falloff: 0_050_000,
 		max_piece_count: 40,
 		test_precision: 0_005_000,
 	);
+}
+parameter_types! {
+	pub const BondingDuration: EraIndex = 3;
+	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
+	pub const MaxNominatorRewardedPerValidator: u32 = 64;
+	pub const UnsignedPriority: u64 = 1 << 20;
+	pub const MinSolutionScoreBump: Perbill = Perbill::zero();
+}
+
+thread_local! {
+	pub static REWARD_REMAINDER_UNBALANCED: RefCell<u128> = RefCell::new(0);
+}
+
+impl pallet_staking::Trait for Test {
+	type Currency = Balances;
+	type UnixTime = Timestamp;
+	type CurrencyToVote = CurrencyToVoteHandler;
+	type RewardRemainder = ();
+	type Event = ();
+	type Slash = ();
+	type Reward = ();
+	type SessionsPerEra = SessionsPerEra;
+	type SlashDeferDuration = SlashDeferDuration;
+	type SlashCancelOrigin = frame_system::EnsureRoot<Self::AccountId>;
+	type BondingDuration = BondingDuration;
+	type SessionInterface = Self;
+	type RewardCurve = RewardCurve;
+	type NextNewSession = Session;
+	type ElectionLookahead = ElectionLookahead;
+	type Call = Call;
+	type MaxIterations = MaxIterations;
+	type MinSolutionScoreBump = MinSolutionScoreBump;
+	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
+	type UnsignedPriority = UnsignedPriority;
+	type WeightInfo = ();
 }
 
 impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test where
@@ -199,36 +322,6 @@ impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test
 
 pub type Extrinsic = TestXt<Call, ()>;
 
-parameter_types! {
-	pub const SessionsPerEra: SessionIndex = 3;
-	pub const BondingDuration: pallet_staking::EraIndex = 3;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &I_NPOS;
-	pub const MaxNominatorRewardedPerValidator: u32 = 64;
-	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
-}
-
-impl pallet_staking::Trait for Test {
-	type Currency = pallet_balances::Module<Self>;
-	type UnixTime = pallet_timestamp::Module<Self>;
-	type CurrencyToVote = CurrencyToVoteHandler;
-	type RewardRemainder = ();
-	type Event = ();
-	type Slash = ();
-	type Reward = ();
-	type SessionsPerEra = SessionsPerEra;
-	type SlashDeferDuration = ();
-	type SlashCancelOrigin = frame_system::EnsureRoot<Self::AccountId>;
-	type BondingDuration = BondingDuration;
-	type SessionInterface = Self;
-	type RewardCurve = RewardCurve;
-	type NextNewSession = pallet_session::Module<Test>;
-	type ElectionLookahead = ();
-	type Call = Call;
-	type MaxIterations = ();
-	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
-	type UnsignedPriority = ();
-	type MinSolutionScoreBump = MinSolutionScoreBump;
-}
 
 thread_local! {
 	static TEN_TO_FOURTEEN: RefCell<Vec<u64>> = RefCell::new(vec![10,11,12,13,14]);
@@ -267,6 +360,7 @@ parameter_types! {
 	pub const TipReportDepositPerByte: u64 = 1;
 	pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
 }
+
 impl pallet_treasury::Trait for Test {
 	type ModuleId = TreasuryModuleId;
 	type Currency = pallet_balances::Module<Test>;
@@ -276,13 +370,21 @@ impl pallet_treasury::Trait for Test {
 	type TipCountdown = TipCountdown;
 	type TipFindersFee = TipFindersFee;
 	type TipReportDepositBase = TipReportDepositBase;
-	type TipReportDepositPerByte = TipReportDepositPerByte;
 	type Event = ();
-	type ProposalRejection = ();
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
+	type DataDepositPerByte = ();
+	type BountyDepositBase = ();
+	type BountyDepositPayoutDelay = ();
+	type BountyUpdatePeriod = ();
+	type BountyCuratorDeposit = ();
+	type BountyValueMinimum = ();
+	type MaximumReasonLength = ();
+	type BurnDestination = ();
+	type WeightInfo = ();
+	type OnSlash = ();
 }
 
 
@@ -297,9 +399,11 @@ impl Trait for Test {
 }
 
 pub type Balances = pallet_balances::Module<Test>;
+pub type Session = pallet_session::Module<Test>;
 pub type System = frame_system::Module<Test>;
 pub type Staking = pallet_staking::Module<Test>;
 pub type Treasury = pallet_treasury::Module<Test>;
+pub type Timestamp = pallet_timestamp::Module<Test>;
 pub type TreasuryReward = Module<Test>;
 
 pub struct ExtBuilder {

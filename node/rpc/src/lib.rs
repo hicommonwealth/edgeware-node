@@ -29,18 +29,22 @@
 
 #![warn(missing_docs)]
 
-use std::sync::Arc;
-
+use std::{sync::Arc};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-use edgeware_runtime::UncheckedExtrinsic;
-use sc_finality_grandpa::{SharedAuthoritySet, SharedVoterState};
+use sc_finality_grandpa::{
+	SharedVoterState, SharedAuthoritySet, FinalityProofProvider, GrandpaJustificationStream
+};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
+pub use sc_rpc_api::DenyUnsafe;
 use sp_api::ProvideRuntimeApi;
-use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
-use sp_consensus::SelectChain;
-use sp_transaction_pool::TransactionPool;
-use sc_rpc_api::DenyUnsafe;
 use sp_block_builder::BlockBuilder;
+use sp_blockchain::{Error as BlockChainError, HeaderMetadata, HeaderBackend};
+use sp_consensus::SelectChain;
+use sc_rpc::SubscriptionTaskExecutor;
+use sp_transaction_pool::TransactionPool;
+
+/// Public io handler for exporting into other modules
+pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 
 /// Light client extra dependencies.
 pub struct LightDeps<C, F, P> {
@@ -55,15 +59,21 @@ pub struct LightDeps<C, F, P> {
 }
 
 /// Extra dependencies for GRANDPA
-pub struct GrandpaDeps {
+pub struct GrandpaDeps<B> {
 	/// Voting round info.
 	pub shared_voter_state: SharedVoterState,
 	/// Authority set info.
 	pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
+	/// Receives notifications about justification events from Grandpa.
+	pub justification_stream: GrandpaJustificationStream<Block>,
+	/// Executor to drive the subscription manager in the Grandpa RPC handler.
+	pub subscription_executor: SubscriptionTaskExecutor,
+	/// Finality proof provider.
+	pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC> {
+pub struct FullDeps<C, P, SC, B> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
@@ -73,26 +83,29 @@ pub struct FullDeps<C, P, SC> {
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
-	pub grandpa: GrandpaDeps,
+	pub grandpa: GrandpaDeps<B>,
 }
 
+
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, M, SC>(deps: FullDeps<C, P, SC>) -> jsonrpc_core::IoHandler<M>
-where
+pub fn create_full<C, P, SC, B>(
+	deps: FullDeps<C, P, SC, B>,
+) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata> where
 	C: ProvideRuntimeApi<Block>,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error=BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
-	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance, UncheckedExtrinsic>,
+	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: BlockBuilder<Block>,
 	P: TransactionPool + 'static,
-	M: jsonrpc_core::Metadata + Default,
 	SC: SelectChain<Block> +'static,
+	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
+	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
-	use pallet_contracts_rpc::{Contracts, ContractsApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
+	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
 	let FullDeps {
@@ -105,6 +118,9 @@ where
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
+		justification_stream,
+		subscription_executor,
+		finality_provider,
 	} = grandpa;
 
 	io.extend_with(
@@ -119,11 +135,19 @@ where
 	io.extend_with(
 		TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone()))
 	);
+
 	io.extend_with(
 		sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
-			GrandpaRpcHandler::new(shared_authority_set, shared_voter_state)
+			GrandpaRpcHandler::new(
+				shared_authority_set,
+				shared_voter_state,
+				justification_stream,
+				subscription_executor,
+				finality_provider,
+			)
 		)
 	);
+
 	io
 }
 
