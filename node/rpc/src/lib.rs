@@ -156,7 +156,6 @@ pub fn create_full<C, P, SC, B>(
 	io.extend_with(
 		EthApiServer::to_delegate(EthApi::new(
 			client.clone(),
-			select_chain.clone(),
 			pool.clone(),
 			edgeware_runtime::TransactionConverter,
 			is_authority,
@@ -165,14 +164,12 @@ pub fn create_full<C, P, SC, B>(
 	io.extend_with(
 		NetApiServer::to_delegate(NetApi::new(
 			client.clone(),
-			select_chain.clone(),
 		))
 	);
 	io.extend_with(
 		EthPubSubApiServer::to_delegate(EthPubSubApi::new(
 			pool.clone(),
 			client.clone(),
-			select_chain.clone(),
 			network.clone(),
 			SubscriptionManager::new(Arc::new(subscription_task_executor)),
 		))

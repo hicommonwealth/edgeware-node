@@ -192,8 +192,8 @@ impl frame_system::Trait for Runtime {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = Version;
-	type ModuleToIndex = ModuleToIndex;
 	type AccountData = pallet_balances::AccountData<Balance>;
+	type PalletInfo = PalletInfo;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
@@ -461,6 +461,7 @@ parameter_types! {
 	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1 * CENTS;
 	pub const MaxVotes: u32 = 100;
+	pub const MaxProposals: u32 = 100;
 }
 
 impl pallet_democracy::Trait for Runtime {
@@ -498,6 +499,9 @@ impl pallet_democracy::Trait for Runtime {
 		pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
 		frame_system::EnsureRoot<AccountId>,
 	>;
+	// To cancel a proposal before it has been passed, the Root must agree.
+	type CancelProposalOrigin = EnsureRoot<AccountId>;
+	type BlacklistOrigin = EnsureRoot<AccountId>;
 	// No vetoing
 	type VetoOrigin = frame_system::EnsureNever<AccountId>;
 	type CooloffPeriod = CooloffPeriod;
@@ -508,6 +512,7 @@ impl pallet_democracy::Trait for Runtime {
 	type MaxVotes = MaxVotes;
 	type PalletsOrigin = OriginCaller;
 	type WeightInfo = weights::pallet_democracy::WeightInfo;
+	type MaxProposals = MaxProposals;
 }
 
 parameter_types! {
@@ -1345,6 +1350,18 @@ impl_runtime_apis! {
 
 		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
 			Ethereum::current_receipts()
+		}
+
+		fn current_all() -> (
+			Option<pallet_ethereum::Block>,
+			Option<Vec<pallet_ethereum::Receipt>>,
+			Option<Vec<TransactionStatus>>
+		) {
+			(
+				Ethereum::current_block(),
+				Ethereum::current_receipts(),
+				Ethereum::current_transaction_statuses()
+			)
 		}
 	}
 }

@@ -152,4 +152,16 @@ impl pallet_democracy::WeightInfo for WeightInfo {
 			.saturating_add(DbWeight::get().reads(2 as Weight))
 			.saturating_add(DbWeight::get().writes(2 as Weight))
 	}
+	fn blacklist(p: u32, ) -> Weight {
+		(117_847_000 as Weight)
+			.saturating_add((871_000 as Weight).saturating_mul(p as Weight))
+			.saturating_add(DbWeight::get().reads(5 as Weight))
+			.saturating_add(DbWeight::get().writes(6 as Weight))
+	}
+	fn cancel_proposal(p: u32, ) -> Weight {
+		(73_937_000 as Weight)
+			.saturating_add((962_000 as Weight).saturating_mul(p as Weight))
+			.saturating_add(DbWeight::get().reads(3 as Weight))
+			.saturating_add(DbWeight::get().writes(3 as Weight))
+	}
 }
