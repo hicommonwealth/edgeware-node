@@ -82,11 +82,17 @@ fn get_lockdrop_participants_allocation() -> Result<Allocation> {
 #[derive(Default, Clone, Serialize, Deserialize, ChainSpecExtension)]
 #[serde(rename_all = "camelCase")]
 pub struct Extensions {
+	/// Block numbers with known hashes.
+	pub fork_blocks: sc_client_api::ForkBlocks<Block>,
+
+	/// Known bad block hashes.
+	pub bad_blocks: sc_client_api::BadBlocks<Block>,
+
 	/// The relay chain of the Parachain.
-	pub relay_chain: String,
+	pub relay_chain: Option<String>,
 	
 	/// The id of the Parachain.
-	pub para_id: u32,
+	pub para_id: Option<u32>,
 }
 
 impl Extensions {
@@ -100,11 +106,48 @@ impl Extensions {
 pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
 // Rococo config
-pub fn edgeware_parachain() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/rococo-local.json")[..]) {
-		Ok(spec) => spec,
-		Err(e) => panic!(e),
-	}
+pub fn edgeware_parachain(para_id: Option<ParaId>) -> ChainSpec {
+	let data = r#"
+		{
+			"ss58Format": 42,
+			"tokenDecimals": 18,
+			"tokenSymbol": "tEDG"
+		}"#;
+	let properties = serde_json::from_str(data).unwrap();
+	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
+
+	ChainSpec::from_genesis(
+		"Development",
+		"dev",
+		ChainType::Development,
+		move || {
+			testnet_genesis(
+				vec![
+					get_authority_keys_from_seed("Alice"),
+					get_authority_keys_from_seed("Bob"),
+				],
+				get_account_id_from_seed::<sr25519::Public>("Alice"),
+				None,
+				false,
+				vec![],
+				vec![],
+				vec![],
+				para_id,
+			)
+		},
+		boot_nodes,
+		Some(
+			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
+				.expect("Staging telemetry url is valid; qed"),
+		),
+		Some(DEFAULT_PROTOCOL_ID),
+		properties,
+		Extensions {
+			relay_chain: para_id.map(|_| "rococo".into()),
+			para_id: para_id.map(Into::into),
+			..Default::default()
+		},
+	)
 }
 
 /// Mainnet configuration
@@ -180,6 +223,7 @@ pub fn testnet_genesis(
 	balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
+	para_id: Option<ParaId>,
 ) -> GenesisConfig {
 	// let alice_evm_account_id = H160::from_str("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b").unwrap();
 	// let mut evm_accounts = BTreeMap::new();
@@ -285,7 +329,7 @@ pub fn testnet_genesis(
 			minting_interval: One::one(),
 		}),
 		parachain_info: Some(ParachainInfoConfig {
-			parachain_id: 5000.into(),
+			parachain_id: para_id.unwrap_or(5001.into()),
 		}),
 	}
 }
@@ -326,6 +370,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		balances,
 		vesting,
 		crate::mainnet_fixtures::get_commonwealth_allocation(),
+		Some(5001.into()),
 	)
 }
 
@@ -372,6 +417,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		Some(5001.into()),
 	)
 }
 
@@ -384,6 +430,7 @@ fn development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		Some(5001.into()),
 	)
 }
 
@@ -407,8 +454,10 @@ pub fn development_config() -> ChainSpec {
 		None,
 		properties,
 		Extensions {
-			relay_chain: "rococo-local".into(),
-			para_id: 200u32.into(),
+			fork_blocks: None,
+			bad_blocks: None,
+			relay_chain: Some("rococo-local".into()),
+			para_id: Some(200u32.into()),
 		},
 	)
 }
@@ -447,6 +496,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		Some(5001.into()),
 	)
 }
 

@@ -79,7 +79,9 @@ impl SubstrateCli for Cli {
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
 			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
 			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
-			"rococo" => Box::new(chain_spec::edgeware_parachain()),
+			"rococo" => Box::new(chain_spec::edgeware_parachain(
+				self.run.parachain_id.map(Into::into),
+			)),
 			path => Box::new(chain_spec::ChainSpec::from_json_file(
 				std::path::PathBuf::from(path),
 			)?),
@@ -181,13 +183,13 @@ pub fn run() -> Result<()> {
 
 				let polkadot_cli = RelayChainCli::new(
 					config.base_path.as_ref().map(|x| x.path().join("polkadot")),
-					relay_chain_id,
+					relay_chain_id.unwrap(),
 					[RelayChainCli::executable_name().to_string()]
 						.iter()
 						.chain(cli.relaychain_args.iter()),
 				);
 
-				let id = ParaId::from(cli.run.parachain_id.or(para_id).unwrap_or(200));
+				let id = ParaId::from(cli.run.parachain_id.or(para_id.unwrap()).unwrap_or(200));
 
 				let parachain_account =
 					AccountIdConversion::<polkadot_primitives::v0::AccountId>::into_account(&id);
