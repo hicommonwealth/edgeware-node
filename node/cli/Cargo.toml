@@ -41,50 +41,50 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { version = "2.0.0",   git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sp-authority-discovery = { version = "2.0.0",   git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 sp-blockchain = { git = "https://github.com/hicommonwealth/substrate", branch = "develop" }
-sp-consensus-aura = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-finality-grandpa = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-core = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-runtime = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-timestamp = { version = "2.0.0", default-features = false,  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-finality-tracker = { version = "2.0.0", default-features = false,  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-inherents = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-keyring = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-io = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-consensus = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-transaction-pool = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sp-consensus-aura = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-finality-grandpa = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-core = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-runtime = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-timestamp = { version = "2.0.0", default-features = false,  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-finality-tracker = { version = "2.0.0", default-features = false,  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-inherents = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-keyring = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-io = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-consensus = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-transaction-pool = { version = "2.0.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 
 # client dependencies
-sc-client-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-chain-spec = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-transaction-pool = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-network = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-consensus-aura = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-client-db = { version = "0.8.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-offchain = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-rpc = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-basic-authorship = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service = { version = "0.8.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-tracing = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-telemetry = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-authority-discovery = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-client-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-chain-spec = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-transaction-pool = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-network = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-consensus-aura = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-client-db = { version = "0.8.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-offchain = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-rpc = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-basic-authorship = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-service = { version = "0.8.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-tracing = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-telemetry = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-authority-discovery = { version = "0.8.0",  git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 
 
 # frame dependencies
-pallet-indices = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-timestamp = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-contracts = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-system = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-balances = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-support = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-im-online = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-authority-discovery = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-staking = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-grandpa = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+pallet-indices = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-timestamp = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-contracts = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+frame-system = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-balances = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+frame-support = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-im-online = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-authority-discovery = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-staking = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-grandpa = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -93,26 +93,26 @@ edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
 
 # CLI-specific dependencies
-sc-cli = { version = "0.8.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-benchmarking-cli = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-cli = { version = "0.8.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+frame-benchmarking-cli = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 edgeware-inspect = { optional = true, path = "../inspect" }
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", optional = true }
+browser-utils = { package = "substrate-browser-utils", git = "https://github.com/hicommonwealth/substrate.git", branch = "master", optional = true }
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
 edgeware-executor = { path = "../executor", features = [ "wasmtime" ] }
-sc-cli = { version = "0.8.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", features = [ "wasmtime" ] }
-sc-service = { version = "0.8.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", features = [ "wasmtime" ] }
-sp-trie = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop", features = ["memory-tracker"] }
+sc-cli = { version = "0.8.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master", features = [ "wasmtime" ] }
+sc-service = { version = "0.8.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master", features = [ "wasmtime" ] }
+sp-trie = { version = "2.0.0", default-features = false, git = "https://github.com/hicommonwealth/substrate.git", branch = "master", features = ["memory-tracker"] }
 
 [dev-dependencies]
-sc-keystore = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-service-test = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sc-keystore = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-service-test = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 futures = "0.3.4"
 tempfile = "3.1.0"
 assert_cmd = "1.0"
@@ -124,16 +124,11 @@ platforms = "0.2.1"
 [build-dependencies]
 structopt = { version = "0.3.8", optional = true }
 edgeware-inspect = { optional = true, path = "../inspect" }
-frame-benchmarking-cli = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-substrate-build-script-utils = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-substrate-frame-cli = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+frame-benchmarking-cli = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+substrate-build-script-utils = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+substrate-frame-cli = { version = "2.0.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-cli = { version = "0.8.0", optional = true, git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 
-[build-dependencies.sc-cli]
-version = "0.8.0"
-package = "sc-cli"
-git = "https://github.com/hicommonwealth/substrate.git"
-branch = "develop"
-optional = true
 
 [features]
 default = [ "cli" ]
