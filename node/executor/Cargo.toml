@@ -8,29 +8,29 @@ edition = "2018"
 [dependencies]
 trie-root = "0.16.0"
 codec = { package = "parity-scale-codec", version = "1.3.0" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-state-machine = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-trie = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-benchmarking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+sp-io = { git = "https://github.com/paritytech/substrate.git" }
+sp-state-machine = { git = "https://github.com/paritytech/substrate.git" }
+sc-executor = { git = "https://github.com/paritytech/substrate.git" }
+sp-core = { git = "https://github.com/paritytech/substrate.git" }
+sp-trie = { git = "https://github.com/paritytech/substrate.git" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate.git" }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 edgeware-runtime-interface = { path = "../runtime-interface" }
 
 [dev-dependencies]
-test-client = { package = "substrate-test-client", git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-treasury = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "develop" }
+test-client = { package = "substrate-test-client", git = "https://github.com/paritytech/substrate.git" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git" }
+frame-support = { git = "https://github.com/paritytech/substrate.git" }
+pallet-balances = { git = "https://github.com/paritytech/substrate.git" }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git" }
+pallet-session = { git = "https://github.com/paritytech/substrate.git" }
+frame-system = { git = "https://github.com/paritytech/substrate.git" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate.git" }
+pallet-treasury = { git = "https://github.com/paritytech/substrate.git" }
+pallet-grandpa = { git = "https://github.com/paritytech/substrate.git" }
+pallet-indices = { git = "https://github.com/paritytech/substrate.git" }
 wabt = "0.10.0"
 criterion = "0.3.0"
 

@@ -70,7 +70,6 @@ impl frame_system::Trait for Test {
 	type Version = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
-	type MigrateAccount = ();
 	type OnKilledAccount = ();
 	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
 	type PalletInfo = ();
