@@ -11,22 +11,22 @@ targets = ["x86_64-unknown-linux-gnu"]
 jsonrpc-core = "15.0.0"
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
-pallet-contracts-rpc = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-transaction-payment-rpc = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-client-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-consensus-babe = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-consensus-babe-rpc = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-finality-grandpa-rpc = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-keystore = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-rpc-api = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-rpc = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-block-builder = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-blockchain = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-consensus-babe = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-runtime = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-transaction-pool = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-substrate-frame-rpc-system = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-contracts-rpc = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+pallet-transaction-payment-rpc = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sc-client-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sc-consensus-babe = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sc-consensus-babe-rpc = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sc-finality-grandpa-rpc = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sc-keystore = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sc-rpc-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sc-rpc = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sp-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sp-block-builder = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sp-blockchain = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sp-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sp-consensus-babe = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sp-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+substrate-frame-rpc-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }

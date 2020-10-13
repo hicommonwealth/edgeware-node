@@ -6,24 +6,24 @@ description = "Test utilities for Edgeware."
 edition = "2018"
 
 [dependencies]
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-balances = { git = "https://github.com/paritytech/substrate.git" }
 codec = { package = "parity-scale-codec", version = "1.3.0" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master", features = ["test-helpers", "db"] }
-pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-substrate-test-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-treasury = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-service = { git = "https://github.com/paritytech/substrate.git", features = ["test-helpers", "db"] }
+pallet-grandpa = { git = "https://github.com/paritytech/substrate.git" }
+pallet-indices = { git = "https://github.com/paritytech/substrate.git" }
+sp-keyring = { git = "https://github.com/paritytech/substrate.git" }
+sp-core = { git = "https://github.com/paritytech/substrate.git" }
+sp-io = { git = "https://github.com/paritytech/substrate.git" }
+frame-support = { git = "https://github.com/paritytech/substrate.git" }
+pallet-session = { git = "https://github.com/paritytech/substrate.git" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git" }
+pallet-staking = { git = "https://github.com/paritytech/substrate.git" }
+sc-executor = { git = "https://github.com/paritytech/substrate.git" }
+frame-system = { git = "https://github.com/paritytech/substrate.git" }
+substrate-test-client = { git = "https://github.com/paritytech/substrate.git" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate.git" }
+pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git" }
+pallet-treasury = { git = "https://github.com/paritytech/substrate.git" }
 wabt = "0.10.0"
 
 edgeware-executor = { path = "../executor" }
