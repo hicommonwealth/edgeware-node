@@ -9,8 +9,8 @@ edition = "2018"
 codec = { package = "parity-scale-codec", version = "1.3.0" }
 sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 sp-runtime-interface = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-runtime-interface-proc-macro = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-edgeware-primitives = { path = "../primitives" }
+sp-runtime-interface-proc-macro = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+edgeware-primitives = { version = "3.1.0", path = "../primitives" }
 
 [features]
 default = [ "std" ]

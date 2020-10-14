@@ -6,28 +6,28 @@ description = "Test utilities for Edgeware."
 edition = "2018"
 
 [dependencies]
-pallet-balances = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-balances = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 codec = { package = "parity-scale-codec", version = "1.3.0" }
-sc-service = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master", features = ["test-helpers", "db"] }
-pallet-grandpa = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-indices = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-keyring = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-core = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-io = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-frame-support = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-session = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-runtime = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-staking = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-executor = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-frame-system = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-substrate-test-client = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-timestamp = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-transaction-payment = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-treasury = { git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-service = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master", features = ["test-helpers", "db"] }
+pallet-grandpa = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-indices = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-keyring = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-core = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-io = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+frame-support = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-session = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sp-runtime = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-staking = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+sc-executor = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+frame-system = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+substrate-test-client = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-timestamp = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-transaction-payment = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+pallet-treasury = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
 wabt = "0.10.0"
 
-edgeware-executor = { path = "../executor" }
-edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
-signaling = { package = "edge-signaling", path = "../../modules/edge-signaling" }
-treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward" }
+edgeware-executor = { version = "3.1.0", path = "../executor" }
+edgeware-primitives = { version = "3.1.0", path = "../primitives" }
+edgeware-runtime = { version = "3.1.0", path = "../runtime" }
+signaling = { package = "edge-signaling", version = "1.0.0", path = "../../modules/edge-signaling" }
+treasury-reward = { package = "edge-treasury-reward", version = "1.0.0", path = "../../modules/edge-treasury-reward" }
