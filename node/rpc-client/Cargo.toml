@@ -4,6 +4,7 @@ version = "3.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
+description = "Edgweare rpc client library"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
