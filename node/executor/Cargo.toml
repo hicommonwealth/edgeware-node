@@ -4,6 +4,10 @@ version = "3.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 edition = "2018"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 trie-root = "0.16.0"

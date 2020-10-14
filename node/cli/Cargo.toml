@@ -6,6 +6,10 @@ description = "Edgeware implementation using a substrate node."
 build = "build.rs"
 edition = "2018"
 default-run = "edgeware"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [package.metadata.wasm-pack.profile.release]
 # `wasm-opt` has some problems on linux, see
