@@ -42,7 +42,7 @@ sp-version = { version = "2.0.0", git = "https://github.com/hicommonwealth/subst
 sp-offchain = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master", default-features = false }
 
 # edgeware primitives
-edgeware-primitives = { path = "../primitives", default-features = false }
+edgeware-primitives = { version = "3.1.0", path = "../primitives", default-features = false }
 
 # pallet dependencies
 pallet-assets = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master", default-features = false }
