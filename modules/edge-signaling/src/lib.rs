@@ -96,7 +96,7 @@ decl_error! {
 		// Invalid or empty title of proposal
 		InvalidProposalTitle,
 		// Invalid or empty contents of proposal
-		InvalidProposalContents
+		InvalidProposalContents,
 		// Duplicate proposal
 		DuplicateProposal,
 		// Not the proposal author
