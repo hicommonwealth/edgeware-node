@@ -712,6 +712,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "chainbridge"
+version = "0.0.2"
+source = "git+https://github.com/hicommonwealth/chainbridge-substrate.git#e17b65f38386934f4913da5a278f4f47f341fa4b"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-io 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-runtime 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-std 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "substrate-wasm-builder-runner",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1341,7 +1358,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-cli"
-version = "3.1.0"
+version = "3.1.1"
 dependencies = [
  "assert_cmd",
  "edgeware-executor",
@@ -1519,8 +1536,9 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "3.1.0"
+version = "3.1.1"
 dependencies = [
+ "chainbridge",
  "edge-signaling",
  "edge-treasury-reward",
  "edge-voting",
