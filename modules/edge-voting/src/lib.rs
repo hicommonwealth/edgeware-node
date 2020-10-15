@@ -136,19 +136,17 @@ decl_error! {
 			/// Vote not in voting stage
 			NotVotingStage,
 			/// Ranked choice vote is not valid
-			InvalidVote,
+			InvalidRankedChoiceVote,
 			/// Multi-option/binary vote is not valid
-			InvalidOutcome,
-			/// Ranked choice vote does not rank all outcomes
-			MustRankAllOutcomes,
+			InvalidVote,
 			/// Vote has already been cast
 			DuplicateVote,
 			/// Must pass in secret for reveal
-			InvalidSecret,
+			SecretMissing,
 			/// Cannot reveal if not already committed
 			SenderNotCommitted,
 			/// Hash of reveal does not match commit
-			CommitNotMatching,
+			InvalidSecret,
 			/// Binary votes must have exactly 2 outcomes
 			InvalidBinaryOutcomes,
 			/// Multi-option votes must have >2 outcomes
@@ -203,23 +201,19 @@ decl_module! {
 				ensure!(Self::is_ranked_choice_vote_valid(
 					vote.clone(),
 					record.outcomes.clone()
-				), Error::<T>::InvalidVote);
+				), Error::<T>::InvalidRankedChoiceVote);
 			} else {
 				ensure!(Self::is_valid_vote(
 					vote.clone(),
 					record.outcomes.clone()
-				), Error::<T>::InvalidOutcome);
-			}
-			// Ensure ranked choice votes have same number of votes as outcomes
-			if record.data.vote_type == VoteType::RankedChoice {
-				ensure!(record.outcomes.len() == vote.len(), Error::<T>::MustRankAllOutcomes);
+				), Error::<T>::InvalidVote);
 			}
 			// Reject vote or reveal changes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateVote);
 			// Ensure voter committed
 			if record.data.is_commit_reveal {
 				// Ensure secret is passed in
-				ensure!(secret.is_some(), Error::<T>::InvalidSecret);
+				ensure!(secret.is_some(), Error::<T>::SecretMissing);
 				// Ensure the current sender has already committed previously
 				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), Error::<T>::SenderNotCommitted);
 				let commit: (T::AccountId, VoteOutcome) = record.commitments
@@ -236,7 +230,7 @@ decl_module! {
 				}
 				let hash = T::Hashing::hash_of(&buf);
 				// Ensure the hashes match
-				ensure!(hash.encode() == commit.1.encode(), Error::<T>::CommitNotMatching);
+				ensure!(hash.encode() == commit.1.encode(), Error::<T>::InvalidSecret);
 			}
 			// Record the revealed vote and emit an event
 			let id = record.id;

@@ -93,19 +93,19 @@ decl_error! {
 	pub enum Error for Module<T: Trait> {
 		/// Corresponding voting for signaling proposal not found
 		VoteRecordDoesntExist,
-		// Invalid or empty title of proposal
+		/// Invalid or empty title of proposal
 		InvalidProposalTitle,
-		// Invalid or empty contents of proposal
+		/// Invalid or empty contents of proposal
 		InvalidProposalContents,
-		// Duplicate proposal
+		/// Duplicate proposal
 		DuplicateProposal,
-		// Not the proposal author
+		/// Not the proposal author
 		NotAuthor,
-		// Proposal in wrong stage
+		/// Proposal in wrong stage
 		InvalidStage,
-		// Proposal does not exist with given hash
+		/// Proposal does not exist with given hash
 		ProposalMissing,
-		// Insufficient funds to reserve bond
+		/// Insufficient funds to reserve bond
 		InsufficientFunds,
 	}
 }

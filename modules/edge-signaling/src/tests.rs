@@ -232,7 +232,7 @@ fn propose_duplicate_should_fail() {
 		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin));
 		assert_err!(
 			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
-			"Proposal already exists");
+			Error::<Test>::DuplicateProposal);
 		assert_eq!(Signaling::proposal_count(), 1);
 		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
 		assert_eq!(
@@ -256,7 +256,7 @@ fn propose_empty_should_fail() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
 			propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
-			"Proposal must not be empty"
+			Error::<Test>::InvalidProposalContents,
 		);
 		assert_eq!(Signaling::proposal_count(), 0);
 		assert_eq!(Signaling::inactive_proposals(), vec![]);
@@ -275,7 +275,7 @@ fn propose_empty_title_should_fail() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
 			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
-			"Proposal must have title"
+			Error::<Test>::InvalidProposalTitle,
 		);
 		assert_eq!(Signaling::proposal_count(), 0);
 		assert_eq!(Signaling::inactive_proposals(), vec![]);
@@ -322,8 +322,7 @@ fn advance_proposal_if_voting_should_fail() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
 		assert_ok!(advance_proposal(public, hash));
-		assert_err!(advance_proposal(public, hash),
-								"Proposal not in pre-voting or commit stage");
+		assert_err!(advance_proposal(public, hash), Error::<Test>::InvalidStage);
 		assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
 		assert_eq!(
 			Signaling::proposal_of(hash),
@@ -384,6 +383,17 @@ fn voting_proposal_should_advance() {
 }
 
 #[test]
+fn advance_proposal_if_invalid_should_fail() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let proposal = vec![];
+		let hash = build_proposal_hash(public, &proposal);
+		assert_err!(advance_proposal(public, hash), Error::<Test>::ProposalMissing);
+	});
+}
+
+#[test]
 fn advance_proposal_if_completed_should_fail() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
@@ -397,7 +407,7 @@ fn advance_proposal_if_completed_should_fail() {
 		System::set_block_number(10002);
 		<Signaling as OnFinalize<u64>>::on_finalize(10002);
 		System::set_block_number(10003);
-		assert_err!(advance_proposal(public, hash), "Proposal not in pre-voting or commit stage");
+		assert_err!(advance_proposal(public, hash), Error::<Test>::InvalidStage);
 		assert_eq!(Signaling::active_proposals(), vec![]);
 		assert_eq!(
 			Signaling::proposal_of(hash),
@@ -421,7 +431,7 @@ fn non_author_advance_should_fail() {
 		let other_public = 2_u64;
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin));
-		assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
+		assert_err!(advance_proposal(other_public, hash), Error::<Test>::NotAuthor);
 		assert_eq!(Signaling::active_proposals(), vec![]);
 		assert_eq!(
 			Signaling::proposal_of(hash),
@@ -442,8 +452,10 @@ fn creating_proposal_with_insufficient_balance_fails() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 
 		assert_err!(
-			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
-			"Not enough currency for reserve bond");
+			propose(
+				public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin),
+				Error::<Test>::InsufficientFunds,
+			);
 	});
 }
 

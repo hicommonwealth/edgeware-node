@@ -242,7 +242,7 @@ fn create_binary_vote_with_multi_options_should_not_work() {
 		let public = get_test_key();
 		let vote = generate_1p1v_public_binary_vote();
 		let multi_vote = generate_1p1v_public_multi_vote();
-		assert_err!(create_vote(public, vote.0, vote.1, vote.2, &multi_vote.3), "Invalid binary outcomes");
+		assert_err!(create_vote(public, vote.0, vote.1, vote.2, &multi_vote.3), Error::<Test>::InvalidBinaryOutcomes);
 		assert_eq!(Voting::vote_record_count(), 0);
 		assert_eq!(Voting::vote_records(1), None);
 	});
@@ -270,7 +270,7 @@ fn create_multi_vote_with_binary_options_should_not_work() {
 		let public = get_test_key();
 		let vote = generate_1p1v_public_binary_vote();
 		let multi_vote = generate_1p1v_public_multi_vote();
-		assert_err!(create_vote(public, multi_vote.0, multi_vote.1, multi_vote.2, &vote.3), "Invalid multi option outcomes");
+		assert_err!(create_vote(public, multi_vote.0, multi_vote.1, multi_vote.2, &vote.3), Error::<Test>::InvalidMultiOptionOutcomes);
 		assert_eq!(Voting::vote_record_count(), 0);
 		assert_eq!(Voting::vote_records(1), None);
 	});
@@ -283,7 +283,7 @@ fn create_vote_with_one_outcome_should_not_work() {
 		let public = get_test_key();
 		let vote = generate_1p1v_public_multi_vote();
 		let outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
-		assert_err!(create_vote(public, vote.0, vote.1, vote.2, &[outcome]), "Invalid multi option outcomes");
+		assert_err!(create_vote(public, vote.0, vote.1, vote.2, &[outcome]), Error::<Test>::InvalidMultiOptionOutcomes);
 		assert_eq!(Voting::vote_record_count(), 0);
 		assert_eq!(Voting::vote_records(1), None);
 	});
@@ -295,7 +295,7 @@ fn commit_to_nonexistent_record_should_not_work() {
 		System::set_block_number(1);
 		let public = get_test_key();
 		let commit_value = SECRET;
-		assert_err!(commit(public, 1, commit_value), "Vote record does not exist");
+		assert_err!(commit(public, 1, commit_value), Error::<Test>::RecordMissing);
 	});
 }
 
@@ -307,7 +307,7 @@ fn commit_to_non_commit_record_should_not_work() {
 		let vote = generate_1p1v_public_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		let commit_value = SECRET;
-		assert_err!(commit(public, 1, commit_value), "Commitments are not configured for this vote");
+		assert_err!(commit(public, 1, commit_value), Error::<Test>::IsNotCommitReveal);
 	});
 }
 
@@ -317,7 +317,7 @@ fn reveal_to_nonexistent_record_should_not_work() {
 		System::set_block_number(1);
 		let public = get_test_key();
 		let commit_value = SECRET;
-		assert_err!(reveal(public, 1, vec![commit_value], Some(commit_value)), "Vote record does not exist");
+		assert_err!(reveal(public, 1, vec![commit_value], Some(commit_value)), Error::<Test>::RecordMissing);
 	});
 }
 
@@ -329,7 +329,7 @@ fn reveal_to_record_before_voting_period_should_not_work() {
 		let vote = generate_1p1v_public_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		let vote_outcome = vote.3[0];
-		assert_err!(reveal(public, 1, vec![vote_outcome], Some(vote_outcome)), "Vote is not in voting stage");
+		assert_err!(reveal(public, 1, vec![vote_outcome], Some(vote_outcome)), Error::<Test>::NotVotingStage);
 	});
 }
 
@@ -366,6 +366,20 @@ fn reveal_should_work() {
 }
 
 #[test]
+fn duplicate_reveal_should_not_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let vote = generate_1p1v_public_binary_vote();
+		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+		assert_ok!(advance_stage(1));
+		let public2 = get_test_key_2();
+		assert_ok!(reveal(public2, 1, vec![vote.3[0]], Some(vote.3[0])));
+		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(vote.3[0])), Error::<Test>::DuplicateVote);
+	});
+}
+
+#[test]
 fn reveal_invalid_outcome_should_not_work() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
@@ -375,7 +389,51 @@ fn reveal_invalid_outcome_should_not_work() {
 		assert_ok!(advance_stage(1));
 		let public2 = get_test_key_2();
 		let invalid_outcome = SECRET;
-		assert_err!(reveal(public2, 1, vec![invalid_outcome], None), "Vote outcome is not valid");
+		assert_err!(reveal(public2, 1, vec![invalid_outcome], None), Error::<Test>::InvalidVote);
+	});
+}
+
+#[test]
+fn reveal_with_wrong_secret_should_not_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let vote = generate_1p1v_commit_reveal_binary_vote();
+
+		let public2 = get_test_key_2();
+		let secret = SECRET;
+		let mut buf = Vec::new();
+		buf.extend_from_slice(&public2.encode());
+		buf.extend_from_slice(&secret);
+		buf.extend_from_slice(&vote.3[0]);
+		let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
+
+		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+		assert_ok!(advance_stage(1));
+		assert_ok!(commit(public2, 1, commit_hash));
+
+		assert_ok!(advance_stage(1));
+		assert_err!(reveal(public2, 1, vec![vote.3[0]], None), Error::<Test>::SecretMissing);
+
+		let bad_secret: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3];
+		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(bad_secret)), Error::<Test>::InvalidSecret);
+	});
+}
+
+#[test]
+fn reveal_without_commit_in_commit_reveal_should_not_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let vote = generate_1p1v_commit_reveal_binary_vote();
+
+		let public2 = get_test_key_2();
+		let secret = SECRET;
+
+		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+		assert_ok!(advance_stage(1));
+		assert_ok!(advance_stage(1));
+		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(secret)), Error::<Test>::SenderNotCommitted);
 	});
 }
 
@@ -410,6 +468,7 @@ fn complete_after_reveal_should_work() {
 			Voting::vote_records(1).unwrap().data.stage,
 			VoteStage::Completed
 		);
+		assert_err!(advance_stage(1), Error::<Test>::VoteCompleted)
 	});
 }
 
@@ -444,7 +503,7 @@ fn reveal_before_commit_should_not_work() {
 			true
 		);
 		let public2 = get_test_key_2();
-		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(vote.3[0])), "Vote is not in voting stage");
+		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(vote.3[0])), Error::<Test>::NotVotingStage);
 	});
 }
 
@@ -469,7 +528,7 @@ fn reveal_commit_before_stage_change_should_not_work() {
 			vec![(public2, commit_hash)]
 		);
 
-		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(secret)), "Vote is not in voting stage");
+		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(secret)), Error::<Test>::NotVotingStage);
 	});
 }
 
@@ -479,8 +538,7 @@ fn reveal_commit_should_work() {
 		System::set_block_number(1);
 		let public = get_test_key();
 		let vote = generate_1p1v_commit_reveal_binary_vote();
-		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
-		assert_ok!(advance_stage(1));
+
 		let public2 = get_test_key_2();
 		let secret = SECRET;
 		let mut buf = Vec::new();
@@ -488,7 +546,12 @@ fn reveal_commit_should_work() {
 		buf.extend_from_slice(&secret);
 		buf.extend_from_slice(&vote.3[0]);
 		let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
+
+		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+		assert_err!(commit(public2, 1, commit_hash), Error::<Test>::NotCommitStage);
+		assert_ok!(advance_stage(1));
 		assert_ok!(commit(public2, 1, commit_hash));
+		assert_err!(commit(public2, 1, commit_hash), Error::<Test>::DuplicateCommit);
 		assert_eq!(
 			Voting::vote_records(1).unwrap().commitments,
 			vec![(public2, commit_hash)]
@@ -540,7 +603,7 @@ fn reveal_incorrect_outcomes_ranked_choice_should_fail() {
 		let vote = generate_1p1v_public_ranked_choice_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_ok!(advance_stage(1));
-		assert_err!(reveal(public, 1, vec![vote.3[0]], None), "Ranked choice vote invalid");
+		assert_err!(reveal(public, 1, vec![vote.3[0]], None), Error::<Test>::InvalidRankedChoiceVote);
 	});
 }
 
