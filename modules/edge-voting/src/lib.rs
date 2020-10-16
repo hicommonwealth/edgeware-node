@@ -309,12 +309,54 @@ decl_storage! {
 	}
 }
 
+#[derive(Decode)]
+struct OldVoteData<AccountId> {
+	pub initiator: AccountId,
+	pub stage: VoteStage,
+	pub vote_type: VoteType,
+	pub tally_type: TallyType,
+	pub is_commit_reveal: bool,
+}
+
+#[derive(Decode)]
+pub struct OldVoteRecord<AccountId> {
+	pub id: u64,
+	pub commitments: Vec<(AccountId, VoteOutcome)>,
+	pub reveals: Vec<(AccountId, Vec<VoteOutcome>)>,
+	pub data: OldVoteData<AccountId>,
+	pub outcomes: Vec<VoteOutcome>,
+}
+
+impl<AccountId> OldVoteData<AccountId> {
+	fn upgraded(self) -> VoteData<AccountId> {
+		VoteData {
+			initiator: self.initiator,
+			stage: self.stage,
+			vote_type: self.vote_type,
+			tally_type: self.tally_type,
+			voting_scheme: VotingScheme::Simple,
+		}
+	}
+}
+
+impl<AccountId> OldVoteRecord<AccountId> {
+	fn upgraded(self) -> VoteRecord<AccountId> {
+		VoteRecord {
+			id: self.id,
+			commitments: self.commitments,
+			reveals: self.reveals,
+			data: self.data.upgraded(),
+			outcomes: self.outcomes,
+		}
+	}
+}
+
 mod migration {
 	use super::*;
 
 	pub fn migrate<T: Trait>() {
-		for idx in 0..(VoteRecordCount::get() + 1) {
-			VoteRecords::<T>::migrate_key_from_blake(idx);
+		for (hash, record) in StorageIterator::<T::OldVoteData<T::AccountId>>::new(b"Voting", b"VoteRecords").drain() {
+			frame_support::migration::put_storage_value(b"Voting", b"VoteRecords", &hash, record.upgraded());
 		}
 	}
 }

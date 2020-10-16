@@ -567,7 +567,7 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 }
 
 #[test]
-fn change_hasher_migration() {
+fn change_voting_scheme_migration() {
 	mod deprecated {
 		use sp_std::prelude::*;
 
@@ -581,8 +581,8 @@ fn change_hasher_migration() {
 		}
 		decl_storage! {
 			trait Store for Module<T: Trait> as Voting {
-				pub VoteRecords get(fn vote_records): map hasher(opaque_blake2_256)
-					u64 => Option<VoteRecord<T::AccountId>>;
+				pub VoteRecords get(fn vote_records): map hasher(twox_64_concat)
+					u64 => Option<OldVoteRecord<T::AccountId>>;
 			}
 		}
 	}
@@ -595,33 +595,29 @@ fn change_hasher_migration() {
 		let no_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 		let outcomes = vec![yes_vote, no_vote];
 		let id = VoteRecordCount::get() + 1;
-		let record = VoteRecord {
+		let record = OldVoteRecord {
 			id: id,
 			commitments: vec![],
 			reveals: vec![],
 			outcomes: outcomes,
-			data: VoteData {
+			data: OldVoteData {
 				initiator: public.clone(),
 				stage: VoteStage::PreVoting,
 				vote_type: VoteType::Binary,
 				tally_type: TallyType::OneCoin,
-				voting_scheme: VotingScheme::Simple,
+				is_commit_reveal: false,
 			},
 		};
 
 		// insert the record with the old hasher
 		deprecated::VoteRecords::<Test>::insert(id, &record);
 		VoteRecordCount::mutate(|i| *i += 1);
-		assert!(
-			Voting::vote_records(id).is_none(),
-			"proposal should not (yet) be available with the new hasher"
-		);
+
 		// do the migration
 		crate::migration::migrate::<Test>();
 		let maybe_vote = Voting::vote_records(id);
 		// check that it was successfull
 		assert!(maybe_vote.is_some());
-		let vote = maybe_vote.unwrap();
-		assert_eq!(vote, record);
+		assert_eq!(maybe_vote.unwrap().data.voting_scheme, VotingScheme::Simple);
 	});
 }
