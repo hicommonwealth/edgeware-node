@@ -856,7 +856,7 @@ impl voting::Trait for Runtime {
 }
 
 parameter_types! {
-    pub const ChainId: u8 = 7;
+    pub const ChainId: u8 = 5;
     pub const ProposalLifetime: u32 = 100;
 }
 
