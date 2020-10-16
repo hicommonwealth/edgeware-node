@@ -28,7 +28,7 @@ use sp_runtime::{
 	testing::{Header}
 };
 pub use crate::{Event, Module, RawEvent, Trait, GenesisConfig};
-use voting::{VoteOutcome, TallyType, VoteStage, VoteType};
+use voting::{VoteOutcome, TallyType, VoteStage, VoteType, VotingScheme};
 
 impl_outer_origin! {
 	pub enum Origin for Test {}
@@ -134,7 +134,7 @@ fn propose(
 	outcomes: Vec<VoteOutcome>,
 	vote_type: VoteType,
 	tally_type: TallyType,
-	is_commit_reveal: bool,
+	voting_scheme: VotingScheme,
 ) -> DispatchResult {
 	Signaling::create_proposal(
 		Origin::signed(who),
@@ -143,7 +143,7 @@ fn propose(
 		outcomes,
 		vote_type,
 		tally_type,
-		is_commit_reveal,
+		voting_scheme,
 	)
 }
 
@@ -193,13 +193,13 @@ fn propose_should_work() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let _vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 		let title2: &[u8] = b"Proposal 2";
 		let proposal2: &[u8] = b"Proposal 2";
 		let hash2 = build_proposal_hash(public, &proposal2);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title2, proposal2, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title2, proposal2, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let vote_id2 = Signaling::proposal_of(hash2).unwrap().vote_id;
 
 		assert_eq!(Signaling::proposal_count(), 2);
@@ -232,9 +232,9 @@ fn propose_commit_reveal_should_work() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin, true));
+		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		assert_err!(
-			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, true),
+			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal),
 			"Proposal already exists");
 		assert_eq!(Signaling::proposal_count(), 1);
 		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
@@ -256,9 +256,9 @@ fn propose_duplicate_should_fail() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		assert_err!(
-			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false),
+			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
 			"Proposal already exists");
 		assert_eq!(Signaling::proposal_count(), 1);
 		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
@@ -282,7 +282,7 @@ fn propose_empty_should_fail() {
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
-			propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false),
+			propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
 			"Proposal must not be empty"
 		);
 		assert_eq!(Signaling::proposal_count(), 0);
@@ -301,7 +301,7 @@ fn propose_empty_title_should_fail() {
 		let title = vec![];
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
-			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false),
+			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
 			"Proposal must have title"
 		);
 		assert_eq!(Signaling::proposal_count(), 0);
@@ -318,7 +318,7 @@ fn advance_proposal_should_work() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 		assert_eq!(vote_id, 1);
 		assert_ok!(advance_proposal(public, hash));
@@ -347,7 +347,7 @@ fn advance_proposal_commit_reveal_should_work() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, true));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 		assert_eq!(vote_id, 1);
 		assert_ok!(advance_proposal(public, hash));
@@ -376,7 +376,7 @@ fn advance_proposal_if_voting_should_fail() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		assert_ok!(advance_proposal(public, hash));
 		assert_err!(advance_proposal(public, hash),
 								"Proposal not in pre-voting or commit stage");
@@ -400,7 +400,7 @@ fn voting_proposal_should_advance() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 		assert_eq!(vote_id, 1);
 		assert_ok!(advance_proposal(public, hash));
@@ -447,7 +447,7 @@ fn commit_reveal_proposal_should_advance() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, true));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 		assert_eq!(vote_id, 1);
 		assert_ok!(advance_proposal(public, hash));
@@ -509,7 +509,7 @@ fn advance_proposal_if_completed_should_fail() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		assert_ok!(advance_proposal(public, hash));
 		assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
 		System::set_block_number(10002);
@@ -538,7 +538,7 @@ fn non_author_advance_should_fail() {
 
 		let other_public = 2_u64;
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		assert_err!(advance_proposal(other_public, hash), "Proposal must be advanced by author");
 		assert_eq!(Signaling::active_proposals(), vec![]);
 		assert_eq!(
@@ -560,7 +560,7 @@ fn creating_proposal_with_insufficient_balance_fails() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 
 		assert_err!(
-			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false),
+			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
 			"Not enough currency for reserve bond");
 	});
 }
@@ -574,7 +574,7 @@ fn completed_proposal_should_return_creation_bond() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		let hash = build_proposal_hash(public, &proposal);
 		let balance = Balances::free_balance(public);
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let after_propose_balance = Balances::free_balance(public);
 		assert_eq!(balance - BOND, after_propose_balance);
 		assert_ok!(advance_proposal(public, hash));
@@ -597,7 +597,7 @@ fn expired_inactive_proposal_should_return_creation_bond() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		let hash = build_proposal_hash(public, &proposal);
 		let balance = Balances::free_balance(public);
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let after_propose_balance = Balances::free_balance(public);
 		assert_eq!(balance - BOND, after_propose_balance);
 		System::set_block_number(10002);
@@ -621,7 +621,7 @@ fn completed_proposal_should_remain_before_deletion() {
 		let (title, proposal) = generate_proposal();
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		let hash = build_proposal_hash(public, &proposal);
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		assert_ok!(advance_proposal(public, hash));
 		System::set_block_number(10002);
 		<Signaling as OnFinalize<u64>>::on_finalize(10002);
@@ -652,13 +652,13 @@ fn propose_multichoice_should_work() {
 		let (title, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE, OTHER_VOTE];
-		assert_ok!(propose(public, title, proposal, outcomes, VoteType::MultiOption, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple));
 		let _vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
 		let title2: &[u8] = b"Proposal 2";
 		let proposal2: &[u8] = b"Proposal 2";
 		let hash2 = build_proposal_hash(public, &proposal2);
 		let outcomes = vec![YES_VOTE, NO_VOTE, OTHER_VOTE];
-		assert_ok!(propose(public, title2, proposal2, outcomes, VoteType::MultiOption, TallyType::OneCoin, false));
+		assert_ok!(propose(public, title2, proposal2, outcomes, VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple));
 		let vote_id2 = Signaling::proposal_of(hash2).unwrap().vote_id;
 
 		assert_eq!(Signaling::proposal_count(), 2);
@@ -715,7 +715,7 @@ fn change_hasher_migration() {
 		let vote_id = Voting::create_vote(
 			public.clone(),
 			VoteType::Binary,
-			false, // not commit-reveal
+			VotingScheme::Simple,
 			TallyType::OneCoin,
 			outcomes,
 		).expect("Voting::create_vote failed");

@@ -80,7 +80,7 @@ decl_module! {
 			outcomes: Vec<VoteOutcome>,
 			vote_type: voting::VoteType,
 			tally_type: voting::TallyType,
-			is_commit_reveal: bool,
+			voting_scheme: voting::VotingScheme,
 		) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!title.is_empty(), "Proposal must have title");
@@ -99,7 +99,7 @@ decl_module! {
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
 				vote_type,
-				is_commit_reveal,
+				voting_scheme,
 				tally_type,
 				outcomes,
 			)?;
