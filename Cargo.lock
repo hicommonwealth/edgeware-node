@@ -1287,6 +1287,7 @@ name = "edge-signaling"
 version = "1.0.0"
 dependencies = [
  "edge-voting",
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-balances",
@@ -1525,6 +1526,7 @@ dependencies = [
  "edge-treasury-reward",
  "edge-voting",
  "edgeware-primitives",
+ "frame-benchmarking",
  "frame-executive",
  "frame-support",
  "frame-system",

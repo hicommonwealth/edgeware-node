@@ -16,6 +16,8 @@ frame-system = { git = "https://github.com/paritytech/substrate.git", default-fe
 pallet-balances = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 voting = { package ="edge-voting", path = "../edge-voting", default-features = false }
 
+frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", default-features = false, optional = true }
+
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -33,4 +35,9 @@ std = [
 	"frame-support/std",
 	"frame-system/std",
 	"voting/std",
+]
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
 ]

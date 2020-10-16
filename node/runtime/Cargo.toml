@@ -88,6 +88,11 @@ wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https:
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate.git" }
 
+[dependencies.frame-benchmarking]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+optional = true
+
 [features]
 default = ["std"]
 std = [
@@ -148,4 +153,11 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
+	"frame-benchmarking/std",
+]
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+	"signaling/runtime-benchmarks"
 ]
