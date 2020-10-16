@@ -225,6 +225,30 @@ fn propose_should_work() {
 }
 
 #[test]
+fn propose_commit_reveal_should_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin, true));
+		assert_err!(
+			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, true),
+			"Proposal already exists");
+		assert_eq!(Signaling::proposal_count(), 1);
+		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
+		assert_eq!(
+			Signaling::proposal_of(hash),
+			Some(ProposalRecord {
+				transition_time: 10001,
+				..make_record(public, title, proposal)
+			})
+		);
+	});
+}
+
+#[test]
 fn propose_duplicate_should_fail() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
@@ -316,6 +340,35 @@ fn advance_proposal_should_work() {
 }
 
 #[test]
+fn advance_proposal_commit_reveal_should_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, true));
+		let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
+		assert_eq!(vote_id, 1);
+		assert_ok!(advance_proposal(public, hash));
+
+		let vote_time = Signaling::voting_length();
+		let now = System::block_number();
+		let _vote_ends_at = now + vote_time;
+
+		assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
+		assert_eq!(
+			Signaling::proposal_of(hash),
+			Some(ProposalRecord {
+				stage: VoteStage::Commit,
+				transition_time: 10001,
+				..make_record(public, title, proposal)
+			})
+		);
+	});
+}
+
+#[test]
 fn advance_proposal_if_voting_should_fail() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
@@ -383,6 +436,68 @@ fn voting_proposal_should_advance() {
 				..make_record(public, title, proposal)
 			})
 		);
+	});
+}
+
+#[test]
+fn commit_reveal_proposal_should_advance() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, true));
+		let vote_id = Signaling::proposal_of(hash).unwrap().vote_id;
+		assert_eq!(vote_id, 1);
+		assert_ok!(advance_proposal(public, hash));
+
+		let vote_time = Signaling::voting_length();
+		let now = System::block_number();
+		let _vote_ends_at = now + vote_time;
+
+		assert_eq!(Signaling::active_proposals(), vec![(hash, 10001)]);
+		assert_eq!(
+			Signaling::proposal_of(hash),
+			Some(ProposalRecord {
+				stage: VoteStage::Commit,
+				transition_time: 10001,
+				..make_record(public, title, proposal)
+			})
+		);
+
+		System::set_block_number(2);
+		<Signaling as OnFinalize<u64>>::on_finalize(2);
+		System::set_block_number(3);
+
+		System::set_block_number(10002);
+		<Signaling as OnFinalize<u64>>::on_finalize(10002);
+		System::set_block_number(10003);
+
+		assert_eq!(Signaling::active_proposals(), vec![(hash, 20002)]);
+		assert_eq!(
+			Signaling::proposal_of(hash),
+			Some(ProposalRecord {
+				stage: VoteStage::Voting,
+				transition_time: 20002,
+				..make_record(public, title, proposal)
+			})
+		);
+
+		System::set_block_number(20003);
+		<Signaling as OnFinalize<u64>>::on_finalize(20003);
+		System::set_block_number(20004);
+
+		assert_eq!(Signaling::active_proposals(), vec![]);
+		assert_eq!(
+			Signaling::proposal_of(hash),
+			Some(ProposalRecord {
+				stage: VoteStage::Completed,
+				transition_time: 30003,
+				..make_record(public, title, proposal)
+			})
+		);
+
 	});
 }
 
