@@ -80,16 +80,16 @@ signaling = { package = "edge-signaling", path = "../../modules/edge-signaling",
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
+# used for runtime benchmarking
+frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", default-features = false, optional = true }
+frame-system-benchmarking = { git = "https://github.com/paritytech/substrate.git", default-features = false, optional = true }
+hex-literal = { version = "0.3.1", optional = true }
+
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", version = "2.0.0" }
 
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate.git" }
-
-[dependencies.frame-benchmarking]
-default-features = false
-git = 'https://github.com/paritytech/substrate.git'
-optional = true
 
 [features]
 default = ["std"]
@@ -150,12 +150,13 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
-	"frame-benchmarking/std",
 ]
 
 runtime-benchmarks = [
 	"frame-benchmarking",
 	"frame-support/runtime-benchmarks",
 	"frame-system/runtime-benchmarks",
+	"frame-system-benchmarking",
+	"hex-literal",
 	"signaling/runtime-benchmarks"
 ]

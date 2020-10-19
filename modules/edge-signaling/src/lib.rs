@@ -20,6 +20,9 @@
 #[cfg(test)]
 mod tests;
 
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
+
 use frame_support::traits::{Currency, Get, ReservableCurrency,};
 use sp_std::prelude::*;
 

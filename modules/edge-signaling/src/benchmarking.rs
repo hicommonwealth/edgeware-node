@@ -20,7 +20,7 @@
 
 use super::*;
 
-use frame_benchmarking::{benchmarks, account, whitelisted_caller};
+use frame_benchmarking::{benchmarks, account, whitelist_account};
 use frame_support::{
 	IterableStorageMap,
 	traits::{Currency, Get, EnsureOrigin, OnInitialize, UnfilteredDispatchable, schedule::DispatchTime},
@@ -30,6 +30,7 @@ use sp_runtime::traits::Bounded;
 
 use crate::Module as Signaling;
 
+const SEED: u32 = 0;
 const YES_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 const MAX_PROPOSALS: u32 = 99;
@@ -40,46 +41,26 @@ fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	caller
 }
 
-fn propose<T: Trait>(n: u32) -> Result<T::Hash, &'static str> {
-	let proposer = funded_account::<T>("proposer", n);
-	
-	let title: &[u8] = b"Edgeware";
-	let contents: &[u8] = n[..];
-	let outcomes = vec![YES_VOTE, NO_VOTE];
-
-	let mut buf = Vec::new();
-	buf.extend_from_slice(&proposer.encode());
-	buf.extend_from_slice(&contents.as_ref());
-	let hash = T::Hashing::hash(&buf[..]);
-	
-	Signaling::<T>::create_proposal(
-		RawOrigin::Signed(proposer.clone()),
-		title,
-		contents,
-		VoteType::Binary,
-		TallyType::OneCoin,
-	)?;
-
-	assert!(Signaling::<T>::proposal_of(hash).is_some());
-	Ok(hash)
-}
-
 benchmarks! {
 	_ { }
 
 	// Benchmark `create_proposal` extrinsic
 	create_proposal {
-		let p in 1 .. MAX_REFERENDUMS;
-		for i in 0 .. p {
-			propose::<T>(i)?;
-		}
-
 		let proposer = funded_account::<T>("proposer", 0);
-		let proposal_hash = Signaling::<T>::active_proposals()[0][0];
-		whitelist_account!(caller);
-	}: _(RawOrigin::Signed(proposer), proposal_hash)
+		whitelist_account!(proposer);
+
+		let title: &[u8] = b"Edgeware";
+		let contents = (10 as u32).to_be_bytes();
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+
+		let mut buf = Vec::new();
+		buf.extend_from_slice(&proposer.encode());
+		buf.extend_from_slice(&contents.as_ref());
+		let hash = T::Hashing::hash(&buf[..]);
+	}: _(RawOrigin::Signed(proposer), title.into(), contents.to_vec(), outcomes, VoteType::Binary, TallyType::OneCoin)
 	verify {
-		assert_eq(Signaling::<T>::active_proposals().len(), p as usize, "Proposals not created");
+		assert!(Signaling::<T>::proposal_of(hash).is_some());
+		assert_eq!(Signaling::<T>::active_proposals().len(), 1 as usize, "Proposals not created");
 	}
 
 	// Benchmark `advance_proposal` extrinsic
