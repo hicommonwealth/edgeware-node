@@ -22,7 +22,6 @@ use sp_runtime::{
 use sp_core::H256;
 use frame_support::{
 	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
-	traits::{OnFinalize}
 };
 
 use super::*;
@@ -633,8 +632,6 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 fn change_voting_scheme_migration() {
 	mod deprecated {
 		use sp_std::prelude::*;
-
-		use codec::{Encode, Decode};
 		use frame_support::{decl_module, decl_storage};
 
 		use crate::{Trait, OldVoteRecord};

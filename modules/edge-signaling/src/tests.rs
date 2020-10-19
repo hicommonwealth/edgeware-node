@@ -18,8 +18,7 @@ use super::*;
 
 use frame_support::{
 	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
-	traits::{OnFinalize}, Twox128, Blake2_256, StorageHasher,
-	storage::{unhashed, generator::StorageMap as GeneratorMap},
+	traits::{OnFinalize},
 };
 use sp_core::{H256, Blake2Hasher, Hasher};
 use sp_runtime::{
@@ -235,7 +234,7 @@ fn propose_commit_reveal_should_work() {
 		assert_ok!(propose(public, title, proposal, outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		assert_err!(
 			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal),
-			"Proposal already exists");
+			Error::<Test>::DuplicateProposal);
 		assert_eq!(Signaling::proposal_count(), 1);
 		assert_eq!(Signaling::inactive_proposals(), vec![(hash, 10001)]);
 		assert_eq!(
@@ -696,8 +695,6 @@ fn propose_multichoice_should_work() {
 fn change_hasher_migration() {
 	mod deprecated {
 		use sp_std::prelude::*;
-		
-		use codec::{Encode, Decode};
 		use frame_support::{decl_module, decl_storage};
 
 		use crate::{Trait, ProposalRecord};
