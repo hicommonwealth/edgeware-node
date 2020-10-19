@@ -99,9 +99,60 @@ pub trait Trait: frame_system::Trait {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
 }
 
+decl_storage! {
+	trait Store for Module<T: Trait> as Voting {
+		/// The map of all vote records indexed by id
+		pub VoteRecords get(fn vote_records): map hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
+		/// The number of vote records that have been created
+		pub VoteRecordCount get(fn vote_record_count): u64;
+	}
+}
+
+decl_event!(
+	pub enum Event<T> where <T as frame_system::Trait>::AccountId {
+		/// new vote (id, creator, type of vote)
+		VoteCreated(u64, AccountId, VoteType),
+		/// vote stage transition (id, old stage, new stage)
+		VoteAdvanced(u64, VoteStage, VoteStage),
+		/// user commits
+		VoteCommitted(u64, AccountId),
+		/// user reveals a vote
+		VoteRevealed(u64, AccountId, Vec<VoteOutcome>),
+	}
+);
+
 decl_error! {
     pub enum Error for Module<T: Trait> {
-        VoteCompleted
+			/// Vote already completed
+			VoteCompleted,
+			/// Record not found for id
+			RecordMissing,
+			/// Cannot commit because vote is not commit-reveal
+			IsNotCommitReveal,
+			/// Vote not in commit stage
+			NotCommitStage,
+			/// Commit has already been made
+			DuplicateCommit,
+			/// Vote not in voting stage
+			NotVotingStage,
+			/// Ranked choice vote is not valid
+			InvalidRankedChoiceVote,
+			/// Multi-option/binary vote is not valid
+			InvalidVote,
+			/// Vote has already been cast
+			DuplicateVote,
+			/// Must pass in secret for reveal
+			SecretMissing,
+			/// Cannot reveal if not already committed
+			SenderNotCommitted,
+			/// Hash of reveal does not match commit
+			InvalidSecret,
+			/// Binary votes must have exactly 2 outcomes
+			InvalidBinaryOutcomes,
+			/// Multi-option votes must have >2 outcomes
+			InvalidMultiOptionOutcomes,
+			/// Ranked choice votes must have >2 outcomes
+			InvalidRankedChoiceOutcomes,
     }
 }
 
@@ -123,11 +174,11 @@ decl_module! {
 		#[weight = 0]
 		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.data.is_commit_reveal, "Commitments are not configured for this vote");
-			ensure!(record.data.stage == VoteStage::Commit, "Vote is not in commit stage");
+			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
+			ensure!(record.data.is_commit_reveal, Error::<T>::IsNotCommitReveal);
+			ensure!(record.data.stage == VoteStage::Commit, Error::<T>::NotCommitStage);
 			// No changing of commitments once placed
-			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), "Duplicate commits are not allowed");
+			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateCommit);
 
 			// Add commitment to record
 			record.commitments.push((_sender.clone(), commit));
@@ -143,32 +194,28 @@ decl_module! {
 		#[weight = 0]
 		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-			let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
-			ensure!(record.data.stage == VoteStage::Voting, "Vote is not in voting stage");
+			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
+			ensure!(record.data.stage == VoteStage::Voting, Error::<T>::NotVotingStage);
 			// Check vote is for valid outcomes
 			if record.data.vote_type == VoteType::RankedChoice {
 				ensure!(Self::is_ranked_choice_vote_valid(
 					vote.clone(),
 					record.outcomes.clone()
-				), "Ranked choice vote invalid");
+				), Error::<T>::InvalidRankedChoiceVote);
 			} else {
 				ensure!(Self::is_valid_vote(
 					vote.clone(),
 					record.outcomes.clone()
-				), "Vote outcome is not valid");
-			}
-			// Ensure ranked choice votes have same number of votes as outcomes
-			if record.data.vote_type == VoteType::RankedChoice {
-				ensure!(record.outcomes.len() == vote.len(), "Vote must rank all outcomes in order");
+				), Error::<T>::InvalidVote);
 			}
 			// Reject vote or reveal changes
-			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), "Duplicate votes are not allowed");
+			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateVote);
 			// Ensure voter committed
 			if record.data.is_commit_reveal {
 				// Ensure secret is passed in
-				ensure!(secret.is_some(), "Secret is invalid");
+				ensure!(secret.is_some(), Error::<T>::SecretMissing);
 				// Ensure the current sender has already committed previously
-				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), "Sender not yet committed");
+				ensure!(record.commitments.iter().any(|c| &c.0 == &_sender), Error::<T>::SenderNotCommitted);
 				let commit: (T::AccountId, VoteOutcome) = record.commitments
 					.iter()
 					.find(|c| &c.0 == &_sender)
@@ -183,7 +230,7 @@ decl_module! {
 				}
 				let hash = T::Hashing::hash_of(&buf);
 				// Ensure the hashes match
-				ensure!(hash.encode() == commit.1.encode(), "Commitments do not match");
+				ensure!(hash.encode() == commit.1.encode(), Error::<T>::InvalidSecret);
 			}
 			// Record the revealed vote and emit an event
 			let id = record.id;
@@ -204,9 +251,9 @@ impl<T: Trait> Module<T> {
 		tally_type: TallyType,
 		outcomes: Vec<VoteOutcome>
 	) -> result::Result<u64, &'static str> {
-		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, "Invalid binary outcomes") }
-		if vote_type == VoteType::MultiOption { ensure!(outcomes.len() > 2, "Invalid multi option outcomes") }
-		if vote_type == VoteType::RankedChoice { ensure!(outcomes.len() > 2, "Invalid ranked choice outcomes") }
+		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, Error::<T>::InvalidBinaryOutcomes) }
+		if vote_type == VoteType::MultiOption { ensure!(outcomes.len() > 2, Error::<T>::InvalidMultiOptionOutcomes) }
+		if vote_type == VoteType::RankedChoice { ensure!(outcomes.len() > 2, Error::<T>::InvalidRankedChoiceOutcomes) }
 
 		let id = Self::vote_record_count() + 1;
 		<VoteRecords<T>>::insert(id, VoteRecord {
@@ -230,7 +277,7 @@ impl<T: Trait> Module<T> {
 
 	/// A helper function for advancing the stage of a vote, as a state machine
 	pub fn advance_stage(vote_id: u64) -> DispatchResult {
-		let mut record = <VoteRecords<T>>::get(vote_id).ok_or("Vote record does not exist")?;
+		let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
 		let curr_stage = record.data.stage;
 		let next_stage = match curr_stage {
 			VoteStage::PreVoting if record.data.is_commit_reveal => VoteStage::Commit,
@@ -276,28 +323,6 @@ impl<T: Trait> Module<T> {
 
 	pub fn get_vote_record(vote_id: u64) -> Option<VoteRecord<T::AccountId>> {
 		return <VoteRecords<T>>::get(vote_id);
-	}
-}
-
-decl_event!(
-	pub enum Event<T> where <T as frame_system::Trait>::AccountId {
-		/// new vote (id, creator, type of vote)
-		VoteCreated(u64, AccountId, VoteType),
-		/// vote stage transition (id, old stage, new stage)
-		VoteAdvanced(u64, VoteStage, VoteStage),
-		/// user commits
-		VoteCommitted(u64, AccountId),
-		/// user reveals a vote
-		VoteRevealed(u64, AccountId, Vec<VoteOutcome>),
-	}
-);
-
-decl_storage! {
-	trait Store for Module<T: Trait> as Voting {
-		/// The map of all vote records indexed by id
-		pub VoteRecords get(fn vote_records): map hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
-		/// The number of vote records that have been created
-		pub VoteRecordCount get(fn vote_record_count): u64;
 	}
 }
 

@@ -44,6 +44,10 @@ pub struct ProposalRecord<AccountId, Moment> {
 	pub vote_id: u64,
 }
 
+pub type ProposalTitle = Vec<u8>;
+pub type ProposalContents = Vec<u8>;
+type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
+
 pub trait Trait: voting::Trait + pallet_balances::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
@@ -51,13 +55,58 @@ pub trait Trait: voting::Trait + pallet_balances::Trait {
 	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 }
 
-pub type ProposalTitle = Vec<u8>;
-pub type ProposalContents = Vec<u8>;
-type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
+decl_storage! {
+	trait Store for Module<T: Trait> as Signaling {
+		/// The total number of proposals created thus far.
+		pub ProposalCount get(fn proposal_count) : u32;
+		/// A list of all extant proposals.
+		pub InactiveProposals get(fn inactive_proposals): Vec<(T::Hash, T::BlockNumber)>;
+		/// A list of active proposals along with the time at which they complete.
+		pub ActiveProposals get(fn active_proposals): Vec<(T::Hash, T::BlockNumber)>;
+		/// A list of completed proposals, pending deletion
+		pub CompletedProposals get(fn completed_proposals): Vec<(T::Hash, T::BlockNumber)>;
+		/// Amount of time a proposal remains in "Voting" stage.
+		pub VotingLength get(fn voting_length) config(): T::BlockNumber;
+		/// Map for retrieving the information about any proposal from its hash.
+		pub ProposalOf get(fn proposal_of): map hasher(twox_64_concat) T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
+		/// Registration bond
+		pub ProposalCreationBond get(fn proposal_creation_bond) config(): BalanceOf<T>;
+	}
+}
+
+decl_event!(
+	pub enum Event<T> where <T as frame_system::Trait>::Hash,
+							<T as frame_system::Trait>::AccountId,
+							<T as frame_system::Trait>::BlockNumber {
+		/// Emitted at proposal creation: (Creator, ProposalHash)
+		NewProposal(AccountId, Hash),
+		/// Emitted when commit stage begins: (ProposalHash, VoteId, CommitEndTime)
+		CommitStarted(Hash, u64, BlockNumber),
+		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
+		VotingStarted(Hash, u64, BlockNumber),
+		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
+		VotingCompleted(Hash, u64),
+	}
+);
 
 decl_error! {
 	pub enum Error for Module<T: Trait> {
+		/// Corresponding voting for signaling proposal not found
 		VoteRecordDoesntExist,
+		/// Invalid or empty title of proposal
+		InvalidProposalTitle,
+		/// Invalid or empty contents of proposal
+		InvalidProposalContents,
+		/// Duplicate proposal
+		DuplicateProposal,
+		/// Not the proposal author
+		NotAuthor,
+		/// Proposal in wrong stage
+		InvalidStage,
+		/// Proposal does not exist with given hash
+		ProposalMissing,
+		/// Insufficient funds to reserve bond
+		InsufficientFunds,
 	}
 }
 
@@ -82,18 +131,18 @@ decl_module! {
 			tally_type: voting::TallyType
 		) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!title.is_empty(), "Proposal must have title");
-			ensure!(!contents.is_empty(), "Proposal must not be empty");
+			ensure!(!title.is_empty(), Error::<T>::InvalidProposalTitle);
+			ensure!(!contents.is_empty(), Error::<T>::InvalidProposalContents);
 
 			// construct hash(origin + proposal) and check existence
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&_sender.encode());
 			buf.extend_from_slice(&contents.as_ref());
 			let hash = T::Hashing::hash(&buf[..]);
-			ensure!(<ProposalOf<T>>::get(hash) == None, "Proposal already exists");
+			ensure!(<ProposalOf<T>>::get(hash) == None, Error::<T>::DuplicateProposal);
 
 			// Reserve the proposal creation bond amount
-			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).map_err(|_| "Not enough currency for reserve bond")?;
+			T::Currency::reserve(&_sender, Self::proposal_creation_bond()).map_err(|_| Error::<T>::InsufficientFunds)?;
 			// create a vote to go along with the proposal
 			let vote_id = <voting::Module<T>>::create_vote(
 				_sender.clone(),
@@ -125,12 +174,12 @@ decl_module! {
 		#[weight = 0]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or("Proposal does not exist")?;
+			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or(Error::<T>::ProposalMissing)?;
 
 			// only permit original author to advance
-			ensure!(record.author == _sender, "Proposal must be advanced by author");
+			ensure!(record.author == _sender, Error::<T>::NotAuthor);
 			ensure!(record.stage == VoteStage::PreVoting
-				|| record.stage == VoteStage::Commit, "Proposal not in pre-voting or commit stage");
+				|| record.stage == VoteStage::Commit, Error::<T>::InvalidStage);
 
 			// prevoting -> voting or commit
 			<voting::Module<T>>::advance_stage(record.vote_id)?;
@@ -156,7 +205,7 @@ decl_module! {
 				}
 				Ok(())
 			} else {
-				return Err(Error::<T>::VoteRecordDoesntExist)?
+				Err(Error::<T>::VoteRecordDoesntExist)?
 			}
 		}
 
@@ -228,40 +277,6 @@ decl_module! {
 			// put back singly, still_inactive, inactive proposals
 			<InactiveProposals<T>>::put(still_inactive);
 		}
-	}
-}
-
-decl_event!(
-	pub enum Event<T> where <T as frame_system::Trait>::Hash,
-							<T as frame_system::Trait>::AccountId,
-							<T as frame_system::Trait>::BlockNumber {
-		/// Emitted at proposal creation: (Creator, ProposalHash)
-		NewProposal(AccountId, Hash),
-		/// Emitted when commit stage begins: (ProposalHash, VoteId, CommitEndTime)
-		CommitStarted(Hash, u64, BlockNumber),
-		/// Emitted when voting begins: (ProposalHash, VoteId, VotingEndTime)
-		VotingStarted(Hash, u64, BlockNumber),
-		/// Emitted when voting is completed: (ProposalHash, VoteId, VoteResults)
-		VotingCompleted(Hash, u64),
-	}
-);
-
-decl_storage! {
-	trait Store for Module<T: Trait> as Signaling {
-		/// The total number of proposals created thus far.
-		pub ProposalCount get(fn proposal_count) : u32;
-		/// A list of all extant proposals.
-		pub InactiveProposals get(fn inactive_proposals): Vec<(T::Hash, T::BlockNumber)>;
-		/// A list of active proposals along with the time at which they complete.
-		pub ActiveProposals get(fn active_proposals): Vec<(T::Hash, T::BlockNumber)>;
-		/// A list of completed proposals, pending deletion
-		pub CompletedProposals get(fn completed_proposals): Vec<(T::Hash, T::BlockNumber)>;
-		/// Amount of time a proposal remains in "Voting" stage.
-		pub VotingLength get(fn voting_length) config(): T::BlockNumber;
-		/// Map for retrieving the information about any proposal from its hash.
-		pub ProposalOf get(fn proposal_of): map hasher(twox_64_concat) T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
-		/// Registration bond
-		pub ProposalCreationBond get(fn proposal_creation_bond) config(): BalanceOf<T>;
 	}
 }
 
