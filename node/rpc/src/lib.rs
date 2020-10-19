@@ -158,6 +158,7 @@ pub fn create_full<C, P, SC, B>(
 			client.clone(),
 			pool.clone(),
 			edgeware_runtime::TransactionConverter,
+			network.clone(),
 			is_authority,
 		))
 	);
