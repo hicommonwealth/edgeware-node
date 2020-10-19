@@ -52,7 +52,6 @@ pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://gi
 pallet-democracy = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 frame-executive = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-pallet-finality-tracker = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-identity = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-im-online = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -88,6 +87,11 @@ wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https:
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate.git" }
 
+[dependencies.frame-benchmarking]
+default-features = false
+git = 'https://github.com/paritytech/substrate.git'
+optional = true
+
 [features]
 default = ["std"]
 std = [
@@ -107,7 +111,6 @@ std = [
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
 	"frame-executive/std",
-	"pallet-finality-tracker/std",
 	"pallet-grandpa/std",
 	"pallet-identity/std",
 	"pallet-im-online/std",
@@ -149,4 +152,12 @@ std = [
 	"treasury-reward/std",
 	"voting/std",
 	"chainbridge/std",
+	"frame-benchmarking/std",
+]
+
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
+	"signaling/runtime-benchmarks"
 ]
