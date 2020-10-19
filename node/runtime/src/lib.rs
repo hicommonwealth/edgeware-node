@@ -114,8 +114,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 41,
-	impl_version: 41,
+	spec_version: 42,
+	impl_version: 42,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -855,6 +855,23 @@ impl voting::Trait for Runtime {
 	type Event = Event;
 }
 
+parameter_types! {
+    pub const ChainId: u8 = 5;
+    pub const ProposalLifetime: u32 = 100;
+}
+
+impl chainbridge::Trait for Runtime {
+    type Event = Event;
+    // Allow 2/3 council to approve proposals
+    type AdminOrigin = frame_system::EnsureOneOf<AccountId,
+		pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
+		frame_system::EnsureRoot<AccountId>,
+	>;
+    type Proposal = Call;
+    type ChainId = ChainId;
+    type ProposalLifetime = ProposalLifetime;
+}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -899,6 +916,7 @@ construct_runtime!(
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
+		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 	}
 );
 
@@ -932,21 +950,8 @@ pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signatu
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
-/// Custom runtime upgrade to execute the balances migration before the account migration.
-mod custom_migration {
-	use super::*;
-	use frame_support::{traits::{OnRuntimeUpgrade}, weights::Weight};
-
-	pub struct Upgrade;
-	impl OnRuntimeUpgrade for Upgrade {
-		fn on_runtime_upgrade() -> Weight {
-			let mut weight = 0;
-			weight
-		}
-	}
-}
 /// Executive: handles dispatch to the various modules.
-pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules, custom_migration::Upgrade>;
+pub type Executive = frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllModules>;
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
 

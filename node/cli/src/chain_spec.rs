@@ -316,6 +316,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	)
 }
 
+/// Development config with 6 node validator set
 fn multi_development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
@@ -335,6 +336,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 	)
 }
 
+/// Development config with single node validator set
 pub fn development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![get_authority_keys_from_seed("Alice")],

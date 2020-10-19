@@ -139,7 +139,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		let client = client.clone();
 		let pool = transaction_pool.clone();
 		let select_chain = select_chain.clone();
-		let keystore = keystore_container.sync_keystore();
+		let _keystore = keystore_container.sync_keystore();
 
 		let rpc_extensions_builder = move |deny_unsafe, subscription_executor| {
 			let deps = edgeware_rpc::FullDeps {

@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "3.1.0"
+version = "3.1.1"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
@@ -77,10 +77,10 @@ pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.gi
 pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-vesting = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 
-
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
+chainbridge = { git = "https://github.com/hicommonwealth/chainbridge-substrate.git", default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", version = "2.0.0" }
@@ -148,4 +148,5 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
+	"chainbridge/std",
 ]
