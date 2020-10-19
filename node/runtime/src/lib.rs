@@ -849,18 +849,6 @@ parameter_types! {
     pub const ProposalLifetime: u32 = 100;
 }
 
-impl chainbridge::Trait for Runtime {
-    type Event = Event;
-    // Allow 2/3 council to approve proposals
-    type AdminOrigin = frame_system::EnsureOneOf<AccountId,
-		pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
-		frame_system::EnsureRoot<AccountId>,
-	>;
-    type Proposal = Call;
-    type ChainId = ChainId;
-    type ProposalLifetime = ProposalLifetime;
-}
-
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -904,7 +892,6 @@ construct_runtime!(
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
-		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 	}
 );
 

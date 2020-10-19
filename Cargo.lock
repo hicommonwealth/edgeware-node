@@ -712,23 +712,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "chainbridge"
-version = "0.0.2"
-source = "git+https://github.com/hicommonwealth/chainbridge-substrate.git#0e780eb07b352038250dc625b49ab39824465df7"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-balances",
- "parity-scale-codec",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
- "substrate-wasm-builder-runner",
-]
-
-[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1538,7 +1521,6 @@ dependencies = [
 name = "edgeware-runtime"
 version = "3.1.1"
 dependencies = [
- "chainbridge",
  "edge-signaling",
  "edge-treasury-reward",
  "edge-voting",
@@ -4171,6 +4153,7 @@ name = "pallet-collective"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate.git#a3e8ca18fbdb5a33e3d1bbfcfcff03b7398fc5a5"
 dependencies = [
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "parity-scale-codec",
