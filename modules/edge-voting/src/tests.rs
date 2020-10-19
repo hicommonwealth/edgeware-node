@@ -574,7 +574,7 @@ fn change_voting_scheme_migration() {
 		use codec::{Encode, Decode};
 		use frame_support::{decl_module, decl_storage};
 
-		use crate::{Trait, VoteRecord};
+		use crate::{Trait, OldVoteRecord};
 
 		decl_module! {
 			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }

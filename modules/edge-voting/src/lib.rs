@@ -32,6 +32,7 @@ use sp_runtime::traits::{
 };
 
 use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
+use frame_support::migration::{put_storage_value, StorageIterator};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
@@ -309,8 +310,8 @@ decl_storage! {
 	}
 }
 
-#[derive(Decode)]
-struct OldVoteData<AccountId> {
+#[derive(Encode, Decode, RuntimeDebug)]
+pub struct OldVoteData<AccountId> {
 	pub initiator: AccountId,
 	pub stage: VoteStage,
 	pub vote_type: VoteType,
@@ -318,7 +319,7 @@ struct OldVoteData<AccountId> {
 	pub is_commit_reveal: bool,
 }
 
-#[derive(Decode)]
+#[derive(Encode, Decode, RuntimeDebug)]
 pub struct OldVoteRecord<AccountId> {
 	pub id: u64,
 	pub commitments: Vec<(AccountId, VoteOutcome)>,
@@ -355,8 +356,8 @@ mod migration {
 	use super::*;
 
 	pub fn migrate<T: Trait>() {
-		for (hash, record) in StorageIterator::<T::OldVoteData<T::AccountId>>::new(b"Voting", b"VoteRecords").drain() {
-			frame_support::migration::put_storage_value(b"Voting", b"VoteRecords", &hash, record.upgraded());
+		for (hash, record) in StorageIterator::<OldVoteRecord<T::AccountId>>::new(b"Voting", b"VoteRecords").drain() {
+			put_storage_value(b"Voting", b"VoteRecords", &hash, record.upgraded());
 		}
 	}
 }
