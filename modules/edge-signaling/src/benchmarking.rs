@@ -60,7 +60,7 @@ benchmarks! {
 	}: _(RawOrigin::Signed(proposer), title.into(), contents.to_vec(), outcomes, VoteType::Binary, TallyType::OneCoin)
 	verify {
 		assert!(Signaling::<T>::proposal_of(hash).is_some());
-		assert_eq!(Signaling::<T>::active_proposals().len(), 1 as usize, "Proposals not created");
+		assert_eq!(Signaling::<T>::inactive_proposals().len(), 1 as usize, "Proposals not created");
 	}
 
 	// Benchmark `advance_proposal` extrinsic
