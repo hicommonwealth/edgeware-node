@@ -158,5 +158,6 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"frame-system-benchmarking",
 	"hex-literal",
-	"signaling/runtime-benchmarks"
+	"signaling/runtime-benchmarks",
+	"voting/runtime-benchmarks"
 ]

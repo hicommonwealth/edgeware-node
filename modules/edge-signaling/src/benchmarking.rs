@@ -21,11 +21,8 @@
 use super::*;
 
 use frame_benchmarking::{benchmarks, account, whitelist_account};
-use frame_support::{
-	IterableStorageMap,
-	traits::{Currency, Get, EnsureOrigin, OnInitialize, UnfilteredDispatchable, schedule::DispatchTime},
-};
-use frame_system::{RawOrigin, Module as System, self, EventRecord};
+use frame_support::traits::Currency;
+use frame_system::{EventRecord, RawOrigin, self};
 use sp_runtime::traits::Bounded;
 
 use crate::Module as Signaling;
@@ -34,6 +31,7 @@ const SEED: u32 = 0;
 const YES_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 const MAX_PROPOSALS: u32 = 99;
+const MAX_BYTES: u32 = 16_384;
 
 fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	let caller: T::AccountId = account(name, index, SEED);
@@ -41,32 +39,67 @@ fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	caller
 }
 
+fn assert_last_event<T: Trait>(generic_event: <T as Trait>::Event) {
+	let events = frame_system::Module::<T>::events();
+	let system_event: <T as frame_system::Trait>::Event = generic_event.into();
+	// compare to the last event record
+	let EventRecord { event, .. } = &events[events.len() - 1];
+	assert_eq!(event, &system_event);
+}
+
 benchmarks! {
 	_ { }
 
 	// Benchmark `create_proposal` extrinsic
 	create_proposal {
+		let p in 1 .. MAX_PROPOSALS;
+		let b in 1 .. MAX_BYTES;
+		// TODO: benchmark max outcomes as well
+
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
 
 		let title: &[u8] = b"Edgeware";
-		let contents = (10 as u32).to_be_bytes();
+
+		let contents = vec![1; b as usize];
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 
 		let mut buf = Vec::new();
 		buf.extend_from_slice(&proposer.encode());
 		buf.extend_from_slice(&contents.as_ref());
 		let hash = T::Hashing::hash(&buf[..]);
-	}: _(RawOrigin::Signed(proposer), title.into(), contents.to_vec(), outcomes, VoteType::Binary, TallyType::OneCoin)
+	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin)
 	verify {
+		assert_last_event::<T>(Event::<T>::NewProposal(proposer, hash).into());
 		assert!(Signaling::<T>::proposal_of(hash).is_some());
-		assert_eq!(Signaling::<T>::inactive_proposals().len(), 1 as usize, "Proposals not created");
 	}
 
 	// Benchmark `advance_proposal` extrinsic
-	// advance_proposal {
+	advance_proposal {
+		let p in 1 .. MAX_PROPOSALS;
+		// TODO: benchmark max outcomes as well
 
-	// }
+		let proposer = funded_account::<T>("proposer", 0);
+		whitelist_account!(proposer);
+		let origin: <T as frame_system::Trait>::Origin = RawOrigin::Signed(proposer.clone()).into();
+
+		let title: &[u8] = b"Edgeware";
+
+		let contents = p.to_le_bytes().to_vec();
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+
+		let mut buf = Vec::new();
+		buf.extend_from_slice(&proposer.encode());
+		buf.extend_from_slice(&contents.as_ref());
+		let hash = T::Hashing::hash(&buf[..]);
+		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin)?;
+	}: _(RawOrigin::Signed(proposer), hash)
+	verify {
+		// TODO: fix this assert
+		// assert_last_event::<T>(Event::<T>::VotingStarted(hash, p, 1).into());
+		assert!(Signaling::<T>::proposal_of(hash).is_some());
+		assert_eq!(Signaling::<T>::proposal_of(hash).unwrap().stage, VoteStage::Voting);
+	}
 }
 
 #[cfg(test)]
@@ -78,7 +111,7 @@ mod tests {
 	fn test_benchmarks() {
 		new_test_ext().execute_with(|| {
 			assert_ok!(test_benchmark_create_proposal::<Test>());
-			// assert_ok!(test_benchmark_advance_proposal::<Test>());
+			assert_ok!(test_benchmark_advance_proposal::<Test>());
 		});
 	}
 }

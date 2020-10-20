@@ -20,6 +20,9 @@
 #[cfg(test)]
 mod tests;
 
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
+
 use sp_std::prelude::*;
 use sp_std::result;
 use frame_system::{ensure_signed};
