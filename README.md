@@ -100,3 +100,4 @@ To run benchmarks and output new weight files while still in the `node/cli` fold
 ```
 ../../target/release/edgeware benchmark --pallet signaling --extrinsic "*" --steps 50 --repeat 20 --output ../runtime/src/weights/
 ```
+If the amount of time it takes to run the benchmark is too long, consider reducing the `steps` and `repeat` parameters.
