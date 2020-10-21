@@ -88,3 +88,15 @@ If you previously build image `cwl/edgeware`, you can use docker-compose as well
 docker-compose up edgeware
 ```
 You will have exposed ports 9933,9944 and 30333.
+
+### Module Benchmarking
+
+To build in benchmarking mode:
+```
+cd node/cli && cargo build --features runtime-benchmarks --release
+```
+
+To run benchmarks and output new weight files while still in the `node/cli` folder (replace `signaling` with `voting` to benchmark voting instead):
+```
+../../target/release/edgeware benchmark --pallet signaling --extrinsic "*" --steps 50 --repeat 20 --output ../runtime/src/weights/
+```
