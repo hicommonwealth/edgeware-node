@@ -126,12 +126,12 @@ impl frame_system::Trait for Test {
 	type MaximumBlockLength = MaximumBlockLength;
 	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
-	type ModuleToIndex = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
-	type MigrateAccount = ();
 	type OnKilledAccount = ();
 	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
+	type PalletInfo = ();
+	type SystemWeightInfo = ();
 }
 
 parameter_types! {
@@ -144,6 +144,8 @@ impl pallet_balances::Trait for Test {
 	type Event = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Test>;
+	type WeightInfo = ();
+	type MaxLocks = ();
 }
 
 parameter_types! {
@@ -163,6 +165,7 @@ impl pallet_session::Trait for Test {
 	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
 	type SessionManager = Staking;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
+	type WeightInfo = ();
 }
 
 impl pallet_session::historical::Trait for Test {
@@ -177,6 +180,7 @@ impl pallet_timestamp::Trait for Test {
 	type Moment = u64;
 	type OnTimestampSet = ();
 	type MinimumPeriod = MinimumPeriod;
+	type WeightInfo = ();
 }
 
 pallet_staking_reward_curve::build! {
@@ -228,6 +232,7 @@ impl pallet_staking::Trait for Test {
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type UnsignedPriority = ();
 	type MinSolutionScoreBump = MinSolutionScoreBump;
+	type WeightInfo = ();
 }
 
 thread_local! {
@@ -276,13 +281,21 @@ impl pallet_treasury::Trait for Test {
 	type TipCountdown = TipCountdown;
 	type TipFindersFee = TipFindersFee;
 	type TipReportDepositBase = TipReportDepositBase;
-	type TipReportDepositPerByte = TipReportDepositPerByte;
 	type Event = ();
-	type ProposalRejection = ();
 	type ProposalBond = ProposalBond;
-	type ProposalBondMinimum = ProposalBondMinimum;
 	type SpendPeriod = SpendPeriod;
 	type Burn = Burn;
+	type DataDepositPerByte = (); 
+	type OnSlash = ();
+	type BountyDepositBase = ();
+	type BountyDepositPayoutDelay = ();
+	type ProposalBondMinimum = ();
+	type BountyUpdatePeriod = ();
+	type BountyCuratorDeposit = ();
+	type BountyValueMinimum = ();
+	type MaximumReasonLength = ();
+	type BurnDestination = ();
+	type WeightInfo = ();
 }
 
 
