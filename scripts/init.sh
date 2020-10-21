@@ -32,3 +32,7 @@ if [[ $(wasm-gc) ]]; then
 else
     cargo install --git https://github.com/alexcrichton/wasm-gc
 fi
+
+git submodule init
+git submodule update
+
