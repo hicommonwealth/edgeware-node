@@ -58,37 +58,21 @@ fn assert_last_event<T: Trait>(generic_event: <T as Trait>::Event) {
 	assert_eq!(event, &system_event);
 }
 
+fn generate_unique_contents<T: Trait>(bytes: u32, i: u32, o: u32) -> Vec<u8> {
+	let mut pvec = vec![i.to_le_bytes()[0]; (bytes - 1) as usize];
+	let mut ovec = vec![o.to_le_bytes()[0]; 1];
+	pvec.append(&mut ovec);
+	pvec
+}
+
 benchmarks! {
 	_ { }
 
 	// Benchmark `create_proposal` extrinsic
 	create_proposal {
 		let p in 1 .. MAX_PROPOSALS;
-		let b in 1 .. MAX_BYTES;
-		let o in 2 .. MAX_OUTCOMES;
-
-		let proposer = funded_account::<T>("proposer", 0);
-		whitelist_account!(proposer);
-
-		let title: &[u8] = b"Edgeware";
-
-		let contents = vec![1; b as usize];
-		let outcomes = &MULTI_OUTCOMES[0 .. (o+1) as usize];
-
-		let mut buf = Vec::new();
-		buf.extend_from_slice(&proposer.encode());
-		buf.extend_from_slice(&contents.as_ref());
-		let hash = T::Hashing::hash(&buf[..]);
-	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin)
-	verify {
-		assert_last_event::<T>(Event::<T>::NewProposal(proposer, hash).into());
-		assert!(Signaling::<T>::proposal_of(hash).is_some());
-	}
-
-	// Benchmark `advance_proposal` extrinsic
-	advance_proposal {
-		let p in 1 .. MAX_PROPOSALS;
-		let o in 2 .. MAX_OUTCOMES;
+		let b in 2 .. MAX_BYTES;
+		let o in 3 .. MAX_OUTCOMES;
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
@@ -96,18 +80,67 @@ benchmarks! {
 
 		let title: &[u8] = b"Edgeware";
 
-		let contents = p.to_le_bytes().to_vec();
-		let outcomes = &MULTI_OUTCOMES[0 .. (o+1) as usize];
+		// Create p existing proposals
+		for i in 0 .. p {
+			let contents = generate_unique_contents::<T>(b, i, o);
+			let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
+			Signaling::<T>::create_proposal(origin.clone(), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)?;	
+		}
+		assert_eq!(Signaling::<T>::inactive_proposals().len(), p as usize);
+
+		// create new proposal
+		let contents = generate_unique_contents::<T>(b, p, o);
+		let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
 
 		let mut buf = Vec::new();
 		buf.extend_from_slice(&proposer.encode());
 		buf.extend_from_slice(&contents.as_ref());
 		let hash = T::Hashing::hash(&buf[..]);
-		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin)?;
+	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)
+	verify {
+		assert_last_event::<T>(Event::<T>::NewProposal(proposer, hash).into());
+		assert!(Signaling::<T>::proposal_of(hash).is_some());
+		assert_eq!(Signaling::<T>::inactive_proposals().len(), (p+1) as usize);
+	}
+
+	// Benchmark `advance_proposal` extrinsic
+	advance_proposal {
+		let p in 1 .. MAX_PROPOSALS;
+		let o in 3 .. MAX_OUTCOMES;
+
+		let proposer = funded_account::<T>("proposer", 0);
+		whitelist_account!(proposer);
+		let origin: <T as frame_system::Trait>::Origin = RawOrigin::Signed(proposer.clone()).into();
+
+		let title: &[u8] = b"Edgeware";
+
+		// Create p existing proposals
+		for i in 0 .. p {
+			let contents = generate_unique_contents::<T>(MAX_BYTES, i, o);
+			let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
+
+			let mut buf = Vec::new();
+			buf.extend_from_slice(&proposer.encode());
+			buf.extend_from_slice(&contents.as_ref());
+			let hash = T::Hashing::hash(&buf[..]);
+			Signaling::<T>::create_proposal(origin.clone(), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)?;	
+			Signaling::<T>::advance_proposal(origin.clone(), hash)?;
+		}
+		assert_eq!(Signaling::<T>::active_proposals().len(), p as usize);
+
+		let contents = generate_unique_contents::<T>(MAX_BYTES, p, o);
+		let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
+
+		let mut buf = Vec::new();
+		buf.extend_from_slice(&proposer.encode());
+		buf.extend_from_slice(&contents.as_ref());
+		let hash = T::Hashing::hash(&buf[..]);
+		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)?;
 	}: _(RawOrigin::Signed(proposer), hash)
 	verify {
 		assert!(Signaling::<T>::proposal_of(hash).is_some());
 		assert_eq!(Signaling::<T>::proposal_of(hash).unwrap().stage, VoteStage::Voting);
+		assert_eq!(Signaling::<T>::active_proposals().len(), (p+1) as usize);
 	}
 }
 

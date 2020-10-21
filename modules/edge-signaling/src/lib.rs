@@ -34,7 +34,7 @@ use sp_runtime::RuntimeDebug;
 use sp_runtime::traits::{Hash};
 use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
 
-pub use voting::{VoteType, VoteOutcome, VoteStage, TallyType};
+pub use voting::{VoteType, VoteOutcome, VoteStage, TallyType, VotingScheme};
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
 pub struct ProposalRecord<AccountId, Moment> {

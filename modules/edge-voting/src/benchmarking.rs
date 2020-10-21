@@ -63,7 +63,7 @@ fn encode_ranked_vote<T: Trait>(voter: T::AccountId) -> VoteOutcome {
 fn add_commit_reveal_ranked_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
 	let other = funded_account::<T>("proposer", n);
 	let id = Voting::<T>::create_vote(
-		other, VoteType::RankedChoice, true, TallyType::OneCoin, MULTI_OUTCOMES.to_vec(),
+		other, VoteType::RankedChoice, VotingScheme::CommitReveal, TallyType::OneCoin, MULTI_OUTCOMES.to_vec(),
 	)?;
 	Voting::<T>::advance_stage(id)?;
 	Ok(id)
