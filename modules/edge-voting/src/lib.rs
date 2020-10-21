@@ -35,6 +35,7 @@ use sp_runtime::traits::{
 };
 
 use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
+use frame_support::migration::{put_storage_value, StorageIterator};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
@@ -71,6 +72,14 @@ pub enum TallyType {
 	OneCoin,
 }
 
+#[derive(Encode, Decode, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
+pub enum VotingScheme {
+	// basic vote casting during voting stage
+	Simple,
+	// two stage cryptographic voting, commit then reveal
+	CommitReveal,
+}
+
 #[derive(Encode, Decode, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
 pub struct VoteData<AccountId> {
 	// creator of vote
@@ -82,7 +91,7 @@ pub struct VoteData<AccountId> {
 	// Tally metric
 	pub tally_type: TallyType,
 	// Flag for commit/reveal voting scheme
-	pub is_commit_reveal: bool,
+	pub voting_scheme: VotingScheme,
 }
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
@@ -180,7 +189,7 @@ decl_module! {
 		pub fn commit(origin, vote_id: u64, commit: VoteCommitment) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
-			ensure!(record.data.is_commit_reveal, Error::<T>::IsNotCommitReveal);
+			ensure!(record.data.voting_scheme == VotingScheme::CommitReveal, Error::<T>::IsNotCommitReveal);
 			ensure!(record.data.stage == VoteStage::Commit, Error::<T>::NotCommitStage);
 			// No changing of commitments once placed
 			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateCommit);
@@ -216,7 +225,7 @@ decl_module! {
 			// Reject vote or reveal changes
 			ensure!(!record.reveals.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateVote);
 			// Ensure voter committed
-			if record.data.is_commit_reveal {
+			if record.data.voting_scheme == VotingScheme::CommitReveal {
 				// Ensure secret is passed in
 				ensure!(secret.is_some(), Error::<T>::SecretMissing);
 				// Ensure the current sender has already committed previously
@@ -252,7 +261,7 @@ impl<T: Trait> Module<T> {
 	pub fn create_vote(
 		sender: T::AccountId,
 		vote_type: VoteType,
-		is_commit_reveal: bool,
+		voting_scheme: VotingScheme,
 		tally_type: TallyType,
 		outcomes: Vec<VoteOutcome>
 	) -> result::Result<u64, &'static str> {
@@ -271,7 +280,7 @@ impl<T: Trait> Module<T> {
 				stage: VoteStage::PreVoting,
 				vote_type: vote_type,
 				tally_type: tally_type,
-				is_commit_reveal: is_commit_reveal,
+				voting_scheme: voting_scheme,
 			},
 		});
 
@@ -285,7 +294,7 @@ impl<T: Trait> Module<T> {
 		let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
 		let curr_stage = record.data.stage;
 		let next_stage = match curr_stage {
-			VoteStage::PreVoting if record.data.is_commit_reveal => VoteStage::Commit,
+			VoteStage::PreVoting if record.data.voting_scheme == VotingScheme::CommitReveal => VoteStage::Commit,
 			VoteStage::PreVoting | VoteStage::Commit => VoteStage::Voting,
 			VoteStage::Voting => VoteStage::Completed,
 			VoteStage::Completed => return Err(Error::<T>::VoteCompleted)?,
@@ -331,12 +340,54 @@ impl<T: Trait> Module<T> {
 	}
 }
 
+#[derive(Encode, Decode, RuntimeDebug)]
+pub struct OldVoteData<AccountId> {
+	pub initiator: AccountId,
+	pub stage: VoteStage,
+	pub vote_type: VoteType,
+	pub tally_type: TallyType,
+	pub is_commit_reveal: bool,
+}
+
+#[derive(Encode, Decode, RuntimeDebug)]
+pub struct OldVoteRecord<AccountId> {
+	pub id: u64,
+	pub commitments: Vec<(AccountId, VoteOutcome)>,
+	pub reveals: Vec<(AccountId, Vec<VoteOutcome>)>,
+	pub data: OldVoteData<AccountId>,
+	pub outcomes: Vec<VoteOutcome>,
+}
+
+impl<AccountId> OldVoteData<AccountId> {
+	fn upgraded(self) -> VoteData<AccountId> {
+		VoteData {
+			initiator: self.initiator,
+			stage: self.stage,
+			vote_type: self.vote_type,
+			tally_type: self.tally_type,
+			voting_scheme: VotingScheme::Simple,
+		}
+	}
+}
+
+impl<AccountId> OldVoteRecord<AccountId> {
+	fn upgraded(self) -> VoteRecord<AccountId> {
+		VoteRecord {
+			id: self.id,
+			commitments: self.commitments,
+			reveals: self.reveals,
+			data: self.data.upgraded(),
+			outcomes: self.outcomes,
+		}
+	}
+}
+
 mod migration {
 	use super::*;
 
 	pub fn migrate<T: Trait>() {
-		for idx in 0..(VoteRecordCount::get() + 1) {
-			VoteRecords::<T>::migrate_key_from_blake(idx);
+		for (hash, record) in StorageIterator::<OldVoteRecord<T::AccountId>>::new(b"Voting", b"VoteRecords").drain() {
+			put_storage_value(b"Voting", b"VoteRecords", &hash, record.upgraded());
 		}
 	}
 }

@@ -22,7 +22,6 @@ use sp_runtime::{
 use sp_core::H256;
 use frame_support::{
 	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
-	traits::{OnFinalize}
 };
 
 use super::*;
@@ -92,13 +91,13 @@ fn new_test_ext() -> sp_io::TestExternalities {
 fn create_vote(
 	who: u64,
 	vote_type: VoteType,
-	is_commit_reveal: bool,
+	voting_scheme: VotingScheme,
 	tally_type: TallyType,
 	outcomes: &[[u8; 32]]
 ) -> result::Result<u64, &'static str> {
 	Voting::create_vote(who,
 						vote_type,
-						is_commit_reveal,
+						voting_scheme,
 						tally_type,
 						outcomes.to_vec())
 }
@@ -125,36 +124,36 @@ fn get_test_key_2() -> u64 {
 	return public;		
 }
 
-fn generate_1p1v_public_binary_vote() -> (VoteType, bool, TallyType, [[u8; 32]; 2]) {
+fn generate_1p1v_public_binary_vote() -> (VoteType, VotingScheme, TallyType, [[u8; 32]; 2]) {
 	let vote_type = VoteType::Binary;
 	let tally_type = TallyType::OnePerson;
-	let is_commit_reveal = false;
+	let voting_scheme = VotingScheme::Simple;
 	let yes_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 	let no_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-	return (vote_type, is_commit_reveal, tally_type, [yes_outcome, no_outcome]);
+	return (vote_type, voting_scheme, tally_type, [yes_outcome, no_outcome]);
 }
 
-fn generate_1p1v_commit_reveal_binary_vote() -> (VoteType, bool, TallyType, [[u8; 32]; 2]) {
+fn generate_1p1v_commit_reveal_binary_vote() -> (VoteType, VotingScheme, TallyType, [[u8; 32]; 2]) {
 	let vote_type = VoteType::Binary;
 	let tally_type = TallyType::OnePerson;
-	let is_commit_reveal = true;
+	let voting_scheme = VotingScheme::CommitReveal;
 	let yes_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 	let no_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 
-	return (vote_type, is_commit_reveal, tally_type, [yes_outcome, no_outcome]);
+	return (vote_type, voting_scheme, tally_type, [yes_outcome, no_outcome]);
 }
 
-fn generate_1p1v_public_multi_vote() -> (VoteType, bool, TallyType, [[u8; 32]; 4]) {
+fn generate_1p1v_public_multi_vote() -> (VoteType, VotingScheme, TallyType, [[u8; 32]; 4]) {
 	let vote_type = VoteType::MultiOption;
 	let tally_type = TallyType::OnePerson;
-	let is_commit_reveal = false;
+	let voting_scheme = VotingScheme::Simple;
 	let one_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 	let two_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
 	let three_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3];
 	let four_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
-	return (vote_type, is_commit_reveal, tally_type, [
+	return (vote_type, voting_scheme, tally_type, [
 		one_outcome,
 		two_outcome,
 		three_outcome,
@@ -162,16 +161,16 @@ fn generate_1p1v_public_multi_vote() -> (VoteType, bool, TallyType, [[u8; 32]; 4
 	]);
 }
 
-fn generate_1p1v_public_ranked_choice_vote() -> (VoteType, bool, TallyType, [[u8; 32]; 4]) {
+fn generate_1p1v_public_ranked_choice_vote() -> (VoteType, VotingScheme, TallyType, [[u8; 32]; 4]) {
 	let vote_type = VoteType::RankedChoice;
 	let tally_type = TallyType::OnePerson;
-	let is_commit_reveal = false;
+	let voting_scheme = VotingScheme::Simple;
 	let one_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 	let two_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
 	let three_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3];
 	let four_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
-	return (vote_type, is_commit_reveal, tally_type, [
+	return (vote_type, voting_scheme, tally_type, [
 		one_outcome,
 		two_outcome,
 		three_outcome,
@@ -179,16 +178,16 @@ fn generate_1p1v_public_ranked_choice_vote() -> (VoteType, bool, TallyType, [[u8
 	]);
 }
 
-fn generate_1p1v_commit_reveal_ranked_choice_vote() -> (VoteType, bool, TallyType, [[u8; 32]; 4]) {
+fn generate_1p1v_commit_reveal_ranked_choice_vote() -> (VoteType, VotingScheme, TallyType, [[u8; 32]; 4]) {
 	let vote_type = VoteType::RankedChoice;
 	let tally_type = TallyType::OnePerson;
-	let is_commit_reveal = true;
+	let voting_scheme = VotingScheme::CommitReveal;
 	let one_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 	let two_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2];
 	let three_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3];
 	let four_outcome: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
-	return (vote_type, is_commit_reveal, tally_type, [
+	return (vote_type, voting_scheme, tally_type, [
 		one_outcome,
 		two_outcome,
 		three_outcome,
@@ -200,7 +199,7 @@ fn make_record(
 	id: u64,
 	author: u64,
 	vote_type: VoteType,
-	is_commit_reveal: bool,
+	voting_scheme: VotingScheme,
 	tally_type: TallyType,
 	outcomes: &[[u8; 32]],
 	stage: VoteStage
@@ -215,7 +214,7 @@ fn make_record(
 			stage: stage,
 			vote_type: vote_type,
 			tally_type: tally_type,
-			is_commit_reveal: is_commit_reveal,
+			voting_scheme: voting_scheme,
 		},
 	}
 }
@@ -480,8 +479,8 @@ fn transition_to_commit_should_work() {
 		let vote = generate_1p1v_commit_reveal_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_eq!(
-			Voting::vote_records(1).unwrap().data.is_commit_reveal,
-			true
+			Voting::vote_records(1).unwrap().data.voting_scheme,
+			VotingScheme::CommitReveal,
 		);
 		assert_ok!(advance_stage(1));
 		assert_eq!(
@@ -499,8 +498,8 @@ fn reveal_before_commit_should_not_work() {
 		let vote = generate_1p1v_commit_reveal_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_eq!(
-			Voting::vote_records(1).unwrap().data.is_commit_reveal,
-			true
+			Voting::vote_records(1).unwrap().data.voting_scheme,
+			VotingScheme::CommitReveal,
 		);
 		let public2 = get_test_key_2();
 		assert_err!(reveal(public2, 1, vec![vote.3[0]], Some(vote.3[0])), Error::<Test>::NotVotingStage);
@@ -630,22 +629,20 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 }
 
 #[test]
-fn change_hasher_migration() {
+fn change_voting_scheme_migration() {
 	mod deprecated {
 		use sp_std::prelude::*;
-
-		use codec::{Encode, Decode};
 		use frame_support::{decl_module, decl_storage};
 
-		use crate::{Trait, VoteRecord};
+		use crate::{Trait, OldVoteRecord};
 
 		decl_module! {
 			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
 		}
 		decl_storage! {
 			trait Store for Module<T: Trait> as Voting {
-				pub VoteRecords get(fn vote_records): map hasher(opaque_blake2_256)
-					u64 => Option<VoteRecord<T::AccountId>>;
+				pub VoteRecords get(fn vote_records): map hasher(twox_64_concat)
+					u64 => Option<OldVoteRecord<T::AccountId>>;
 			}
 		}
 	}
@@ -658,12 +655,12 @@ fn change_hasher_migration() {
 		let no_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 		let outcomes = vec![yes_vote, no_vote];
 		let id = VoteRecordCount::get() + 1;
-		let record = VoteRecord {
+		let record = OldVoteRecord {
 			id: id,
 			commitments: vec![],
 			reveals: vec![],
 			outcomes: outcomes,
-			data: VoteData {
+			data: OldVoteData {
 				initiator: public.clone(),
 				stage: VoteStage::PreVoting,
 				vote_type: VoteType::Binary,
@@ -675,16 +672,12 @@ fn change_hasher_migration() {
 		// insert the record with the old hasher
 		deprecated::VoteRecords::<Test>::insert(id, &record);
 		VoteRecordCount::mutate(|i| *i += 1);
-		assert!(
-			Voting::vote_records(id).is_none(),
-			"proposal should not (yet) be available with the new hasher"
-		);
+
 		// do the migration
 		crate::migration::migrate::<Test>();
 		let maybe_vote = Voting::vote_records(id);
 		// check that it was successfull
 		assert!(maybe_vote.is_some());
-		let vote = maybe_vote.unwrap();
-		assert_eq!(vote, record);
+		assert_eq!(maybe_vote.unwrap().data.voting_scheme, VotingScheme::Simple);
 	});
 }
