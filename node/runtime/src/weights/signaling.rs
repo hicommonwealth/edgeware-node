@@ -10,16 +10,16 @@ use sp_std::marker::PhantomData;
 
 pub struct WeightInfo<T>(PhantomData<T>);
 impl<T: frame_system::Trait> signaling::WeightInfo for WeightInfo<T> {
-	fn create_proposal(p: u32, b: u32, _o: u32, ) -> Weight {
-		(141_283_000 as Weight)
-			.saturating_add((552_000 as Weight).saturating_mul(p as Weight))
-			.saturating_add((2_000 as Weight).saturating_mul(b as Weight))
+	fn create_proposal(p: u32, b: u32, ) -> Weight {
+		(12_424_000 as Weight)
+			.saturating_add((983_000 as Weight).saturating_mul(p as Weight))
+			.saturating_add((3_000 as Weight).saturating_mul(b as Weight))
 			.saturating_add(T::DbWeight::get().reads(6 as Weight))
 			.saturating_add(T::DbWeight::get().writes(5 as Weight))
 	}
-	fn advance_proposal(p: u32, _o: u32, ) -> Weight {
-		(86_050_000 as Weight)
-			.saturating_add((314_000 as Weight).saturating_mul(p as Weight))
+	fn advance_proposal(p: u32, ) -> Weight {
+		(58_164_000 as Weight)
+			.saturating_add((846_000 as Weight).saturating_mul(p as Weight))
 			.saturating_add(T::DbWeight::get().reads(5 as Weight))
 			.saturating_add(T::DbWeight::get().writes(4 as Weight))
 	}

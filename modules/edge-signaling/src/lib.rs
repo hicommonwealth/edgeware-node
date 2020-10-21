@@ -54,11 +54,11 @@ type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trai
 /// NOTE: This is not enforced by any logic.
 pub const MAX_PROPOSALS: u32 = 99;
 pub const MAX_CONTENTS_BYTES: u32 = 16_384;
-pub const MAX_OUTCOMES: u32 = 10;
+// TODO: enforce these and add a MAX_OUTCOMES as well
 
 pub trait WeightInfo {
-	fn create_proposal(p: u32, b: u32, _o: u32, ) -> Weight;
-	fn advance_proposal(p: u32, _o: u32, ) -> Weight;
+	fn create_proposal(p: u32, b: u32, ) -> Weight;
+	fn advance_proposal(p: u32, ) -> Weight;
 }
 
 pub trait Trait: voting::Trait + pallet_balances::Trait {
@@ -136,7 +136,7 @@ decl_module! {
 		}
 
 		/// Creates a new signaling proposal.
-		#[weight = <T as Trait>::WeightInfo::create_proposal(MAX_PROPOSALS, MAX_CONTENTS_BYTES, MAX_OUTCOMES)]
+		#[weight = <T as Trait>::WeightInfo::create_proposal(MAX_PROPOSALS, MAX_CONTENTS_BYTES)]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -187,7 +187,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
-		#[weight = <T as Trait>::WeightInfo::advance_proposal(MAX_PROPOSALS, MAX_OUTCOMES)]
+		#[weight = <T as Trait>::WeightInfo::advance_proposal(MAX_PROPOSALS)]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or(Error::<T>::ProposalMissing)?;

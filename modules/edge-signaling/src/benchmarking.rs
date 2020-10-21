@@ -22,25 +22,14 @@ use super::*;
 
 use frame_benchmarking::{benchmarks, account, whitelist_account};
 use frame_support::traits::Currency;
-use frame_system::{EventRecord, RawOrigin, self};
+use frame_system::{RawOrigin, self};
 use sp_runtime::traits::Bounded;
 
 use crate::Module as Signaling;
 
 const SEED: u32 = 0;
-const MULTI_OUTCOMES: [[u8; 32]; 10] = [
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8],
-	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9],
-];
-const MAX_OUTCOMES: u32 = 10;
+const YES_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
+const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 const MAX_PROPOSALS: u32 = 99;
 const MAX_BYTES: u32 = 16_384;
 
@@ -50,29 +39,17 @@ fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	caller
 }
 
-fn assert_last_event<T: Trait>(generic_event: <T as Trait>::Event) {
-	let events = frame_system::Module::<T>::events();
-	let system_event: <T as frame_system::Trait>::Event = generic_event.into();
-	// compare to the last event record
-	let EventRecord { event, .. } = &events[events.len() - 1];
-	assert_eq!(event, &system_event);
-}
-
-fn generate_unique_contents<T: Trait>(bytes: u32, i: u32, o: u32) -> Vec<u8> {
-	let mut pvec = vec![i.to_le_bytes()[0]; (bytes - 1) as usize];
-	let mut ovec = vec![o.to_le_bytes()[0]; 1];
-	pvec.append(&mut ovec);
-	pvec
-}
-
 benchmarks! {
 	_ { }
 
 	// Benchmark `create_proposal` extrinsic
+	// NOTES:
+	//	- In past benchmarks of outcome size, they had no effect on weight, so we do not include them here.
+	//			Number of outcomes should still be capped to a reasonable number.
+	//	- Since no branching logic depends on tally type or vote type, we omit these from consideration.
 	create_proposal {
 		let p in 1 .. MAX_PROPOSALS;
 		let b in 2 .. MAX_BYTES;
-		let o in 3 .. MAX_OUTCOMES;
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
@@ -82,31 +59,32 @@ benchmarks! {
 
 		// Create p existing proposals
 		for i in 0 .. p {
-			let contents = generate_unique_contents::<T>(b, i, o);
-			let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
-			Signaling::<T>::create_proposal(origin.clone(), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)?;	
+			let contents = vec![i.to_le_bytes()[0]; b as usize];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
+			Signaling::<T>::create_proposal(origin.clone(), title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple)?;	
 		}
 		assert_eq!(Signaling::<T>::inactive_proposals().len(), p as usize);
 
 		// create new proposal
-		let contents = generate_unique_contents::<T>(b, p, o);
-		let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
+		let contents = vec![p.to_le_bytes()[0]; b as usize];
+		let outcomes = vec![YES_VOTE, NO_VOTE];
 
 		let mut buf = Vec::new();
 		buf.extend_from_slice(&proposer.encode());
 		buf.extend_from_slice(&contents.as_ref());
 		let hash = T::Hashing::hash(&buf[..]);
-	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)
+	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple)
 	verify {
-		assert_last_event::<T>(Event::<T>::NewProposal(proposer, hash).into());
 		assert!(Signaling::<T>::proposal_of(hash).is_some());
 		assert_eq!(Signaling::<T>::inactive_proposals().len(), (p+1) as usize);
 	}
 
 	// Benchmark `advance_proposal` extrinsic
+	// NOTES:
+	// - See above note regarding outcomes.
+	// - No branching logic depends on commit-reveal, so we use the simple voting scheme for this benchmark.
 	advance_proposal {
 		let p in 1 .. MAX_PROPOSALS;
-		let o in 3 .. MAX_OUTCOMES;
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
@@ -116,26 +94,26 @@ benchmarks! {
 
 		// Create p existing proposals
 		for i in 0 .. p {
-			let contents = generate_unique_contents::<T>(MAX_BYTES, i, o);
-			let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
+			let contents = vec![i.to_le_bytes()[0]; MAX_BYTES as usize];
+			let outcomes = vec![YES_VOTE, NO_VOTE];
 
 			let mut buf = Vec::new();
 			buf.extend_from_slice(&proposer.encode());
 			buf.extend_from_slice(&contents.as_ref());
 			let hash = T::Hashing::hash(&buf[..]);
-			Signaling::<T>::create_proposal(origin.clone(), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)?;	
+			Signaling::<T>::create_proposal(origin.clone(), title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple)?;	
 			Signaling::<T>::advance_proposal(origin.clone(), hash)?;
 		}
 		assert_eq!(Signaling::<T>::active_proposals().len(), p as usize);
 
-		let contents = generate_unique_contents::<T>(MAX_BYTES, p, o);
-		let outcomes = &MULTI_OUTCOMES[0 .. o as usize];
+		let contents = vec![p.to_le_bytes()[0]; MAX_BYTES as usize];
+		let outcomes = vec![YES_VOTE, NO_VOTE];
 
 		let mut buf = Vec::new();
 		buf.extend_from_slice(&proposer.encode());
 		buf.extend_from_slice(&contents.as_ref());
 		let hash = T::Hashing::hash(&buf[..]);
-		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin, VotingScheme::Simple)?;
+		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple)?;
 	}: _(RawOrigin::Signed(proposer), hash)
 	verify {
 		assert!(Signaling::<T>::proposal_of(hash).is_some());

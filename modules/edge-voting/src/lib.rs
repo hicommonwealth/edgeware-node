@@ -109,11 +109,13 @@ pub struct VoteRecord<AccountId> {
 }
 
 /// NOTE: This is not enforced by any logic.
-pub const MAX_VOTES: u32 = 99;
+const MAX_VOTERS: u32 = 100;
+const MAX_VOTES: u32 = 99;
+// TODO: enforce these and add a MAX_OUTCOMES as well
 
 pub trait WeightInfo {
-	fn commit(s: u32, ) -> Weight;
-	fn reveal(s: u32, ) -> Weight;
+	fn commit(p: u32, s: u32, ) -> Weight;
+	fn reveal(p: u32, s: u32, ) -> Weight;
 }
 
 pub trait Trait: frame_system::Trait {
@@ -195,7 +197,7 @@ decl_module! {
 		/// A vote commitment is formatted using the native hash function. There
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
-		#[weight = T::WeightInfo::commit(MAX_VOTES)]
+		#[weight = T::WeightInfo::commit(MAX_VOTES, MAX_VOTERS)]
 		pub fn commit(origin, vote_id: u64, commit: VoteCommitment) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
@@ -215,7 +217,7 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
-		#[weight = T::WeightInfo::reveal(MAX_VOTES)]
+		#[weight = T::WeightInfo::reveal(MAX_VOTES, MAX_VOTERS)]
 		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;

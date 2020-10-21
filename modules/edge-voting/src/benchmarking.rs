@@ -40,12 +40,12 @@ const MULTI_OUTCOMES: [[u8; 32]; 10] = [
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9],
 ];
 const MAX_VOTERS: u32 = 100;
+const MAX_VOTES: u32 = 99;
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
-fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
+fn get_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	let caller: T::AccountId = account(name, index, SEED);
-	// T::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 	caller
 }
 
@@ -61,7 +61,7 @@ fn encode_ranked_vote<T: Trait>(voter: T::AccountId) -> VoteOutcome {
 }
 
 fn add_commit_reveal_ranked_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
-	let other = funded_account::<T>("proposer", n);
+	let other = get_account::<T>("proposer", n);
 	let id = Voting::<T>::create_vote(
 		other, VoteType::RankedChoice, VotingScheme::CommitReveal, TallyType::OneCoin, MULTI_OUTCOMES.to_vec(),
 	)?;
@@ -73,20 +73,27 @@ benchmarks! {
 	_ { }
 
 	commit {
+		let p in 1 .. MAX_VOTES;
 		let s in 1 .. MAX_VOTERS;
 
-		let caller = funded_account::<T>("caller", 0);
-		let id = add_commit_reveal_ranked_vote::<T>(s)?;
+		let caller = get_account::<T>("caller", s);
 
-		// Create s existing "voter"
-		for i in 0 .. s {
-			let voter = funded_account::<T>("voter", i);
-			let hash = encode_ranked_vote::<T>(voter.clone());
-			Voting::<T>::commit(RawOrigin::Signed(voter).into(), id, hash.into())?;
+		// Create p proposals
+		for i in 0 .. p {
+			let id = add_commit_reveal_ranked_vote::<T>(s)?;
+
+			// Create s existing "voters" for each proposal
+			for j in 0 .. s {
+				let voter = get_account::<T>("voter", j);
+				let hash = encode_ranked_vote::<T>(voter.clone());
+				Voting::<T>::commit(RawOrigin::Signed(voter).into(), id, hash.into())?;
+			}
+
+			let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
+			assert_eq!(record.commitments.len(), s as usize, "Votes not recorded");
 		}
 
-		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
-		assert_eq!(record.commitments.len(), s as usize, "Votes not recorded");
+		let id = Voting::<T>::vote_record_count();
 		whitelist_account!(caller);
 		let hash = encode_ranked_vote::<T>(caller.clone());
 	}: _(RawOrigin::Signed(caller), id, hash)
@@ -96,35 +103,44 @@ benchmarks! {
 	}
 
 	reveal {
+		let p in 2 .. MAX_VOTES;
 		let s in 1 .. MAX_VOTERS;
 
-		let caller = funded_account::<T>("caller", 0);
-		let id = add_commit_reveal_ranked_vote::<T>(s)?;
-
-		// Create s existing "voters"
-		for i in 0 .. s {
-			let voter = funded_account::<T>("voter", i);
-			let hash = encode_ranked_vote::<T>(voter.clone());
-			Voting::<T>::commit(RawOrigin::Signed(voter).into(), id, hash)?;
-		}
-
+		let caller = get_account::<T>("caller", s);
 		whitelist_account!(caller);
-		let hash = encode_ranked_vote::<T>(caller.clone());
-		Voting::<T>::commit(RawOrigin::Signed(caller.clone()).into(), id, hash)?;
 
-		// move to reveal phase and perform reveals
-		Voting::<T>::advance_stage(id)?;
+		// Create p proposals
+		for i in 0 .. p {
+			let id = add_commit_reveal_ranked_vote::<T>(i)?;
 
-		for i in 0 .. s {
-			let voter = funded_account::<T>("voter", i);
-			Voting::<T>::reveal(RawOrigin::Signed(voter).into(), id, MULTI_OUTCOMES.to_vec(), Some(SECRET))?;
+			// Create s existing "voters" for each proposal
+			for j in 0 .. s {
+				let voter = get_account::<T>("voter", j);
+				let hash = encode_ranked_vote::<T>(voter.clone());
+				Voting::<T>::commit(RawOrigin::Signed(voter).into(), id, hash.into())?;
+			}
+
+			// commit on every proposal from caller, but only vote on the final one
+			let hash = encode_ranked_vote::<T>(caller.clone());
+			Voting::<T>::commit(RawOrigin::Signed(caller.clone()).into(), id, hash.into())?;
+
+			Voting::<T>::advance_stage(id)?;
+
+			for j in 0 .. s {
+				let voter = get_account::<T>("voter", j);
+				Voting::<T>::reveal(RawOrigin::Signed(voter).into(), id, MULTI_OUTCOMES.to_vec(), Some(SECRET))?;
+			}
+
+			let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
+			assert_eq!(record.commitments.len(), (s + 1) as usize, "Commitments not recorded");
+			assert_eq!(record.reveals.len(), s as usize, "Votes not recorded");
 		}
 
-		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
-		assert_eq!(record.reveals.len(), s as usize, "Votes not recorded");
-	}: _(RawOrigin::Signed(caller), id, MULTI_OUTCOMES.to_vec(), Some(SECRET))
+		let last_vote_id = Voting::<T>::vote_record_count() - 1;
+		let record = Voting::<T>::vote_records(last_vote_id).ok_or("Last proposal not created")?;
+	}: _(RawOrigin::Signed(caller), last_vote_id, MULTI_OUTCOMES.to_vec(), Some(SECRET))
 	verify {
-		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
+		let record = Voting::<T>::vote_records(last_vote_id).ok_or("Proposal not created")?;
 		assert_eq!(record.reveals.len(), (s + 1) as usize, "Vote not recorded");
 	}
 }
