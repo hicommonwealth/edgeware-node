@@ -23,14 +23,28 @@ use super::*;
 use frame_benchmarking::{benchmarks, account, whitelist_account};
 use frame_support::traits::Currency;
 use frame_system::{EventRecord, RawOrigin, self};
-use sp_runtime::traits::Bounded;
+use sp_runtime::traits::{BlakeTwo256, Bounded};
 
 use crate::Module as Voting;
 
 const SEED: u32 = 0;
 const YES_VOTE: VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
 const NO_VOTE: VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+const MULTI_OUTCOMES: [[u8; 32]; 10] = [
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8],
+	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9],
+];
 const MAX_VOTERS: u32 = 100;
+
+static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
 fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	let caller: T::AccountId = account(name, index, SEED);
@@ -38,10 +52,30 @@ fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
 	caller
 }
 
+fn encode_ranked_vote<T: Trait>(voter: T::AccountId) -> VoteOutcome {
+	// create hash to commit
+	let mut buf = vec![];
+	buf.extend_from_slice(&voter.encode());
+	buf.extend_from_slice(&SECRET.encode());
+	for i in 0..MULTI_OUTCOMES.len() {
+		buf.extend_from_slice(&MULTI_OUTCOMES[i].encode());
+	}
+	BlakeTwo256::hash_of(&buf).into()
+}
+
 fn add_simple_binary_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
 	let other = funded_account::<T>("proposer", n);
 	let id = Voting::<T>::create_vote(
 		other, VoteType::Binary, false, TallyType::OneCoin, vec![YES_VOTE, NO_VOTE]
+	)?;
+	Voting::<T>::advance_stage(id)?;
+	Ok(id)
+}
+
+fn add_commit_reveal_ranked_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
+	let other = funded_account::<T>("proposer", n);
+	let id = Voting::<T>::create_vote(
+		other, VoteType::RankedChoice, true, TallyType::OneCoin, MULTI_OUTCOMES.to_vec(),
 	)?;
 	Voting::<T>::advance_stage(id)?;
 	Ok(id)
@@ -58,22 +92,57 @@ fn assert_last_event<T: Trait>(generic_event: <T as Trait>::Event) {
 benchmarks! {
 	_ { }
 
+	commit {
+		let s in 1 .. MAX_VOTERS;
+
+		let caller = funded_account::<T>("caller", 0);
+		let id = add_commit_reveal_ranked_vote::<T>(s)?;
+
+		// Create s existing "voter"
+		for i in 0 .. s {
+			let voter = funded_account::<T>("voter", i);
+			let hash = encode_ranked_vote::<T>(voter.clone());
+			Voting::<T>::commit(RawOrigin::Signed(voter).into(), id, hash.into())?;
+		}
+
+		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
+		assert_eq!(record.commitments.len(), s as usize, "Votes not recorded");
+		whitelist_account!(caller);
+		let hash = encode_ranked_vote::<T>(caller.clone());
+	}: _(RawOrigin::Signed(caller), id, hash)
+	verify {
+		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
+		assert_eq!(record.commitments.len(), (s + 1) as usize, "Vote not recorded");
+	}
+
 	reveal {
 		let s in 1 .. MAX_VOTERS;
 
 		let caller = funded_account::<T>("caller", 0);
-		let id = add_simple_binary_vote::<T>(s)?;
+		let id = add_commit_reveal_ranked_vote::<T>(s)?;
 
-		// Create s existing "seconds"
+		// Create s existing "voters"
 		for i in 0 .. s {
-			let seconder = funded_account::<T>("seconder", i);
-			Voting::<T>::reveal(RawOrigin::Signed(seconder).into(), id, vec![YES_VOTE], None)?;
+			let voter = funded_account::<T>("voter", i);
+			let hash = encode_ranked_vote::<T>(voter.clone());
+			Voting::<T>::commit(RawOrigin::Signed(voter).into(), id, hash)?;
+		}
+
+		whitelist_account!(caller);
+		let hash = encode_ranked_vote::<T>(caller.clone());
+		Voting::<T>::commit(RawOrigin::Signed(caller.clone()).into(), id, hash)?;
+
+		// move to reveal phase and perform reveals
+		Voting::<T>::advance_stage(id)?;
+
+		for i in 0 .. s {
+			let voter = funded_account::<T>("voter", i);
+			Voting::<T>::reveal(RawOrigin::Signed(voter).into(), id, MULTI_OUTCOMES.to_vec(), Some(SECRET))?;
 		}
 
 		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
 		assert_eq!(record.reveals.len(), s as usize, "Votes not recorded");
-		whitelist_account!(caller);
-	}: _(RawOrigin::Signed(caller), id, vec![YES_VOTE], None)
+	}: _(RawOrigin::Signed(caller), id, MULTI_OUTCOMES.to_vec(), Some(SECRET))
 	verify {
 		let record = Voting::<T>::vote_records(id).ok_or("Proposal not created")?;
 		assert_eq!(record.reveals.len(), (s + 1) as usize, "Vote not recorded");

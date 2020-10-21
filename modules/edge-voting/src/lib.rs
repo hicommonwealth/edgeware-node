@@ -38,6 +38,8 @@ use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, S
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
+/// The hash of a vote outcome plus a secret, to commit to a vote.
+pub type VoteCommitment = [u8; 32];
 
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
 pub enum VoteStage {
@@ -175,7 +177,7 @@ decl_module! {
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
 		#[weight = 0]
-		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> DispatchResult {
+		pub fn commit(origin, vote_id: u64, commit: VoteCommitment) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
 			ensure!(record.data.is_commit_reveal, Error::<T>::IsNotCommitReveal);
