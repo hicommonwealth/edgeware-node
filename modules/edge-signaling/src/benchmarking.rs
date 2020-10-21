@@ -28,8 +28,6 @@ use sp_runtime::traits::Bounded;
 use crate::Module as Signaling;
 
 const SEED: u32 = 0;
-const YES_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 const MULTI_OUTCOMES: [[u8; 32]; 10] = [
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -42,6 +40,7 @@ const MULTI_OUTCOMES: [[u8; 32]; 10] = [
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8],
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,9],
 ];
+const MAX_OUTCOMES: u32 = 10;
 const MAX_PROPOSALS: u32 = 99;
 const MAX_BYTES: u32 = 16_384;
 
@@ -66,7 +65,7 @@ benchmarks! {
 	create_proposal {
 		let p in 1 .. MAX_PROPOSALS;
 		let b in 1 .. MAX_BYTES;
-		// TODO: benchmark max outcomes as well
+		let o in 2 .. MAX_OUTCOMES;
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
@@ -74,13 +73,13 @@ benchmarks! {
 		let title: &[u8] = b"Edgeware";
 
 		let contents = vec![1; b as usize];
-		let outcomes = vec![YES_VOTE, NO_VOTE];
+		let outcomes = &MULTI_OUTCOMES[0 .. (o+1) as usize];
 
 		let mut buf = Vec::new();
 		buf.extend_from_slice(&proposer.encode());
 		buf.extend_from_slice(&contents.as_ref());
 		let hash = T::Hashing::hash(&buf[..]);
-	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin)
+	}: _(RawOrigin::Signed(proposer.clone()), title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin)
 	verify {
 		assert_last_event::<T>(Event::<T>::NewProposal(proposer, hash).into());
 		assert!(Signaling::<T>::proposal_of(hash).is_some());
@@ -89,7 +88,7 @@ benchmarks! {
 	// Benchmark `advance_proposal` extrinsic
 	advance_proposal {
 		let p in 1 .. MAX_PROPOSALS;
-		// TODO: benchmark max outcomes as well
+		let o in 2 .. MAX_OUTCOMES;
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
@@ -98,17 +97,15 @@ benchmarks! {
 		let title: &[u8] = b"Edgeware";
 
 		let contents = p.to_le_bytes().to_vec();
-		let outcomes = vec![YES_VOTE, NO_VOTE];
+		let outcomes = &MULTI_OUTCOMES[0 .. (o+1) as usize];
 
 		let mut buf = Vec::new();
 		buf.extend_from_slice(&proposer.encode());
 		buf.extend_from_slice(&contents.as_ref());
 		let hash = T::Hashing::hash(&buf[..]);
-		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes, VoteType::Binary, TallyType::OneCoin)?;
+		Signaling::<T>::create_proposal(origin, title.into(), contents, outcomes.to_vec(), VoteType::MultiOption, TallyType::OneCoin)?;
 	}: _(RawOrigin::Signed(proposer), hash)
 	verify {
-		// TODO: fix this assert
-		// assert_last_event::<T>(Event::<T>::VotingStarted(hash, p, 1).into());
 		assert!(Signaling::<T>::proposal_of(hash).is_some());
 		assert_eq!(Signaling::<T>::proposal_of(hash).unwrap().stage, VoteStage::Voting);
 	}

@@ -21,15 +21,12 @@
 use super::*;
 
 use frame_benchmarking::{benchmarks, account, whitelist_account};
-use frame_support::traits::Currency;
-use frame_system::{EventRecord, RawOrigin, self};
-use sp_runtime::traits::{BlakeTwo256, Bounded};
+use frame_system::{RawOrigin, self};
+use sp_runtime::traits::{BlakeTwo256};
 
 use crate::Module as Voting;
 
 const SEED: u32 = 0;
-const YES_VOTE: VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-const NO_VOTE: VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
 const MULTI_OUTCOMES: [[u8; 32]; 10] = [
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 	[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
@@ -63,15 +60,6 @@ fn encode_ranked_vote<T: Trait>(voter: T::AccountId) -> VoteOutcome {
 	BlakeTwo256::hash_of(&buf).into()
 }
 
-fn add_simple_binary_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
-	let other = funded_account::<T>("proposer", n);
-	let id = Voting::<T>::create_vote(
-		other, VoteType::Binary, false, TallyType::OneCoin, vec![YES_VOTE, NO_VOTE]
-	)?;
-	Voting::<T>::advance_stage(id)?;
-	Ok(id)
-}
-
 fn add_commit_reveal_ranked_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
 	let other = funded_account::<T>("proposer", n);
 	let id = Voting::<T>::create_vote(
@@ -79,14 +67,6 @@ fn add_commit_reveal_ranked_vote<T: Trait>(n: u32) -> Result<u64, &'static str> 
 	)?;
 	Voting::<T>::advance_stage(id)?;
 	Ok(id)
-}
-
-fn assert_last_event<T: Trait>(generic_event: <T as Trait>::Event) {
-	let events = frame_system::Module::<T>::events();
-	let system_event: <T as frame_system::Trait>::Event = generic_event.into();
-	// compare to the last event record
-	let EventRecord { event, .. } = &events[events.len() - 1];
-	assert_eq!(event, &system_event);
 }
 
 benchmarks! {
