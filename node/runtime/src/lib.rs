@@ -833,6 +833,7 @@ impl pallet_assets::Trait for Runtime {
 impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
+	type WeightInfo = weights::signaling::WeightInfo<Self>;
 }
 
 impl treasury_reward::Trait for Runtime {
@@ -842,6 +843,7 @@ impl treasury_reward::Trait for Runtime {
 
 impl voting::Trait for Runtime {
 	type Event = Event;
+	type WeightInfo = weights::voting::WeightInfo<Self>;
 }
 
 parameter_types! {
