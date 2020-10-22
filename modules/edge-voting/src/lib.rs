@@ -108,19 +108,18 @@ pub struct VoteRecord<AccountId> {
 	pub outcomes: Vec<VoteOutcome>,
 }
 
-/// NOTE: This is not enforced by any logic.
-const MAX_VOTERS: u32 = 100;
-const MAX_VOTES: u32 = 99;
-// TODO: enforce these and add a MAX_OUTCOMES as well
-
 pub trait WeightInfo {
-	fn commit(p: u32, s: u32, ) -> Weight;
-	fn reveal(p: u32, s: u32, ) -> Weight;
+	fn commit(s: u32, ) -> Weight;
+	fn reveal(s: u32, ) -> Weight;
 }
 
 pub trait Trait: frame_system::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
+	/// Maxmimum number of voters on a single proposal.
+	type MaxVotersPerProposal: Get<u32>;
+
 	/// Weight information for extrinsics in this pallet.
 	type WeightInfo: WeightInfo;
 }
@@ -179,11 +178,18 @@ decl_error! {
 			InvalidMultiOptionOutcomes,
 			/// Ranked choice votes must have >2 outcomes
 			InvalidRankedChoiceOutcomes,
+			/// Reached commit limit on a proposal
+			TooManyCommits,
+			/// Reached reveal limit on a proposal
+			TooManyReveals,
     }
 }
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		/// Maxmimum number of voters on a single proposal.
+		const MaxVotersPerProposal: u32 = T::MaxVotersPerProposal::get();
+
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
@@ -197,7 +203,7 @@ decl_module! {
 		/// A vote commitment is formatted using the native hash function. There
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
-		#[weight = T::WeightInfo::commit(MAX_VOTES, MAX_VOTERS)]
+		#[weight = T::WeightInfo::commit(T::MaxVotersPerProposal::get())]
 		pub fn commit(origin, vote_id: u64, commit: VoteCommitment) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
@@ -205,6 +211,7 @@ decl_module! {
 			ensure!(record.data.stage == VoteStage::Commit, Error::<T>::NotCommitStage);
 			// No changing of commitments once placed
 			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateCommit);
+			ensure!(record.commitments.len() < T::MaxVotersPerProposal::get() as usize, Error::<T>::TooManyCommits);
 
 			// Add commitment to record
 			record.commitments.push((_sender.clone(), commit));
@@ -217,11 +224,12 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
-		#[weight = T::WeightInfo::reveal(MAX_VOTES, MAX_VOTERS)]
+		#[weight = T::WeightInfo::reveal(T::MaxVotersPerProposal::get())]
 		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
 			ensure!(record.data.stage == VoteStage::Voting, Error::<T>::NotVotingStage);
+			ensure!(record.reveals.len() < T::MaxVotersPerProposal::get() as usize, Error::<T>::TooManyReveals);
 			// Check vote is for valid outcomes
 			if record.data.vote_type == VoteType::RankedChoice {
 				ensure!(Self::is_ranked_choice_vote_valid(

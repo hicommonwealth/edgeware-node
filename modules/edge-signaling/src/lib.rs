@@ -51,11 +51,6 @@ pub type ProposalTitle = Vec<u8>;
 pub type ProposalContents = Vec<u8>;
 type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
 
-/// NOTE: This is not enforced by any logic.
-pub const MAX_PROPOSALS: u32 = 99;
-pub const MAX_CONTENTS_BYTES: u32 = 16_384;
-// TODO: enforce these and add a MAX_OUTCOMES as well
-
 pub trait WeightInfo {
 	fn create_proposal(p: u32, b: u32, ) -> Weight;
 	fn advance_proposal(p: u32, ) -> Weight;
@@ -64,8 +59,22 @@ pub trait WeightInfo {
 pub trait Trait: voting::Trait + pallet_balances::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
 	/// The account balance.
 	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
+
+	/// Maxmimum number of proposals allowed on chain.
+	type MaxProposals: Get<u32>;
+
+	/// Maxmimum length of title in bytes.
+	type MaxTitleLength: Get<u32>;
+
+	/// Maxmimum length of contents in bytes.
+	type MaxContentsLength: Get<u32>;
+
+	/// Maxmimum number of outcomes.
+	type MaxOutcomes: Get<u32>;
+
 	/// Weight information for extrinsics in this pallet.
 	type WeightInfo: WeightInfo;
 }
@@ -122,11 +131,31 @@ decl_error! {
 		ProposalMissing,
 		/// Insufficient funds to reserve bond
 		InsufficientFunds,
+		/// Title is longer than max title length
+		TitleTooLong,
+		/// Contents are longer than max content length
+		ContentsTooLong,
+		/// Provided more outcomes than max outcome count
+		TooManyOutcomes,
+		/// Proposal limit reached
+		TooManyProposals
 	}
 }
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		/// Maxmimum number of proposals allowed on chain.
+		const MaxProposals: u32 = T::MaxProposals::get();
+
+		/// Maxmimum length of title in bytes.
+		const MaxTitleLength: u32 = T::MaxTitleLength::get();
+
+		/// Maxmimum length of contents in bytes.
+		const MaxContentsLength: u32 = T::MaxContentsLength::get();
+
+		/// Maxmimum number of outcomes.
+		const MaxOutcomes: u32 = T::MaxOutcomes::get();
+
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
@@ -136,7 +165,7 @@ decl_module! {
 		}
 
 		/// Creates a new signaling proposal.
-		#[weight = <T as Trait>::WeightInfo::create_proposal(MAX_PROPOSALS, MAX_CONTENTS_BYTES)]
+		#[weight = <T as Trait>::WeightInfo::create_proposal(T::MaxProposals::get(), T::MaxContentsLength::get())]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -149,6 +178,13 @@ decl_module! {
 			let _sender = ensure_signed(origin)?;
 			ensure!(!title.is_empty(), Error::<T>::InvalidProposalTitle);
 			ensure!(!contents.is_empty(), Error::<T>::InvalidProposalContents);
+
+			ensure!(title.len() < T::MaxTitleLength::get() as usize, Error::<T>::TitleTooLong);
+			ensure!(contents.len() < T::MaxContentsLength::get() as usize, Error::<T>::ContentsTooLong);
+			ensure!(outcomes.len() < T::MaxOutcomes::get() as usize, Error::<T>::TooManyOutcomes);
+			let extant_proposal_count =
+				Self::inactive_proposals().len() + Self::active_proposals().len() + Self::completed_proposals().len();
+			ensure!(extant_proposal_count < T::MaxProposals::get() as usize, Error::<T>::TooManyProposals);
 
 			// construct hash(origin + proposal) and check existence
 			let mut buf = Vec::new();
@@ -187,7 +223,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
-		#[weight = <T as Trait>::WeightInfo::advance_proposal(MAX_PROPOSALS)]
+		#[weight = <T as Trait>::WeightInfo::advance_proposal(T::MaxProposals::get())]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or(Error::<T>::ProposalMissing)?;
