@@ -17,6 +17,8 @@
 #![recursion_limit="128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod default_weight;
+
 #[cfg(test)]
 mod tests;
 
@@ -120,6 +122,9 @@ pub trait Trait: frame_system::Trait {
 	/// Maxmimum number of voters on a single proposal.
 	type MaxVotersPerProposal: Get<u32>;
 
+	/// Maxmimum number of outcomes.
+	type MaxOutcomes: Get<u32>;
+
 	/// Weight information for extrinsics in this pallet.
 	type WeightInfo: WeightInfo;
 }
@@ -178,6 +183,8 @@ decl_error! {
 			InvalidMultiOptionOutcomes,
 			/// Ranked choice votes must have >2 outcomes
 			InvalidRankedChoiceOutcomes,
+			/// Provided more outcomes than max outcome count
+			TooManyOutcomes,
 			/// Reached commit limit on a proposal
 			TooManyCommits,
 			/// Reached reveal limit on a proposal
@@ -189,6 +196,9 @@ decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		/// Maxmimum number of voters on a single proposal.
 		const MaxVotersPerProposal: u32 = T::MaxVotersPerProposal::get();
+
+		/// Maxmimum number of outcomes.
+		const MaxOutcomes: u32 = T::MaxOutcomes::get();
 
 		type Error = Error<T>;
 		fn deposit_event() = default;
@@ -288,6 +298,7 @@ impl<T: Trait> Module<T> {
 		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, Error::<T>::InvalidBinaryOutcomes) }
 		if vote_type == VoteType::MultiOption { ensure!(outcomes.len() > 2, Error::<T>::InvalidMultiOptionOutcomes) }
 		if vote_type == VoteType::RankedChoice { ensure!(outcomes.len() > 2, Error::<T>::InvalidRankedChoiceOutcomes) }
+		ensure!(outcomes.len() < T::MaxOutcomes::get() as usize, Error::<T>::TooManyOutcomes);
 
 		let id = Self::vote_record_count() + 1;
 		<VoteRecords<T>>::insert(id, VoteRecord {

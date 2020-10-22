@@ -830,9 +830,30 @@ impl pallet_assets::Trait for Runtime {
 	type AssetId = Nonce;
 }
 
+parameter_types! {
+	pub const MaxVotersPerProposal: u32 = 256;
+	pub const MaxOutcomes: u32 = 16;
+}
+
+impl voting::Trait for Runtime {
+	type Event = Event;
+	type MaxVotersPerProposal = MaxVotersPerProposal;
+	type MaxOutcomes = MaxOutcomes;
+	type WeightInfo = weights::voting::WeightInfo<Runtime>;
+}
+
+parameter_types! {
+	pub const MaxProposals: u32 = 32;
+	pub const MaxTitleLength: u32 = 128;
+	pub const MaxContentsLength: u32 = 16_384;
+}
+
 impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
+	type MaxProposals = MaxProposals;
+	type MaxTitleLength = MaxTitleLength;
+	type MaxContentsLength = MaxContentsLength;
 	type WeightInfo = weights::signaling::WeightInfo<Runtime>;
 }
 
@@ -841,10 +862,6 @@ impl treasury_reward::Trait for Runtime {
 	type Currency = Balances;
 }
 
-impl voting::Trait for Runtime {
-	type Event = Event;
-	type WeightInfo = weights::voting::WeightInfo<Runtime>;
-}
 
 parameter_types! {
     pub const ChainId: u8 = 5;
@@ -891,8 +908,8 @@ construct_runtime!(
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 
-		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},
+		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 	}
 );

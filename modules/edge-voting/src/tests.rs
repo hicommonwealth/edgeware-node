@@ -72,9 +72,15 @@ impl frame_system::Trait for Test {
 	type SystemWeightInfo = ();
 }
 
-
+parameter_types! {
+	pub const MaxVotersPerProposal: u32 = 5;
+	pub const MaxOutcomes: u32 = 6;
+}
 impl Trait for Test {
 	type Event = ();
+	type MaxVotersPerProposal = MaxVotersPerProposal;
+	type MaxOutcomes = MaxOutcomes;
+	type WeightInfo = ();
 }
 
 pub type System = frame_system::Module<Test>;
@@ -122,6 +128,10 @@ fn get_test_key() -> u64 {
 fn get_test_key_2() -> u64 {
 	let public = 2_u64;
 	return public;		
+}
+
+fn get_test_key_n(n: u64) -> u64 {
+	return n;		
 }
 
 fn generate_1p1v_public_binary_vote() -> (VoteType, VotingScheme, TallyType, [[u8; 32]; 2]) {
@@ -270,6 +280,28 @@ fn create_multi_vote_with_binary_options_should_not_work() {
 		let vote = generate_1p1v_public_binary_vote();
 		let multi_vote = generate_1p1v_public_multi_vote();
 		assert_err!(create_vote(public, multi_vote.0, multi_vote.1, multi_vote.2, &vote.3), Error::<Test>::InvalidMultiOptionOutcomes);
+		assert_eq!(Voting::vote_record_count(), 0);
+		assert_eq!(Voting::vote_records(1), None);
+	});
+}
+
+#[test]
+fn create_multi_vote_too_many_outcomes_should_not_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		// MaxOutcomes declared as 6 in Trait above
+		let outcomes = [
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6],
+			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7],
+		];
+		let multi_vote = generate_1p1v_public_multi_vote();
+		assert_err!(create_vote(public, multi_vote.0, multi_vote.1, multi_vote.2, &outcomes.to_vec()), Error::<Test>::TooManyOutcomes);
 		assert_eq!(Voting::vote_record_count(), 0);
 		assert_eq!(Voting::vote_records(1), None);
 	});
@@ -558,6 +590,54 @@ fn reveal_commit_should_work() {
 
 		assert_ok!(advance_stage(1));
 		assert_ok!(reveal(public2, 1, vec![vote.3[0]], Some(secret)));
+	});
+}
+
+#[test]
+fn commits_after_max_voters_should_not_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let vote = generate_1p1v_commit_reveal_binary_vote();
+		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+		assert_ok!(advance_stage(1));
+		for i in 0 .. <Test as Trait>::MaxVotersPerProposal::get() {
+			let key = get_test_key_n((i + 2) as u64);
+			let secret = SECRET;
+			let mut buf = Vec::new();
+			buf.extend_from_slice(&key.encode());
+			buf.extend_from_slice(&secret);
+			buf.extend_from_slice(&vote.3[0]);
+			let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
+			assert_ok!(commit(key, 1, commit_hash));
+		}
+
+		let key = get_test_key_n(10 as u64);
+		let secret = SECRET;
+		let mut buf = Vec::new();
+		buf.extend_from_slice(&key.encode());
+		buf.extend_from_slice(&secret);
+		buf.extend_from_slice(&vote.3[0]);
+		let commit_hash: [u8; 32] = BlakeTwo256::hash_of(&buf).into();
+		assert_err!(commit(key, 1, commit_hash), Error::<Test>::TooManyCommits);
+	});
+}
+
+#[test]
+fn reveal_after_max_voters_should_not_work() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let vote = generate_1p1v_public_binary_vote();
+		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
+		assert_ok!(advance_stage(1));
+		for i in 0 .. <Test as Trait>::MaxVotersPerProposal::get() {
+			let key = get_test_key_n((i + 2) as u64);
+			assert_ok!(reveal(key, 1, vec![vote.3[0]], Some(vote.3[0])));
+		}
+
+		let key = get_test_key_n(10 as u64);
+		assert_err!(reveal(key, 1, vec![vote.3[0]], Some(vote.3[0])), Error::<Test>::TooManyReveals);
 	});
 }
 

@@ -17,6 +17,8 @@
 #![recursion_limit="128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod default_weight;
+
 #[cfg(test)]
 mod tests;
 
@@ -72,9 +74,6 @@ pub trait Trait: voting::Trait + pallet_balances::Trait {
 	/// Maxmimum length of contents in bytes.
 	type MaxContentsLength: Get<u32>;
 
-	/// Maxmimum number of outcomes.
-	type MaxOutcomes: Get<u32>;
-
 	/// Weight information for extrinsics in this pallet.
 	type WeightInfo: WeightInfo;
 }
@@ -117,10 +116,10 @@ decl_error! {
 	pub enum Error for Module<T: Trait> {
 		/// Corresponding voting for signaling proposal not found
 		VoteRecordDoesntExist,
-		/// Invalid or empty title of proposal
-		InvalidProposalTitle,
-		/// Invalid or empty contents of proposal
-		InvalidProposalContents,
+		/// Empty title of proposal
+		EmptyProposalTitle,
+		/// Empty contents of proposal
+		EmptyProposalContents,
 		/// Duplicate proposal
 		DuplicateProposal,
 		/// Not the proposal author
@@ -135,8 +134,6 @@ decl_error! {
 		TitleTooLong,
 		/// Contents are longer than max content length
 		ContentsTooLong,
-		/// Provided more outcomes than max outcome count
-		TooManyOutcomes,
 		/// Proposal limit reached
 		TooManyProposals
 	}
@@ -152,9 +149,6 @@ decl_module! {
 
 		/// Maxmimum length of contents in bytes.
 		const MaxContentsLength: u32 = T::MaxContentsLength::get();
-
-		/// Maxmimum number of outcomes.
-		const MaxOutcomes: u32 = T::MaxOutcomes::get();
 
 		type Error = Error<T>;
 		fn deposit_event() = default;
@@ -176,12 +170,11 @@ decl_module! {
 			voting_scheme: voting::VotingScheme,
 		) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!title.is_empty(), Error::<T>::InvalidProposalTitle);
-			ensure!(!contents.is_empty(), Error::<T>::InvalidProposalContents);
+			ensure!(!title.is_empty(), Error::<T>::EmptyProposalTitle);
+			ensure!(!contents.is_empty(), Error::<T>::EmptyProposalContents);
 
 			ensure!(title.len() < T::MaxTitleLength::get() as usize, Error::<T>::TitleTooLong);
 			ensure!(contents.len() < T::MaxContentsLength::get() as usize, Error::<T>::ContentsTooLong);
-			ensure!(outcomes.len() < T::MaxOutcomes::get() as usize, Error::<T>::TooManyOutcomes);
 			let extant_proposal_count =
 				Self::inactive_proposals().len() + Self::active_proposals().len() + Self::completed_proposals().len();
 			ensure!(extant_proposal_count < T::MaxProposals::get() as usize, Error::<T>::TooManyProposals);
