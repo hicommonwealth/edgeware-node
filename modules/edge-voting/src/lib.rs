@@ -333,6 +333,10 @@ impl<T: Trait> Module<T> {
 	pub fn get_vote_record(vote_id: u64) -> Option<VoteRecord<T::AccountId>> {
 		return <VoteRecords<T>>::get(vote_id);
 	}
+
+	pub fn delete_vote_record(vote_id: u64) -> () {
+		<VoteRecords<T>>::remove(vote_id);
+	}
 }
 
 #[derive(Encode, Decode, RuntimeDebug)]

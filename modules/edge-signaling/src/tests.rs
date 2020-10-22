@@ -607,6 +607,7 @@ fn expired_inactive_proposal_should_return_creation_bond() {
 		let balance = Balances::free_balance(public);
 		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
 		let after_propose_balance = Balances::free_balance(public);
+		let record = Signaling::proposal_of(hash).unwrap();
 		assert_eq!(balance - BOND, after_propose_balance);
 		System::set_block_number(10002);
 		<Signaling as OnFinalize<u64>>::on_finalize(10002);
@@ -614,10 +615,8 @@ fn expired_inactive_proposal_should_return_creation_bond() {
 
 		let after_completion_balance = Balances::free_balance(public);
 		assert_eq!(balance, after_completion_balance);
-		assert_eq!(
-			Signaling::proposal_of(hash),
-			None
-		);
+		assert_eq!(Signaling::proposal_of(hash), None);
+		assert_eq!(Voting::get_vote_record(record.vote_id), None);
 	});
 }
 
@@ -630,6 +629,7 @@ fn completed_proposal_should_remain_before_deletion() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		let hash = build_proposal_hash(public, &proposal);
 		assert_ok!(propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple));
+		let record = Signaling::proposal_of(hash).unwrap();
 		assert_ok!(advance_proposal(public, hash));
 		System::set_block_number(10002);
 		<Signaling as OnFinalize<u64>>::on_finalize(10002);
@@ -645,10 +645,8 @@ fn completed_proposal_should_remain_before_deletion() {
 		System::set_block_number(20003);
 		<Signaling as OnFinalize<u64>>::on_finalize(20003);
 		System::set_block_number(20004);
-		assert_eq!(
-			Signaling::proposal_of(hash),
-			None
-		);
+		assert_eq!(Signaling::proposal_of(hash), None);
+		assert_eq!(Voting::get_vote_record(record.vote_id), None);
 	});
 }
 
