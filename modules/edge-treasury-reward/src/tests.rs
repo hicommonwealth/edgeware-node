@@ -14,20 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-
-
-
-use frame_support::traits::OnUnbalanced;
 use pallet_staking::EraIndex;
 use super::*;
 use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::traits::{Convert, SaturatedConversion, Zero};
 use sp_runtime::testing::{UintAuthorityId, TestXt};
 use sp_staking::{SessionIndex};
 use frame_support::{
-	impl_outer_origin, parameter_types, impl_outer_dispatch, impl_outer_event,
-	StorageValue, StorageMap, StorageDoubleMap,
-	traits::{Currency, Get, FindAuthor, OnFinalize},
+	impl_outer_origin, parameter_types, impl_outer_dispatch,
+	traits::{Get, FindAuthor, OnFinalize},
 	weights::{Weight, constants::RocksDbWeight},
 };
 #[cfg(feature = "std")]
@@ -35,7 +29,7 @@ use std::{collections::HashSet, cell::RefCell};
 
 use sp_core::{H256};
 
-use frame_support::{traits::{Contains, ContainsLengthBound}};
+use frame_support::{traits::{Contains, ContainsLengthBound, SaturatingCurrencyToVote}};
 
 use sp_runtime::{
 	Perbill, Permill, ModuleId,
@@ -50,19 +44,6 @@ pub(crate) type AccountId = u64;
 pub(crate) type AccountIndex = u64;
 pub(crate) type BlockNumber = u64;
 pub(crate) type Balance = u128;
-
-/// Simple structure that exposes how u64 currency can be represented as... u64.
-pub struct CurrencyToVoteHandler;
-impl Convert<Balance, u64> for CurrencyToVoteHandler {
-	fn convert(x: Balance) -> u64 {
-		x.saturated_into()
-	}
-}
-impl Convert<u128, Balance> for CurrencyToVoteHandler {
-	fn convert(x: u128) -> Balance {
-		x
-	}
-}
 
 thread_local! {
 	static SESSION: RefCell<(Vec<AccountId>, HashSet<AccountId>)> = RefCell::new(Default::default());
@@ -104,11 +85,6 @@ impl pallet_session::OneSessionHandler<AccountId> for OtherSessionHandler {
 
 impl sp_runtime::BoundToRuntimeAppPublic for OtherSessionHandler {
 	type Public = UintAuthorityId;
-}
-
-pub fn is_disabled(controller: AccountId) -> bool {
-	let stash = Staking::ledger(&controller).unwrap().stash;
-	SESSION.with(|d| d.borrow().1.contains(&stash))
 }
 
 pub struct ExistentialDeposit;
@@ -291,7 +267,7 @@ thread_local! {
 impl pallet_staking::Trait for Test {
 	type Currency = Balances;
 	type UnixTime = Timestamp;
-	type CurrencyToVote = CurrencyToVoteHandler;
+	type CurrencyToVote = SaturatingCurrencyToVote;
 	type RewardRemainder = ();
 	type Event = ();
 	type Slash = ();
@@ -309,6 +285,7 @@ impl pallet_staking::Trait for Test {
 	type MinSolutionScoreBump = MinSolutionScoreBump;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type UnsignedPriority = UnsignedPriority;
+	type OffchainSolutionWeightLimit = ();
 	type WeightInfo = ();
 }
 
