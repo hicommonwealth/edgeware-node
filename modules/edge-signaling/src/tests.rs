@@ -101,14 +101,14 @@ impl voting::Trait for Test {
 }
 
 parameter_types! {
-	pub const MaxProposals: u32 = 4;
+	pub const MaxSignalingProposals: u32 = 4;
 	pub const MaxTitleLength: u32 = 128;
 	pub const MaxContentsLength: u32 = 128;
 }
 impl Trait for Test {
 	type Event = ();
 	type Currency = pallet_balances::Module<Self>;
-	type MaxProposals = MaxProposals;
+	type MaxSignalingProposals = MaxSignalingProposals;
 	type MaxTitleLength = MaxTitleLength;
 	type MaxContentsLength = MaxContentsLength;
 	type WeightInfo = ();
@@ -370,7 +370,7 @@ fn propose_with_too_many_existing_proposals_should_fail() {
 		let public = get_test_key();
 		let (title, proposal) = generate_proposal();
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		for i in 0 .. <Test as Trait>::MaxProposals::get() {
+		for i in 0 .. <Test as Trait>::MaxSignalingProposals::get() {
 			assert_ok!(propose(public, title, &i.to_le_bytes(), outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		}
 		assert_err!(

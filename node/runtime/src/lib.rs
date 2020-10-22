@@ -843,7 +843,7 @@ impl voting::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const MaxProposals: u32 = 32;
+	pub const MaxSignalingProposals: u32 = 32;
 	pub const MaxTitleLength: u32 = 128;
 	pub const MaxContentsLength: u32 = 16_384;
 }
@@ -851,7 +851,7 @@ parameter_types! {
 impl signaling::Trait for Runtime {
 	type Event = Event;
 	type Currency = Balances;
-	type MaxProposals = MaxProposals;
+	type MaxSignalingProposals = MaxSignalingProposals;
 	type MaxTitleLength = MaxTitleLength;
 	type MaxContentsLength = MaxContentsLength;
 	type WeightInfo = weights::signaling::WeightInfo<Runtime>;

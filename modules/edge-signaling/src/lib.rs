@@ -66,7 +66,7 @@ pub trait Trait: voting::Trait + pallet_balances::Trait {
 	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
 
 	/// Maxmimum number of proposals allowed on chain.
-	type MaxProposals: Get<u32>;
+	type MaxSignalingProposals: Get<u32>;
 
 	/// Maxmimum length of title in bytes.
 	type MaxTitleLength: Get<u32>;
@@ -142,7 +142,7 @@ decl_error! {
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
 		/// Maxmimum number of proposals allowed on chain.
-		const MaxProposals: u32 = T::MaxProposals::get();
+		const MaxSignalingProposals: u32 = T::MaxSignalingProposals::get();
 
 		/// Maxmimum length of title in bytes.
 		const MaxTitleLength: u32 = T::MaxTitleLength::get();
@@ -159,7 +159,7 @@ decl_module! {
 		}
 
 		/// Creates a new signaling proposal.
-		#[weight = <T as Trait>::WeightInfo::create_proposal(T::MaxProposals::get(), T::MaxContentsLength::get())]
+		#[weight = <T as Trait>::WeightInfo::create_proposal(T::MaxSignalingProposals::get(), T::MaxContentsLength::get())]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -177,7 +177,7 @@ decl_module! {
 			ensure!(contents.len() < T::MaxContentsLength::get() as usize, Error::<T>::ContentsTooLong);
 			let extant_proposal_count =
 				Self::inactive_proposals().len() + Self::active_proposals().len() + Self::completed_proposals().len();
-			ensure!(extant_proposal_count < T::MaxProposals::get() as usize, Error::<T>::TooManyProposals);
+			ensure!(extant_proposal_count < T::MaxSignalingProposals::get() as usize, Error::<T>::TooManyProposals);
 
 			// construct hash(origin + proposal) and check existence
 			let mut buf = Vec::new();
@@ -216,7 +216,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
-		#[weight = <T as Trait>::WeightInfo::advance_proposal(T::MaxProposals::get())]
+		#[weight = <T as Trait>::WeightInfo::advance_proposal(T::MaxSignalingProposals::get())]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or(Error::<T>::ProposalMissing)?;
