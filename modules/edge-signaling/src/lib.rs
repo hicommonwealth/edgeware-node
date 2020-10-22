@@ -303,14 +303,19 @@ decl_module! {
 
 			// delete all artifacts of "completed", completed proposals
 			completed.iter().for_each(|(finished_hash, _)| {
+				if let Some(record) = <ProposalOf<T>>::get(finished_hash) {
+					<voting::Module<T>>::delete_vote_record(record.vote_id);
+				}
 				<ProposalOf<T>>::remove(finished_hash);
 			});
+
 			// we want to delete the doubly inactive, inactive proposals which never
 			// proceeded into a commit or voting stage, always remaining in prevoting,
 			// while also returning the bond.
 			doubly_inactive.into_iter().for_each(|(hash, _)| {
 				if let Some(record) = <ProposalOf<T>>::get(hash) {
 					T::Currency::unreserve(&record.author, Self::proposal_creation_bond());
+					<voting::Module<T>>::delete_vote_record(record.vote_id);
 				}
 				<ProposalOf<T>>::remove(hash);
 			});
