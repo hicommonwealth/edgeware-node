@@ -17,8 +17,13 @@
 #![recursion_limit="128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod default_weight;
+
 #[cfg(test)]
 mod tests;
+
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
 
 use frame_support::traits::{Currency, Get, ReservableCurrency,};
 use sp_std::prelude::*;
@@ -31,7 +36,7 @@ use sp_runtime::RuntimeDebug;
 use sp_runtime::traits::{Hash};
 use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
 
-pub use voting::{VoteType, VoteOutcome, VoteStage, TallyType};
+pub use voting::{VoteType, VoteOutcome, VoteStage, TallyType, VotingScheme};
 
 #[derive(Encode, Decode, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
 pub struct ProposalRecord<AccountId, Moment> {
@@ -48,11 +53,29 @@ pub type ProposalTitle = Vec<u8>;
 pub type ProposalContents = Vec<u8>;
 type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
 
+pub trait WeightInfo {
+	fn create_proposal(p: u32, b: u32, ) -> Weight;
+	fn advance_proposal(p: u32, ) -> Weight;
+}
+
 pub trait Trait: voting::Trait + pallet_balances::Trait {
 	/// The overarching event type
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
 	/// The account balance.
 	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
+
+	/// Maxmimum number of proposals allowed on chain.
+	type MaxSignalingProposals: Get<u32>;
+
+	/// Maxmimum length of title in bytes.
+	type MaxTitleLength: Get<u32>;
+
+	/// Maxmimum length of contents in bytes.
+	type MaxContentsLength: Get<u32>;
+
+	/// Weight information for extrinsics in this pallet.
+	type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
@@ -93,10 +116,10 @@ decl_error! {
 	pub enum Error for Module<T: Trait> {
 		/// Corresponding voting for signaling proposal not found
 		VoteRecordDoesntExist,
-		/// Invalid or empty title of proposal
-		InvalidProposalTitle,
-		/// Invalid or empty contents of proposal
-		InvalidProposalContents,
+		/// Empty title of proposal
+		EmptyProposalTitle,
+		/// Empty contents of proposal
+		EmptyProposalContents,
 		/// Duplicate proposal
 		DuplicateProposal,
 		/// Not the proposal author
@@ -107,11 +130,26 @@ decl_error! {
 		ProposalMissing,
 		/// Insufficient funds to reserve bond
 		InsufficientFunds,
+		/// Title is longer than max title length
+		TitleTooLong,
+		/// Contents are longer than max content length
+		ContentsTooLong,
+		/// Proposal limit reached
+		TooManyProposals
 	}
 }
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		/// Maxmimum number of proposals allowed on chain.
+		const MaxSignalingProposals: u32 = T::MaxSignalingProposals::get();
+
+		/// Maxmimum length of title in bytes.
+		const MaxTitleLength: u32 = T::MaxTitleLength::get();
+
+		/// Maxmimum length of contents in bytes.
+		const MaxContentsLength: u32 = T::MaxContentsLength::get();
+
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
@@ -121,7 +159,7 @@ decl_module! {
 		}
 
 		/// Creates a new signaling proposal.
-		#[weight = 0]
+		#[weight = <T as Trait>::WeightInfo::create_proposal(T::MaxSignalingProposals::get(), T::MaxContentsLength::get())]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -132,8 +170,14 @@ decl_module! {
 			voting_scheme: voting::VotingScheme,
 		) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
-			ensure!(!title.is_empty(), Error::<T>::InvalidProposalTitle);
-			ensure!(!contents.is_empty(), Error::<T>::InvalidProposalContents);
+			ensure!(!title.is_empty(), Error::<T>::EmptyProposalTitle);
+			ensure!(!contents.is_empty(), Error::<T>::EmptyProposalContents);
+
+			ensure!(title.len() < T::MaxTitleLength::get() as usize, Error::<T>::TitleTooLong);
+			ensure!(contents.len() < T::MaxContentsLength::get() as usize, Error::<T>::ContentsTooLong);
+			let extant_proposal_count =
+				Self::inactive_proposals().len() + Self::active_proposals().len() + Self::completed_proposals().len();
+			ensure!(extant_proposal_count < T::MaxSignalingProposals::get() as usize, Error::<T>::TooManyProposals);
 
 			// construct hash(origin + proposal) and check existence
 			let mut buf = Vec::new();
@@ -172,7 +216,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
-		#[weight = 0]
+		#[weight = <T as Trait>::WeightInfo::advance_proposal(T::MaxSignalingProposals::get())]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or(Error::<T>::ProposalMissing)?;

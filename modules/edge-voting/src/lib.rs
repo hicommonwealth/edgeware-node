@@ -17,8 +17,13 @@
 #![recursion_limit="128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+mod default_weight;
+
 #[cfg(test)]
 mod tests;
+
+#[cfg(feature = "runtime-benchmarks")]
+pub mod benchmarking;
 
 use sp_std::prelude::*;
 use sp_std::result;
@@ -36,6 +41,8 @@ use frame_support::migration::{put_storage_value, StorageIterator};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
+/// The hash of a vote outcome plus a secret, to commit to a vote.
+pub type VoteCommitment = [u8; 32];
 
 #[derive(Encode, Decode, Copy, Clone, Eq, PartialEq, Ord, PartialOrd, RuntimeDebug)]
 pub enum VoteStage {
@@ -103,9 +110,23 @@ pub struct VoteRecord<AccountId> {
 	pub outcomes: Vec<VoteOutcome>,
 }
 
+pub trait WeightInfo {
+	fn commit(s: u32, ) -> Weight;
+	fn reveal(s: u32, ) -> Weight;
+}
+
 pub trait Trait: frame_system::Trait {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+
+	/// Maxmimum number of voters on a single proposal.
+	type MaxVotersPerProposal: Get<u32>;
+
+	/// Maxmimum number of outcomes.
+	type MaxOutcomes: Get<u32>;
+
+	/// Weight information for extrinsics in this pallet.
+	type WeightInfo: WeightInfo;
 }
 
 decl_storage! {
@@ -162,11 +183,23 @@ decl_error! {
 			InvalidMultiOptionOutcomes,
 			/// Ranked choice votes must have >2 outcomes
 			InvalidRankedChoiceOutcomes,
+			/// Provided more outcomes than max outcome count
+			TooManyOutcomes,
+			/// Reached commit limit on a proposal
+			TooManyCommits,
+			/// Reached reveal limit on a proposal
+			TooManyReveals,
     }
 }
 
 decl_module! {
 	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+		/// Maxmimum number of voters on a single proposal.
+		const MaxVotersPerProposal: u32 = T::MaxVotersPerProposal::get();
+
+		/// Maxmimum number of outcomes.
+		const MaxOutcomes: u32 = T::MaxOutcomes::get();
+
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
@@ -180,14 +213,15 @@ decl_module! {
 		/// A vote commitment is formatted using the native hash function. There
 		/// are currently no cryptoeconomic punishments against not revealing the
 		/// commitment.
-		#[weight = 0]
-		pub fn commit(origin, vote_id: u64, commit: VoteOutcome) -> DispatchResult {
+		#[weight = T::WeightInfo::commit(T::MaxVotersPerProposal::get())]
+		pub fn commit(origin, vote_id: u64, commit: VoteCommitment) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
 			ensure!(record.data.voting_scheme == VotingScheme::CommitReveal, Error::<T>::IsNotCommitReveal);
 			ensure!(record.data.stage == VoteStage::Commit, Error::<T>::NotCommitStage);
 			// No changing of commitments once placed
 			ensure!(!record.commitments.iter().any(|c| &c.0 == &_sender), Error::<T>::DuplicateCommit);
+			ensure!(record.commitments.len() < T::MaxVotersPerProposal::get() as usize, Error::<T>::TooManyCommits);
 
 			// Add commitment to record
 			record.commitments.push((_sender.clone(), commit));
@@ -200,11 +234,12 @@ decl_module! {
 		/// A function that reveals a vote commitment or serves as the general vote function.
 		///
 		/// There are currently no cryptoeconomic incentives for revealing commited votes.
-		#[weight = 0]
+		#[weight = T::WeightInfo::reveal(T::MaxVotersPerProposal::get())]
 		pub fn reveal(origin, vote_id: u64, vote: Vec<VoteOutcome>, secret: Option<VoteOutcome>) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let mut record = <VoteRecords<T>>::get(vote_id).ok_or(Error::<T>::RecordMissing)?;
 			ensure!(record.data.stage == VoteStage::Voting, Error::<T>::NotVotingStage);
+			ensure!(record.reveals.len() < T::MaxVotersPerProposal::get() as usize, Error::<T>::TooManyReveals);
 			// Check vote is for valid outcomes
 			if record.data.vote_type == VoteType::RankedChoice {
 				ensure!(Self::is_ranked_choice_vote_valid(
@@ -263,6 +298,7 @@ impl<T: Trait> Module<T> {
 		if vote_type == VoteType::Binary { ensure!(outcomes.len() == 2, Error::<T>::InvalidBinaryOutcomes) }
 		if vote_type == VoteType::MultiOption { ensure!(outcomes.len() > 2, Error::<T>::InvalidMultiOptionOutcomes) }
 		if vote_type == VoteType::RankedChoice { ensure!(outcomes.len() > 2, Error::<T>::InvalidRankedChoiceOutcomes) }
+		ensure!(outcomes.len() < T::MaxOutcomes::get() as usize, Error::<T>::TooManyOutcomes);
 
 		let id = Self::vote_record_count() + 1;
 		<VoteRecords<T>>::insert(id, VoteRecord {

@@ -328,7 +328,6 @@ pub fn new_full_base(
 			config,
 			link: grandpa_link,
 			network: network.clone(),
-			inherent_data_providers: inherent_data_providers.clone(),
 			telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
 			voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
 			prometheus_registry,
@@ -342,11 +341,8 @@ pub fn new_full_base(
 			sc_finality_grandpa::run_grandpa_voter(grandpa_config)?
 		);
 	} else {
-		sc_finality_grandpa::setup_disabled_grandpa(
-			client.clone(),
-			&inherent_data_providers,
-			network.clone(),
-		)?;
+		sc_finality_grandpa::setup_disabled_grandpa(network.clone())?;
+
 	}
 
 	network_starter.start_network();

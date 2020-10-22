@@ -89,13 +89,29 @@ impl pallet_balances::Trait for Test {
 	type MaxLocks = ();
 }
 
+parameter_types! {
+	pub const MaxVotersPerProposal: u32 = 5;
+	pub const MaxOutcomes: u32 = 8;
+}
 impl voting::Trait for Test {
 	type Event = ();
+	type MaxVotersPerProposal = MaxVotersPerProposal;
+	type MaxOutcomes = MaxOutcomes;
+	type WeightInfo = ();
 }
 
+parameter_types! {
+	pub const MaxSignalingProposals: u32 = 4;
+	pub const MaxTitleLength: u32 = 128;
+	pub const MaxContentsLength: u32 = 128;
+}
 impl Trait for Test {
 	type Event = ();
 	type Currency = pallet_balances::Module<Self>;
+	type MaxSignalingProposals = MaxSignalingProposals;
+	type MaxTitleLength = MaxTitleLength;
+	type MaxContentsLength = MaxContentsLength;
+	type WeightInfo = ();
 }
 
 pub type Balances = pallet_balances::Module<Test>;
@@ -282,7 +298,7 @@ fn propose_empty_should_fail() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
 			propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
-			Error::<Test>::InvalidProposalContents
+			Error::<Test>::EmptyProposalContents
 		);
 		assert_eq!(Signaling::proposal_count(), 0);
 		assert_eq!(Signaling::inactive_proposals(), vec![]);
@@ -301,11 +317,66 @@ fn propose_empty_title_should_fail() {
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
 			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
-			Error::<Test>::InvalidProposalTitle
+			Error::<Test>::EmptyProposalTitle
 		);
 		assert_eq!(Signaling::proposal_count(), 0);
 		assert_eq!(Signaling::inactive_proposals(), vec![]);
 		assert_eq!(Signaling::proposal_of(hash), None);
+	});
+}
+
+#[test]
+fn propose_too_long_should_fail() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (title, _) = generate_proposal();
+		let proposal = vec![1; (<Test as Trait>::MaxContentsLength::get() + 1) as usize];
+		let hash = build_proposal_hash(public, &proposal);
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		assert_err!(
+			propose(public, title, &proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
+			Error::<Test>::ContentsTooLong
+		);
+		assert_eq!(Signaling::proposal_count(), 0);
+		assert_eq!(Signaling::inactive_proposals(), vec![]);
+		assert_eq!(Signaling::proposal_of(hash), None);
+	});
+}
+
+#[test]
+fn propose_too_long_title_should_fail() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (_, proposal) = generate_proposal();
+		let hash = build_proposal_hash(public, &proposal);
+		let title = vec![1; (<Test as Trait>::MaxTitleLength::get() + 1) as usize];
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		assert_err!(
+			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
+			Error::<Test>::TitleTooLong
+		);
+		assert_eq!(Signaling::proposal_count(), 0);
+		assert_eq!(Signaling::inactive_proposals(), vec![]);
+		assert_eq!(Signaling::proposal_of(hash), None);
+	});
+}
+
+#[test]
+fn propose_with_too_many_existing_proposals_should_fail() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+		let public = get_test_key();
+		let (title, proposal) = generate_proposal();
+		let outcomes = vec![YES_VOTE, NO_VOTE];
+		for i in 0 .. <Test as Trait>::MaxSignalingProposals::get() {
+			assert_ok!(propose(public, title, &i.to_le_bytes(), outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
+		}
+		assert_err!(
+			propose(public, title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
+			Error::<Test>::TooManyProposals
+		);
 	});
 }
 
