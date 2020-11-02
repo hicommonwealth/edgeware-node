@@ -55,7 +55,6 @@ pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git
 pallet-ethereum = { default-features = false, path = "../../vendor/frontier/frame/ethereum" }
 pallet-evm = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 frame-executive = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
-pallet-finality-tracker = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-identity = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-im-online = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
@@ -86,7 +85,7 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", branch = "frontier", version = "1.0.4" }
+wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
@@ -110,7 +109,6 @@ std = [
 	"pallet-elections-phragmen/std",
 	"pallet-evm/std",
 	"frame-executive/std",
-	"pallet-finality-tracker/std",
 	"pallet-grandpa/std",
 	"pallet-identity/std",
 	"pallet-im-online/std",

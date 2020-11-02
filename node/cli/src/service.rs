@@ -36,7 +36,6 @@ use sc_network::{Event, NetworkService};
 use sp_runtime::traits::Block as BlockT;
 use futures::prelude::*;
 use sc_client_api::{ExecutorProvider, RemoteBackend};
-use sp_core::traits::BareCryptoStorePtr;
 use edgeware_executor::Executor;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
@@ -45,8 +44,6 @@ type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport =
 	sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
-
-
 
 pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponents<
 	FullClient, FullBackend, FullSelectChain,
@@ -66,7 +63,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 	)
 >, ServiceError> {
-	let (client, backend, keystore, task_manager) =
+	let (client, backend, keystore_container, task_manager) =
 		sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
 	let client = Arc::new(client);
 
@@ -110,7 +107,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 	)?;
 
 	Ok(sc_service::PartialComponents {
-		client, backend, task_manager, import_queue, keystore, select_chain, transaction_pool,
+		client, backend, task_manager, import_queue, keystore_container, select_chain, transaction_pool,
 		inherent_data_providers,
 		other: (aura_block_import.clone(), grandpa_link,)
 	})
@@ -138,7 +135,7 @@ pub fn new_full_base(
 	Arc<sc_transaction_pool::FullPool<Block, FullClient>>,
 ), ServiceError> {
 	let sc_service::PartialComponents {
-		client, backend, mut task_manager, import_queue, keystore, select_chain, transaction_pool,
+		client, backend, mut task_manager, import_queue, keystore_container, select_chain, transaction_pool,
 		inherent_data_providers,
 		other: (block_import, grandpa_link),
 	} = new_partial(&config)?;
@@ -215,7 +212,7 @@ pub fn new_full_base(
 		config,
 		backend: backend.clone(),
 		client: client.clone(),
-		keystore: keystore.clone(),
+		keystore: keystore_container.sync_keystore(),
 		network: network.clone(),
 		rpc_extensions_builder,
 		transaction_pool: transaction_pool.clone(),
@@ -233,6 +230,7 @@ pub fn new_full_base(
 
 	if let sc_service::config::Role::Authority { .. } = &role {
 		let proposer = sc_basic_authorship::ProposerFactory::new(
+			task_manager.spawn_handle(),
 			client.clone(),
 			transaction_pool.clone(),
 			prometheus_registry.as_ref(),
@@ -250,7 +248,7 @@ pub fn new_full_base(
 			network.clone(),
 			inherent_data_providers.clone(),
 			force_authoring,
-			keystore.clone(),
+			keystore_container.sync_keystore(),
 			can_author_with,
 		)?;
 
@@ -265,7 +263,7 @@ pub fn new_full_base(
 			sc_service::config::Role::Authority { ref sentry_nodes } => (
 				sentry_nodes.clone(),
 				sc_authority_discovery::Role::Authority (
-					keystore.clone(),
+					keystore_container.keystore(),
 				),
 			),
 			sc_service::config::Role::Sentry {..} => (
@@ -279,23 +277,23 @@ pub fn new_full_base(
 			.filter_map(|e| async move { match e {
 				Event::Dht(e) => Some(e),
 				_ => None,
-			}}).boxed();
+			}});
 		let (authority_discovery_worker, _service) = sc_authority_discovery::new_worker_and_service(
 			client.clone(),
 			network.clone(),
 			sentries,
-			dht_event_stream,
+			Box::pin(dht_event_stream),
 			authority_discovery_role,
 			prometheus_registry.clone(),
 		);
 
-		task_manager.spawn_handle().spawn("authority-discovery-worker", authority_discovery_worker);
+		task_manager.spawn_handle().spawn("authority-discovery-worker", authority_discovery_worker.run());
 	}
 
 	// if the node isn't actively participating in consensus then it doesn't
 	// need a keystore, regardless of which protocol we use below.
 	let keystore = if role.is_authority() {
-		Some(keystore as BareCryptoStorePtr)
+		Some(keystore_container.sync_keystore())
 	} else {
 		None
 	};
@@ -321,7 +319,6 @@ pub fn new_full_base(
 			config,
 			link: grandpa_link,
 			network: network.clone(),
-			inherent_data_providers: inherent_data_providers.clone(),
 			telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
 			voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
 			prometheus_registry,
@@ -335,11 +332,7 @@ pub fn new_full_base(
 			sc_finality_grandpa::run_grandpa_voter(grandpa_config)?
 		);
 	} else {
-		sc_finality_grandpa::setup_disabled_grandpa(
-			client.clone(),
-			&inherent_data_providers,
-			network.clone(),
-		)?;
+		sc_finality_grandpa::setup_disabled_grandpa(network.clone())?;
 	}
 
 	network_starter.start_network();
@@ -359,7 +352,7 @@ pub fn new_light_base(config: Configuration) -> Result<(
 	Arc<NetworkService<Block, <Block as BlockT>::Hash>>,
 	Arc<sc_transaction_pool::LightPool<Block, LightClient, sc_network::config::OnDemand<Block>>>
 ), ServiceError> {
-	let (client, backend, keystore, mut task_manager, on_demand) =
+	let (client, backend, keystore_container, mut task_manager, on_demand) =
 		sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
 	let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
@@ -430,7 +423,8 @@ pub fn new_light_base(config: Configuration) -> Result<(
 			rpc_extensions_builder: Box::new(sc_service::NoopRpcExtensionBuilder(rpc_extensions)),
 			client: client.clone(),
 			transaction_pool: transaction_pool.clone(),
-			config, keystore, backend, network_status_sinks, system_rpc_tx,
+			keystore: keystore_container.sync_keystore(),
+			config, backend, network_status_sinks, system_rpc_tx,
 			network: network.clone(),
 			telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
 			task_manager: &mut task_manager,

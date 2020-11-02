@@ -31,7 +31,7 @@ use frame_support::{
 		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 	},
-	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier, FindAuthor},
+	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier, FindAuthor, U128CurrencyToVote},
 	ConsensusEngineId,
 };
 
@@ -71,8 +71,15 @@ pub use sp_version::RuntimeVersion;
 pub use pallet_session::{historical as pallet_session_historical};
 
 use pallet_contracts_rpc_runtime_api::ContractExecResult;
-use pallet_ethereum::{Block as EthereumBlock, Transaction as EthereumTransaction, Receipt as EthereumReceipt};
-use pallet_evm::{Account as EVMAccount, FeeCalculator, HashedAddressMapping, EnsureAddressTruncated};
+use pallet_ethereum::{
+	Block as EthereumBlock, Transaction as EthereumTransaction,
+	Receipt as EthereumReceipt
+};
+use pallet_evm::{
+	Account as EVMAccount, FeeCalculator, HashedAddressMapping,
+	EnsureAddressTruncated, Runner
+};
+
 use evm::Config;
 use frontier_rpc_primitives::{TransactionStatus};
 
@@ -91,7 +98,7 @@ pub use pallet_staking::StakerStatus;
 pub use pallet_evm::precompiles::{Sha256, Ripemd160, ECRecover};
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
-use impls::{CurrencyToVoteHandler, Author};
+use impls::{Author};
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -420,12 +427,15 @@ parameter_types! {
 	pub const MaxIterations: u32 = 5;
 	// 0.05%. The higher the value, the more strict solution acceptance becomes.
 	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
+	pub OffchainSolutionWeightLimit: Weight = MaximumExtrinsicWeight::get()
+	.saturating_sub(BlockExecutionWeight::get())
+	.saturating_sub(ExtrinsicBaseWeight::get());
 }
 
 impl pallet_staking::Trait for Runtime {
 	type Currency = Balances;
 	type UnixTime = Timestamp;
-	type CurrencyToVote = CurrencyToVoteHandler;
+	type CurrencyToVote = U128CurrencyToVote;
 	type RewardRemainder = Treasury;
 	type Event = Event;
 	type Slash = Treasury; // send the slashed funds to the treasury.
@@ -448,6 +458,7 @@ impl pallet_staking::Trait for Runtime {
 	type MinSolutionScoreBump = MinSolutionScoreBump;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
 	type UnsignedPriority = StakingUnsignedPriority;
+	type OffchainSolutionWeightLimit = OffchainSolutionWeightLimit;
 	type WeightInfo = ();
 }
 
@@ -552,7 +563,7 @@ impl pallet_elections_phragmen::Trait for Runtime {
 	// NOTE: this implies that council's genesis members cannot be set directly and must come from
 	// this module.
 	type InitializeMembers = Council;
-	type CurrencyToVote = CurrencyToVoteHandler;
+	type CurrencyToVote = U128CurrencyToVote;
 	type CandidacyBond = CandidacyBond;
 	type VotingBond = VotingBond;
 	type LoserCandidate = ();
@@ -726,17 +737,6 @@ impl pallet_grandpa::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const WindowSize: BlockNumber = 101;
-	pub const ReportLatency: BlockNumber = 1000;
-}
-
-impl pallet_finality_tracker::Trait for Runtime {
-	type OnFinalizationStalled = ();
-	type WindowSize = WindowSize;
-	type ReportLatency = ReportLatency;
-}
-
-parameter_types! {
 	pub const BasicDeposit: Balance = 10 * DOLLARS;			 // 258 bytes on-chain
 	pub const FieldDeposit: Balance = 250 * CENTS;				// 66 bytes on-chain
 	pub const SubAccountDeposit: Balance = 2 * DOLLARS;	 // 53 bytes on-chain
@@ -819,10 +819,12 @@ impl pallet_contracts::Trait for Runtime {
 	type MaxDepth = pallet_contracts::DefaultMaxDepth;
 	type MaxValueSize = pallet_contracts::DefaultMaxValueSize;
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
+	type WeightInfo = ();
 }
 
-// EVM structs
+/// Fixed gas price of `1`.
 pub struct FixedGasPrice;
+
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> U256 {
 		// Gas price is always one token per gas.
@@ -834,44 +836,6 @@ parameter_types! {
 	pub const ChainId: u64 = 42;
 }
 
-/// Clone of Istanbul config with `create_contract_limit` raised.
-static EVM_CONFIG: Config = Config {
-	gas_ext_code: 700,
-	gas_ext_code_hash: 700,
-	gas_balance: 700,
-	gas_sload: 800,
-	gas_sstore_set: 20000,
-	gas_sstore_reset: 5000,
-	refund_sstore_clears: 15000,
-	gas_suicide: 5000,
-	gas_suicide_new_account: 25000,
-	gas_call: 700,
-	gas_expbyte: 50,
-	gas_transaction_create: 53000,
-	gas_transaction_call: 21000,
-	gas_transaction_zero_data: 4,
-	gas_transaction_non_zero_data: 16,
-	sstore_gas_metering: true,
-	sstore_revert_under_stipend: true,
-	err_on_call_with_more_gas: false,
-	empty_considered_exists: false,
-	create_increase_nonce: true,
-	call_l64_after_gas: true,
-	stack_limit: 1024,
-	memory_limit: usize::max_value(),
-	call_stack_limit: 1024,
-	create_contract_limit: Some(0x6000000),
-	call_stipend: 2300,
-	has_delegate_call: true,
-	has_create2: true,
-	has_revert: true,
-	has_return_data: true,
-	has_bitwise_shifting: true,
-	has_chain_id: true,
-	has_self_balance: true,
-	has_ext_code_hash: true,
-};
-
 impl pallet_evm::Trait for Runtime {
 	type FeeCalculator = FixedGasPrice;
 	type CallOrigin = EnsureAddressTruncated;
@@ -879,13 +843,9 @@ impl pallet_evm::Trait for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type Currency = Balances;
 	type Event = Event;
+	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type Precompiles = EdgewarePrecompiles;
 	type ChainId = ChainId;
-
-	/// EVM config used in the module.
-	fn config() -> &'static Config {
-		&EVM_CONFIG
-	}
 }
 
 pub struct EdgewarePrecompiles;
@@ -1024,8 +984,7 @@ construct_runtime!(
 		Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>},
 		Elections: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>},
 
-		FinalityTracker: pallet_finality_tracker::{Module, Call, Inherent},
-		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event},
+		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned},
 		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
 
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
@@ -1038,7 +997,7 @@ construct_runtime!(
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 
-		Contracts: pallet_contracts::{Module, Call, Config, Storage, Event<T>},
+		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
 		Ethereum: pallet_ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
 
@@ -1239,6 +1198,96 @@ impl_runtime_apis! {
 		}
 	}
 
+	impl frontier_rpc_primitives::EthereumRuntimeRPCApi<Block> for Runtime {
+		fn chain_id() -> u64 {
+			<Runtime as pallet_evm::Trait>::ChainId::get()
+		}
+
+		fn account_basic(address: H160) -> EVMAccount {
+			EVM::account_basic(&address)
+		}
+
+		fn gas_price() -> U256 {
+			<Runtime as pallet_evm::Trait>::FeeCalculator::min_gas_price()
+		}
+
+		fn account_code_at(address: H160) -> Vec<u8> {
+			EVM::account_codes(address)
+		}
+
+		fn author() -> H160 {
+			<pallet_ethereum::Module<Runtime>>::find_author()
+		}
+
+		fn storage_at(address: H160, index: U256) -> H256 {
+			let mut tmp = [0u8; 32];
+			index.to_big_endian(&mut tmp);
+			EVM::account_storages(address, H256::from_slice(&tmp[..]))
+		}
+
+		fn call(
+			from: H160,
+			to: H160,
+			data: Vec<u8>,
+			value: U256,
+			gas_limit: U256,
+			gas_price: Option<U256>,
+			nonce: Option<U256>,
+		) -> Result<pallet_evm::CallInfo, sp_runtime::DispatchError> {
+			<Runtime as pallet_evm::Trait>::Runner::call(
+				from,
+				to,
+				data,
+				value,
+				gas_limit.low_u32(),
+				gas_price,
+				nonce,
+			).map_err(|err| err.into())
+		}
+
+		fn create(
+			from: H160,
+			data: Vec<u8>,
+			value: U256,
+			gas_limit: U256,
+			gas_price: Option<U256>,
+			nonce: Option<U256>,
+		) -> Result<pallet_evm::CreateInfo, sp_runtime::DispatchError> {
+			<Runtime as pallet_evm::Trait>::Runner::create(
+				from,
+				data,
+				value,
+				gas_limit.low_u32(),
+				gas_price,
+				nonce,
+			).map_err(|err| err.into())
+		}
+
+		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
+			Ethereum::current_transaction_statuses()
+		}
+
+		fn current_block() -> Option<pallet_ethereum::Block> {
+			Ethereum::current_block()
+		}
+
+		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
+			Ethereum::current_receipts()
+		}
+
+		fn current_all() -> (
+			Option<pallet_ethereum::Block>,
+			Option<Vec<pallet_ethereum::Receipt>>,
+			Option<Vec<TransactionStatus>>
+		) {
+			(
+				Ethereum::current_block(),
+				Ethereum::current_receipts(),
+				Ethereum::current_transaction_statuses()
+			)
+		}
+	}
+
 	impl pallet_contracts_rpc_runtime_api::ContractsApi<Block, AccountId, Balance, BlockNumber>
 		for Runtime
 	{
@@ -1272,96 +1321,6 @@ impl_runtime_apis! {
 			address: AccountId,
 		) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
 			Contracts::rent_projection(address)
-		}
-	}
-
-	impl frontier_rpc_primitives::EthereumRuntimeRPCApi<Block> for Runtime {
-		fn chain_id() -> u64 {
-			ChainId::get()
-		}
-
-		fn account_basic(address: H160) -> EVMAccount {
-			EVM::account_basic(&address)
-		}
-
-		fn gas_price() -> U256 {
-			FixedGasPrice::min_gas_price()
-		}
-
-		fn account_code_at(address: H160) -> Vec<u8> {
-			EVM::account_codes(address)
-		}
-
-		fn author() -> H160 {
-			<pallet_ethereum::Module<Runtime>>::find_author()
-		}
-
-		fn storage_at(address: H160, index: U256) -> H256 {
-			let mut tmp = [0u8; 32];
-			index.to_big_endian(&mut tmp);
-			EVM::account_storages(address, H256::from_slice(&tmp[..]))
-		}
-
-		fn call(
-			from: H160,
-			data: Vec<u8>,
-			value: U256,
-			gas_limit: U256,
-			gas_price: Option<U256>,
-			nonce: Option<U256>,
-			action: pallet_ethereum::TransactionAction,
-		) -> Result<(Vec<u8>, U256), sp_runtime::DispatchError> {
-			match action {
-				pallet_ethereum::TransactionAction::Call(to) =>
-					EVM::execute_call(
-						from,
-						to,
-						data,
-						value,
-						gas_limit.low_u32(),
-						gas_price.unwrap_or(U256::from(150000000)),
-						nonce,
-						false,
-					)
-					.map(|(_, ret, gas, _)| (ret, gas))
-					.map_err(|err| err.into()),
-				pallet_ethereum::TransactionAction::Create =>
-					EVM::execute_create(
-						from,
-						data,
-						value,
-						gas_limit.low_u32(),
-						gas_price.unwrap_or(U256::from(150000000)),
-						nonce,
-						false,
-					)
-					.map(|(_, _, gas, _)| (vec![], gas))
-					.map_err(|err| err.into()),
-			}
-		}
-
-		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
-			Ethereum::current_transaction_statuses()
-		}
-
-		fn current_block() -> Option<pallet_ethereum::Block> {
-			Ethereum::current_block()
-		}
-
-		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
-			Ethereum::current_receipts()
-		}
-
-		fn current_all() -> (
-			Option<pallet_ethereum::Block>,
-			Option<Vec<pallet_ethereum::Receipt>>,
-			Option<Vec<TransactionStatus>>
-		) {
-			(
-				Ethereum::current_block(),
-				Ethereum::current_receipts(),
-				Ethereum::current_transaction_statuses()
-			)
 		}
 	}
 }
