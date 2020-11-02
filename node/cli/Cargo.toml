@@ -49,7 +49,6 @@ sp-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", bra
 sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 sp-timestamp = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
-sp-finality-tracker = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 sp-inherents = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 sp-keyring = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 sp-io = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
