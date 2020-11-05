@@ -244,7 +244,7 @@ impl InstanceFilter<Call> for ProxyType {
 			ProxyType::NonTransfer => matches!(c,
 				Call::System(..) |
 				Call::Scheduler(..) |
-				Call::Aura(..) |
+				// Call::Aura(..) |
 				Call::Timestamp(..) |
 				Call::Indices(pallet_indices::Call::claim(..)) |
 				Call::Indices(pallet_indices::Call::free(..)) |
@@ -260,7 +260,7 @@ impl InstanceFilter<Call> for ProxyType {
 				Call::AuthorityDiscovery(..) |
 				Call::Democracy(..) |
 				Call::Council(..) |
-				Call::ElectionsPhragmen(..) |
+				// Call::ElectionsPhragmen(..) |
 				Call::Treasury(..) |
 				Call::Vesting(pallet_vesting::Call::vest(..)) |
 				Call::Vesting(pallet_vesting::Call::vest_other(..)) |
@@ -273,7 +273,7 @@ impl InstanceFilter<Call> for ProxyType {
 			ProxyType::Governance => matches!(c,
 				Call::Democracy(..) |
 				Call::Council(..) |
-				Call::ElectionsPhragmen(..) |
+				// Call::ElectionsPhragmen(..) |
 				Call::Treasury(..) |
 				Call::Utility(..)
 			),
@@ -983,7 +983,7 @@ construct_runtime!(
 		 // = 32,
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		 // = 33,
-		EdgeBridge: edge_chainbridge::{Module, Call, Storage, Event<T>, Config<T>},
+		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>, Config<T>},
 		 // = 34,
 	}
 );
