@@ -228,30 +228,65 @@ parameter_types! {
 /// The type used to represent the kinds of proxying allowed.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
 pub enum ProxyType {
-	Any,
-	NonTransfer,
-	Governance,
-	Staking,
+	Any = 0,
+	NonTransfer = 1,
+	Governance = 2,
+	Staking = 3,
+	// Skip 4 as it is now removed (was SudoBalances)
+	IdentityJudgement = 5,
 }
+
 impl Default for ProxyType { fn default() -> Self { Self::Any } }
 impl InstanceFilter<Call> for ProxyType {
 	fn filter(&self, c: &Call) -> bool {
 		match self {
 			ProxyType::Any => true,
-			ProxyType::NonTransfer => !matches!(
-				c,
-				Call::Balances(..) |
-				Call::Vesting(pallet_vesting::Call::vested_transfer(..)) |
-				Call::Indices(pallet_indices::Call::transfer(..))
-			),
-			ProxyType::Governance => matches!(
-				c,
+			ProxyType::NonTransfer => matches!(c,
+				Call::System(..) |
+				Call::Scheduler(..) |
+				Call::Aura(..) |
+				Call::Timestamp(..) |
+				Call::Indices(pallet_indices::Call::claim(..)) |
+				Call::Indices(pallet_indices::Call::free(..)) |
+				Call::Indices(pallet_indices::Call::freeze(..)) |
+				// Specifically omitting Indices `transfer`, `force_transfer`
+				// Specifically omitting the entire Balances pallet
+				Call::Authorship(..) |
+				Call::Staking(..) |
+				Call::Offences(..) |
+				Call::Session(..) |
+				Call::Grandpa(..) |
+				Call::ImOnline(..) |
+				Call::AuthorityDiscovery(..) |
 				Call::Democracy(..) |
 				Call::Council(..) |
-				Call::Elections(..) |
-				Call::Treasury(..)
+				Call::ElectionsPhragmen(..) |
+				Call::Treasury(..) |
+				Call::Claims(..) |
+				Call::Vesting(pallet_vesting::Call::vest(..)) |
+				Call::Vesting(pallet_vesting::Call::vest_other(..)) |
+				// Specifically omitting Vesting `vested_transfer`, and `force_vested_transfer`
+				Call::Utility(..) |
+				Call::Identity(..) |
+				Call::Proxy(..) |
+				Call::Multisig(..)
 			),
-			ProxyType::Staking => matches!(c, Call::Staking(..)),
+			ProxyType::Governance => matches!(c,
+				Call::Democracy(..) |
+				Call::Council(..) |
+				Call::ElectionsPhragmen(..) |
+				Call::Treasury(..) |
+				Call::Utility(..)
+			),
+			ProxyType::Staking => matches!(c,
+				Call::Staking(..) |
+				Call::Session(..) |
+				Call::Utility(..)
+			),
+			ProxyType::IdentityJudgement => matches!(c,
+				Call::Identity(pallet_identity::Call::provide_judgement(..)) |
+				Call::Utility(..)
+			)
 		}
 	}
 	fn is_superset(&self, o: &Self) -> bool {
@@ -632,49 +667,47 @@ parameter_types! {
 	pub const StakingUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 2;
 }
 
-impl<LocalCall> frame_system::offchain::CreateSignedTransaction<LocalCall> for Runtime
-	where
-		Call: From<LocalCall>,
+/// Submits a transaction with the node's public and signature type. Adheres to the signed extension
+/// format of the chain.
+impl<LocalCall> frame_system::offchain::CreateSignedTransaction<LocalCall> for Runtime where
+	Call: From<LocalCall>,
 {
 	fn create_transaction<C: frame_system::offchain::AppCrypto<Self::Public, Self::Signature>>(
 		call: Call,
-		public: <Signature as traits::Verify>::Signer,
+		public: <Signature as Verify>::Signer,
 		account: AccountId,
-		nonce: Index,
-	) -> Option<(Call, <UncheckedExtrinsic as traits::Extrinsic>::SignaturePayload)> {
-		let tip = 0;
+		nonce: <Runtime as frame_system::Trait>::Index,
+	) -> Option<(Call, <UncheckedExtrinsic as ExtrinsicT>::SignaturePayload)> {
 		// take the biggest period possible.
 		let period = BlockHashCount::get()
 			.checked_next_power_of_two()
 			.map(|c| c / 2)
 			.unwrap_or(2) as u64;
+
 		let current_block = System::block_number()
 			.saturated_into::<u64>()
 			// The `System::block_number` is initialized with `n+1`,
 			// so the actual block number is `n`.
 			.saturating_sub(1);
-		let era = Era::mortal(period, current_block);
-		let extra = (
+		let tip = 0;
+		let extra: SignedExtra = (
 			frame_system::CheckSpecVersion::<Runtime>::new(),
 			frame_system::CheckTxVersion::<Runtime>::new(),
 			frame_system::CheckGenesis::<Runtime>::new(),
-			frame_system::CheckEra::<Runtime>::from(era),
+			frame_system::CheckMortality::<Runtime>::from(generic::Era::mortal(period, current_block)),
 			frame_system::CheckNonce::<Runtime>::from(nonce),
 			frame_system::CheckWeight::<Runtime>::new(),
 			pallet_transaction_payment::ChargeTransactionPayment::<Runtime>::from(tip),
+			claims::PrevalidateAttests::<Runtime>::new(),
 		);
-		let raw_payload = SignedPayload::new(call, extra)
-			.map_err(|e| {
-				debug::warn!("Unable to create signed payload: {:?}", e);
-			})
-			.ok()?;
-		let signature = raw_payload
-			.using_encoded(|payload| {
-				C::sign(payload, public)
-			})?;
-		let address = Indices::unlookup(account);
+		let raw_payload = SignedPayload::new(call, extra).map_err(|e| {
+			debug::warn!("Unable to create signed payload: {:?}", e);
+		}).ok()?;
+		let signature = raw_payload.using_encoded(|payload| {
+			C::sign(payload, public)
+		})?;
 		let (call, extra, _) = raw_payload.deconstruct();
-		Some((call, (address, signature.into(), extra)))
+		Some((call, (account, signature, extra)))
 	}
 }
 
@@ -877,78 +910,78 @@ construct_runtime!(
 		NodeBlock = edgeware_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: frame_system::{Module, Call, Config, Storage, Event<T>}
+		System: frame_system::{Module, Call, Config, Storage, Event<T>},
 		 // = 0,
-		Utility: pallet_utility::{Module, Call, Event}
+		Utility: pallet_utility::{Module, Call, Event},
 		 // = 1,
-		Aura: pallet_aura::{Module, Config<T>, Inherent}
+		Aura: pallet_aura::{Module, Config<T>, Inherent},
 		 // = 2,
 
-		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent}
+		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
 		 // = 3,
-		Authorship: pallet_authorship::{Module, Call, Storage, Inherent}
+		Authorship: pallet_authorship::{Module, Call, Storage, Inherent},
 		 // = 4,
-		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>}
+		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
 		 // = 5,
-		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>}
+		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
 		 // = 6,
-		TransactionPayment: pallet_transaction_payment::{Module, Storage}
+		TransactionPayment: pallet_transaction_payment::{Module, Storage},
 		 // = 7,
 
-		Staking: pallet_staking::{Module, Call, Config<T>, Storage, Event<T>, ValidateUnsigned}
+		Staking: pallet_staking::{Module, Call, Config<T>, Storage, Event<T>, ValidateUnsigned},
 		 // = 8,
-		Session: pallet_session::{Module, Call, Storage, Event, Config<T>}
+		Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
 		 // = 9,
-		Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>}
+		Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>},
 		 // = 10,
-		Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>}
+		Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>},
 		 // = 11,
-		Elections: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>}
+		Elections: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>},
 		 // = 12,
 
-		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned}
+		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned},
 		 // = 14,
-		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>}
+		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
 		 // = 15,
-		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>}
+		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
 		 // = 16,
-		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>}
+		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
 		 // = 17,
-		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>}
+		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
 		 // = 18,
-		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config}
+		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
 		 // = 19,
-		Offences: pallet_offences::{Module, Call, Storage, Event}
+		Offences: pallet_offences::{Module, Call, Storage, Event},
 		 // = 20,
-		Historical: pallet_session_historical::{Module}
+		Historical: pallet_session_historical::{Module},
 		 // = 21,
-		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage}
+		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
 		 // = 22,
-		Identity: pallet_identity::{Module, Call, Storage, Event<T>}
+		Identity: pallet_identity::{Module, Call, Storage, Event<T>},
 		 // = 23,
 
-		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>}
+		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
 		 // = 24,
-		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>}
+		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
 		 // = 25,
-		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>}
+		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		 // = 26,
-		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>}
+		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		 // = 27,
-		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>}
+		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
 		 // = 28,
-		Assets: pallet_assets::{Module, Call, Storage, Event<T>}
+		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 		 // = 29,
 
-		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>}
+		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		 // = 30,
-		Voting: voting::{Module, Call, Storage, Event<T>}
+		Voting: voting::{Module, Call, Storage, Event<T>},
 		 // = 31,
-		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>}
+		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 		 // = 32,
-		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>}
+		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		 // = 33,
-		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>}
+		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
 		 // = 34,
 	}
 );
