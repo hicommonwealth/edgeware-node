@@ -983,7 +983,7 @@ construct_runtime!(
 		 // = 32,
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		 // = 33,
-		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>, Config<T>},
+		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
 		 // = 34,
 	}
 );
