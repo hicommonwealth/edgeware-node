@@ -51,7 +51,7 @@ pub use sp_core::{
 	u32_trait::{_1, _2, _3, _4, _5},
 	OpaqueMetadata, U256, H160, H256,
 };
-use sp_core::hashing::blake2_128;
+use sp_io::hashing::blake2_128;
 use sp_runtime::{
 	Permill, Perbill, Perquintill, Percent, ApplyExtrinsicResult,
 	impl_opaque_keys, generic, create_runtime_str, ModuleId, FixedPointNumber,

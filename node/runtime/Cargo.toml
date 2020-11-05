@@ -26,6 +26,7 @@ sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", defau
 sp-block-builder = { git = "https://github.com/paritytech/substrate.git", default-features = false}
 sp-inherents = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-io = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-api = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -117,6 +118,7 @@ std = [
 	"pallet-proxy/std",
 	"pallet-recovery/std",
 	"sp-core/std",
+	"sp-io/std",
 	"pallet-randomness-collective-flip/std",
 	"sp-std/std",
 	"rustc-hex",
