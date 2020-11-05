@@ -716,7 +716,6 @@ dependencies = [
 [[package]]
 name = "chainbridge"
 version = "0.0.2"
-source = "git+https://github.com/ChainSafe/chainbridge-substrate.git#06d4b4da38aba1d63c6112eced2cdca786278b16"
 dependencies = [
  "frame-support 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "frame-system 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1350,16 +1349,16 @@ name = "edge-chainbridge"
 version = "1.0.0"
 dependencies = [
  "chainbridge",
- "frame-support 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "frame-system 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "pallet-balances 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "frame-support 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "frame-system 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "pallet-balances 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "parity-scale-codec",
  "serde",
- "sp-arithmetic 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-core 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-io 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-runtime 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "sp-std 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "sp-arithmetic 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-core 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-io 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-runtime 2.0.0 (git+https://github.com/paritytech/substrate.git)",
+ "sp-std 2.0.0 (git+https://github.com/paritytech/substrate.git)",
  "substrate-wasm-builder-runner 2.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 

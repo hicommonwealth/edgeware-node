@@ -2,17 +2,16 @@
 
 use super::*;
 
-use frame_support::{ord_parameter_types, parameter_types, weights::Weight};
+use frame_support::{assert_ok, ord_parameter_types, parameter_types, weights::Weight};
 use frame_system::{self as system};
-use sp_core::hashing::blake2_128;
 use sp_core::H256;
 use sp_runtime::{
     testing::Header,
     traits::{AccountIdConversion, BlakeTwo256, Block as BlockT, IdentityLookup},
-    ModuleId, Perbill,
+    Perbill,
 };
 
-use crate::{self as example, Trait};
+use crate::{self as bridge, Trait};
 pub use pallet_balances as balances;
 
 parameter_types! {
@@ -71,26 +70,15 @@ impl pallet_balances::Trait for Test {
 
 parameter_types! {
     pub const TestChainId: u8 = 5;
-    pub const ProposalLifetime: u64 = 100;
+    pub const ProposalLifetime: u64 = 50;
 }
 
-impl chainbridge::Trait for Test {
+impl Trait for Test {
     type Event = Event;
     type AdminOrigin = frame_system::EnsureRoot<Self::AccountId>;
     type Proposal = Call;
     type ChainId = TestChainId;
     type ProposalLifetime = ProposalLifetime;
-}
-
-parameter_types! {
-    pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"DAV"));
-}
-
-impl Trait for Test {
-    type Event = Event;
-    type BridgeOrigin = chainbridge::EnsureBridge<Test>;
-    type Currency = Balances;
-    type NativeTokenId = NativeTokenId;
 }
 
 pub type Block = sp_runtime::generic::Block<Header, UncheckedExtrinsic>;
@@ -104,23 +92,24 @@ frame_support::construct_runtime!(
     {
         System: system::{Module, Call, Event<T>},
         Balances: balances::{Module, Call, Storage, Config<T>, Event<T>},
-        Bridge: chainbridge::{Module, Call, Storage, Event<T>},
-        Example: example::{Module, Call, Event<T>}
+        Bridge: bridge::{Module, Call, Storage, Event<T>},
     }
 );
 
+// pub const BRIDGE_ID: u64 =
 pub const RELAYER_A: u64 = 0x2;
 pub const RELAYER_B: u64 = 0x3;
 pub const RELAYER_C: u64 = 0x4;
 pub const ENDOWED_BALANCE: u64 = 100_000_000;
+pub const TEST_THRESHOLD: u32 = 2;
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
     let bridge_id = ModuleId(*b"cb/bridg").into_account();
     let mut t = frame_system::GenesisConfig::default()
         .build_storage::<Test>()
         .unwrap();
-    balances::GenesisConfig::<Test> {
-        balances: vec![(bridge_id, ENDOWED_BALANCE), (RELAYER_A, ENDOWED_BALANCE)],
+    pallet_balances::GenesisConfig::<Test> {
+        balances: vec![(bridge_id, ENDOWED_BALANCE)],
     }
     .assimilate_storage(&mut t)
     .unwrap();
@@ -129,32 +118,27 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
     ext
 }
 
-fn last_event() -> Event {
-    system::Module::<Test>::events()
-        .pop()
-        .map(|e| e.event)
-        .expect("Event expected")
-}
-
-pub fn expect_event<E: Into<Event>>(e: E) {
-    assert_eq!(last_event(), e.into());
-}
-
-// Asserts that the event was emitted at some point.
-pub fn event_exists<E: Into<Event>>(e: E) {
-    let actual: Vec<Event> = system::Module::<Test>::events()
-        .iter()
-        .map(|e| e.event.clone())
-        .collect();
-    let e: Event = e.into();
-    let mut exists = false;
-    for evt in actual {
-        if evt == e {
-            exists = true;
-            break;
-        }
-    }
-    assert!(exists);
+pub fn new_test_ext_initialized(
+    src_id: ChainId,
+    r_id: ResourceId,
+    resource: Vec<u8>,
+) -> sp_io::TestExternalities {
+    let mut t = new_test_ext();
+    t.execute_with(|| {
+        // Set and check threshold
+        assert_ok!(Bridge::set_threshold(Origin::root(), TEST_THRESHOLD));
+        assert_eq!(Bridge::relayer_threshold(), TEST_THRESHOLD);
+        // Add relayers
+        assert_ok!(Bridge::add_relayer(Origin::root(), RELAYER_A));
+        assert_ok!(Bridge::add_relayer(Origin::root(), RELAYER_B));
+        assert_ok!(Bridge::add_relayer(Origin::root(), RELAYER_C));
+        // Whitelist chain
+        assert_ok!(Bridge::whitelist_chain(Origin::root(), src_id));
+        // Set and check resource ID mapped to some junk data
+        assert_ok!(Bridge::set_resource(Origin::root(), r_id, resource));
+        assert_eq!(Bridge::resource_exists(r_id), true);
+    });
+    t
 }
 
 // Checks events against the latest. A contiguous set of events must be provided. They must
@@ -169,6 +153,6 @@ pub fn assert_events(mut expected: Vec<Event>) {
 
     for evt in expected {
         let next = actual.pop().expect("event expected");
-        assert_eq!(next, evt.into(), "Events don't match");
+        assert_eq!(next, evt.into(), "Events don't match (actual,expected)");
     }
 }

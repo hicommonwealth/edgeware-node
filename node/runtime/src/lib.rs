@@ -883,7 +883,7 @@ parameter_types! {
     pub const ProposalLifetime: u32 = 100;
 }
 
-impl chainbridge::Trait for Runtime {
+impl edge_chainbridge::chainbridge::Trait for Runtime {
     type Event = Event;
     // Allow 2/3 council to approve proposals
     type AdminOrigin = frame_system::EnsureOneOf<AccountId,
@@ -901,7 +901,8 @@ parameter_types! {
 
 impl edge_chainbridge::Trait for Runtime {
     type Event = Event;
-    type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
+    type Call = Call;
+    type BridgeOrigin = edge_chainbridge::chainbridge::EnsureBridge<Runtime>;
     type Currency = Balances;
     type NativeTokenId = NativeTokenId;
 }
@@ -981,9 +982,9 @@ construct_runtime!(
 		 // = 31,
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 		 // = 32,
-		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
+		ChainBridge: edge_chainbridge::chainbridge::{Module, Call, Storage, Event<T>},
 		 // = 33,
-		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
+		EdgeBridge: edge_chainbridge::{Module, Call, Storage, Event<T>, Config<T>},
 		 // = 34,
 	}
 );

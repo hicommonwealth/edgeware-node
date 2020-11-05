@@ -81,7 +81,7 @@ signaling = { package = "edge-signaling", path = "../../modules/edge-signaling",
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
-chainbridge = { git = "https://github.com/ChainSafe/chainbridge-substrate.git", default-features = false }
+chainbridge = { path = "../../modules/chainbridge", default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", version = "2.0.0" }

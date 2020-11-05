@@ -1,16 +1,16 @@
 #![cfg(test)]
 
 use super::mock::{
-    assert_events, balances, event_exists, expect_event, new_test_ext, Balances, Bridge, Call,
-    Event, Example, NativeTokenId, Origin, ProposalLifetime, Test,
+    assert_events, balances, expect_event, new_test_ext, Balances, Bridge, Call,
+    Event, Example, NativeTokenId, Origin, ProposalLifetime,
     ENDOWED_BALANCE, RELAYER_A, RELAYER_B, RELAYER_C,
 };
 use super::*;
-use frame_support::dispatch::DispatchError;
-use frame_support::{assert_noop, assert_ok};
 
-use codec::Encode;
-use sp_core::{blake2_256, H256};
+use frame_support::{assert_ok};
+
+
+
 
 const TEST_THRESHOLD: u32 = 2;
 
@@ -35,7 +35,7 @@ fn transfer_native() {
             dest_chain,
         ));
 
-        expect_event(bridge::RawEvent::FungibleTransfer(
+        expect_event(chainbridge::RawEvent::FungibleTransfer(
             dest_chain,
             1,
             resource_id,
@@ -73,7 +73,7 @@ fn create_sucessful_transfer_proposal() {
     new_test_ext().execute_with(|| {
         let prop_id = 1;
         let src_id = 1;
-        let r_id = bridge::derive_resource_id(src_id, b"transfer");
+        let r_id = chainbridge::derive_resource_id(src_id, b"transfer");
         let resource = b"Example.transfer".to_vec();
         let proposal = make_transfer_proposal(RELAYER_A, 10);
 
@@ -93,10 +93,10 @@ fn create_sucessful_transfer_proposal() {
             Box::new(proposal.clone())
         ));
         let prop = Bridge::votes(src_id, (prop_id.clone(), proposal.clone())).unwrap();
-        let expected = bridge::ProposalVotes {
+        let expected = chainbridge::ProposalVotes {
             votes_for: vec![RELAYER_A],
             votes_against: vec![],
-            status: bridge::ProposalStatus::Initiated,
+            status: chainbridge::ProposalStatus::Initiated,
             expiry: ProposalLifetime::get() + 1,
         };
         assert_eq!(prop, expected);
@@ -110,10 +110,10 @@ fn create_sucessful_transfer_proposal() {
             Box::new(proposal.clone())
         ));
         let prop = Bridge::votes(src_id, (prop_id.clone(), proposal.clone())).unwrap();
-        let expected = bridge::ProposalVotes {
+        let expected = chainbridge::ProposalVotes {
             votes_for: vec![RELAYER_A],
             votes_against: vec![RELAYER_B],
-            status: bridge::ProposalStatus::Initiated,
+            status: chainbridge::ProposalStatus::Initiated,
             expiry: ProposalLifetime::get() + 1,
         };
         assert_eq!(prop, expected);
@@ -127,10 +127,10 @@ fn create_sucessful_transfer_proposal() {
             Box::new(proposal.clone())
         ));
         let prop = Bridge::votes(src_id, (prop_id.clone(), proposal.clone())).unwrap();
-        let expected = bridge::ProposalVotes {
+        let expected = chainbridge::ProposalVotes {
             votes_for: vec![RELAYER_A, RELAYER_C],
             votes_against: vec![RELAYER_B],
-            status: bridge::ProposalStatus::Approved,
+            status: chainbridge::ProposalStatus::Approved,
             expiry: ProposalLifetime::get() + 1,
         };
         assert_eq!(prop, expected);
@@ -142,16 +142,16 @@ fn create_sucessful_transfer_proposal() {
         );
 
         assert_events(vec![
-            Event::bridge(bridge::RawEvent::VoteFor(src_id, prop_id, RELAYER_A)),
-            Event::bridge(bridge::RawEvent::VoteAgainst(src_id, prop_id, RELAYER_B)),
-            Event::bridge(bridge::RawEvent::VoteFor(src_id, prop_id, RELAYER_C)),
-            Event::bridge(bridge::RawEvent::ProposalApproved(src_id, prop_id)),
+            Event::chainbridge(chainbridge::RawEvent::VoteFor(src_id, prop_id, RELAYER_A)),
+            Event::chainbridge(chainbridge::RawEvent::VoteAgainst(src_id, prop_id, RELAYER_B)),
+            Event::chainbridge(chainbridge::RawEvent::VoteFor(src_id, prop_id, RELAYER_C)),
+            Event::chainbridge(chainbridge::RawEvent::ProposalApproved(src_id, prop_id)),
             Event::balances(balances::RawEvent::Transfer(
                 Bridge::account_id(),
                 RELAYER_A,
                 10,
             )),
-            Event::bridge(bridge::RawEvent::ProposalSucceeded(src_id, prop_id)),
+            Event::chainbridge(chainbridge::RawEvent::ProposalSucceeded(src_id, prop_id)),
         ]);
     })
 }
