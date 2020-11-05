@@ -187,7 +187,7 @@ impl frame_system::Trait for Runtime {
 	type AccountData = pallet_balances::AccountData<Balance>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
-	type SystemWeightInfo = weights::frame_system::WeightInfo;
+	type SystemWeightInfo = frame_system::weights::SubstrateWeight<Runtime>;
 }
 
 impl pallet_utility::Trait for Runtime {
@@ -765,8 +765,9 @@ impl pallet_grandpa::Trait for Runtime {
 		pallet_grandpa::EquivocationHandler<Self::KeyOwnerIdentification, Offences>;
 
 	type WeightInfo = ();
+}
 
-weights::SubstrateWeight<Runtime>{
+parameter_types! {
 	pub const BasicDeposit: Balance = 5 * DOLLARS;       // 258 bytes on-chain
 	pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
 	pub const SubAccountDeposit: Balance = 1 * DOLLARS;   // 53 bytes on-chain
