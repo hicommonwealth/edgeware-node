@@ -901,7 +901,6 @@ parameter_types! {
 
 impl edge_chainbridge::Trait for Runtime {
     type Event = Event;
-    type Call = Call;
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
     type Currency = Balances;
     type NativeTokenId = NativeTokenId;
