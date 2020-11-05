@@ -109,16 +109,6 @@ pub fn run() -> Result<()> {
 			let runner = cli.create_runner(cmd)?;
 			runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
 		},
-		// Some(Subcommand::BuildSyncSpec(cmd)) => {
-		// 	let runner = cli.create_runner(cmd)?;
-		// 	runner.async_run(|config| {
-		// 		let chain_spec = config.chain_spec.cloned_box();
-		// 		let network_config = config.network.clone();
-		// 		let NewFullBase { task_manager, client, network_status_sinks, .. }
-		// 			= new_full_base(config, |_, _| ())?;
-		// 		Ok((cmd.run(chain_spec, network_config, client, network_status_sinks), task_manager))
-		// 	})
-		// },
 		Some(Subcommand::CheckBlock(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
