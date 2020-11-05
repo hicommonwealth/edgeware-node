@@ -764,7 +764,7 @@ impl pallet_grandpa::Trait for Runtime {
 	type HandleEquivocation =
 		pallet_grandpa::EquivocationHandler<Self::KeyOwnerIdentification, Offences>;
 
-	type WeightInfo = }
+	type WeightInfo = ();
 
 weights::SubstrateWeight<Runtime>{
 	pub const BasicDeposit: Balance = 5 * DOLLARS;       // 258 bytes on-chain
