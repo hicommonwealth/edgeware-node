@@ -52,7 +52,6 @@ pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://gi
 pallet-democracy = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 frame-executive = { git = "https://github.com/paritytech/substrate.git", default-features = false }
-pallet-finality-tracker = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-identity = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-im-online = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -80,7 +79,8 @@ pallet-vesting = { git = "https://github.com/paritytech/substrate.git", default-
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
-chainbridge = { git = "https://github.com/hicommonwealth/chainbridge-substrate.git", default-features = false }
+edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
+chainbridge = { git = "https://github.com/ChainSafe/chainbridge-substrate.git", default-features = false }
 
 [build-dependencies]
 wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", version = "2.0.0" }
@@ -107,7 +107,6 @@ std = [
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
 	"frame-executive/std",
-	"pallet-finality-tracker/std",
 	"pallet-grandpa/std",
 	"pallet-identity/std",
 	"pallet-im-online/std",
@@ -148,5 +147,6 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
+	"edge-chainbridge/std",
 	"chainbridge/std",
 ]

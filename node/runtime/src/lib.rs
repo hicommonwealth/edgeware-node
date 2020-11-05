@@ -51,6 +51,7 @@ pub use sp_core::{
 	u32_trait::{_1, _2, _3, _4, _5},
 	OpaqueMetadata, U256, H160, H256,
 };
+use sp_io::hashing::blake2_128;
 use sp_runtime::{
 	Permill, Perbill, Perquintill, Percent, ApplyExtrinsicResult,
 	impl_opaque_keys, generic, create_runtime_str, ModuleId, FixedPointNumber,
@@ -68,8 +69,6 @@ pub use sp_version::NativeVersion;
 pub use sp_version::RuntimeVersion;
 
 pub use pallet_session::{historical as pallet_session_historical};
-
-use pallet_contracts_rpc_runtime_api::ContractExecResult;
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -734,17 +733,6 @@ impl pallet_grandpa::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const WindowSize: BlockNumber = 101;
-	pub const ReportLatency: BlockNumber = 1000;
-}
-
-impl pallet_finality_tracker::Trait for Runtime {
-	type OnFinalizationStalled = ();
-	type WindowSize = WindowSize;
-	type ReportLatency = ReportLatency;
-}
-
-parameter_types! {
 	pub const BasicDeposit: Balance = 5 * DOLLARS;       // 258 bytes on-chain
 	pub const FieldDeposit: Balance = 250 * CENTS;        // 66 bytes on-chain
 	pub const SubAccountDeposit: Balance = 1 * DOLLARS;   // 53 bytes on-chain
@@ -872,51 +860,96 @@ impl chainbridge::Trait for Runtime {
     type ProposalLifetime = ProposalLifetime;
 }
 
+parameter_types! {
+    pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"EDG"));
+}
+
+impl edge_chainbridge::Trait for Runtime {
+    type Event = Event;
+    type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
+    type Currency = Balances;
+    type NativeTokenId = NativeTokenId;
+}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
 		NodeBlock = edgeware_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: frame_system::{Module, Call, Config, Storage, Event<T>},
-		Utility: pallet_utility::{Module, Call, Event},
-		Aura: pallet_aura::{Module, Config<T>, Inherent},
+		System: frame_system::{Module, Call, Config, Storage, Event<T>}
+		 // = 0,
+		Utility: pallet_utility::{Module, Call, Event}
+		 // = 1,
+		Aura: pallet_aura::{Module, Config<T>, Inherent}
+		 // = 2,
 
-		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-		Authorship: pallet_authorship::{Module, Call, Storage, Inherent},
-		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
-		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-		TransactionPayment: pallet_transaction_payment::{Module, Storage},
+		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent}
+		 // = 3,
+		Authorship: pallet_authorship::{Module, Call, Storage, Inherent}
+		 // = 4,
+		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>}
+		 // = 5,
+		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>}
+		 // = 6,
+		TransactionPayment: pallet_transaction_payment::{Module, Storage}
+		 // = 7,
 
-		Staking: pallet_staking::{Module, Call, Config<T>, Storage, Event<T>, ValidateUnsigned},
-		Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
-		Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>},
-		Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>},
-		Elections: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>},
+		Staking: pallet_staking::{Module, Call, Config<T>, Storage, Event<T>, ValidateUnsigned}
+		 // = 8,
+		Session: pallet_session::{Module, Call, Storage, Event, Config<T>}
+		 // = 9,
+		Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>}
+		 // = 10,
+		Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>}
+		 // = 11,
+		Elections: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>}
+		 // = 12,
 
-		FinalityTracker: pallet_finality_tracker::{Module, Call, Inherent},
-		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned},
-		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
-		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
-		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
-		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
-		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
-		Offences: pallet_offences::{Module, Call, Storage, Event},
-		Historical: pallet_session_historical::{Module},
-		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
-		Identity: pallet_identity::{Module, Call, Storage, Event<T>},
+		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned}
+		 // = 14,
+		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>}
+		 // = 15,
+		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>}
+		 // = 16,
+		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>}
+		 // = 17,
+		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>}
+		 // = 18,
+		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config}
+		 // = 19,
+		Offences: pallet_offences::{Module, Call, Storage, Event}
+		 // = 20,
+		Historical: pallet_session_historical::{Module}
+		 // = 21,
+		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage}
+		 // = 22,
+		Identity: pallet_identity::{Module, Call, Storage, Event<T>}
+		 // = 23,
 
-		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
-		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
-		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
-		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
-		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
+		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>}
+		 // = 24,
+		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>}
+		 // = 25,
+		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>}
+		 // = 26,
+		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>}
+		 // = 27,
+		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>}
+		 // = 28,
+		Assets: pallet_assets::{Module, Call, Storage, Event<T>}
+		 // = 29,
 
-		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
-		Voting: voting::{Module, Call, Storage, Event<T>},
-		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
-		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
+		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>}
+		 // = 30,
+		Voting: voting::{Module, Call, Storage, Event<T>}
+		 // = 31,
+		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>}
+		 // = 32,
+		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>}
+		 // = 33,
+		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>}
+		 // = 34,
 	}
 );
 
@@ -1076,17 +1109,8 @@ impl_runtime_apis! {
 			value: Balance,
 			gas_limit: u64,
 			input_data: Vec<u8>,
-		) -> ContractExecResult {
-			let (exec_result, gas_consumed) =
-				Contracts::bare_call(origin, dest.into(), value, gas_limit, input_data);
-			match exec_result {
-				Ok(v) => ContractExecResult::Success {
-					flags: v.flags.bits(),
-					data: v.data,
-					gas_consumed: gas_consumed,
-				},
-				Err(_) => ContractExecResult::Error,
-			}
+		) -> pallet_contracts_primitives::ContractExecResult {
+			Contracts::bare_call(origin, dest, value, gas_limit, input_data)
 		}
 
 		fn get_storage(
