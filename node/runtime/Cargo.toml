@@ -26,6 +26,7 @@ sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", defau
 sp-block-builder = { git = "https://github.com/paritytech/substrate.git", default-features = false}
 sp-inherents = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-core = { git = "https://github.com/paritytech/substrate.git", default-features = false }
+sp-io = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-api = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate.git", default-features = false }
@@ -79,6 +80,8 @@ pallet-vesting = { git = "https://github.com/paritytech/substrate.git", default-
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
+edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
+chainbridge = { path = "../../modules/chainbridge", default-features = false }
 
 # used for runtime benchmarking
 frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", default-features = false, optional = true }
@@ -120,6 +123,7 @@ std = [
 	"pallet-proxy/std",
 	"pallet-recovery/std",
 	"sp-core/std",
+	"sp-io/std",
 	"pallet-randomness-collective-flip/std",
 	"sp-std/std",
 	"rustc-hex",
@@ -150,6 +154,8 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
+	"edge-chainbridge/std",
+	"chainbridge/std",
 ]
 
 runtime-benchmarks = [

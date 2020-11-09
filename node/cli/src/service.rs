@@ -240,6 +240,7 @@ pub fn new_full_base(
 
 	if let sc_service::config::Role::Authority { .. } = &role {
 		let proposer = sc_basic_authorship::ProposerFactory::new(
+			task_manager.spawn_handle(),
 			client.clone(),
 			transaction_pool.clone(),
 			prometheus_registry.as_ref(),
@@ -267,21 +268,10 @@ pub fn new_full_base(
 	}
 
 	// Spawn authority discovery module.
-	if matches!(role, Role::Authority{..} | Role::Sentry {..}) {
-		let (sentries, authority_discovery_role) = match role {
-			sc_service::config::Role::Authority { ref sentry_nodes } => (
-				sentry_nodes.clone(),
-				sc_authority_discovery::Role::Authority (
-					keystore_container.keystore(),
-				),
-			),
-			sc_service::config::Role::Sentry {..} => (
-				vec![],
-				sc_authority_discovery::Role::Sentry,
-			),
-			_ => unreachable!("Due to outer matches! constraint; qed.")
-		};
-
+	if role.is_authority() {
+		let authority_discovery_role = sc_authority_discovery::Role::PublishAndDiscover(
+			keystore_container.keystore(),
+		);
 		let dht_event_stream = network.event_stream("authority-discovery")
 			.filter_map(|e| async move { match e {
 				Event::Dht(e) => Some(e),
@@ -290,7 +280,6 @@ pub fn new_full_base(
 		let (authority_discovery_worker, _service) = sc_authority_discovery::new_worker_and_service(
 			client.clone(),
 			network.clone(),
-			sentries,
 			Box::pin(dht_event_stream),
 			authority_discovery_role,
 			prometheus_registry.clone(),
@@ -342,7 +331,6 @@ pub fn new_full_base(
 		);
 	} else {
 		sc_finality_grandpa::setup_disabled_grandpa(network.clone())?;
-
 	}
 
 	network_starter.start_network();
