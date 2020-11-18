@@ -1534,7 +1534,7 @@ dependencies = [
  "edge-treasury-reward",
  "edge-voting",
  "edgeware-primitives",
- "evm 0.17.0",
+ "evm",
  "frame-executive",
  "frame-support",
  "frame-system",
@@ -1729,16 +1729,19 @@ dependencies = [
 
 [[package]]
 name = "ethereum"
-version = "0.4.1"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7538b2bb55bde83b500c4e6ea0bdb3b1c0e9e5ae57951941e5412db32c2a8344"
+checksum = "01ea35e1b0845310ade8eb048d401b0b899b8eff05c4d2a3454d29ef4eb1b8af"
 dependencies = [
  "ethereum-types",
+ "hash-db",
+ "hash256-std-hasher",
  "parity-scale-codec",
  "rlp",
  "rlp-derive",
  "serde",
  "sha3 0.9.1",
+ "triehash",
 ]
 
 [[package]]
@@ -1764,44 +1767,20 @@ checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
 
 [[package]]
 name = "evm"
-version = "0.17.0"
+version = "0.18.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "68224b0aa788720ef0c8a23030a4412a021ed73df069a922bee8f0db9ed617e2"
-dependencies = [
- "evm-core 0.17.0",
- "evm-gasometer 0.17.0",
- "evm-runtime 0.17.0",
- "primitive-types",
- "rlp",
- "serde",
- "sha3 0.8.2",
-]
-
-[[package]]
-name = "evm"
-version = "0.18.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1fc70736bd5ec89622647ea9346b70567557917596a39538d76e8f2a17ff59e"
+checksum = "5286da2277b078e7033491d62e674eeccd01d913a87bb60ec0cabbcf80ec62e9"
 dependencies = [
  "ethereum",
- "evm-core 0.18.3",
- "evm-gasometer 0.18.3",
- "evm-runtime 0.18.3",
+ "evm-core",
+ "evm-gasometer",
+ "evm-runtime",
  "log 0.4.11",
  "parity-scale-codec",
  "primitive-types",
  "rlp",
  "serde",
  "sha3 0.8.2",
-]
-
-[[package]]
-name = "evm-core"
-version = "0.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a040378759577447945c89da1b07d6e33fda32a97a104afe0ec3fa1c382949d"
-dependencies = [
- "primitive-types",
 ]
 
 [[package]]
@@ -1817,35 +1796,13 @@ dependencies = [
 
 [[package]]
 name = "evm-gasometer"
-version = "0.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bb5bc051afad6bb0735c82b46656bbdfac41917861307a608b1404a546fec42"
-dependencies = [
- "evm-core 0.17.0",
- "evm-runtime 0.17.0",
- "primitive-types",
-]
-
-[[package]]
-name = "evm-gasometer"
 version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "689c481648c3f45b64b1278077c04284ad535e068c9d6872153c7b74da7ccb03"
 dependencies = [
- "evm-core 0.18.3",
- "evm-runtime 0.18.3",
+ "evm-core",
+ "evm-runtime",
  "primitive-types",
-]
-
-[[package]]
-name = "evm-runtime"
-version = "0.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7410f5677a52203d3fca02b0eb8f96f9799f3a45cff82946a8ed28379e6b1b04"
-dependencies = [
- "evm-core 0.17.0",
- "primitive-types",
- "sha3 0.8.2",
 ]
 
 [[package]]
@@ -1854,7 +1811,7 @@ version = "0.18.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "61a148ad1b3e0af31aa03c6c3cc9df3a529e279dad8e29b4ef90dccad32601e4"
 dependencies = [
- "evm-core 0.18.3",
+ "evm-core",
  "primitive-types",
  "sha3 0.8.2",
 ]
@@ -2196,10 +2153,12 @@ dependencies = [
  "jsonrpc-core-client 14.2.0",
  "jsonrpc-derive 14.2.2",
  "jsonrpc-pubsub 15.0.0",
+ "libsecp256k1",
  "log 0.4.11",
  "pallet-ethereum",
  "pallet-evm",
  "parity-scale-codec",
+ "rand 0.7.3",
  "rlp",
  "rustc-hex",
  "sc-client-api",
@@ -4694,7 +4653,7 @@ version = "0.1.0"
 dependencies = [
  "ethereum",
  "ethereum-types",
- "evm 0.18.4",
+ "evm",
  "frame-support",
  "frame-system",
  "frontier-consensus-primitives",
@@ -4719,9 +4678,9 @@ name = "pallet-evm"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate.git?branch=frontier#7865a34b17c5881e1c73eb7579faf5affd2365c4"
 dependencies = [
- "evm 0.18.4",
- "evm-gasometer 0.18.3",
- "evm-runtime 0.18.3",
+ "evm",
+ "evm-gasometer",
+ "evm-runtime",
  "frame-support",
  "frame-system",
  "impl-trait-for-tuples",
@@ -7881,7 +7840,7 @@ name = "sp-evm"
 version = "0.8.0"
 source = "git+https://github.com/paritytech/substrate.git?branch=frontier#7865a34b17c5881e1c73eb7579faf5affd2365c4"
 dependencies = [
- "evm 0.18.4",
+ "evm",
  "parity-scale-codec",
  "serde",
  "sp-core",
@@ -9150,6 +9109,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "652931506d2c1244d7217a70b99f56718a7b4161b37f04e7cd868072a99f68cd"
 dependencies = [
  "hash-db",
+]
+
+[[package]]
+name = "triehash"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f490aa7aa4e4d07edeba442c007e42e3e7f43aafb5112c5b047fff0b1aa5449c"
+dependencies = [
+ "hash-db",
+ "rlp",
 ]
 
 [[package]]
