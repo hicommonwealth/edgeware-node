@@ -16,8 +16,6 @@
 
 //! Some configurable implementations as associated type for the substrate runtime.
 
-use edgeware_primitives::Balance;
-use sp_runtime::traits::Convert;
 use frame_support::traits::{OnUnbalanced, Currency};
 use crate::{Balances, Authorship, NegativeImbalance};
 

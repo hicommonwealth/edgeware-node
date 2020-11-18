@@ -116,6 +116,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 /// Creates a full service from the configuration.
 pub fn new_full_base(
 	config: Configuration,
+	enable_dev_signer: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_aura::AuraBlockImport<
 			Block,
@@ -199,7 +200,8 @@ pub fn new_full_base(
 					subscription_executor: subscription_executor.clone(),
 					finality_provider: finality_proof_provider.clone(),
 				},
-				is_authority: is_authority,
+				is_authority,
+				enable_dev_signer,
 			};
 
 			edgeware_rpc::create_full(deps, subscription_executor.clone())
@@ -224,7 +226,7 @@ pub fn new_full_base(
 		system_rpc_tx,
 	})?;
 
-	let (shared_voter_state, finality_proof_provider) = rpc_setup;
+	let (shared_voter_state, _finality_proof_provider) = rpc_setup;
 
 	(with_startup_data)(&block_import, &grandpa_link);
 
@@ -340,9 +342,9 @@ pub fn new_full_base(
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(config: Configuration)
+pub fn new_full(config: Configuration, enable_dev_signer: bool)
 -> Result<TaskManager, ServiceError> {
-	new_full_base(config, |_, _| ()).map(|(task_manager, _, _, _, _)| {
+	new_full_base(config, enable_dev_signer, |_, _| ()).map(|(task_manager, _, _, _, _)| {
 		task_manager
 	})
 }

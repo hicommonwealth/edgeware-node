@@ -39,10 +39,9 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 pub use sc_rpc_api::DenyUnsafe;
-use sp_runtime::traits::BlakeTwo256;
 use sc_network::NetworkService;
 use sc_client_api::{
-	backend::{StorageProvider, Backend, StateBackend, AuxStore},
+	backend::{StorageProvider, AuxStore},
 	client::BlockchainEvents,
 };
 use sc_rpc::SubscriptionTaskExecutor;
@@ -89,6 +88,8 @@ pub struct FullDeps<C, P, SC, B> {
 	pub deny_unsafe: DenyUnsafe,
 	/// The Node authority flag
 	pub is_authority: bool,
+	/// Whether to enable dev signer
+	pub enable_dev_signer: bool,
 	/// Network service
 	pub network: Arc<NetworkService<Block, Hash>>,
 	/// GRANDPA specific dependencies.
@@ -118,7 +119,9 @@ pub fn create_full<C, P, SC, B>(
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use frontier_rpc::{EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi};
+	use frontier_rpc::{
+		EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi, EthDevSigner, EthSigner,
+	};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -126,12 +129,12 @@ pub fn create_full<C, P, SC, B>(
 	let FullDeps {
 		client,
 		pool,
-		select_chain,
+		select_chain: _,
 		deny_unsafe,
 		is_authority,
-		// command_sink,
 		grandpa,
 		network,
+		enable_dev_signer,
 	} = deps;
 	let GrandpaDeps {
 		shared_voter_state,
@@ -153,12 +156,18 @@ pub fn create_full<C, P, SC, B>(
 	io.extend_with(
 		TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone()))
 	);
+
+	let mut signers = Vec::new();
+	if enable_dev_signer {
+		signers.push(Box::new(EthDevSigner::new()) as Box<dyn EthSigner>);
+	}
 	io.extend_with(
 		EthApiServer::to_delegate(EthApi::new(
 			client.clone(),
 			pool.clone(),
 			edgeware_runtime::TransactionConverter,
 			network.clone(),
+			signers,
 			is_authority,
 		))
 	);

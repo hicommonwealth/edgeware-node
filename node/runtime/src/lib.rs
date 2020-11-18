@@ -71,16 +71,11 @@ pub use sp_version::RuntimeVersion;
 pub use pallet_session::{historical as pallet_session_historical};
 
 use pallet_contracts_rpc_runtime_api::ContractExecResult;
-use pallet_ethereum::{
-	Block as EthereumBlock, Transaction as EthereumTransaction,
-	Receipt as EthereumReceipt
-};
 use pallet_evm::{
 	Account as EVMAccount, FeeCalculator, HashedAddressMapping,
 	EnsureAddressTruncated, Runner
 };
 
-use evm::Config;
 use frontier_rpc_primitives::{TransactionStatus};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
