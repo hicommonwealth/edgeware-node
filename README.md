@@ -55,6 +55,13 @@ rustup target add wasm32-unknown-unknown --toolchain nightly
 cargo install --git https://github.com/alexcrichton/wasm-gc
 ```
 
+If you building a frontier dependent branch (i.e. edgeware-frontier),
+you will need to run: 
+```
+
+git submodule update --init
+```
+
 Build Edgeware:
 
 ```
