@@ -1359,11 +1359,11 @@ dependencies = [
  "edgeware-primitives",
  "edgeware-rpc",
  "edgeware-runtime",
+ "fc-consensus",
  "frame-benchmarking-cli",
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
- "frontier-consensus",
  "futures 0.3.5",
  "hex 0.3.2",
  "hex-literal 0.2.1",
@@ -1490,8 +1490,8 @@ version = "3.0.0"
 dependencies = [
  "edgeware-primitives",
  "edgeware-runtime",
- "frontier-rpc",
- "frontier-rpc-primitives",
+ "fc-rpc",
+ "fp-rpc",
  "jsonrpc-core 15.0.0",
  "jsonrpc-pubsub 15.0.0",
  "pallet-contracts-rpc",
@@ -1535,11 +1535,11 @@ dependencies = [
  "edge-voting",
  "edgeware-primitives",
  "evm",
+ "fp-rpc",
  "frame-executive",
  "frame-support",
  "frame-system",
  "frame-system-rpc-runtime-api",
- "frontier-rpc-primitives",
  "integer-sqrt",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -1866,6 +1866,77 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c85295147490b8fcf2ea3d104080a105a8b2c63f9c319e82c02d8e952388919"
 
 [[package]]
+name = "fc-consensus"
+version = "0.1.0"
+dependencies = [
+ "derive_more",
+ "ethereum",
+ "fp-consensus",
+ "futures 0.3.5",
+ "log 0.4.11",
+ "parity-scale-codec",
+ "sc-client-api",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-consensus",
+ "sp-core",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-timestamp",
+ "substrate-prometheus-endpoint",
+]
+
+[[package]]
+name = "fc-rpc"
+version = "0.1.0"
+dependencies = [
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-rpc-core",
+ "fp-rpc",
+ "futures 0.3.5",
+ "jsonrpc-core 15.0.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "jsonrpc-pubsub 15.0.0",
+ "libsecp256k1",
+ "log 0.4.11",
+ "pallet-ethereum",
+ "pallet-evm",
+ "parity-scale-codec",
+ "rand 0.7.3",
+ "rlp",
+ "rustc-hex",
+ "sc-client-api",
+ "sc-network",
+ "sc-rpc",
+ "sc-service",
+ "sha3 0.8.2",
+ "sp-api",
+ "sp-blockchain",
+ "sp-io",
+ "sp-runtime",
+ "sp-storage",
+ "sp-transaction-pool",
+]
+
+[[package]]
+name = "fc-rpc-core"
+version = "0.1.0"
+dependencies = [
+ "ethereum-types",
+ "jsonrpc-core 15.0.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "jsonrpc-pubsub 15.0.0",
+ "rustc-hex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fdlimit"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1957,6 +2028,41 @@ version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate.git?branch=frontier#7865a34b17c5881e1c73eb7579faf5affd2365c4"
 dependencies = [
  "parity-scale-codec",
+]
+
+[[package]]
+name = "fp-consensus"
+version = "0.1.0"
+dependencies = [
+ "parity-scale-codec",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "fp-evm"
+version = "0.8.0"
+dependencies = [
+ "evm",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-std",
+]
+
+[[package]]
+name = "fp-rpc"
+version = "0.1.0"
+dependencies = [
+ "ethereum",
+ "ethereum-types",
+ "fp-evm",
+ "parity-scale-codec",
+ "sp-api",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]
@@ -2105,101 +2211,6 @@ source = "git+https://github.com/paritytech/substrate.git?branch=frontier#7865a3
 dependencies = [
  "parity-scale-codec",
  "sp-api",
-]
-
-[[package]]
-name = "frontier-consensus"
-version = "0.1.0"
-dependencies = [
- "derive_more",
- "ethereum",
- "frontier-consensus-primitives",
- "futures 0.3.5",
- "log 0.4.11",
- "parity-scale-codec",
- "sc-client-api",
- "sp-api",
- "sp-block-builder",
- "sp-blockchain",
- "sp-consensus",
- "sp-core",
- "sp-inherents",
- "sp-runtime",
- "sp-timestamp",
- "substrate-prometheus-endpoint",
-]
-
-[[package]]
-name = "frontier-consensus-primitives"
-version = "0.1.0"
-dependencies = [
- "parity-scale-codec",
- "sp-core",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "frontier-rpc"
-version = "0.1.0"
-dependencies = [
- "ethereum",
- "ethereum-types",
- "frontier-consensus",
- "frontier-rpc-core",
- "frontier-rpc-primitives",
- "futures 0.3.5",
- "jsonrpc-core 15.0.0",
- "jsonrpc-core-client 14.2.0",
- "jsonrpc-derive 14.2.2",
- "jsonrpc-pubsub 15.0.0",
- "libsecp256k1",
- "log 0.4.11",
- "pallet-ethereum",
- "pallet-evm",
- "parity-scale-codec",
- "rand 0.7.3",
- "rlp",
- "rustc-hex",
- "sc-client-api",
- "sc-network",
- "sc-rpc",
- "sc-service",
- "sha3 0.8.2",
- "sp-api",
- "sp-blockchain",
- "sp-io",
- "sp-runtime",
- "sp-storage",
- "sp-transaction-pool",
-]
-
-[[package]]
-name = "frontier-rpc-core"
-version = "0.1.0"
-dependencies = [
- "ethereum-types",
- "jsonrpc-core 15.0.0",
- "jsonrpc-core-client 14.2.0",
- "jsonrpc-derive 14.2.2",
- "jsonrpc-pubsub 15.0.0",
- "rustc-hex",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "frontier-rpc-primitives"
-version = "0.1.0"
-dependencies = [
- "ethereum",
- "ethereum-types",
- "parity-scale-codec",
- "sp-api",
- "sp-core",
- "sp-evm",
- "sp-runtime",
- "sp-std",
 ]
 
 [[package]]
@@ -4654,10 +4665,11 @@ dependencies = [
  "ethereum",
  "ethereum-types",
  "evm",
+ "fp-consensus",
+ "fp-evm",
+ "fp-rpc",
  "frame-support",
  "frame-system",
- "frontier-consensus-primitives",
- "frontier-rpc-primitives",
  "libsecp256k1",
  "pallet-balances",
  "pallet-evm",
@@ -4667,7 +4679,6 @@ dependencies = [
  "rustc-hex",
  "serde",
  "sha3 0.8.2",
- "sp-evm",
  "sp-io",
  "sp-runtime",
  "sp-std",
@@ -4676,11 +4687,11 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?branch=frontier#7865a34b17c5881e1c73eb7579faf5affd2365c4"
 dependencies = [
  "evm",
  "evm-gasometer",
  "evm-runtime",
+ "fp-evm",
  "frame-support",
  "frame-system",
  "impl-trait-for-tuples",
@@ -4693,7 +4704,6 @@ dependencies = [
  "serde",
  "sha3 0.8.2",
  "sp-core",
- "sp-evm",
  "sp-io",
  "sp-runtime",
  "sp-std",
@@ -7833,18 +7843,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "sp-evm"
-version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?branch=frontier#7865a34b17c5881e1c73eb7579faf5affd2365c4"
-dependencies = [
- "evm",
- "parity-scale-codec",
- "serde",
- "sp-core",
- "sp-std",
 ]
 
 [[package]]

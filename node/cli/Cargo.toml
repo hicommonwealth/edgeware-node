@@ -84,7 +84,7 @@ frame-support = { git = "https://github.com/paritytech/substrate.git", branch = 
 pallet-im-online = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
 frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-pallet-evm = { git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
+pallet-evm = { path = "../../vendor/frontier/frame/evm" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -96,7 +96,7 @@ edgeware-executor = { path = "../executor" }
 edgeware-inspect = { version = "3.0.0", optional = true, path = "../inspect" }
 sc-cli = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", optional = true }
 frame-benchmarking-cli = { optional = true, git = "https://github.com/paritytech/substrate.git", branch = "frontier" }
-frontier-consensus = { version = "0.1.0", path = "../../vendor/frontier/consensus" }
+fc-consensus = { version = "0.1.0", path = "../../vendor/frontier/client/consensus" }
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }

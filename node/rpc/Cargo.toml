@@ -30,5 +30,5 @@ sc-network = { git = "https://github.com/paritytech/substrate.git", branch = "fr
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 
-frontier-rpc = { version = "0.1.0", path = "../../vendor/frontier/rpc" }
-frontier-rpc-primitives = { version = "0.1.0", path = "../../vendor/frontier/rpc/primitives" }
+fp-rpc = { version = "0.1.0", path = "../../vendor/frontier/primitives/rpc" }
+fc-rpc = { version = "0.1.0", path = "../../vendor/frontier/client/rpc" }

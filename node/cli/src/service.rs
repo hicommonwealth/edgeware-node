@@ -24,7 +24,7 @@ use sc_consensus_aura;
 use sc_finality_grandpa::{
 	self, FinalityProofProvider as GrandpaFinalityProofProvider,
 };
-use frontier_consensus::FrontierBlockImport;
+use fc_consensus::FrontierBlockImport;
 use edgeware_primitives::Block;
 use edgeware_runtime::RuntimeApi;
 use sc_service::{

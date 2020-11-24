@@ -110,7 +110,7 @@ pub fn create_full<C, P, SC, B>(
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-	C::Api: frontier_rpc_primitives::EthereumRuntimeRPCApi<Block>,
+	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
 	<C::Api as sp_api::ApiErrorExt>::Error: fmt::Debug,
 	P: TransactionPool<Block=Block> + 'static,
 	SC: SelectChain<Block> +'static,
@@ -119,8 +119,9 @@ pub fn create_full<C, P, SC, B>(
 {
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-	use frontier_rpc::{
-		EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi, EthDevSigner, EthSigner,
+	use fc_rpc::{
+		EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi,
+		EthDevSigner, EthSigner, HexEncodedIdProvider,
 	};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 
@@ -174,6 +175,7 @@ pub fn create_full<C, P, SC, B>(
 	io.extend_with(
 		NetApiServer::to_delegate(NetApi::new(
 			client.clone(),
+			network.clone(),
 		))
 	);
 	io.extend_with(
@@ -181,7 +183,10 @@ pub fn create_full<C, P, SC, B>(
 			pool.clone(),
 			client.clone(),
 			network.clone(),
-			SubscriptionManager::new(Arc::new(subscription_task_executor)),
+			SubscriptionManager::<HexEncodedIdProvider>::with_id_provider(
+				HexEncodedIdProvider::default(),
+				Arc::new(subscription_task_executor)
+			),
 		))
 	);
 	io.extend_with(
