@@ -89,7 +89,7 @@ frame-system-benchmarking = { git = "https://github.com/paritytech/substrate.git
 hex-literal = { version = "0.3.1", optional = true }
 
 [build-dependencies]
-wasm-builder-runner = { package = "substrate-wasm-builder-runner", git = "https://github.com/paritytech/substrate.git", version = "2.0.0" }
+substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate.git" }
 
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate.git" }
@@ -156,6 +156,7 @@ std = [
 	"voting/std",
 	"edge-chainbridge/std",
 	"chainbridge/std",
+	"frame-benchmarking/std",
 ]
 
 runtime-benchmarks = [
@@ -164,6 +165,7 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"frame-system-benchmarking",
 	"hex-literal",
+	"chainbridge/runtime-benchmarks",
 	"signaling/runtime-benchmarks",
-	"voting/runtime-benchmarks"
+	"voting/runtime-benchmarks",
 ]

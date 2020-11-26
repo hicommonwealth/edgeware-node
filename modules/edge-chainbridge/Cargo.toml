@@ -23,8 +23,7 @@ pallet-balances = { git = "https://github.com/paritytech/substrate.git", default
 
 chainbridge = { path = "../chainbridge", default-features = false }
 
-[build-dependencies]
-wasm-builder-runner = { git = "https://github.com/paritytech/substrate.git", package = "substrate-wasm-builder-runner" }
+frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", default-features = false, optional = true }
 
 [features]
 default = ["std"]
@@ -40,4 +39,10 @@ std = [
 	"frame-system/std",
 	"pallet-balances/std",
 	"chainbridge/std",
+]
+
+runtime-benchmarks = [
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system/runtime-benchmarks",
 ]
