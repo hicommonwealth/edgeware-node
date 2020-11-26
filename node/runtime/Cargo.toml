@@ -39,7 +39,7 @@ sp-offchain = { git = "https://github.com/paritytech/substrate.git", branch = "f
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
-frontier-rpc-primitives = { default-features = false, path = "../../vendor/frontier/rpc/primitives" }
+fp-rpc = { default-features = false, path = "../../vendor/frontier/primitives/rpc" }
 
 # pallet dependencies
 pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
@@ -53,7 +53,7 @@ pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://gi
 pallet-democracy = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-ethereum = { default-features = false, path = "../../vendor/frontier/frame/ethereum" }
-pallet-evm = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
+pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
 frame-executive = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
 pallet-identity = { git = "https://github.com/paritytech/substrate.git", branch = "frontier", default-features = false }
@@ -149,7 +149,7 @@ std = [
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
-	"frontier-rpc-primitives/std",
+	"fp-rpc/std",
 	"pallet-ethereum/std",
 	"evm/std",
 ]
