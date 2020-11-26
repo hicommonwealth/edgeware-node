@@ -490,12 +490,12 @@ impl pallet_staking::Trait for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
-	pub const FastTrackVotingPeriod: BlockNumber = 3 * 24 * 60 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 4 * 24 * 60 * MINUTES;
+	pub const FastTrackVotingPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	pub const InstantAllowed: bool = false;
-	pub const EnactmentPeriod: BlockNumber = 8 * 24 * 60 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1 * CENTS;
 	pub const MaxVotes: u32 = 100;
@@ -830,9 +830,9 @@ impl pallet_sudo::Trait for Runtime {
 
 parameter_types! {
 	pub const TombstoneDeposit: Balance = 16 * MILLICENTS;
-	pub const RentByteFee: Balance = 4 * MILLICENTS;
-	pub const RentDepositOffset: Balance = 1000 * MILLICENTS;
-	pub const SurchargeReward: Balance = 150 * MILLICENTS;
+	pub const RentByteFee: Balance = 1 * MILLICENTS;
+	pub const RentDepositOffset: Balance = 100 * MILLICENTS;
+	pub const SurchargeReward: Balance = 15 * MILLICENTS;
 }
 
 impl pallet_contracts::Trait for Runtime {
@@ -909,6 +909,7 @@ impl chainbridge::Trait for Runtime {
     type Proposal = Call;
     type ChainId = ChainId;
     type ProposalLifetime = ProposalLifetime;
+    type WeightInfo = ();
 }
 
 parameter_types! {
@@ -920,6 +921,7 @@ impl edge_chainbridge::Trait for Runtime {
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
     type Currency = Balances;
     type NativeTokenId = NativeTokenId;
+	type WeightInfo = ();
 }
 
 construct_runtime!(
@@ -929,78 +931,44 @@ construct_runtime!(
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
 		System: frame_system::{Module, Call, Config, Storage, Event<T>},
-		 // = 0,
 		Utility: pallet_utility::{Module, Call, Event},
-		 // = 1,
 		Aura: pallet_aura::{Module, Config<T>, Inherent},
-		 // = 2,
 
 		Timestamp: pallet_timestamp::{Module, Call, Storage, Inherent},
-		 // = 3,
 		Authorship: pallet_authorship::{Module, Call, Storage, Inherent},
-		 // = 4,
 		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
-		 // = 5,
 		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-		 // = 6,
 		TransactionPayment: pallet_transaction_payment::{Module, Storage},
-		 // = 7,
 
 		Staking: pallet_staking::{Module, Call, Config<T>, Storage, Event<T>, ValidateUnsigned},
-		 // = 8,
 		Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
-		 // = 9,
 		Democracy: pallet_democracy::{Module, Call, Storage, Config, Event<T>},
-		 // = 10,
 		Council: pallet_collective::<Instance1>::{Module, Call, Storage, Origin<T>, Event<T>, Config<T>},
-		 // = 11,
 		Elections: pallet_elections_phragmen::{Module, Call, Storage, Event<T>, Config<T>},
-		 // = 12,
 
 		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned},
-		 // = 14,
 		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
-		 // = 15,
 		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
-		 // = 16,
 		Sudo: pallet_sudo::{Module, Call, Config<T>, Storage, Event<T>},
-		 // = 17,
 		ImOnline: pallet_im_online::{Module, Call, Storage, Event<T>, ValidateUnsigned, Config<T>},
-		 // = 18,
 		AuthorityDiscovery: pallet_authority_discovery::{Module, Call, Config},
-		 // = 19,
 		Offences: pallet_offences::{Module, Call, Storage, Event},
-		 // = 20,
 		Historical: pallet_session_historical::{Module},
-		 // = 21,
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Module, Call, Storage},
-		 // = 22,
 		Identity: pallet_identity::{Module, Call, Storage, Event<T>},
-		 // = 23,
 
 		Recovery: pallet_recovery::{Module, Call, Storage, Event<T>},
-		 // = 24,
 		Vesting: pallet_vesting::{Module, Call, Storage, Event<T>, Config<T>},
-		 // = 25,
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
-		 // = 26,
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
-		 // = 27,
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
-		 // = 28,
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
-		 // = 29,
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
-		 // = 30,
 		Voting: voting::{Module, Call, Storage, Event<T>},
-		 // = 31,
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
-		 // = 32,
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
-		 // = 33,
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
-		 // = 34,
 	}
 );
 

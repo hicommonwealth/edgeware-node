@@ -711,7 +711,6 @@ dependencies = [
 name = "chainbridge"
 version = "0.0.2"
 dependencies = [
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "pallet-balances",

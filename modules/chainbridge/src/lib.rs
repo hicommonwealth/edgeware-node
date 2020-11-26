@@ -599,6 +599,7 @@ impl<T: Trait> Module<T> {
 	}
 }
 
+
 /// Simple ensure origin for the bridge account
 pub struct EnsureBridge<T>(sp_std::marker::PhantomData<T>);
 impl<T: Trait> EnsureOrigin<T::Origin> for EnsureBridge<T> {
@@ -609,5 +610,10 @@ impl<T: Trait> EnsureOrigin<T::Origin> for EnsureBridge<T> {
 			system::RawOrigin::Signed(who) if who == bridge_id => Ok(bridge_id),
 			r => Err(T::Origin::from(r)),
 		})
+	}
+
+	#[cfg(feature = "runtime-benchmarks")]
+	fn successful_origin() -> T::Origin {
+		O::from(RawOrigin::Root)
 	}
 }

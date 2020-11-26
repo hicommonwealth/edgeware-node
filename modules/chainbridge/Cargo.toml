@@ -21,8 +21,6 @@ frame-system = { git = "https://github.com/paritytech/substrate.git", default-fe
 
 pallet-balances = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 
-frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", default-features = false, optional = true }
-
 [build-dependencies]
 wasm-builder-runner = { git = "https://github.com/paritytech/substrate.git", package = "substrate-wasm-builder-runner"}
 [features]
@@ -40,7 +38,6 @@ std = [
 ]
 
 runtime-benchmarks = [
-	"frame-benchmarking",
-	"frame-support/runtime-benchmarks",
+	"sp-runtime/runtime-benchmarks",
 	"frame-system/runtime-benchmarks",
 ]
