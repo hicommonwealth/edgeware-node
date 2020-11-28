@@ -17,10 +17,26 @@
 #![allow(unused_parens)]
 #![allow(unused_imports)]
 
+use sp_std::marker::PhantomData;
 use frame_support::weights::{Weight, constants::RocksDbWeight as DbWeight};
 
-/// Default implementation of weight, this is just from an example return, values may change
-/// depending on the runtime. This is not meant to be used in production.
+pub struct SubstrateWeight<T>(PhantomData<T>);
+impl<T: frame_system::Trait> crate::WeightInfo for SubstrateWeight<T> {
+	fn commit(s: u32, ) -> Weight {
+		(25_910_000 as Weight)
+			.saturating_add((373_000 as Weight).saturating_mul(s as Weight))
+			.saturating_add(DbWeight::get().reads(1 as Weight))
+			.saturating_add(DbWeight::get().writes(1 as Weight))
+	}
+	fn reveal(s: u32, ) -> Weight {
+		(20_153_000 as Weight)
+			.saturating_add((3_168_000 as Weight).saturating_mul(s as Weight))
+			.saturating_add(DbWeight::get().reads(1 as Weight))
+			.saturating_add(DbWeight::get().writes(1 as Weight))
+	}
+}
+
+
 impl crate::WeightInfo for () {
 	fn commit(s: u32, ) -> Weight {
 		(25_910_000 as Weight)

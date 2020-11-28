@@ -21,7 +21,7 @@ frame-support = { git = "https://github.com/paritytech/substrate.git", default-f
 frame-system = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 pallet-balances = { git = "https://github.com/paritytech/substrate.git", default-features = false }
 
-chainbridge = { path = "../chainbridge", default-features = false }
+chainbridge = { path = "../chainbridge", default-features = false, features = ["runtime-benchmarks"] }
 
 [build-dependencies]
 wasm-builder-runner = { git = "https://github.com/paritytech/substrate.git", package = "substrate-wasm-builder-runner" }

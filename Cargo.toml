@@ -3,12 +3,15 @@ members = [
 	"modules/edge-signaling",
 	"modules/edge-voting",
 	"modules/edge-treasury-reward",
+	"modules/chainbridge",
+	"modules/edge-chainbridge",
 	"node/cli",
 	"node/executor",
 	"node/primitives",
 	"node/rpc",
 	"node/rpc-client",
 	"node/runtime",
+	"node/runtime-interface",
 	"node/testing",
 ]
 

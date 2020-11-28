@@ -89,8 +89,6 @@ use impls::{Author};
 pub mod constants;
 use constants::{currency::*, time::*};
 use sp_runtime::generic::Era;
-/// Weights for pallets used in the runtime.
-mod weights;
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
@@ -852,7 +850,7 @@ impl pallet_contracts::Trait for Runtime {
 	type MaxDepth = pallet_contracts::DefaultMaxDepth;
 	type MaxValueSize = pallet_contracts::DefaultMaxValueSize;
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
-	type WeightInfo = weights::pallet_contracts::WeightInfo<Self>;
+	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Runtime>;
 }
 
 impl pallet_assets::Trait for Runtime {
@@ -870,7 +868,7 @@ impl voting::Trait for Runtime {
 	type Event = Event;
 	type MaxVotersPerProposal = MaxVotersPerProposal;
 	type MaxOutcomes = MaxOutcomes;
-	type WeightInfo = weights::voting::WeightInfo<Runtime>;
+	type WeightInfo = voting::default_weight::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -885,7 +883,7 @@ impl signaling::Trait for Runtime {
 	type MaxSignalingProposals = MaxSignalingProposals;
 	type MaxTitleLength = MaxTitleLength;
 	type MaxContentsLength = MaxContentsLength;
-	type WeightInfo = weights::signaling::WeightInfo<Runtime>;
+	type WeightInfo = signaling::default_weight::SubstrateWeight<Runtime>;
 }
 
 impl treasury_reward::Trait for Runtime {
@@ -909,7 +907,6 @@ impl chainbridge::Trait for Runtime {
     type Proposal = Call;
     type ChainId = ChainId;
     type ProposalLifetime = ProposalLifetime;
-    type WeightInfo = ();
 }
 
 parameter_types! {
@@ -921,7 +918,6 @@ impl edge_chainbridge::Trait for Runtime {
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
     type Currency = Balances;
     type NativeTokenId = NativeTokenId;
-	type WeightInfo = ();
 }
 
 construct_runtime!(

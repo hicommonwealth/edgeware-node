@@ -709,7 +709,7 @@ dependencies = [
 
 [[package]]
 name = "chainbridge"
-version = "0.0.2"
+version = "1.0.0"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -1417,7 +1417,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-cli"
-version = "3.1.1"
+version = "3.2.0"
 dependencies = [
  "assert_cmd",
  "edgeware-executor",
@@ -1493,7 +1493,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-executor"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "criterion",
  "edgeware-primitives",
@@ -1524,7 +1524,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-inspect"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "derive_more",
  "log",
@@ -1540,7 +1540,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-primitives"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
@@ -1553,7 +1553,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-rpc"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "edgeware-primitives",
  "edgeware-runtime",
@@ -1581,7 +1581,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-rpc-client"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "edgeware-primitives",
  "futures 0.1.30",
@@ -1594,7 +1594,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "3.1.1"
+version = "3.2.0"
 dependencies = [
  "chainbridge",
  "edge-chainbridge",
@@ -1667,7 +1667,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime-interface"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "edgeware-primitives",
  "parity-scale-codec",
@@ -1678,7 +1678,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-testing"
-version = "3.1.0"
+version = "3.2.0"
 dependencies = [
  "edge-signaling",
  "edge-treasury-reward",

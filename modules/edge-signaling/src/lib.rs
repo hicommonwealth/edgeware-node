@@ -17,7 +17,7 @@
 #![recursion_limit="128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-mod default_weight;
+pub mod default_weight;
 
 #[cfg(test)]
 mod tests;

@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "3.1.1"
+version = "3.2.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
@@ -165,5 +165,6 @@ runtime-benchmarks = [
 	"frame-system-benchmarking",
 	"hex-literal",
 	"signaling/runtime-benchmarks",
-	"voting/runtime-benchmarks"
+	"voting/runtime-benchmarks",
+	"chainbridge/runtime-benchmarks",
 ]

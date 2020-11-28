@@ -1,6 +1,6 @@
 [package]
 name = 'chainbridge'
-version = '0.0.2'
+version = '1.0.0'
 authors = ['david@chainsafe.io']
 edition = '2018'
 
@@ -24,6 +24,7 @@ pallet-balances = { git = "https://github.com/paritytech/substrate.git", default
 [build-dependencies]
 wasm-builder-runner = { git = "https://github.com/paritytech/substrate.git", package = "substrate-wasm-builder-runner"}
 [features]
+
 default = ["std"]
 std = [
 	"codec/std",
