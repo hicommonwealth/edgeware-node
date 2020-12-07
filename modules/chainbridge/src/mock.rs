@@ -11,7 +11,7 @@ use sp_runtime::{
 	Perbill,
 };
 
-use crate::{self as bridge, Trait};
+use crate::{self as bridge, Config};
 pub use pallet_balances as balances;
 
 parameter_types! {
@@ -22,7 +22,7 @@ parameter_types! {
 	pub const MaxLocks: u32 = 100;
 }
 
-impl frame_system::Trait for Test {
+impl frame_system::Config for Test {
 	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Call = Call;
@@ -58,7 +58,7 @@ ord_parameter_types! {
 	pub const One: u64 = 1;
 }
 
-impl pallet_balances::Trait for Test {
+impl pallet_balances::Config for Test {
 	type Balance = u64;
 	type DustRemoval = ();
 	type Event = Event;
@@ -73,7 +73,7 @@ parameter_types! {
 	pub const ProposalLifetime: u64 = 50;
 }
 
-impl Trait for Test {
+impl Config for Test {
 	type Event = Event;
 	type AdminOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type Proposal = Call;

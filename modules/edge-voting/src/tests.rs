@@ -25,7 +25,7 @@ use frame_support::{
 };
 
 use super::*;
-use crate::{Trait, Module, VoteType, TallyType};
+use crate::{Config, Module, VoteType, TallyType};
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
@@ -44,7 +44,7 @@ parameter_types! {
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 
-impl frame_system::Trait for Test {
+impl frame_system::Config for Test {
 	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Index = u64;
@@ -76,7 +76,7 @@ parameter_types! {
 	pub const MaxVotersPerProposal: u32 = 5;
 	pub const MaxOutcomes: u32 = 6;
 }
-impl Trait for Test {
+impl Config for Test {
 	type Event = ();
 	type MaxVotersPerProposal = MaxVotersPerProposal;
 	type MaxOutcomes = MaxOutcomes;
@@ -290,7 +290,7 @@ fn create_multi_vote_too_many_outcomes_should_not_work() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
 		let public = get_test_key();
-		// MaxOutcomes declared as 6 in Trait above
+		// MaxOutcomes declared as 6 in Config above
 		let outcomes = [
 			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
 			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
@@ -601,7 +601,7 @@ fn commits_after_max_voters_should_not_work() {
 		let vote = generate_1p1v_commit_reveal_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_ok!(advance_stage(1));
-		for i in 0 .. <Test as Trait>::MaxVotersPerProposal::get() {
+		for i in 0 .. <Test as Config>::MaxVotersPerProposal::get() {
 			let key = get_test_key_n((i + 2) as u64);
 			let secret = SECRET;
 			let mut buf = Vec::new();
@@ -631,7 +631,7 @@ fn reveal_after_max_voters_should_not_work() {
 		let vote = generate_1p1v_public_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_ok!(advance_stage(1));
-		for i in 0 .. <Test as Trait>::MaxVotersPerProposal::get() {
+		for i in 0 .. <Test as Config>::MaxVotersPerProposal::get() {
 			let key = get_test_key_n((i + 2) as u64);
 			assert_ok!(reveal(key, 1, vec![vote.3[0]], Some(vote.3[0])));
 		}
@@ -714,13 +714,13 @@ fn change_voting_scheme_migration() {
 		use sp_std::prelude::*;
 		use frame_support::{decl_module, decl_storage};
 
-		use crate::{Trait, OldVoteRecord};
+		use crate::{Config, OldVoteRecord};
 
 		decl_module! {
-			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
+			pub struct Module<T: Config> for enum Call where origin: T::Origin { }
 		}
 		decl_storage! {
-			trait Store for Module<T: Trait> as Voting {
+			trait Store for Module<T: Config> as Voting {
 				pub VoteRecords get(fn vote_records): map hasher(twox_64_concat)
 					u64 => Option<OldVoteRecord<T::AccountId>>;
 			}

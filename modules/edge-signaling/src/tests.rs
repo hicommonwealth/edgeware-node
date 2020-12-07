@@ -26,7 +26,7 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	testing::{Header}
 };
-pub use crate::{Event, Module, RawEvent, Trait, GenesisConfig};
+pub use crate::{Event, Module, RawEvent, Config, GenesisConfig};
 use voting::{VoteOutcome, TallyType, VoteStage, VoteType, VotingScheme};
 
 impl_outer_origin! {
@@ -47,7 +47,7 @@ parameter_types! {
 type AccountId = u64;
 type BlockNumber = u64;
 
-impl frame_system::Trait for Test {
+impl frame_system::Config for Test {
 	type BaseCallFilter = ();
 	type Origin = Origin;
 	type Index = u64;
@@ -79,7 +79,7 @@ parameter_types! {
 	pub const ExistentialDeposit: u128 = 1;
 }
 
-impl pallet_balances::Trait for Test {
+impl pallet_balances::Config for Test {
 	type Balance = u128;
 	type Event = ();
 	type DustRemoval = ();
@@ -93,7 +93,7 @@ parameter_types! {
 	pub const MaxVotersPerProposal: u32 = 5;
 	pub const MaxOutcomes: u32 = 8;
 }
-impl voting::Trait for Test {
+impl voting::Config for Test {
 	type Event = ();
 	type MaxVotersPerProposal = MaxVotersPerProposal;
 	type MaxOutcomes = MaxOutcomes;
@@ -105,7 +105,7 @@ parameter_types! {
 	pub const MaxTitleLength: u32 = 128;
 	pub const MaxContentsLength: u32 = 128;
 }
-impl Trait for Test {
+impl Config for Test {
 	type Event = ();
 	type Currency = pallet_balances::Module<Self>;
 	type MaxSignalingProposals = MaxSignalingProposals;
@@ -331,7 +331,7 @@ fn propose_too_long_should_fail() {
 		System::set_block_number(1);
 		let public = get_test_key();
 		let (title, _) = generate_proposal();
-		let proposal = vec![1; (<Test as Trait>::MaxContentsLength::get() + 1) as usize];
+		let proposal = vec![1; (<Test as Config>::MaxContentsLength::get() + 1) as usize];
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
@@ -351,7 +351,7 @@ fn propose_too_long_title_should_fail() {
 		let public = get_test_key();
 		let (_, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
-		let title = vec![1; (<Test as Trait>::MaxTitleLength::get() + 1) as usize];
+		let title = vec![1; (<Test as Config>::MaxTitleLength::get() + 1) as usize];
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
 			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
@@ -370,7 +370,7 @@ fn propose_with_too_many_existing_proposals_should_fail() {
 		let public = get_test_key();
 		let (title, proposal) = generate_proposal();
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		for i in 0 .. <Test as Trait>::MaxSignalingProposals::get() {
+		for i in 0 .. <Test as Config>::MaxSignalingProposals::get() {
 			assert_ok!(propose(public, title, &i.to_le_bytes(), outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		}
 		assert_err!(
@@ -766,13 +766,13 @@ fn change_hasher_migration() {
 		use sp_std::prelude::*;
 		use frame_support::{decl_module, decl_storage};
 
-		use crate::{Trait, ProposalRecord};
+		use crate::{Config, ProposalRecord};
 
 		decl_module! {
-			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
+			pub struct Module<T: Config> for enum Call where origin: T::Origin { }
 		}
 		decl_storage! {
-			trait Store for Module<T: Trait> as Signaling {
+			trait Store for Module<T: Config> as Signaling {
 				pub ProposalOf get(fn proposal_of): map hasher(opaque_blake2_256) 
 					T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
 			}

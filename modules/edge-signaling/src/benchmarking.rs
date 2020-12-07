@@ -31,7 +31,7 @@ const NO_VOTE: voting::VoteOutcome = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 const MAX_PROPOSALS: u32 = 99;
 const MAX_BYTES: u32 = 16_384;
 
-fn funded_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
+fn funded_account<T: Config>(name: &'static str, index: u32) -> T::AccountId {
 	let caller: T::AccountId = account(name, index, SEED);
 	T::Currency::make_free_balance_be(&caller, BalanceOf::<T>::max_value());
 	caller
@@ -51,7 +51,7 @@ benchmarks! {
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
-		let origin: <T as frame_system::Trait>::Origin = RawOrigin::Signed(proposer.clone()).into();
+		let origin: <T as frame_system::Config>::Origin = RawOrigin::Signed(proposer.clone()).into();
 
 		let title: &[u8] = b"Edgeware";
 
@@ -86,7 +86,7 @@ benchmarks! {
 
 		let proposer = funded_account::<T>("proposer", 0);
 		whitelist_account!(proposer);
-		let origin: <T as frame_system::Trait>::Origin = RawOrigin::Signed(proposer.clone()).into();
+		let origin: <T as frame_system::Config>::Origin = RawOrigin::Signed(proposer.clone()).into();
 
 		let title: &[u8] = b"Edgeware";
 
