@@ -33,6 +33,7 @@ use frame_support::{
 	},
 	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier, U128CurrencyToVote},
 };
+use orml_traits::parameter_type_with_key;
 
 use frame_system::{EnsureRoot, EnsureOneOf};
 use frame_support::traits::InstanceFilter;
@@ -60,7 +61,7 @@ use sp_runtime::{
 pub use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
-	ConvertInto, OpaqueKeys, NumberFor, Saturating,
+	ConvertInto, OpaqueKeys, NumberFor, Saturating, AccountIdConversion,
 };
 pub use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource, TransactionPriority};
 
@@ -856,22 +857,6 @@ impl pallet_contracts::Config for Runtime {
 }
 
 parameter_types! {
-	pub const AssetDepositBase: Balance = 100 * DOLLARS;
-	pub const AssetDepositPerZombie: Balance = 1 * DOLLARS;
-}
-
-impl pallet_assets::Config for Runtime {
-	type Event = Event;
-	type Balance = u64;
-	type AssetId = u32;
-	type Currency = Balances;
-	type ForceOrigin = EnsureRoot<AccountId>;
-	type AssetDepositBase = AssetDepositBase;
-	type AssetDepositPerZombie = AssetDepositPerZombie;
-	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
-}
-
-parameter_types! {
 	pub const MaxVotersPerProposal: u32 = 256;
 	pub const MaxOutcomes: u32 = 16;
 }
@@ -923,6 +908,9 @@ impl chainbridge::Config for Runtime {
 
 parameter_types! {
     pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"EDG"));
+    pub NativeBridgedTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(2, &blake2_128(b"ETH"));
+    pub const NativeTransferFee: Balance = 1 * DOLLARS;
+    pub const BridgedAssetTransferFee: Balance = 1 * DOLLARS;
 }
 
 impl edge_chainbridge::Config for Runtime {
@@ -930,6 +918,34 @@ impl edge_chainbridge::Config for Runtime {
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
     type Currency = Balances;
     type NativeTokenId = NativeTokenId;
+    type NativeTransferFee = NativeTransferFee;
+    type BridgedAssetTransferFee = BridgedAssetTransferFee;
+}
+
+parameter_type_with_key! {
+	pub ExistentialDeposits: |currency_id: CurrencyId| -> Balance {
+		match currency_id {
+			&BTC => 1,
+			&DOT => 2,
+			_ => 0,
+		}
+	};
+}
+
+parameter_types! {
+	pub TreasuryModuleAccount: AccountId = TreasuryModuleId::get().into_account();
+}
+
+pub type CurrencyId = u32;
+
+impl orml_tokens::Config for Runtime {
+	type Event = Event;
+	type Balance = Balance;
+	type Amount = i64;
+	type CurrencyId = CurrencyId;
+	type WeightInfo = ();
+	type ExistentialDeposits = ExistentialDeposits;
+	type OnDust = orml_tokens::TransferDust<Runtime, TreasuryModuleAccount>;
 }
 
 construct_runtime!(
@@ -970,7 +986,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
-		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
+		Tokens: orml_tokens::{Module, Call, Storage, Event<T>},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

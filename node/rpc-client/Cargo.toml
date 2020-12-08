@@ -10,5 +10,5 @@ hyper = "0.12.35"
 jsonrpc-core-client = { version = "15.0.0", default-features = false, features = ["http"] }
 log = "0.4.8"
 edgeware-primitives = { path = "../primitives" }
-sp-tracing = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git"}
-sc-rpc = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git"}
+sp-tracing = { version = "2.0.0" }
+sc-rpc = { version = "2.0.0" }
