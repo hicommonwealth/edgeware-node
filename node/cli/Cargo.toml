@@ -84,6 +84,7 @@ pallet-im-online = { version = "2.0.0", default-features = false, git = "https:/
 pallet-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 pallet-staking = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 pallet-grandpa = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+pallet-evm = { path = "../../vendor/frontier/frame/evm" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
