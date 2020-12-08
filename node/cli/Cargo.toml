@@ -84,6 +84,7 @@ pallet-im-online = { version = "2.0.0", default-features = false }
 pallet-authority-discovery = { version = "2.0.0" }
 pallet-staking = { version = "2.0.0" }
 pallet-grandpa = { version = "2.0.0" }
+pallet-evm = { path = "../../vendor/frontier/frame/evm" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
