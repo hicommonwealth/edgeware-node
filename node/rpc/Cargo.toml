@@ -9,6 +9,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 jsonrpc-core = "15.0.0"
+jsonrpc-pubsub = "15.0.0"
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 pallet-contracts-rpc = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
@@ -20,6 +21,7 @@ sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/paritytech/
 sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
 sc-finality-grandpa-rpc = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
 sc-keystore = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+sc-network = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
 sc-rpc-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate.git" }
 sc-rpc = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 sp-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
