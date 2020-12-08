@@ -107,7 +107,7 @@ pub fn sign(
 				.into();
 			UncheckedExtrinsic {
 				signature: Some((
-					pallet_indices::address::Address::Id(signed),
+					sp_runtime::MultiAddress::Id(signed),
 					signature,
 					extra,
 				)),

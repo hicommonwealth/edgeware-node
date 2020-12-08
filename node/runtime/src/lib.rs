@@ -831,6 +831,10 @@ parameter_types! {
 	pub const RentByteFee: Balance = 1 * MILLICENTS;
 	pub const RentDepositOffset: Balance = 100 * MILLICENTS;
 	pub const SurchargeReward: Balance = 15 * MILLICENTS;
+	pub const SignedClaimHandicap: u32 = 2;
+	pub const MaxDepth: u32 = 32;
+	pub const StorageSizeOffset: u32 = 8;
+	pub const MaxValueSize: u32 = 16 * 1024;
 }
 
 impl pallet_contracts::Config for Runtime {
@@ -838,25 +842,33 @@ impl pallet_contracts::Config for Runtime {
 	type Randomness = RandomnessCollectiveFlip;
 	type Currency = Balances;
 	type Event = Event;
-	type DetermineContractAddress = pallet_contracts::SimpleAddressDeterminer<Runtime>;
-	type TrieIdGenerator = pallet_contracts::TrieIdFromParentCounter<Runtime>;
 	type RentPayment = ();
-	type SignedClaimHandicap = pallet_contracts::DefaultSignedClaimHandicap;
+	type SignedClaimHandicap = SignedClaimHandicap;
 	type TombstoneDeposit = TombstoneDeposit;
-	type StorageSizeOffset = pallet_contracts::DefaultStorageSizeOffset;
+	type StorageSizeOffset = StorageSizeOffset;
 	type RentByteFee = RentByteFee;
 	type RentDepositOffset = RentDepositOffset;
 	type SurchargeReward = SurchargeReward;
-	type MaxDepth = pallet_contracts::DefaultMaxDepth;
-	type MaxValueSize = pallet_contracts::DefaultMaxValueSize;
+	type MaxDepth = MaxDepth;
+	type MaxValueSize = MaxValueSize;
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
 	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Runtime>;
 }
 
+parameter_types! {
+	pub const AssetDepositBase: Balance = 100 * DOLLARS;
+	pub const AssetDepositPerZombie: Balance = 1 * DOLLARS;
+}
+
 impl pallet_assets::Config for Runtime {
 	type Event = Event;
-	type Balance = Balance;
-	type AssetId = Nonce;
+	type Balance = u64;
+	type AssetId = u32;
+	type Currency = Balances;
+	type ForceOrigin = EnsureRoot<AccountId>;
+	type AssetDepositBase = AssetDepositBase;
+	type AssetDepositPerZombie = AssetDepositPerZombie;
+	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
