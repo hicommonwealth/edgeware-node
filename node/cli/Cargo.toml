@@ -41,7 +41,7 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { version = "2.0.0",   git = "https://github.com/paritytech/substrate.git" }
+sp-authority-discovery = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 sp-blockchain = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 sp-consensus-aura = { version = "0.8.0",  git = "https://github.com/paritytech/substrate.git" }
 sp-finality-grandpa = { version = "2.0.0",  git = "https://github.com/paritytech/substrate.git" }
@@ -95,6 +95,7 @@ edgeware-executor = { path = "../executor" }
 sc-cli = { version = "0.8.0", optional = true, git = "https://github.com/paritytech/substrate.git" }
 frame-benchmarking-cli = { version = "2.0.0", optional = true, git = "https://github.com/paritytech/substrate.git" }
 edgeware-inspect = { optional = true, path = "../inspect" }
+fc-consensus = { version = "0.1.0", path = "../../vendor/frontier/client/consensus" }
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }

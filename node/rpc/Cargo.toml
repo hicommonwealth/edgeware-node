@@ -30,3 +30,7 @@ sp-consensus-babe = { version = "0.8.0", git = "https://github.com/paritytech/su
 sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 sp-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
 substrate-frame-rpc-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate.git" }
+
+pallet-ethereum = { version = "0.1.0", path = "../../vendor/frontier/frame/ethereum" }
+fc-rpc = { version = "0.1.0", path = "../../vendor/frontier/client/rpc" }
+fp-rpc = { version = "0.1.0", path = "../../vendor/frontier/primitives/rpc" }
