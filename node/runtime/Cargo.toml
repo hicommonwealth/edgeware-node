@@ -18,6 +18,7 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
+evm = { version = "0.19.0", default-features = false, features = ["with-codec"] }
 
 # primitives
 sp-application-crypto = { version = "2.0.0", default-features = false }
@@ -85,6 +86,10 @@ edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features =
 chainbridge = { path = "../../modules/chainbridge", default-features = false }
 orml-tokens = { git = "https://github.com/open-web3-stack/open-runtime-module-library", rev = "f69c13bf90cc007b553ce228108ad822c33f8459", default-features = false }
 orml-traits = { git = "https://github.com/open-web3-stack/open-runtime-module-library", rev = "f69c13bf90cc007b553ce228108ad822c33f8459", default-features = false }
+
+fp-rpc = { path = "../../vendor/frontier/primitives/rpc", default-features = false }
+pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-features = false }
+pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
@@ -161,6 +166,9 @@ std = [
 	"chainbridge/std",
 	"orml-tokens/std",
 	"orml-traits/std",
+	"fp-rpc/std",
+	"pallet-ethereum/std",
+	"evm/std",
 ]
 
 runtime-benchmarks = [
