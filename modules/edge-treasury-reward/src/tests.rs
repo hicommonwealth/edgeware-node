@@ -14,15 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+use sp_runtime::traits::BlakeTwo256;
 use pallet_staking::EraIndex;
 use super::*;
 use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::testing::{UintAuthorityId, TestXt};
 use sp_staking::{SessionIndex};
 use frame_support::{
-	impl_outer_origin, parameter_types, impl_outer_dispatch,
+	impl_outer_origin, parameter_types, impl_outer_dispatch, impl_outer_event,
 	traits::{Get, FindAuthor, OnFinalize},
-	weights::{Weight, constants::RocksDbWeight},
+	weights::{Weight},
 };
 #[cfg(feature = "std")]
 use std::{collections::HashSet, cell::RefCell};
@@ -171,18 +172,18 @@ impl frame_system::Config for Test {
 	type DbWeight = ();
 	type Origin = Origin;
 	type Index = u64;
-	type Call = ();
+	type Call = Call;
 	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = Event;
+	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
 	type PalletInfo = ();
-	type AccountData = pallet_balances::AccountData<u64>;
+	type AccountData = pallet_balances::AccountData<Balance>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
@@ -285,7 +286,8 @@ impl pallet_staking::Config for Test {
 	type WeightInfo = ();
 }
 
-impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test where
+impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test
+where
 	Call: From<LocalCall>,
 {
 	type OverarchingCall = Call;

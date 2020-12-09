@@ -16,14 +16,12 @@ type ResourceId = chainbridge::ResourceId;
 type BalanceOf<T> =
 	<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
-pub trait Config: pallet_assets::Config + chainbridge::Config {
+pub trait Config: pallet_balances::Config + chainbridge::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 	/// Specifies the origin check provided by the bridge for calls that can only be called by the bridge pallet
 	type BridgeOrigin: EnsureOrigin<Self::Origin, Success = Self::AccountId>;
-
 	/// The currency mechanism.
 	type Currency: Currency<Self::AccountId>;
-
 	/// Ids can be defined by the runtime and passed in, perhaps from blake2b_128 hashes.
 	type NativeTokenId: Get<ResourceId>;
 
@@ -32,9 +30,10 @@ pub trait Config: pallet_assets::Config + chainbridge::Config {
 
 decl_event! {
 	pub enum Event<T> where
-		<T as frame_system::Config>::Hash,
+		<T as frame_system::Config>::AccountId,
+		<T as pallet_balances::Config>::Balance,
 	{
-		Remark(Hash),
+		TransferNative(AccountId, Balance),
 	}
 }
 

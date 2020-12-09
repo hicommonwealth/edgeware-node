@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::*;
 use sp_runtime::{
 	Perbill,
 	testing::Header,
@@ -21,11 +22,8 @@ use sp_runtime::{
 };
 use sp_core::H256;
 use frame_support::{
-	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
+	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight, impl_outer_event
 };
-
-use super::*;
-use crate::{Config, Module, VoteType, TallyType};
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
@@ -58,7 +56,7 @@ impl frame_system::Config for Test {
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = Event;
+	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
 	type PalletInfo = ();
@@ -701,59 +699,5 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 		assert_ok!(commit(public, 1, hash.into()));
 		assert_ok!(advance_stage(1));
 		assert_ok!(reveal(public, 1, vote.3.to_vec(), Some(SECRET)));
-	});
-}
-
-#[test]
-fn change_voting_scheme_migration() {
-	mod deprecated {
-		use sp_std::prelude::*;
-		use frame_support::{decl_module, decl_storage};
-
-		use crate::{Config, OldVoteRecord};
-
-		decl_module! {
-			pub struct Module<T: Config> for enum Call where origin: T::Origin { }
-		}
-		decl_storage! {
-			trait Store for Module<T: Config> as Voting {
-				pub VoteRecords get(fn vote_records): map hasher(twox_64_concat)
-					u64 => Option<OldVoteRecord<T::AccountId>>;
-			}
-		}
-	}
-
-	new_test_ext().execute_with(|| {
-		System::set_block_number(1);
-		// build vote record
-		let public = get_test_key();
-		let yes_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-		let no_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-		let outcomes = vec![yes_vote, no_vote];
-		let id = VoteRecordCount::get() + 1;
-		let record = OldVoteRecord {
-			id: id,
-			commitments: vec![],
-			reveals: vec![],
-			outcomes: outcomes,
-			data: OldVoteData {
-				initiator: public.clone(),
-				stage: VoteStage::PreVoting,
-				vote_type: VoteType::Binary,
-				tally_type: TallyType::OneCoin,
-				is_commit_reveal: false,
-			},
-		};
-
-		// insert the record with the old hasher
-		deprecated::VoteRecords::<Test>::insert(id, &record);
-		VoteRecordCount::mutate(|i| *i += 1);
-
-		// do the migration
-		crate::migration::migrate::<Test>();
-		let maybe_vote = Voting::vote_records(id);
-		// check that it was successfull
-		assert!(maybe_vote.is_some());
-		assert_eq!(maybe_vote.unwrap().data.voting_scheme, VotingScheme::Simple);
 	});
 }

@@ -30,7 +30,7 @@ impl frame_system::Config for Test {
 	type DbWeight = ();
 	type Origin = Origin;
 	type Index = u64;
-	type Call = ();
+	type Call = Call;
 	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
@@ -79,7 +79,11 @@ impl chainbridge::Config for Test {
 }
 
 parameter_types! {
-	pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"DAV"));
+	pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"EDG"));
+}
+
+parameter_types! {
+	pub const NativeTransferFee: u64 = 1;
 }
 
 impl Config for Test {
@@ -87,6 +91,7 @@ impl Config for Test {
 	type BridgeOrigin = chainbridge::EnsureBridge<Test>;
 	type Currency = Balances;
 	type NativeTokenId = NativeTokenId;
+	type NativeTransferFee = NativeTransferFee;
 }
 
 pub type Block = sp_runtime::generic::Block<Header, UncheckedExtrinsic>;
@@ -98,10 +103,10 @@ frame_support::construct_runtime!(
 		NodeBlock = Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: system::{Module, Call, Event<T>},
+		System: frame_system::{Module, Call, Config, Storage, Event<T>},
 		Balances: balances::{Module, Call, Storage, Config<T>, Event<T>},
 		Bridge: chainbridge::{Module, Call, Storage, Event<T>},
-		Example: example::{Module, Call, Event<T>}
+        Example: example::{Module, Call, Event<T>}
 	}
 );
 

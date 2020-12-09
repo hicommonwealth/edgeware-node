@@ -44,9 +44,6 @@ parameter_types! {
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 
-type AccountId = u64;
-type BlockNumber = u64;
-
 impl frame_system::Config for Test {
 	type BaseCallFilter = ();
 	type BlockWeights = ();
@@ -61,11 +58,11 @@ impl frame_system::Config for Test {
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = Event;
+	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
 	type PalletInfo = ();
-	type AccountData = pallet_balances::AccountData<u64>;
+	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
@@ -76,13 +73,13 @@ parameter_types! {
 }
 
 impl pallet_balances::Config for Test {
+	type MaxLocks = ();
 	type Balance = u128;
 	type Event = ();
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
-	type AccountStore = frame_system::Module<Test>;
+	type AccountStore = System;
 	type WeightInfo = ();
-	type MaxLocks = ();
 }
 
 parameter_types! {
@@ -753,66 +750,5 @@ fn propose_multichoice_should_work() {
 				..make_record(public, title2, proposal2)
 			})
 		);
-	});
-}
-
-#[test]
-fn change_hasher_migration() {
-	mod deprecated {
-		use sp_std::prelude::*;
-		use frame_support::{decl_module, decl_storage};
-
-		use crate::{Config, ProposalRecord};
-
-		decl_module! {
-			pub struct Module<T: Config> for enum Call where origin: T::Origin { }
-		}
-		decl_storage! {
-			trait Store for Module<T: Config> as Signaling {
-				pub ProposalOf get(fn proposal_of): map hasher(opaque_blake2_256) 
-					T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
-			}
-		}
-	}
-
-	new_test_ext().execute_with(|| {
-		System::set_block_number(1);
-		// build proposal, vote and record
-		let public = get_test_key();
-		let (title, proposal) = generate_proposal();
-		let hash = build_proposal_hash(public, &proposal);
-		let outcomes = vec![YES_VOTE, NO_VOTE];
-		let index = ProposalCount::get();
-		let vote_id = Voting::create_vote(
-			public.clone(),
-			VoteType::Binary,
-			VotingScheme::Simple,
-			TallyType::OneCoin,
-			outcomes,
-		).expect("Voting::create_vote failed");
-		let transition_time = System::block_number() + Signaling::voting_length();
-		let record = ProposalRecord {
-			index: index,
-			author: public.clone(),
-			stage: VoteStage::PreVoting,
-			transition_time: transition_time,
-			title: title.to_vec(),
-			contents: proposal.to_vec(),
-			vote_id: vote_id,
-		};
-		// insert the record with the old hasher
-		deprecated::ProposalOf::<Test>::insert(hash, &record);
-		InactiveProposals::<Test>::mutate(|proposals| proposals.push((hash, transition_time)));
-		assert!(
-			Signaling::proposal_of(hash).is_none(),
-			"proposal should not (yet) be available with the new hasher"
-		);
-		// do the migration
-		crate::migration::migrate::<Test>();
-		let maybe_prop = Signaling::proposal_of(hash);
-		// check that it was successfull
-		assert!(maybe_prop.is_some());
-		let prop = maybe_prop.unwrap();
-		assert_eq!(prop, record);
 	});
 }

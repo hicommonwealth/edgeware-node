@@ -19,7 +19,6 @@ sp-arithmetic = { version = "2.0.0", default-features = false }
 # frame dependencies
 frame-support = { version = "2.0.0", default-features = false }
 frame-system = { version = "2.0.0", default-features = false }
-pallet-assets = { version = "2.0.0", default-features = false }
 pallet-balances = { version = "2.0.0", default-features = false }
 
 chainbridge = { path = "../chainbridge", default-features = false, features = ["runtime-benchmarks"] }
@@ -36,7 +35,6 @@ std = [
 	"sp-arithmetic/std",
 	"frame-support/std",
 	"frame-system/std",
-	"pallet-assets/std",
 	"pallet-balances/std",
 	"chainbridge/std",
 ]
