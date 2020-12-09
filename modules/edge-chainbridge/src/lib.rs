@@ -31,9 +31,10 @@ pub trait Config: pallet_balances::Config + chainbridge::Config {
 decl_event! {
 	pub enum Event<T> where
 		<T as frame_system::Config>::AccountId,
-		<T as pallet_balances::Config>::Balance,
+		Balance = BalanceOf<T>,
 	{
-		TransferNative(AccountId, Balance),
+		/// A bridge transfer event from an Edgeware account to a destination account
+		TransferOverBridge(AccountId, Vec<u8>, chainbridge::ChainId, Balance),
 	}
 }
 
@@ -62,6 +63,7 @@ decl_module! {
 			<T as Config>::Currency::transfer(&source, &bridge_id, amount.into(), AllowDeath)?;
 
 			let resource_id = T::NativeTokenId::get();
+			Self::deposit_event(RawEvent::TransferOverBridge(source, recipient.clone(), dest_id, amount.clone()));
 			<chainbridge::Module<T>>::transfer_fungible(dest_id, resource_id, recipient, U256::from(amount.saturated_into::<u128>()))
 		}
 
