@@ -41,12 +41,12 @@ const MAX_VOTERS: u32 = 256;
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
-fn get_account<T: Trait>(name: &'static str, index: u32) -> T::AccountId {
+fn get_account<T: Config>(name: &'static str, index: u32) -> T::AccountId {
 	let caller: T::AccountId = account(name, index, SEED);
 	caller
 }
 
-fn encode_ranked_vote<T: Trait>(voter: T::AccountId) -> VoteOutcome {
+fn encode_ranked_vote<T: Config>(voter: T::AccountId) -> VoteOutcome {
 	// create hash to commit
 	let mut buf = vec![];
 	buf.extend_from_slice(&voter.encode());
@@ -57,7 +57,7 @@ fn encode_ranked_vote<T: Trait>(voter: T::AccountId) -> VoteOutcome {
 	BlakeTwo256::hash_of(&buf).into()
 }
 
-fn add_commit_reveal_ranked_vote<T: Trait>(n: u32) -> Result<u64, &'static str> {
+fn add_commit_reveal_ranked_vote<T: Config>(n: u32) -> Result<u64, &'static str> {
 	let other = get_account::<T>("proposer", n);
 	let id = Voting::<T>::create_vote(
 		other, VoteType::RankedChoice, VotingScheme::CommitReveal, TallyType::OneCoin, MULTI_OUTCOMES.to_vec(),

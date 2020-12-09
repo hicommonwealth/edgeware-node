@@ -51,16 +51,16 @@ pub struct ProposalRecord<AccountId, Moment> {
 
 pub type ProposalTitle = Vec<u8>;
 pub type ProposalContents = Vec<u8>;
-type BalanceOf<T> = <<T as Trait>::Currency as Currency<<T as frame_system::Trait>::AccountId>>::Balance;
+type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
 pub trait WeightInfo {
 	fn create_proposal(p: u32, b: u32, ) -> Weight;
 	fn advance_proposal(p: u32, ) -> Weight;
 }
 
-pub trait Trait: voting::Trait + pallet_balances::Trait {
+pub trait Config: voting::Config + pallet_balances::Config {
 	/// The overarching event type
-	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 
 	/// The account balance.
 	type Currency: Currency<Self::AccountId> + ReservableCurrency<Self::AccountId>;
@@ -79,7 +79,7 @@ pub trait Trait: voting::Trait + pallet_balances::Trait {
 }
 
 decl_storage! {
-	trait Store for Module<T: Trait> as Signaling {
+	trait Store for Module<T: Config> as Signaling {
 		/// The total number of proposals created thus far.
 		pub ProposalCount get(fn proposal_count) : u32;
 		/// A list of all extant proposals.
@@ -98,9 +98,9 @@ decl_storage! {
 }
 
 decl_event!(
-	pub enum Event<T> where <T as frame_system::Trait>::Hash,
-							<T as frame_system::Trait>::AccountId,
-							<T as frame_system::Trait>::BlockNumber {
+	pub enum Event<T> where <T as frame_system::Config>::Hash,
+							<T as frame_system::Config>::AccountId,
+							<T as frame_system::Config>::BlockNumber {
 		/// Emitted at proposal creation: (Creator, ProposalHash)
 		NewProposal(AccountId, Hash),
 		/// Emitted when commit stage begins: (ProposalHash, VoteId, CommitEndTime)
@@ -113,7 +113,7 @@ decl_event!(
 );
 
 decl_error! {
-	pub enum Error for Module<T: Trait> {
+	pub enum Error for Module<T: Config> {
 		/// Corresponding voting for signaling proposal not found
 		VoteRecordDoesntExist,
 		/// Empty title of proposal
@@ -140,7 +140,7 @@ decl_error! {
 }
 
 decl_module! {
-	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+	pub struct Module<T: Config> for enum Call where origin: T::Origin {
 		/// Maxmimum number of proposals allowed on chain.
 		const MaxSignalingProposals: u32 = T::MaxSignalingProposals::get();
 
@@ -153,13 +153,8 @@ decl_module! {
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
-		fn on_runtime_upgrade() -> Weight {
-			migration::migrate::<T>();
-			T::MaximumBlockWeight::get()
-		}
-
 		/// Creates a new signaling proposal.
-		#[weight = <T as Trait>::WeightInfo::create_proposal(T::MaxSignalingProposals::get(), T::MaxContentsLength::get())]
+		#[weight = <T as Config>::WeightInfo::create_proposal(T::MaxSignalingProposals::get(), T::MaxContentsLength::get())]
 		pub fn create_proposal(
 			origin,
 			title: ProposalTitle,
@@ -216,7 +211,7 @@ decl_module! {
 
 		/// Advance a signaling proposal into the "voting" or "commit" stage.
 		/// Can only be performed by the original author of the proposal.
-		#[weight = <T as Trait>::WeightInfo::advance_proposal(T::MaxSignalingProposals::get())]
+		#[weight = <T as Config>::WeightInfo::advance_proposal(T::MaxSignalingProposals::get())]
 		pub fn advance_proposal(origin, proposal_hash: T::Hash) -> DispatchResult {
 			let _sender = ensure_signed(origin)?;
 			let record = <ProposalOf<T>>::get(&proposal_hash).ok_or(Error::<T>::ProposalMissing)?;
@@ -326,22 +321,6 @@ decl_module! {
 			<CompletedProposals<T>>::put(pending);
 			// put back singly, still_inactive, inactive proposals
 			<InactiveProposals<T>>::put(still_inactive);
-		}
-	}
-}
-
-mod migration {
-	use super::*;
-
-	pub fn migrate<T: Trait>() {
-		for (hash, _n) in InactiveProposals::<T>::get() {
-			ProposalOf::<T>::migrate_key_from_blake(hash);
-		}
-		for (hash, _n) in ActiveProposals::<T>::get() {
-			ProposalOf::<T>::migrate_key_from_blake(hash);
-		}
-		for (hash, _n) in CompletedProposals::<T>::get() {
-			ProposalOf::<T>::migrate_key_from_blake(hash);
 		}
 	}
 }

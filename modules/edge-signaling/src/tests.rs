@@ -26,7 +26,7 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	testing::{Header}
 };
-pub use crate::{Event, Module, RawEvent, Trait, GenesisConfig};
+pub use crate::{Event, Module, RawEvent, Config, GenesisConfig};
 use voting::{VoteOutcome, TallyType, VoteStage, VoteType, VotingScheme};
 
 impl_outer_origin! {
@@ -44,34 +44,27 @@ parameter_types! {
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 
-type AccountId = u64;
-type BlockNumber = u64;
-
-impl frame_system::Trait for Test {
+impl frame_system::Config for Test {
 	type BaseCallFilter = ();
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
 	type Origin = Origin;
 	type Index = u64;
-	type BlockNumber = BlockNumber;
 	type Call = ();
+	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
-	type AccountId = AccountId;
+	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = ();
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type PalletInfo = ();
 	type AccountData = pallet_balances::AccountData<u128>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
-	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
-	type PalletInfo = ();
 	type SystemWeightInfo = ();
 }
 
@@ -79,21 +72,21 @@ parameter_types! {
 	pub const ExistentialDeposit: u128 = 1;
 }
 
-impl pallet_balances::Trait for Test {
+impl pallet_balances::Config for Test {
+	type MaxLocks = ();
 	type Balance = u128;
 	type Event = ();
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
-	type AccountStore = frame_system::Module<Test>;
+	type AccountStore = System;
 	type WeightInfo = ();
-	type MaxLocks = ();
 }
 
 parameter_types! {
 	pub const MaxVotersPerProposal: u32 = 5;
 	pub const MaxOutcomes: u32 = 8;
 }
-impl voting::Trait for Test {
+impl voting::Config for Test {
 	type Event = ();
 	type MaxVotersPerProposal = MaxVotersPerProposal;
 	type MaxOutcomes = MaxOutcomes;
@@ -105,7 +98,7 @@ parameter_types! {
 	pub const MaxTitleLength: u32 = 128;
 	pub const MaxContentsLength: u32 = 128;
 }
-impl Trait for Test {
+impl Config for Test {
 	type Event = ();
 	type Currency = pallet_balances::Module<Self>;
 	type MaxSignalingProposals = MaxSignalingProposals;
@@ -331,7 +324,7 @@ fn propose_too_long_should_fail() {
 		System::set_block_number(1);
 		let public = get_test_key();
 		let (title, _) = generate_proposal();
-		let proposal = vec![1; (<Test as Trait>::MaxContentsLength::get() + 1) as usize];
+		let proposal = vec![1; (<Test as Config>::MaxContentsLength::get() + 1) as usize];
 		let hash = build_proposal_hash(public, &proposal);
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
@@ -351,7 +344,7 @@ fn propose_too_long_title_should_fail() {
 		let public = get_test_key();
 		let (_, proposal) = generate_proposal();
 		let hash = build_proposal_hash(public, &proposal);
-		let title = vec![1; (<Test as Trait>::MaxTitleLength::get() + 1) as usize];
+		let title = vec![1; (<Test as Config>::MaxTitleLength::get() + 1) as usize];
 		let outcomes = vec![YES_VOTE, NO_VOTE];
 		assert_err!(
 			propose(public, &title, proposal, outcomes, VoteType::Binary, TallyType::OneCoin, VotingScheme::Simple),
@@ -370,7 +363,7 @@ fn propose_with_too_many_existing_proposals_should_fail() {
 		let public = get_test_key();
 		let (title, proposal) = generate_proposal();
 		let outcomes = vec![YES_VOTE, NO_VOTE];
-		for i in 0 .. <Test as Trait>::MaxSignalingProposals::get() {
+		for i in 0 .. <Test as Config>::MaxSignalingProposals::get() {
 			assert_ok!(propose(public, title, &i.to_le_bytes(), outcomes.clone(), VoteType::Binary, TallyType::OneCoin, VotingScheme::CommitReveal));
 		}
 		assert_err!(
@@ -757,66 +750,5 @@ fn propose_multichoice_should_work() {
 				..make_record(public, title2, proposal2)
 			})
 		);
-	});
-}
-
-#[test]
-fn change_hasher_migration() {
-	mod deprecated {
-		use sp_std::prelude::*;
-		use frame_support::{decl_module, decl_storage};
-
-		use crate::{Trait, ProposalRecord};
-
-		decl_module! {
-			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
-		}
-		decl_storage! {
-			trait Store for Module<T: Trait> as Signaling {
-				pub ProposalOf get(fn proposal_of): map hasher(opaque_blake2_256) 
-					T::Hash => Option<ProposalRecord<T::AccountId, T::BlockNumber>>;
-			}
-		}
-	}
-
-	new_test_ext().execute_with(|| {
-		System::set_block_number(1);
-		// build proposal, vote and record
-		let public = get_test_key();
-		let (title, proposal) = generate_proposal();
-		let hash = build_proposal_hash(public, &proposal);
-		let outcomes = vec![YES_VOTE, NO_VOTE];
-		let index = ProposalCount::get();
-		let vote_id = Voting::create_vote(
-			public.clone(),
-			VoteType::Binary,
-			VotingScheme::Simple,
-			TallyType::OneCoin,
-			outcomes,
-		).expect("Voting::create_vote failed");
-		let transition_time = System::block_number() + Signaling::voting_length();
-		let record = ProposalRecord {
-			index: index,
-			author: public.clone(),
-			stage: VoteStage::PreVoting,
-			transition_time: transition_time,
-			title: title.to_vec(),
-			contents: proposal.to_vec(),
-			vote_id: vote_id,
-		};
-		// insert the record with the old hasher
-		deprecated::ProposalOf::<Test>::insert(hash, &record);
-		InactiveProposals::<Test>::mutate(|proposals| proposals.push((hash, transition_time)));
-		assert!(
-			Signaling::proposal_of(hash).is_none(),
-			"proposal should not (yet) be available with the new hasher"
-		);
-		// do the migration
-		crate::migration::migrate::<Test>();
-		let maybe_prop = Signaling::proposal_of(hash);
-		// check that it was successfull
-		assert!(maybe_prop.is_some());
-		let prop = maybe_prop.unwrap();
-		assert_eq!(prop, record);
 	});
 }

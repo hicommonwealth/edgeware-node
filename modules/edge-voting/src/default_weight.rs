@@ -21,7 +21,7 @@ use sp_std::marker::PhantomData;
 use frame_support::weights::{Weight, constants::RocksDbWeight as DbWeight};
 
 pub struct SubstrateWeight<T>(PhantomData<T>);
-impl<T: frame_system::Trait> crate::WeightInfo for SubstrateWeight<T> {
+impl<T: frame_system::Config> crate::WeightInfo for SubstrateWeight<T> {
 	fn commit(s: u32, ) -> Weight {
 		(25_910_000 as Weight)
 			.saturating_add((373_000 as Weight).saturating_mul(s as Weight))

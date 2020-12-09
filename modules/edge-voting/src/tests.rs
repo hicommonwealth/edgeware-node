@@ -14,6 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::*;
 use sp_runtime::{
 	Perbill,
 	testing::Header,
@@ -21,11 +22,8 @@ use sp_runtime::{
 };
 use sp_core::H256;
 use frame_support::{
-	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight,
+	parameter_types, impl_outer_origin, assert_err, assert_ok, weights::Weight, impl_outer_event
 };
-
-use super::*;
-use crate::{Trait, Module, VoteType, TallyType};
 
 static SECRET: [u8; 32] = [1,0,1,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4];
 
@@ -44,12 +42,15 @@ parameter_types! {
 	pub const MaximumExtrinsicWeight: Weight = 1024;
 }
 
-impl frame_system::Trait for Test {
+impl frame_system::Config for Test {
 	type BaseCallFilter = ();
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
 	type Origin = Origin;
 	type Index = u64;
-	type BlockNumber = u64;
 	type Call = ();
+	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
 	type AccountId = u64;
@@ -57,18 +58,11 @@ impl frame_system::Trait for Test {
 	type Header = Header;
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = ();
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
-	type AccountData = pallet_balances::AccountData<u128>;
+	type PalletInfo = ();
+	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
-	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
-	type PalletInfo = ();
 	type SystemWeightInfo = ();
 }
 
@@ -76,7 +70,7 @@ parameter_types! {
 	pub const MaxVotersPerProposal: u32 = 5;
 	pub const MaxOutcomes: u32 = 6;
 }
-impl Trait for Test {
+impl Config for Test {
 	type Event = ();
 	type MaxVotersPerProposal = MaxVotersPerProposal;
 	type MaxOutcomes = MaxOutcomes;
@@ -290,7 +284,7 @@ fn create_multi_vote_too_many_outcomes_should_not_work() {
 	new_test_ext().execute_with(|| {
 		System::set_block_number(1);
 		let public = get_test_key();
-		// MaxOutcomes declared as 6 in Trait above
+		// MaxOutcomes declared as 6 in Config above
 		let outcomes = [
 			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
 			[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2],
@@ -601,7 +595,7 @@ fn commits_after_max_voters_should_not_work() {
 		let vote = generate_1p1v_commit_reveal_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_ok!(advance_stage(1));
-		for i in 0 .. <Test as Trait>::MaxVotersPerProposal::get() {
+		for i in 0 .. <Test as Config>::MaxVotersPerProposal::get() {
 			let key = get_test_key_n((i + 2) as u64);
 			let secret = SECRET;
 			let mut buf = Vec::new();
@@ -631,7 +625,7 @@ fn reveal_after_max_voters_should_not_work() {
 		let vote = generate_1p1v_public_binary_vote();
 		assert_eq!(Ok(1), create_vote(public, vote.0, vote.1, vote.2, &vote.3));
 		assert_ok!(advance_stage(1));
-		for i in 0 .. <Test as Trait>::MaxVotersPerProposal::get() {
+		for i in 0 .. <Test as Config>::MaxVotersPerProposal::get() {
 			let key = get_test_key_n((i + 2) as u64);
 			assert_ok!(reveal(key, 1, vec![vote.3[0]], Some(vote.3[0])));
 		}
@@ -705,59 +699,5 @@ fn commit_reveal_ranked_choice_vote_should_work() {
 		assert_ok!(commit(public, 1, hash.into()));
 		assert_ok!(advance_stage(1));
 		assert_ok!(reveal(public, 1, vote.3.to_vec(), Some(SECRET)));
-	});
-}
-
-#[test]
-fn change_voting_scheme_migration() {
-	mod deprecated {
-		use sp_std::prelude::*;
-		use frame_support::{decl_module, decl_storage};
-
-		use crate::{Trait, OldVoteRecord};
-
-		decl_module! {
-			pub struct Module<T: Trait> for enum Call where origin: T::Origin { }
-		}
-		decl_storage! {
-			trait Store for Module<T: Trait> as Voting {
-				pub VoteRecords get(fn vote_records): map hasher(twox_64_concat)
-					u64 => Option<OldVoteRecord<T::AccountId>>;
-			}
-		}
-	}
-
-	new_test_ext().execute_with(|| {
-		System::set_block_number(1);
-		// build vote record
-		let public = get_test_key();
-		let yes_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1];
-		let no_vote: [u8; 32] = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-		let outcomes = vec![yes_vote, no_vote];
-		let id = VoteRecordCount::get() + 1;
-		let record = OldVoteRecord {
-			id: id,
-			commitments: vec![],
-			reveals: vec![],
-			outcomes: outcomes,
-			data: OldVoteData {
-				initiator: public.clone(),
-				stage: VoteStage::PreVoting,
-				vote_type: VoteType::Binary,
-				tally_type: TallyType::OneCoin,
-				is_commit_reveal: false,
-			},
-		};
-
-		// insert the record with the old hasher
-		deprecated::VoteRecords::<Test>::insert(id, &record);
-		VoteRecordCount::mutate(|i| *i += 1);
-
-		// do the migration
-		crate::migration::migrate::<Test>();
-		let maybe_vote = Voting::vote_records(id);
-		// check that it was successfull
-		assert!(maybe_vote.is_some());
-		assert_eq!(maybe_vote.unwrap().data.voting_scheme, VotingScheme::Simple);
 	});
 }

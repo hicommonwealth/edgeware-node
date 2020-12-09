@@ -22,7 +22,7 @@ use frame_support::weights::{Weight, constants::RocksDbWeight as DbWeight};
 
 
 pub struct SubstrateWeight<T>(PhantomData<T>);
-impl<T: frame_system::Trait> crate::WeightInfo for SubstrateWeight<T> {
+impl<T: frame_system::Config> crate::WeightInfo for SubstrateWeight<T> {
 	fn create_proposal(p: u32, b: u32, ) -> Weight {
 		(12_424_000 as Weight)
 			.saturating_add((983_000 as Weight).saturating_mul(p as Weight))

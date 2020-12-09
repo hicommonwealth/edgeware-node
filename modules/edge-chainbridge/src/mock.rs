@@ -12,7 +12,7 @@ use sp_runtime::{
 	ModuleId, Perbill,
 };
 
-use crate::{self as example, Trait};
+use crate::{self as example, Config};
 pub use pallet_balances as balances;
 
 parameter_types! {
@@ -23,11 +23,14 @@ parameter_types! {
 	pub const MaxLocks: u32 = 100;
 }
 
-impl frame_system::Trait for Test {
+impl frame_system::Config for Test {
 	type BaseCallFilter = ();
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
 	type Origin = Origin;
-	type Call = Call;
 	type Index = u64;
+	type Call = Call;
 	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
@@ -36,19 +39,12 @@ impl frame_system::Trait for Test {
 	type Header = Header;
 	type Event = Event;
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = ();
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumExtrinsicWeight = ();
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type PalletInfo = ();
 	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
-	type PalletInfo = ();
 }
 
 parameter_types! {
@@ -59,7 +55,7 @@ ord_parameter_types! {
 	pub const One: u64 = 1;
 }
 
-impl pallet_balances::Trait for Test {
+impl pallet_balances::Config for Test {
 	type Balance = u64;
 	type DustRemoval = ();
 	type Event = Event;
@@ -74,7 +70,7 @@ parameter_types! {
 	pub const ProposalLifetime: u64 = 100;
 }
 
-impl chainbridge::Trait for Test {
+impl chainbridge::Config for Test {
 	type Event = Event;
 	type AdminOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type Proposal = Call;
@@ -83,14 +79,19 @@ impl chainbridge::Trait for Test {
 }
 
 parameter_types! {
-	pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"DAV"));
+	pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"EDG"));
 }
 
-impl Trait for Test {
+parameter_types! {
+	pub const NativeTransferFee: u64 = 1;
+}
+
+impl Config for Test {
 	type Event = Event;
 	type BridgeOrigin = chainbridge::EnsureBridge<Test>;
 	type Currency = Balances;
 	type NativeTokenId = NativeTokenId;
+	type NativeTransferFee = NativeTransferFee;
 }
 
 pub type Block = sp_runtime::generic::Block<Header, UncheckedExtrinsic>;
@@ -102,10 +103,10 @@ frame_support::construct_runtime!(
 		NodeBlock = Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: system::{Module, Call, Event<T>},
+		System: frame_system::{Module, Call, Config, Storage, Event<T>},
 		Balances: balances::{Module, Call, Storage, Config<T>, Event<T>},
 		Bridge: chainbridge::{Module, Call, Storage, Event<T>},
-		Example: example::{Module, Call, Event<T>}
+        Example: example::{Module, Call, Event<T>}
 	}
 );
 

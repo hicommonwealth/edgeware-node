@@ -37,7 +37,6 @@ use sp_runtime::traits::{
 };
 
 use frame_support::{decl_event, decl_module, decl_storage, decl_error, ensure, StorageMap};
-use frame_support::migration::{put_storage_value, StorageIterator};
 
 /// A potential outcome of a vote, with 2^32 possible options
 pub type VoteOutcome = [u8; 32];
@@ -115,9 +114,9 @@ pub trait WeightInfo {
 	fn reveal(s: u32, ) -> Weight;
 }
 
-pub trait Trait: frame_system::Trait {
+pub trait Config: frame_system::Config {
 	/// The overarching event type.
-	type Event: From<Event<Self>> + Into<<Self as frame_system::Trait>::Event>;
+	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 
 	/// Maxmimum number of voters on a single proposal.
 	type MaxVotersPerProposal: Get<u32>;
@@ -130,7 +129,7 @@ pub trait Trait: frame_system::Trait {
 }
 
 decl_storage! {
-	trait Store for Module<T: Trait> as Voting {
+	trait Store for Module<T: Config> as Voting {
 		/// The map of all vote records indexed by id
 		pub VoteRecords get(fn vote_records): map hasher(twox_64_concat) u64 => Option<VoteRecord<T::AccountId>>;
 		/// The number of vote records that have been created
@@ -139,7 +138,7 @@ decl_storage! {
 }
 
 decl_event!(
-	pub enum Event<T> where <T as frame_system::Trait>::AccountId {
+	pub enum Event<T> where <T as frame_system::Config>::AccountId {
 		/// new vote (id, creator, type of vote)
 		VoteCreated(u64, AccountId, VoteType),
 		/// vote stage transition (id, old stage, new stage)
@@ -152,7 +151,7 @@ decl_event!(
 );
 
 decl_error! {
-    pub enum Error for Module<T: Trait> {
+    pub enum Error for Module<T: Config> {
 			/// Vote already completed
 			VoteCompleted,
 			/// Record not found for id
@@ -193,7 +192,7 @@ decl_error! {
 }
 
 decl_module! {
-	pub struct Module<T: Trait> for enum Call where origin: T::Origin {
+	pub struct Module<T: Config> for enum Call where origin: T::Origin {
 		/// Maxmimum number of voters on a single proposal.
 		const MaxVotersPerProposal: u32 = T::MaxVotersPerProposal::get();
 
@@ -202,11 +201,6 @@ decl_module! {
 
 		type Error = Error<T>;
 		fn deposit_event() = default;
-
-		fn on_runtime_upgrade() -> Weight {
-			migration::migrate::<T>();
-			T::MaximumBlockWeight::get()
-		}
 
 		/// A function for commit-reveal voting schemes that adds a vote commitment.
 		///
@@ -286,7 +280,7 @@ decl_module! {
 	}
 }
 
-impl<T: Trait> Module<T> {
+impl<T: Config> Module<T> {
 	/// A helper function for creating a new vote/ballot.
 	pub fn create_vote(
 		sender: T::AccountId,
@@ -372,57 +366,5 @@ impl<T: Trait> Module<T> {
 
 	pub fn delete_vote_record(vote_id: u64) -> () {
 		<VoteRecords<T>>::remove(vote_id);
-	}
-}
-
-#[derive(Encode, Decode, RuntimeDebug)]
-pub struct OldVoteData<AccountId> {
-	pub initiator: AccountId,
-	pub stage: VoteStage,
-	pub vote_type: VoteType,
-	pub tally_type: TallyType,
-	pub is_commit_reveal: bool,
-}
-
-#[derive(Encode, Decode, RuntimeDebug)]
-pub struct OldVoteRecord<AccountId> {
-	pub id: u64,
-	pub commitments: Vec<(AccountId, VoteOutcome)>,
-	pub reveals: Vec<(AccountId, Vec<VoteOutcome>)>,
-	pub data: OldVoteData<AccountId>,
-	pub outcomes: Vec<VoteOutcome>,
-}
-
-impl<AccountId> OldVoteData<AccountId> {
-	fn upgraded(self) -> VoteData<AccountId> {
-		VoteData {
-			initiator: self.initiator,
-			stage: self.stage,
-			vote_type: self.vote_type,
-			tally_type: self.tally_type,
-			voting_scheme: VotingScheme::Simple,
-		}
-	}
-}
-
-impl<AccountId> OldVoteRecord<AccountId> {
-	fn upgraded(self) -> VoteRecord<AccountId> {
-		VoteRecord {
-			id: self.id,
-			commitments: self.commitments,
-			reveals: self.reveals,
-			data: self.data.upgraded(),
-			outcomes: self.outcomes,
-		}
-	}
-}
-
-mod migration {
-	use super::*;
-
-	pub fn migrate<T: Trait>() {
-		for (hash, record) in StorageIterator::<OldVoteRecord<T::AccountId>>::new(b"Voting", b"VoteRecords").drain() {
-			put_storage_value(b"Voting", b"VoteRecords", &hash, record.upgraded());
-		}
 	}
 }
