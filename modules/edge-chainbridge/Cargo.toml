@@ -19,10 +19,10 @@ sp-arithmetic = { version = "2.0.0", default-features = false }
 # frame dependencies
 frame-support = { version = "2.0.0", default-features = false }
 frame-system = { version = "2.0.0", default-features = false }
+pallet-assets = { version = "2.0.0", default-features = false }
 pallet-balances = { version = "2.0.0", default-features = false }
 
 chainbridge = { path = "../chainbridge", default-features = false, features = ["runtime-benchmarks"] }
-orml-tokens = { git = "https://github.com/open-web3-stack/open-runtime-module-library", default-features = false, rev = "f69c13bf90cc007b553ce228108ad822c33f8459" }
 
 [features]
 default = ["std"]
@@ -36,9 +36,9 @@ std = [
 	"sp-arithmetic/std",
 	"frame-support/std",
 	"frame-system/std",
+	"pallet-assets/std",
 	"pallet-balances/std",
 	"chainbridge/std",
-	"orml-tokens/std",
 ]
 
 runtime-benchmarks = [

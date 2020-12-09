@@ -46,29 +46,25 @@ parameter_types! {
 
 impl frame_system::Config for Test {
 	type BaseCallFilter = ();
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
 	type Origin = Origin;
 	type Index = u64;
-	type BlockNumber = u64;
 	type Call = ();
+	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
 	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = ();
+	type Event = Event;
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = ();
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
-	type AccountData = pallet_balances::AccountData<u128>;
+	type PalletInfo = ();
+	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
-	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
-	type PalletInfo = ();
 	type SystemWeightInfo = ();
 }
 

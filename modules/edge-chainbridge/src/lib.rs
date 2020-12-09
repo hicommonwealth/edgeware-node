@@ -16,7 +16,7 @@ type ResourceId = chainbridge::ResourceId;
 type BalanceOf<T> =
 	<<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
-pub trait Config: orml_tokens::Config + chainbridge::Config {
+pub trait Config: pallet_assets::Config + chainbridge::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 	/// Specifies the origin check provided by the bridge for calls that can only be called by the bridge pallet
 	type BridgeOrigin: EnsureOrigin<Self::Origin, Success = Self::AccountId>;
@@ -28,7 +28,6 @@ pub trait Config: orml_tokens::Config + chainbridge::Config {
 	type NativeTokenId: Get<ResourceId>;
 
 	type NativeTransferFee: Get<Self::Balance>;
-	type BridgedAssetTransferFee: Get<Self::Balance>;
 }
 
 decl_event! {
@@ -61,7 +60,7 @@ decl_module! {
 			let source = ensure_signed(origin)?;
 			ensure!(<chainbridge::Module<T>>::chain_whitelisted(dest_id), Error::<T>::InvalidTransfer);
 			let bridge_id = <chainbridge::Module<T>>::account_id();
-			T::Currency::transfer(&source, &bridge_id, amount.into(), AllowDeath)?;
+			<T as Config>::Currency::transfer(&source, &bridge_id, amount.into(), AllowDeath)?;
 
 			let resource_id = T::NativeTokenId::get();
 			<chainbridge::Module<T>>::transfer_fungible(dest_id, resource_id, recipient, U256::from(amount.saturated_into::<u128>()))

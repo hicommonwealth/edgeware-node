@@ -166,27 +166,23 @@ parameter_types! {
 }
 impl frame_system::Config for Test {
 	type BaseCallFilter = ();
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
 	type Origin = Origin;
-	type Index = AccountIndex;
-	type BlockNumber = BlockNumber;
-	type Call = Call;
+	type Index = u64;
+	type Call = ();
+	type BlockNumber = u64;
 	type Hash = H256;
-	type Hashing = ::sp_runtime::traits::BlakeTwo256;
-	type AccountId = AccountId;
+	type Hashing = BlakeTwo256;
+	type AccountId = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = ();
+	type Event = Event;
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = RocksDbWeight;
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumExtrinsicWeight = MaximumBlockWeight;
-	type AvailableBlockRatio = AvailableBlockRatio;
-	type MaximumBlockLength = MaximumBlockLength;
 	type Version = ();
 	type PalletInfo = ();
-	type AccountData = pallet_balances::AccountData<Balance>;
+	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();

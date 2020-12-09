@@ -25,9 +25,12 @@ parameter_types! {
 
 impl frame_system::Config for Test {
 	type BaseCallFilter = ();
+	type BlockWeights = ();
+	type BlockLength = ();
+	type DbWeight = ();
 	type Origin = Origin;
-	type Call = Call;
 	type Index = u64;
+	type Call = ();
 	type BlockNumber = u64;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
@@ -36,19 +39,12 @@ impl frame_system::Config for Test {
 	type Header = Header;
 	type Event = Event;
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = ();
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumExtrinsicWeight = ();
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = ();
+	type PalletInfo = ();
 	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
-	type PalletInfo = ();
 }
 
 parameter_types! {

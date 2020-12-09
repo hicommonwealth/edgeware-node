@@ -29,13 +29,13 @@ use frame_support::{
 	construct_runtime, parameter_types, debug, RuntimeDebug,
 	weights::{
 		Weight, IdentityFee,
-		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
+		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND}, DispatchClass,
 	},
 	traits::{Currency, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier, U128CurrencyToVote},
 };
-use orml_traits::parameter_type_with_key;
 
 use frame_system::{EnsureRoot, EnsureOneOf};
+use frame_system::limits::{BlockLength, BlockWeights};
 use frame_support::traits::InstanceFilter;
 use codec::{Encode, Decode};
 
@@ -61,7 +61,7 @@ use sp_runtime::{
 pub use sp_runtime::curve::PiecewiseLinear;
 use sp_runtime::traits::{
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
-	ConvertInto, OpaqueKeys, NumberFor, Saturating, AccountIdConversion,
+	ConvertInto, OpaqueKeys, NumberFor,
 };
 pub use sp_runtime::transaction_validity::{TransactionValidity, TransactionSource, TransactionPriority};
 
@@ -145,24 +145,45 @@ impl OnUnbalanced<NegativeImbalance> for DealWithFees {
 	}
 }
 
-const AVERAGE_ON_INITIALIZE_WEIGHT: Perbill = Perbill::from_percent(10);
-parameter_types! {
-	pub const BlockHashCount: BlockNumber = 250;
-	pub const MaximumBlockWeight: Weight = 2 * WEIGHT_PER_SECOND;
-	pub MaximumExtrinsicWeight: Weight =
-		AvailableBlockRatio::get().saturating_sub(AVERAGE_ON_INITIALIZE_WEIGHT)
-		* MaximumBlockWeight::get();
-	pub const MaximumBlockLength: u32 = 5 * 1024 * 1024;
-	pub const Version: RuntimeVersion = VERSION;
-	pub const AvailableBlockRatio: Perbill = Perbill::from_percent(75);
-}
+/// We assume that ~10% of the block weight is consumed by `on_initalize` handlers.
+/// This is used to limit the maximal weight of a single extrinsic.
+const AVERAGE_ON_INITIALIZE_RATIO: Perbill = Perbill::from_percent(10);
+/// We allow `Normal` extrinsics to fill up the block up to 75%, the rest can be used
+/// by  Operational  extrinsics.
+const NORMAL_DISPATCH_RATIO: Perbill = Perbill::from_percent(75);
+/// We allow for 2 seconds of compute with a 6 second average block time.
+const MAXIMUM_BLOCK_WEIGHT: Weight = 2 * WEIGHT_PER_SECOND;
 
-const_assert!(
-	AvailableBlockRatio::get().deconstruct() >= AVERAGE_ON_INITIALIZE_WEIGHT.deconstruct()
-);
+parameter_types! {
+	pub const BlockHashCount: BlockNumber = 2400;
+	pub const Version: RuntimeVersion = VERSION;
+	pub RuntimeBlockLength: BlockLength =
+		BlockLength::max_with_normal_ratio(5 * 1024 * 1024, NORMAL_DISPATCH_RATIO);
+	pub RuntimeBlockWeights: BlockWeights = BlockWeights::builder()
+		.base_block(BlockExecutionWeight::get())
+		.for_class(DispatchClass::all(), |weights| {
+			weights.base_extrinsic = ExtrinsicBaseWeight::get();
+		})
+		.for_class(DispatchClass::Normal, |weights| {
+			weights.max_total = Some(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT);
+		})
+		.for_class(DispatchClass::Operational, |weights| {
+			weights.max_total = Some(MAXIMUM_BLOCK_WEIGHT);
+			// Operational transactions have some extra reserved space, so that they
+			// are included even if block reached `MAXIMUM_BLOCK_WEIGHT`.
+			weights.reserved = Some(
+				MAXIMUM_BLOCK_WEIGHT - NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT
+			);
+		})
+		.avg_block_initialization(AVERAGE_ON_INITIALIZE_RATIO)
+		.build_or_panic();
+}
 
 impl frame_system::Config for Runtime {
 	type BaseCallFilter = ();
+	type BlockWeights = RuntimeBlockWeights;
+	type BlockLength = RuntimeBlockLength;
+	type DbWeight = RocksDbWeight;
 	type Origin = Origin;
 	type Call = Call;
 	type Index = Index;
@@ -174,13 +195,6 @@ impl frame_system::Config for Runtime {
 	type Header = generic::Header<BlockNumber, BlakeTwo256>;
 	type Event = Event;
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type DbWeight = RocksDbWeight;
-	type BlockExecutionWeight = BlockExecutionWeight;
-	type ExtrinsicBaseWeight = ExtrinsicBaseWeight;
-	type MaximumExtrinsicWeight = MaximumExtrinsicWeight;
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
 	type Version = Version;
 	type PalletInfo = PalletInfo;
 	type AccountData = pallet_balances::AccountData<Balance>;
@@ -311,7 +325,7 @@ impl pallet_proxy::Config for Runtime {
 }
 
 parameter_types! {
-	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) * MaximumBlockWeight::get();
+	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) * RuntimeBlockWeights::get().max_block;
 	pub const MaxScheduledPerBlock: u32 = 50;
 }
 
@@ -453,9 +467,10 @@ parameter_types! {
 	pub const MaxIterations: u32 = 5;
 	// 0.05%. The higher the value, the more strict solution acceptance becomes.
 	pub MinSolutionScoreBump: Perbill = Perbill::from_rational_approximation(5u32, 10_000);
-	pub OffchainSolutionWeightLimit: Weight = MaximumExtrinsicWeight::get()
-		.saturating_sub(BlockExecutionWeight::get())
-		.saturating_sub(ExtrinsicBaseWeight::get());
+	pub OffchainSolutionWeightLimit: Weight = RuntimeBlockWeights::get()
+		.get(DispatchClass::Normal)
+		.max_extrinsic.expect("Normal extrinsics have a weight limit configured; qed")
+		.saturating_sub(BlockExecutionWeight::get());
 }
 
 impl pallet_staking::Config for Runtime {
@@ -731,7 +746,8 @@ impl pallet_im_online::Config for Runtime {
 }
 
 parameter_types! {
-	pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) * MaximumBlockWeight::get();
+	pub OffencesWeightSoftLimit: Weight = Perbill::from_percent(60) *
+		RuntimeBlockWeights::get().max_block;
 }
 
 impl pallet_offences::Config for Runtime {
@@ -908,44 +924,31 @@ impl chainbridge::Config for Runtime {
 
 parameter_types! {
     pub NativeTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(1, &blake2_128(b"EDG"));
-    pub NativeBridgedTokenId: chainbridge::ResourceId = chainbridge::derive_resource_id(2, &blake2_128(b"ETH"));
     pub const NativeTransferFee: Balance = 1 * DOLLARS;
-    pub const BridgedAssetTransferFee: Balance = 1 * DOLLARS;
 }
 
 impl edge_chainbridge::Config for Runtime {
     type Event = Event;
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
-    type Currency = Balances;
-    type NativeTokenId = NativeTokenId;
+	type Currency = Balances;
+    type NativeTokenId = NativeTokenId;    
     type NativeTransferFee = NativeTransferFee;
-    type BridgedAssetTransferFee = BridgedAssetTransferFee;
-}
-
-parameter_type_with_key! {
-	pub ExistentialDeposits: |currency_id: CurrencyId| -> Balance {
-		match currency_id {
-			&BTC => 1,
-			&DOT => 2,
-			_ => 0,
-		}
-	};
 }
 
 parameter_types! {
-	pub TreasuryModuleAccount: AccountId = TreasuryModuleId::get().into_account();
+	pub const AssetDepositBase: u64 = 1;
+	pub const AssetDepositPerZombie: u64 = 1;
 }
 
-pub type CurrencyId = u32;
-
-impl orml_tokens::Config for Runtime {
+impl pallet_assets::Config for Runtime {
+	type Currency = Balances;
 	type Event = Event;
 	type Balance = Balance;
-	type Amount = i64;
-	type CurrencyId = CurrencyId;
+	type AssetId = constants::currency::AssetId;
+	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
+	type AssetDepositBase = AssetDepositBase;
+	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
-	type ExistentialDeposits = ExistentialDeposits;
-	type OnDust = orml_tokens::TransferDust<Runtime, TreasuryModuleAccount>;
 }
 
 construct_runtime!(
@@ -986,7 +989,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
-		Tokens: orml_tokens::{Module, Call, Storage, Event<T>},
+		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 
 		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
 		Voting: voting::{Module, Call, Storage, Event<T>},

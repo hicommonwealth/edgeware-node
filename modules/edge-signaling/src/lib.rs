@@ -153,11 +153,6 @@ decl_module! {
 		type Error = Error<T>;
 		fn deposit_event() = default;
 
-		fn on_runtime_upgrade() -> Weight {
-			migration::migrate::<T>();
-			T::MaximumBlockWeight::get()
-		}
-
 		/// Creates a new signaling proposal.
 		#[weight = <T as Config>::WeightInfo::create_proposal(T::MaxSignalingProposals::get(), T::MaxContentsLength::get())]
 		pub fn create_proposal(
@@ -326,22 +321,6 @@ decl_module! {
 			<CompletedProposals<T>>::put(pending);
 			// put back singly, still_inactive, inactive proposals
 			<InactiveProposals<T>>::put(still_inactive);
-		}
-	}
-}
-
-mod migration {
-	use super::*;
-
-	pub fn migrate<T: Config>() {
-		for (hash, _n) in InactiveProposals::<T>::get() {
-			ProposalOf::<T>::migrate_key_from_blake(hash);
-		}
-		for (hash, _n) in ActiveProposals::<T>::get() {
-			ProposalOf::<T>::migrate_key_from_blake(hash);
-		}
-		for (hash, _n) in CompletedProposals::<T>::get() {
-			ProposalOf::<T>::migrate_key_from_blake(hash);
 		}
 	}
 }
