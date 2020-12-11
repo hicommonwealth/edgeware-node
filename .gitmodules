@@ -1,4 +1,4 @@
 [submodule "vendor/frontier"]
 	path = vendor/frontier
-	url = https://github.com/PureStake/frontier.git
-	branch = joshy-parachains-v1
+	url = https://github.com/paritytech/frontier.git
+	

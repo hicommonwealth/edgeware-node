@@ -977,58 +977,13 @@ fn get_precompiled_func_from_address(address: &H160) -> Option<PrecompiledCallab
 	use core::str::FromStr;
 	use pallet_evm::Precompile;
 
-	// identity
 	let addr_ecrecover = H160::from_str("0000000000000000000000000000000000000001").expect("Invalid address at precompiles generation");
-	// ecrecover
 	let addr_sha256 = H160::from_str("0000000000000000000000000000000000000002").expect("Invalid address at precompiles generation");
-	// sha256
 	let addr_ripemd160 = H160::from_str("0000000000000000000000000000000000000003").expect("Invalid address at precompiles generation");
-	// ripemd160
-	let _addr_modexp = H160::from_str("0000000000000000000000000000000000000004").expect("Invalid address at precompiles generation");
-	// modexp
-	let _addr_alt_bn128_add = H160::from_str("0000000000000000000000000000000000000005").expect("Invalid address at precompiles generation");
-	// alt_bn128_add
-	let _addr_alt_bn128_mul = H160::from_str("0000000000000000000000000000000000000006").expect("Invalid address at precompiles generation");
-	// alt_bn128_mul
-	let _addr_alt_bn128_pairing = H160::from_str("0000000000000000000000000000000000000007").expect("Invalid address at precompiles generation");
-	// alt_bn128_pairing
-	let _addr_blake2_f = H160::from_str("0000000000000000000000000000000000000008").expect("Invalid address at precompiles generation");
-	// blake2_f
-	let _addr_bls12_381_g1_add = H160::from_str("0000000000000000000000000000000000000009").expect("Invalid address at precompiles generation");
-	// bls12_381_g1_add
-	let _addr_bls12_381_g1_mul = H160::from_str("000000000000000000000000000000000000000A").expect("Invalid address at precompiles generation");
-	// bls12_381_g1_mul
-	let _addr_bls12_381_g1_multiexp = H160::from_str("000000000000000000000000000000000000000b").expect("Invalid address at precompiles generation");
-	// bls12_381_g1_multiexp
-	let _addr_bls12_381_g2_add = H160::from_str("000000000000000000000000000000000000000c").expect("Invalid address at precompiles generation");
-	// bls12_381_g2_add
-	let _addr_bls12_381_g2_mul = H160::from_str("000000000000000000000000000000000000000d").expect("Invalid address at precompiles generation");
-	// bls12_381_g2_mul
-	let _addr_bls12_381_g2_multiexp = H160::from_str("000000000000000000000000000000000000000e").expect("Invalid address at precompiles generation");
-	// bls12_381_g2_multiexp
-	let _addr_bls12_381_pairing = H160::from_str("000000000000000000000000000000000000000f").expect("Invalid address at precompiles generation");
-	// bls12_381_pairing
-	let _addr_bls12_381_fp_to_g1 = H160::from_str("0000000000000000000000000000000000000010").expect("Invalid address at precompiles generation");
-	// bls12_381_fp_to_g1
-	let _addr_bls12_381_fp2_to_g2 = H160::from_str("0000000000000000000000000000000000000011").expect("Invalid address at precompiles generation");
 
 	let exec: Option<PrecompiledCallable> = if *address == addr_ecrecover { Some(ECRecover::execute) }
 		else if *address == addr_sha256 { Some(Sha256::execute) }
 		else if *address == addr_ripemd160 { Some(Ripemd160::execute) }
-		// else if *address == addr_modexp { Some(Modexp::execute) }
-		// else if *address == addr_alt_bn128_add { Some(Bn128Add::execute) }
-		// else if *address == addr_alt_bn128_mul { Some(Bn128Mul::execute) }
-		// else if *address == addr_alt_bn128_pairing { Some(Bn128Pairing::execute) }
-		// else if *address == addr_blake2_f { Some(Blake2F::execute) }
-		// else if *address == addr_bls12_381_g1_add { Some(Bls12G1Add::execute) }
-		// else if *address == addr_bls12_381_g1_mul { Some(Bls12G1Mul::execute) }
-		// else if *address == addr_bls12_381_g1_multiexp { Some(Bls12G1MultiExp::execute) }
-		// else if *address == addr_bls12_381_g2_add { Some(Bls12G2Add::execute) }
-		// else if *address == addr_bls12_381_g2_mul { Some(Bls12G2Mul::execute) }
-		// else if *address == addr_bls12_381_g2_multiexp { Some(Bls12G2MultiExp::execute) }
-		// else if *address == addr_bls12_381_pairing { Some(Bls12Pairing::execute) }
-		// else if *address == addr_bls12_381_fp_to_g1 { Some(Bls12MapFpToG1::execute) }
-		// else if *address == addr_bls12_381_fp2_to_g2 { Some(Bls12MapFp2ToG2::execute) }
 		else { None };
 
 	exec
