@@ -13,6 +13,7 @@ jobs:
       - checkout
       - run: apt-get update
       - run: ~/edgeware/scripts/init.sh
+      - run: cd ~/edgeware && git submodule update --init --recursive
 
       # module test cases
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh

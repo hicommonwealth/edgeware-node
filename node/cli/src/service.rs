@@ -22,6 +22,7 @@ use sc_service::ChainSpec;
 use std::sync::Arc;
 use sc_consensus_aura;
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
+use fc_consensus::FrontierBlockImport;
 use edgeware_primitives::Block;
 use edgeware_runtime::RuntimeApi;
 use sc_service::{
@@ -66,23 +67,17 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 	sp_consensus::DefaultImportQueue<Block, FullClient>,
 	sc_transaction_pool::FullPool<Block, FullClient>,
 	(
-		impl Fn(
-			edgeware_rpc::DenyUnsafe,
-			sc_rpc::SubscriptionTaskExecutor
-		) -> edgeware_rpc::IoHandler,
-		(
-			sc_consensus_aura::AuraBlockImport<
+		sc_consensus_aura::AuraBlockImport<
+			Block,
+			FullClient,
+			FrontierBlockImport<
 				Block,
-				FullClient,
 				FullGrandpaBlockImport,
-				sp_consensus_aura::ed25519::AuthorityPair
+				FullClient
 			>,
-			sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
-		),
-		(
-			sc_finality_grandpa::SharedVoterState,
-			Arc<GrandpaFinalityProofProvider<FullBackend, Block>>,
-		),
+			sp_consensus_aura::ed25519::AuthorityPair
+		>,
+		sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 	)
 >, ServiceError> {
 	let (client, backend, keystore_container, task_manager) =
@@ -104,9 +99,15 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		select_chain.clone(),
 	)?;
 
+	let frontier_block_import = FrontierBlockImport::new(
+		grandpa_block_import.clone(),
+		client.clone(),
+		true
+	);
+
 	let aura_block_import =
 		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
-			grandpa_block_import.clone(),
+			frontier_block_import,
 			client.clone()
 		);
 
@@ -123,59 +124,26 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone()),
 	)?;
 
-	let import_setup = (aura_block_import.clone(), grandpa_link);
-
-	let (rpc_extensions_builder, rpc_setup) = {
-		let (_, grandpa_link) = &import_setup;
-
-		let justification_stream = grandpa_link.justification_stream();
-		let shared_authority_set = grandpa_link.shared_authority_set().clone();
-		let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
-		let finality_proof_provider =
-			GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
-
-		let rpc_setup = (shared_voter_state.clone(), finality_proof_provider.clone());
-		let client = client.clone();
-		let pool = transaction_pool.clone();
-		let select_chain = select_chain.clone();
-		let _keystore = keystore_container.sync_keystore();
-
-		let rpc_extensions_builder = move |deny_unsafe, subscription_executor| {
-			let deps = edgeware_rpc::FullDeps {
-				client: client.clone(),
-				pool: pool.clone(),
-				select_chain: select_chain.clone(),
-				deny_unsafe,
-				grandpa: edgeware_rpc::GrandpaDeps {
-					shared_voter_state: shared_voter_state.clone(),
-					shared_authority_set: shared_authority_set.clone(),
-					justification_stream: justification_stream.clone(),
-					subscription_executor,
-					finality_provider: finality_proof_provider.clone(),
-				},
-			};
-
-			edgeware_rpc::create_full(deps)
-		};
-
-		(rpc_extensions_builder, rpc_setup)
-	};
-
 	Ok(sc_service::PartialComponents {
-		client, backend, task_manager, keystore_container,
-		select_chain, import_queue, transaction_pool, inherent_data_providers,
-		other: (rpc_extensions_builder, import_setup, rpc_setup)
+		client, backend, task_manager, import_queue, keystore_container, select_chain, transaction_pool,
+		inherent_data_providers,
+		other: (aura_block_import.clone(), grandpa_link,)
 	})
 }
 
 /// Creates a full service from the configuration.
 pub fn new_full_base(
 	config: Configuration,
+	enable_dev_signer: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_aura::AuraBlockImport<
 			Block,
 			FullClient,
-			FullGrandpaBlockImport,
+			FrontierBlockImport<
+				Block,
+				FullGrandpaBlockImport,
+				FullClient
+			>,
 			sp_consensus_aura::ed25519::AuthorityPair
 		>,
 		&sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
@@ -184,7 +152,7 @@ pub fn new_full_base(
 	let sc_service::PartialComponents {
 		client, backend, mut task_manager, import_queue, keystore_container,
 		select_chain, transaction_pool, inherent_data_providers,
-		other: (rpc_extensions_builder, import_setup, rpc_setup),
+		other: (block_import, grandpa_link),
 	} = new_partial(&config)?;
 
 	let (network, network_status_sinks, system_rpc_tx, network_starter) =
@@ -211,6 +179,46 @@ pub fn new_full_base(
 	let prometheus_registry = config.prometheus_registry().cloned();
 	let telemetry_connection_sinks = sc_service::TelemetryConnectionSinks::default();
 
+	let (rpc_extensions_builder, rpc_setup) = {
+		let justification_stream = grandpa_link.justification_stream();
+		let shared_authority_set = grandpa_link.shared_authority_set().clone();
+		let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
+		let finality_proof_provider =
+			GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
+
+		let rpc_setup = (shared_voter_state.clone(), finality_proof_provider.clone());
+		let client = client.clone();
+		let pool = transaction_pool.clone();
+		let select_chain = select_chain.clone();
+		let network = network.clone();
+		let is_authority = config.role.clone().is_authority();
+		let _keystore = keystore_container.sync_keystore();
+		let subscription_executor = sc_rpc::SubscriptionTaskExecutor::new(task_manager.spawn_handle());
+
+		let rpc_extensions_builder = move |deny_unsafe, _| {
+			let deps = edgeware_rpc::FullDeps {
+				client: client.clone(),
+				pool: pool.clone(),
+				select_chain: select_chain.clone(),
+				network: network.clone(),
+				is_authority,
+				enable_dev_signer,
+				deny_unsafe,
+				grandpa: edgeware_rpc::GrandpaDeps {
+					shared_voter_state: shared_voter_state.clone(),
+					shared_authority_set: shared_authority_set.clone(),
+					justification_stream: justification_stream.clone(),
+					subscription_executor: subscription_executor.clone(),
+					finality_provider: finality_proof_provider.clone(),
+				},
+			};
+
+			edgeware_rpc::create_full(deps, subscription_executor.clone())
+		};
+
+		(rpc_extensions_builder, rpc_setup)
+	};
+
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
 		backend: backend.clone(),
@@ -227,7 +235,6 @@ pub fn new_full_base(
 		system_rpc_tx,
 	})?;
 
-	let (block_import, grandpa_link) = import_setup;
 	let (shared_voter_state, _finality_proof_provider) = rpc_setup;
 
 	(with_startup_data)(&block_import, &grandpa_link);
@@ -344,9 +351,9 @@ pub struct NewFullBase {
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(config: Configuration)
+pub fn new_full(config: Configuration, enable_dev_signer: bool)
 -> Result<TaskManager, ServiceError> {
-	new_full_base(config, |_, _| ()).map(|NewFullBase { task_manager, .. }| {
+	new_full_base(config, enable_dev_signer, |_, _| ()).map(|NewFullBase { task_manager, .. }| {
 		task_manager
 	})
 }
