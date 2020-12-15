@@ -3,7 +3,6 @@
 use codec::{Encode};
 use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
 use frame_system::{self as system, ensure_none, ensure_signed};
-use edgeware_primitives::Balance;
 use sp_core::ecdsa;
 use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
 use sp_runtime::{
@@ -28,16 +27,11 @@ type RenVMAssetId<T> = <T as pallet_assets::Config>::AssetId;
 
 pub trait Config: pallet_assets::Config {
 	type Event: From<Event<Self>> + Into<<Self as system::Config>::Event>;
-	type RenVMBTCAssetId: Get<<Self as pallet_assets::Config>::AssetId>;//Member + Parameter + Default + Copy + HasCompact;
-	// type RenVMBTCAssetId: Get<u32>;
 	/// The RenVM split public key
 	type PublicKey: Get<[u8; 20]>;
 	/// The RenVM Currency identifier
 	type CurrencyIdentifier: Get<[u8; 32]>;
 	/// A configuration for base priority of unsigned transactions.
-	///
-	/// This is exposed so that it can be tuned for particular runtime, when
-	/// multiple modules send unsigned transactions.
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
 }
 
@@ -46,7 +40,7 @@ decl_storage! {
 		/// Signature blacklist. This is required to prevent double claim.
 		Signatures get(fn signatures): map hasher(opaque_twox_256) EcdsaSignature => Option<()>;
 		/// Record burn event details
-		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(T::BlockNumber, DestAddress, Balance)>;
+		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(T::BlockNumber, DestAddress, T::Balance)>;
 		/// Next burn event ID
 		NextBurnEventId get(fn next_burn_event_id): u32;
 	}
@@ -54,7 +48,8 @@ decl_storage! {
 
 decl_event!(
 	pub enum Event<T> where
-		<T as system::Config>::AccountId
+		<T as system::Config>::AccountId,
+		<T as pallet_assets::Config>::Balance,
 	{
 		/// Asset minted. \[owner, amount\]
 		Minted(AccountId, Balance),
@@ -97,15 +92,13 @@ decl_module! {
 			origin,
 			who: T::AccountId,
 			p_hash: [u8; 32],
-			#[compact] amount: Balance,
+			#[compact] amount: T::Balance,
 			n_hash: [u8; 32],
 			sig: EcdsaSignature,
-			#[compact] asset_id: RenVMAssetId<T>
+			#[compact] asset_id: T::AssetId,
 		) {
 			ensure_none(origin)?;
-			ensure!(T::RenVMBTCAssetId::get()==asset_id, Error::<T>::AssetIdDoesNotMatch);
-			ensure!(pallet_assets::Store::Asset::get(asset_id).is_some(),Error::<T>::AssetIdDoesNotExist);
-
+			ensure!(<pallet_assets::Module<T> as Config>::Asset::contains_key(asset_id), Error::<T>::AssetIdDoesNotExist);
 			Self::do_mint(who, amount, sig, asset_id)?;
 		}
 
@@ -113,19 +106,26 @@ decl_module! {
 		#[weight = 10_000]
 		fn burn(
 			origin,
-			#[compact] asset_id: RenVMAssetId<T>,
+			#[compact] asset_id: T::AssetId,
 			to: DestAddress,
-			#[compact] amount: Balance,
+			#[compact] amount: T::Balance,
 		) {
 			let sender = ensure_signed(origin)?;
-			ensure!(T::RenVMBTCAssetId::get()==asset_id, Error::<T>::AssetIdDoesNotMatch);
-			ensure!(pallet_assets::Module::<T>::balance(asset_id,sender.clone()).into() > amount,Error::<T>::InsufficientFunds);
+			ensure!(
+				<pallet_assets::Module::<T>>::balance(asset_id, sender.clone()).into() > amount,
+				Error::<T>::InsufficientFunds
+			);
 
 			NextBurnEventId::try_mutate(|id| -> DispatchResult {
 				let this_id = *id;
 				*id = id.checked_add(1).ok_or(Error::<T>::BurnIdOverflow)?;
 
-				<pallet_assets::Module<T>>::burn(frame_system::RawOrigin::Signed(Self::account_id()).into(),asset_id,T::Lookup::unlookup(sender.clone()),amount.into())?;
+				<pallet_assets::Module<T>>::burn(
+					frame_system::RawOrigin::Signed(Self::account_id()).into(),
+					asset_id,
+					T::Lookup::unlookup(sender.clone()),
+					amount,
+				)?;
 				BurnEvents::<T>::insert(this_id, (frame_system::Module::<T>::block_number(), &to, amount));
 				Self::deposit_event(RawEvent::Burnt(sender, to, amount));
 
@@ -138,8 +138,13 @@ decl_module! {
 
 
 impl<T: Config> Module<T> {
-	fn do_mint(sender: T::AccountId, amount: Balance, sig: EcdsaSignature, asset_id: RenVMAssetId<T>) -> DispatchResult {
-		<pallet_assets::Module<T>>::mint(frame_system::RawOrigin::Signed(Self::account_id()).into(),asset_id,T::Lookup::unlookup(sender.clone()),amount.into())?;
+	fn do_mint(sender: T::AccountId, amount: T::Balance, sig: EcdsaSignature, asset_id: T::AssetId) -> DispatchResult {
+		<pallet_assets::Module<T>>::mint(
+			frame_system::RawOrigin::Signed(Self::account_id()).into(),
+			asset_id,
+			T::Lookup::unlookup(sender.clone()),
+			amount.into()
+		)?;
 		Signatures::insert(&sig, ());
 
 		Self::deposit_event(RawEvent::Minted(sender, amount));
@@ -147,13 +152,13 @@ impl<T: Config> Module<T> {
 	}
 
 	// ABI-encode the values for creating the signature hash.
-	fn signable_message(p_hash: &[u8; 32], amount: u128, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
+	fn signable_message(p_hash: &[u8; 32], amount: T::Balance, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
 		// p_hash ++ amount ++ token ++ to ++ n_hash
 		let length = 32 + 32 + 32 + 32 + 32;
 		let mut v = Vec::with_capacity(length);
 		v.extend_from_slice(&p_hash[..]);
 		v.extend_from_slice(&[0u8; 16][..]);
-		v.extend_from_slice(&amount.to_be_bytes()[..]);
+		v.extend_from_slice(&amount.encode());
 		v.extend_from_slice(&token[..]);
 		v.extend_from_slice(to);
 		v.extend_from_slice(&n_hash[..]);
@@ -163,7 +168,7 @@ impl<T: Config> Module<T> {
 	// Verify that the signature has been signed by RenVM.
 	fn verify_signature(
 		p_hash: &[u8; 32],
-		amount: u128,
+		amount: T::Balance,
 		to: &[u8],
 		n_hash: &[u8; 32],
 		sig: &[u8; 65],
@@ -235,7 +240,7 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 		})
 	}
 
-	// #[cfg(feature = "runtime-benchmarks")]
+	#[cfg(feature = "runtime-benchmarks")]
 	fn successful_origin() -> T::Origin {
 		T::Origin::from(frame_system::RawOrigin::Root)
 	}

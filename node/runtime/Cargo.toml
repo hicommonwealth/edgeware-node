@@ -178,4 +178,5 @@ runtime-benchmarks = [
 	"signaling/runtime-benchmarks",
 	"voting/runtime-benchmarks",
 	"chainbridge/runtime-benchmarks",
+	"edge-ren/runtime-benchmarks",
 ]
