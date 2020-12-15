@@ -16,7 +16,9 @@ sp-trie = { version = "2.0.0"}
 frame-benchmarking = { version = "2.0.0"}
 
 edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
+edgeware-mainnet-runtime = { path = "../runtime/mainnet" }
+edgeware-beresheet-runtime = { path = "../runtime/beresheet" }
+edgeware-development-runtime = { path = "../runtime/dev" }
 edgeware-runtime-interface = { path = "../runtime-interface" }
 
 [dev-dependencies]

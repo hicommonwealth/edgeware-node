@@ -21,6 +21,13 @@ use sc_cli::{Result, SubstrateCli, RuntimeVersion, Role, ChainSpec};
 use sc_service::PartialComponents;
 use crate::service::{new_partial};
 
+fn get_exec_name() -> Option<String> {
+	std::env::current_exe()
+		.ok()
+		.and_then(|pb| pb.file_name().map(|s| s.to_os_string()))
+		.and_then(|s| s.into_string().ok())
+}
+
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
 		"Edgeware Node".into()
@@ -51,24 +58,89 @@ impl SubstrateCli for Cli {
 	}
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
+		let id = if id.is_empty() {
+			let n = get_exec_name().unwrap_or_default();
+			["edgeware", "beresheet", "development"]
+				.iter()
+				.cloned()
+				.find(|&chain| n.starts_with(chain))
+				.unwrap_or("edgeware")
+		} else {
+			id
+		};
+
 		Ok(match id {
-			"dev" => Box::new(chain_spec::development_config()),
-			"multi-dev" | "multi" => Box::new(chain_spec::multi_development_config()),
-			"local" => Box::new(chain_spec::local_testnet_config()),
-			"testnet-conf" => Box::new(chain_spec::edgeware_testnet_config(
+			#[cfg(feature = "with-development-runtime")]
+			"dev" => Box::new(chain_spec::development::development_config()),
+			#[cfg(feature = "with-development-runtime")]
+			"multi-dev" | "multi" => Box::new(chain_spec::development::multi_development_config()),
+			#[cfg(feature = "with-development-runtime")]
+			"local" => Box::new(chain_spec::development::local_testnet_config()),
+			#[cfg(feature = "with-beresheet-runtime")]
+			"testnet-conf" => Box::new(chain_spec::beresheet::edgeware_testnet_config(
 				"Beresheet".to_string(),
 				"beresheet_edgeware_testnet".to_string(),
 			)),
-			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
-			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
-			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
-			path => Box::new(chain_spec::ChainSpec::from_json_file(
-				std::path::PathBuf::from(path),
-			)?),
+			#[cfg(feature = "with-beresheet-runtime")]
+			"beresheet" => Box::new(chain_spec::beresheet::edgeware_beresheet_official()),
+			#[cfg(feature = "with-mainnet-runtime")]
+			"mainnet-conf" => Box::new(chain_spec::mainnet::edgeware_mainnet_config()),
+			#[cfg(feature = "with-mainnet-runtime")]
+			"edgeware" => Box::new(chain_spec::mainnet::edgeware_mainnet_official()),
+			path => {
+				let path = std::path::PathBuf::from(path);
+
+				let starts_with = |prefix: &str| {
+					path.file_name()
+						.map(|f| f.to_str().map(|s| s.starts_with(&prefix)))
+						.flatten()
+						.unwrap_or(false)
+				};
+
+				if starts_with("mainnet") || starts_with("edgeware") {
+					#[cfg(feature = "with-mainnet-runtime")]
+					{
+						Box::new(chain_spec::mainnet::ChainSpec::from_json_file(path)?)
+					}
+
+					#[cfg(not(feature = "with-mainnet-runtime"))]
+					return Err("Mainnet runtime is not available. Please compile the node with `--features with-mainnet-runtime` to enable it.".into());
+				} else if starts_with("beresheet") {
+					#[cfg(feature = "with-beresheet-runtime")]
+					{
+						Box::new(chain_spec::beresheet::ChainSpec::from_json_file(path)?)
+					}
+					#[cfg(not(feature = "with-beresheet-runtime"))]
+					return Err("Beresheet runtime is not available. Please compile the node with `--features with-beresheet-runtime` to enable it.".into());
+				} else {
+					#[cfg(feature = "with-development-runtime")]
+					{
+						Box::new(chain_spec::development::ChainSpec::from_json_file(path)?)
+					}
+					#[cfg(not(feature = "with-development-runtime"))]
+					return Err("Development runtime is not available. Please compile the node with `--features with-development-runtime` to enable it.".into());
+				}
+			}
 		})
 	}
+
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&edgeware_runtime::VERSION
+		if spec.is_mainnet() {
+			#[cfg(feature = "with-mainnet-runtime")]
+			return &service::acala_runtime::VERSION;
+			#[cfg(not(feature = "with-mainnet-runtime"))]
+			panic!("Mainnet runtime is not available. Please compile the node with `--features with-mainnet-runtime` to enable it.");
+		} else if spec.is_beresheet() {
+			#[cfg(feature = "with-beresheet-runtime")]
+			return &service::beresheet_runtime::VERSION;
+			#[cfg(not(feature = "with-beresheet-runtime"))]
+			panic!("Beresheet runtime is not available. Please compile the node with `--features with-beresheet-runtime` to enable it.");
+		} else {
+			#[cfg(feature = "with-development-runtime")]
+			return &service::development_runtime::VERSION;
+			#[cfg(not(feature = "with-development-runtime"))]
+			panic!("Development runtime is not available. Please compile the node with `--features with-development-runtime` to enable it.");
+		}
 	}
 }
 

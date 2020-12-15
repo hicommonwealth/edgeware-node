@@ -24,7 +24,14 @@ use sc_consensus_aura;
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use fc_consensus::FrontierBlockImport;
 use edgeware_primitives::Block;
-use edgeware_runtime::RuntimeApi;
+
+#[cfg(feature = "with-mainnet-runtime")]
+pub use mainnet_runtime;
+#[cfg(feature = "with-beresheet-runtime")]
+pub use beresheet_runtime;
+#[cfg(feature = "with-development-runtime")]
+pub use development_runtime;
+
 use sc_service::{
 	config::{Configuration}, error::{Error as ServiceError},
 	RpcHandlers, TaskManager,

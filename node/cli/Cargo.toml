@@ -89,7 +89,9 @@ pallet-grandpa = { version = "2.0.0" }
 pallet-evm = { path = "../../vendor/frontier/frame/evm" }
 
 # node-specific dependencies
-edgeware-runtime = { path = "../runtime" }
+edgeware-mainnet-runtime = { path = "../runtime/mainnet" }
+edgeware-beresheet-runtime = { path = "../runtime/beresheet" }
+edgeware-development-runtime = { path = "../runtime/dev" }
 edgeware-rpc = { path = "../rpc" }
 edgeware-primitives = { path = "../primitives" }
 edgeware-executor = { path = "../executor" }
@@ -151,6 +153,6 @@ cli = [
 ]
 
 runtime-benchmarks = [
-	"edgeware-runtime/runtime-benchmarks",
+	"edgeware-mainnet-runtime/runtime-benchmarks",
 	"frame-benchmarking-cli",
 ]

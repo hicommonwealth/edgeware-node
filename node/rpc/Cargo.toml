@@ -11,7 +11,9 @@ targets = ["x86_64-unknown-linux-gnu"]
 jsonrpc-core = "15.0.0"
 jsonrpc-pubsub = "15.0.0"
 edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
+edgeware-mainnet-runtime = { path = "../runtime/mainnet" }
+edgeware-beresheet-runtime = { path = "../runtime/beresheet" }
+edgeware-development-runtime = { path = "../runtime/dev" }
 pallet-contracts-rpc = { version = "0.8.0" }
 pallet-transaction-payment-rpc = { version = "2.0.0" }
 sc-client-api = { version = "2.0.0" }

@@ -44,7 +44,9 @@ futures = "0.3.1"
 
 edgeware-executor = { path = "../executor" }
 edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
+edgeware-mainnet-runtime = { path = "../runtime/mainnet" }
+edgeware-beresheet-runtime = { path = "../runtime/beresheet" }
+edgeware-development-runtime = { path = "../runtime/dev" }
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling" }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward" }
 

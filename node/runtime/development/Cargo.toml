@@ -1,5 +1,5 @@
 [package]
-name = "edgeware-runtime"
+name = "edgeware-development-runtime"
 version = "3.2.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
