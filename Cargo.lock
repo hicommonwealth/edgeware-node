@@ -1312,8 +1312,6 @@ dependencies = [
 name = "edge-ren"
 version = "1.0.0"
 dependencies = [
- "edgeware-primitives",
- "frame-benchmarking",
  "frame-support",
  "frame-system",
  "hex-literal",

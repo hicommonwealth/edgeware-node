@@ -1150,6 +1150,7 @@ construct_runtime!(
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
+		RenVM: edge_ren::{Module, Call, Storage, Event<T>},
 	}
 );
 

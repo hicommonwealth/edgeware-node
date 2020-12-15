@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Encode};
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get}};
 use frame_system::{self as system, ensure_none, ensure_signed};
 use sp_core::ecdsa;
 use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
@@ -224,25 +224,4 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 			InvalidTransaction::Call.into()
 		}
 	}
-}
-
-
-/// Simple ensure origin for the RenVM account
-//
-pub struct EnsureRenVM<T>(sp_std::marker::PhantomData<T>);
-impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
-	type Success = T::AccountId;
-	fn try_origin(o: T::Origin) -> Result<Self::Success, T::Origin> {
-		let renvm_id = MODULE_ID.into_account();
-		o.into().and_then(|o| match o {
-			system::RawOrigin::Signed(who) if who == renvm_id => Ok(renvm_id),
-			r => Err(T::Origin::from(r)),
-		})
-	}
-
-	#[cfg(feature = "runtime-benchmarks")]
-	fn successful_origin() -> T::Origin {
-		T::Origin::from(frame_system::RawOrigin::Root)
-	}
-
 }
