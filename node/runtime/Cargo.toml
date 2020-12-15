@@ -89,6 +89,10 @@ fp-rpc = { path = "../../vendor/frontier/primitives/rpc", default-features = fal
 pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-features = false }
 pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
 pallet-evm-precompile-simple = { path = "../../vendor/frontier/frame/evm/precompile/simple", default-features = false }
+pallet-evm-precompile-modexp = { path = "../../vendor/frontier/frame/evm/precompile/modexp", default-features = false }
+pallet-evm-precompile-bn128 = { path = "../../vendor/frontier/frame/evm/precompile/bn128", default-features = false }
+pallet-evm-precompile-blake2 = { path = "../../vendor/frontier/frame/evm/precompile/blake2", default-features = false }
+pallet-evm-precompile-ed25519 = { path = "../../vendor/frontier/frame/evm/precompile/ed25519", default-features = false }
 
 
 # used for runtime benchmarking
