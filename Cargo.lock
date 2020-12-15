@@ -1309,6 +1309,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-ren"
+version = "1.0.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "hex-literal",
+ "pallet-assets",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "edge-signaling"
 version = "1.0.0"
 dependencies = [
