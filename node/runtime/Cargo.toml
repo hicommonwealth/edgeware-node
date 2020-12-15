@@ -89,6 +89,8 @@ fp-rpc = { path = "../../vendor/frontier/primitives/rpc", default-features = fal
 pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-features = false }
 pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
 
+edge-ren = {path = "../../modules/edge-ren", default-features = false}
+
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
 frame-system-benchmarking = { version = "2.0.0", default-features = false, optional = true }

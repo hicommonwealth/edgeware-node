@@ -1067,7 +1067,7 @@ impl edge_chainbridge::Config for Runtime {
     type Event = Event;
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
 	type Currency = Balances;
-    type NativeTokenId = NativeTokenId;    
+    type NativeTokenId = NativeTokenId;
     type NativeTransferFee = NativeTransferFee;
 }
 
@@ -1085,6 +1085,22 @@ impl pallet_assets::Config for Runtime {
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const RenvmBridgeUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 16;
+	pub const RENBTCCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::RENBTC);
+	pub const RenVmPublickKey: [u8; 20] = hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"];
+	pub const RENBTCIdentifier: [u8; 32] = hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"];
+	pun const RenVMBTCAssetId: constants::currency::AssetId = 10;
+}
+
+impl edge_ren::Config for Runtime {
+	type Event = Event;
+	type RenVMBTCAssetId = RenVMBTCAssetId;
+	type PublicKey = RenVmPublickKey;
+	type CurrencyIdentifier = RENBTCIdentifier;
+	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 }
 
 construct_runtime!(

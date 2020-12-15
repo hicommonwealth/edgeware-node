@@ -16,6 +16,8 @@ sp-io = { version = "2.0.0", default-features = false }
 sp-core = { version = "2.0.0", default-features = false }
 sp-runtime = { version = "2.0.0", default-features = false }
 
+edgeware-primitives = { path = "../../node/primitives", default-features = false }
+
 [dev-dependencies]
 hex-literal = { version = "0.3.1" }
 pallet-balances = { version = "2.0.0", default-features = false }
@@ -31,4 +33,5 @@ std = [
 	"sp-runtime/std",
 	"pallet-assets/std",
 	"pallet-balances/std",
+	"edgeware-primitives/std",
 ]

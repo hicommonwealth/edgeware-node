@@ -1312,6 +1312,7 @@ dependencies = [
 name = "edge-ren"
 version = "1.0.0"
 dependencies = [
+ "edgeware-primitives",
  "frame-support",
  "frame-system",
  "hex-literal",
@@ -1573,6 +1574,7 @@ version = "3.2.0"
 dependencies = [
  "chainbridge",
  "edge-chainbridge",
+ "edge-ren",
  "edge-signaling",
  "edge-treasury-reward",
  "edge-voting",

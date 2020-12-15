@@ -1,12 +1,14 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use codec::Encode;
-use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, traits::Get};
+use codec::{Encode};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
 use frame_system::{self as system, ensure_none, ensure_signed};
-use primitives::Balance;
+use edgeware_primitives::Balance;
 use sp_core::ecdsa;
 use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
 use sp_runtime::{
+	ModuleId,
+	traits::{ StaticLookup, AccountIdConversion},
 	transaction_validity::{
 		InvalidTransaction, TransactionPriority, TransactionSource, TransactionValidity, ValidTransaction,
 	},
@@ -14,15 +16,20 @@ use sp_runtime::{
 };
 use sp_std::vec::Vec;
 
-mod mock;
-mod tests;
+// mod mock;
+// mod tests;
+
+const MODULE_ID: ModuleId = ModuleId(*b"edge-ren");
 
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
 
+type RenVMAssetId<T> = <T as pallet_assets::Config>::AssetId;
+
 pub trait Config: pallet_assets::Config {
 	type Event: From<Event<Self>> + Into<<Self as system::Config>::Event>;
-	type Currency: 	type Currency: Currency<Self::AccountId>;
+	type RenVMBTCAssetId: Get<<Self as pallet_assets::Config>::AssetId>;//Member + Parameter + Default + Copy + HasCompact;
+	// type RenVMBTCAssetId: Get<u32>;
 	/// The RenVM split public key
 	type PublicKey: Get<[u8; 20]>;
 	/// The RenVM Currency identifier
@@ -31,7 +38,7 @@ pub trait Config: pallet_assets::Config {
 	///
 	/// This is exposed so that it can be tuned for particular runtime, when
 	/// multiple modules send unsigned transactions.
-	type UnsignedPriority: Get<TransactionPriority>;
+	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
 }
 
 decl_storage! {
@@ -47,12 +54,13 @@ decl_storage! {
 
 decl_event!(
 	pub enum Event<T> where
-		<T as system::Config>::AccountId,
+		<T as system::Config>::AccountId
 	{
 		/// Asset minted. \[owner, amount\]
 		Minted(AccountId, Balance),
 		/// Asset burnt in this chain \[owner, dest, amount\]
 		Burnt(AccountId, DestAddress, Balance),
+
 	}
 );
 
@@ -64,6 +72,12 @@ decl_error! {
 		SignatureAlreadyUsed,
 		/// Burn ID overflow.
 		BurnIdOverflow,
+		/// The AssetId not found in pallet-asset Asset Storage map
+		AssetIdDoesNotExist,
+		/// The AssetId does not match RenVMBTCAssetId
+		AssetIdDoesNotMatch,
+		/// The funds aren't enough to burn the amount
+		InsufficientFunds,
 	}
 }
 
@@ -86,37 +100,46 @@ decl_module! {
 			#[compact] amount: Balance,
 			n_hash: [u8; 32],
 			sig: EcdsaSignature,
+			#[compact] asset_id: RenVMAssetId<T>
 		) {
 			ensure_none(origin)?;
-			Self::do_mint(who, amount, sig)?;
+			ensure!(T::RenVMBTCAssetId::get()==asset_id, Error::<T>::AssetIdDoesNotMatch);
+			ensure!(pallet_assets::Store::Asset::get(asset_id).is_some(),Error::<T>::AssetIdDoesNotExist);
+
+			Self::do_mint(who, amount, sig, asset_id)?;
 		}
 
 		/// Allow a user to burn assets.
 		#[weight = 10_000]
 		fn burn(
 			origin,
+			#[compact] asset_id: RenVMAssetId<T>,
 			to: DestAddress,
 			#[compact] amount: Balance,
 		) {
 			let sender = ensure_signed(origin)?;
+			ensure!(T::RenVMBTCAssetId::get()==asset_id, Error::<T>::AssetIdDoesNotMatch);
+			ensure!(pallet_assets::Module::<T>::balance(asset_id,sender.clone()).into() > amount,Error::<T>::InsufficientFunds);
 
 			NextBurnEventId::try_mutate(|id| -> DispatchResult {
 				let this_id = *id;
 				*id = id.checked_add(1).ok_or(Error::<T>::BurnIdOverflow)?;
 
-				T::Currency::withdraw(&sender, amount)?;
+				<pallet_assets::Module<T>>::burn(frame_system::RawOrigin::Signed(Self::account_id()).into(),asset_id,T::Lookup::unlookup(sender.clone()),amount.into())?;
 				BurnEvents::<T>::insert(this_id, (frame_system::Module::<T>::block_number(), &to, amount));
 				Self::deposit_event(RawEvent::Burnt(sender, to, amount));
 
 				Ok(())
 			})?;
 		}
+
 	}
 }
 
+
 impl<T: Config> Module<T> {
-	fn do_mint(sender: T::AccountId, amount: Balance, sig: EcdsaSignature) -> DispatchResult {
-		T::Currency::deposit(&sender, amount)?;
+	fn do_mint(sender: T::AccountId, amount: Balance, sig: EcdsaSignature, asset_id: RenVMAssetId<T>) -> DispatchResult {
+		<pallet_assets::Module<T>>::mint(frame_system::RawOrigin::Signed(Self::account_id()).into(),asset_id,T::Lookup::unlookup(sender.clone()),amount.into())?;
 		Signatures::insert(&sig, ());
 
 		Self::deposit_event(RawEvent::Minted(sender, amount));
@@ -156,6 +179,14 @@ impl<T: Config> Module<T> {
 
 		Ok(())
 	}
+
+	/// Provides an AccountId for the pallet.
+	/// This is used both as an origin check and deposit/withdrawal account.
+	pub fn account_id() -> T::AccountId {
+		MODULE_ID.into_account()
+	}
+
+
 }
 
 #[allow(deprecated)]
@@ -163,7 +194,7 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 	type Call = Call<T>;
 
 	fn validate_unsigned(_source: TransactionSource, call: &Self::Call) -> TransactionValidity {
-		if let Call::mint(who, p_hash, amount, n_hash, sig) = call {
+		if let Call::mint(who, p_hash, amount, n_hash, sig, asset_id) = call {
 			// check if already exists
 			if Signatures::contains_key(&sig) {
 				return InvalidTransaction::Stale.into();
@@ -179,7 +210,7 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 			}
 
 			ValidTransaction::with_tag_prefix("renvm-bridge")
-				.priority(T::UnsignedPriority::get())
+				.priority(T::RenvmBridgeUnsignedPriority::get())
 				.and_provides(sig)
 				.longevity(64_u64)
 				.propagate(true)
@@ -188,4 +219,25 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 			InvalidTransaction::Call.into()
 		}
 	}
+}
+
+
+/// Simple ensure origin for the RenVM account
+//
+pub struct EnsureRenVM<T>(sp_std::marker::PhantomData<T>);
+impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
+	type Success = T::AccountId;
+	fn try_origin(o: T::Origin) -> Result<Self::Success, T::Origin> {
+		let renvm_id = MODULE_ID.into_account();
+		o.into().and_then(|o| match o {
+			system::RawOrigin::Signed(who) if who == renvm_id => Ok(renvm_id),
+			r => Err(T::Origin::from(r)),
+		})
+	}
+
+	// #[cfg(feature = "runtime-benchmarks")]
+	fn successful_origin() -> T::Origin {
+		T::Origin::from(frame_system::RawOrigin::Root)
+	}
+
 }
