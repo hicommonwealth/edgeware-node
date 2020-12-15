@@ -90,8 +90,6 @@ pub use pallet_balances::Call as BalancesCall;
 pub use frame_system::Call as SystemCall;
 #[cfg(any(feature = "std", test))]
 pub use pallet_staking::StakerStatus;
-/// Public precompiles from evm module
-pub use pallet_evm::precompiles::{Sha256, Ripemd160, ECRecover};
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
 use impls::{Author};
@@ -943,7 +941,12 @@ impl pallet_evm::Config for Runtime {
 	type Currency = Balances;
 	type Event = Event;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
-	type Precompiles = EdgewarePrecompiles;
+	type Precompiles = (
+		pallet_evm_precompile_simple::ECRecover,
+		pallet_evm_precompile_simple::Sha256,
+		pallet_evm_precompile_simple::Ripemd160,
+		pallet_evm_precompile_simple::Identity,
+	);
 	type ChainId = EthChainId;
 	type GasToWeight = ();
 
@@ -951,42 +954,6 @@ impl pallet_evm::Config for Runtime {
 	fn config() -> &'static EvmConfig {
 		&EVM_CONFIG
 	}
-}
-
-pub struct EdgewarePrecompiles;
-
-type PrecompiledCallable = fn(&[u8], Option<usize>)
-	-> core::result::Result<(pallet_evm::ExitSucceed, Vec<u8>, usize), pallet_evm::ExitError>;
-
-impl pallet_evm::Precompiles for EdgewarePrecompiles {
-	fn execute(
-		address: H160,
-		input: &[u8],
-		target_gas: Option<usize>
-	) -> Option<core::result::Result<(pallet_evm::ExitSucceed, Vec<u8>, usize), pallet_evm::ExitError>> {
-		match get_precompiled_func_from_address(&address) {
-			 Some(func) => return Some(func(input, target_gas)),
-			 _ => {},
-		};
-
-		None
-	}
-}
-
-fn get_precompiled_func_from_address(address: &H160) -> Option<PrecompiledCallable> {
-	use core::str::FromStr;
-	use pallet_evm::Precompile;
-
-	let addr_ecrecover = H160::from_str("0000000000000000000000000000000000000001").expect("Invalid address at precompiles generation");
-	let addr_sha256 = H160::from_str("0000000000000000000000000000000000000002").expect("Invalid address at precompiles generation");
-	let addr_ripemd160 = H160::from_str("0000000000000000000000000000000000000003").expect("Invalid address at precompiles generation");
-
-	let exec: Option<PrecompiledCallable> = if *address == addr_ecrecover { Some(ECRecover::execute) }
-		else if *address == addr_sha256 { Some(Sha256::execute) }
-		else if *address == addr_ripemd160 { Some(Ripemd160::execute) }
-		else { None };
-
-	exec
 }
 
 pub struct EthereumFindAuthor<F>(PhantomData<F>);

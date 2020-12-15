@@ -1583,6 +1583,7 @@ dependencies = [
  "pallet-elections-phragmen",
  "pallet-ethereum",
  "pallet-evm",
+ "pallet-evm-precompile-simple",
  "pallet-grandpa",
  "pallet-identity",
  "pallet-im-online",
@@ -2088,6 +2089,7 @@ name = "fp-evm"
 version = "0.8.0"
 dependencies = [
  "evm",
+ "impl-trait-for-tuples",
  "parity-scale-codec",
  "serde",
  "sp-core",
@@ -4648,12 +4650,10 @@ dependencies = [
  "fp-evm",
  "frame-support",
  "frame-system",
- "impl-trait-for-tuples",
  "pallet-balances",
  "pallet-timestamp",
  "parity-scale-codec",
  "primitive-types",
- "ripemd160",
  "rlp",
  "serde",
  "sha3 0.8.2",
@@ -4661,6 +4661,17 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-evm-precompile-simple"
+version = "2.0.0"
+dependencies = [
+ "evm",
+ "fp-evm",
+ "ripemd160",
+ "sp-core",
+ "sp-io",
 ]
 
 [[package]]
