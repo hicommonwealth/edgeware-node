@@ -942,7 +942,6 @@ impl pallet_evm::Config for Runtime {
 	type Event = Event;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type Precompiles = (
-		pallet_evm_precompile_simple::Identity,
 		pallet_evm_precompile_simple::ECRecover,
 		pallet_evm_precompile_simple::Sha256,
 		pallet_evm_precompile_simple::Ripemd160,
