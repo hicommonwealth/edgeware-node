@@ -17,3 +17,4 @@ edgeware*.wasm
 .vscode
 mainnet-state.json
 db
+node_modules
