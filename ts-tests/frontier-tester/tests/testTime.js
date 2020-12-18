@@ -3,6 +3,8 @@ const TimeContract = require("../build/contracts/TimeContract.json");
 const { initWeb3, account } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
+const BLOCK_TIME_MS = 6000;
+
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -26,18 +28,18 @@ describe("TimeContract test", async () => {
     // fetch initial values
     let now = await t.viewNow.call({ from: account });
     let dNow = blockTimeifyDate(Date.now()).toString();
-    assert.equal(dNow.substring(0, dNow.length - 1), now.toString().substring(0, now.toString().length - 1));
+    assert.equal(dNow, now.toString());
 
-    // wait 1s
-    await timeout(1000);
+    // wait a block
+    await timeout(BLOCK_TIME_MS);
     const now2 = await t.viewNow.call({ from: account });
     dNow = blockTimeifyDate(Date.now()).toString();
-    assert.equal(dNow.substring(0, dNow.length - 1), now2.toString().substring(0, now2.toString().length - 1));
+    assert.equal(dNow, now2.toString());
 
-    // wait 1s
-    await timeout(1000);
+    // wait a block
+    await timeout(BLOCK_TIME_MS);
     const now3 = await t.viewNow.call({ from: account });
     dNow = blockTimeifyDate(Date.now()).toString();
-    assert.equal(dNow.substring(0, dNow.length - 1), now3.toString().substring(0, now3.toString().length - 1));
+    assert.equal(dNow, now3.toString());
   });
 });
