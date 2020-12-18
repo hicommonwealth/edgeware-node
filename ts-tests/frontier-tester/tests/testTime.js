@@ -1,6 +1,6 @@
 const { assert } = require("chai");
 const TimeContract = require("../build/contracts/TimeContract.json");
-const { initWeb3, account } = require('../utils');
+const { initWeb3, account } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
 function timeout(ms) {
@@ -27,6 +27,7 @@ describe("TimeContract test", async () => {
     let now = await t.viewNow.call({ from: account });
     let dNow = blockTimeifyDate(Date.now()).toString();
     assert.equal(dNow.substring(0, dNow.length - 1), now.toString().substring(0, now.toString().length - 1));
+
     // wait 1s
     await timeout(1000);
     const now2 = await t.viewNow.call({ from: account });

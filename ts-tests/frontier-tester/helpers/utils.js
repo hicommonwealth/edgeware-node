@@ -17,15 +17,22 @@ const initWeb3 = (pkey = privKey) => {
 
   // ensure native web3 sending works as well as truffle provider
   web3.eth.accounts.wallet.add(privKey);
-  web3.eth.defaultAccount = account;
+  web3.eth.defaultAccount = web3.eth.accounts.wallet[0].address;
   return web3;
 };
 
 const deployContract = async (name, c, args = [], web3 = undefined) => {
+  let deployer, pkey;
   if (!web3) {
     web3 = initWeb3();
+    deployer = account;
+    pkey = privKey;
+  } else {
+    deployer = web3.eth.accounts.wallet[0].address;
+    pkey = web3.eth.accounts.wallet[0].privateKey;
   }
-  console.log(`Attempting to deploy ${name} from account: ${account}`);
+
+  console.log(`Attempting to deploy ${name} from account: ${deployer}`);
   const contract = new web3.eth.Contract(c.abi);
 
   const contractTx = contract.deploy({
@@ -36,12 +43,12 @@ const deployContract = async (name, c, args = [], web3 = undefined) => {
   const data = contractTx.encodeABI();
   const createTransaction = await web3.eth.accounts.signTransaction(
      {
-        from: account,
+        from: deployer,
         data,
         gasLimit: 8000000,
         gasPrice: 1000000000,
      },
-     privKey
+     pkey
   );
 
   const createReceipt = await web3.eth.sendSignedTransaction(

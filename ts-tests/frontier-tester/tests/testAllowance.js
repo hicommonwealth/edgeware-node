@@ -1,5 +1,5 @@
 const { assert } = require("chai");
-const { account, initWeb3 } = require('../utils');
+const { account, initWeb3 } = require('../helpers/utils');
 // const UniswapV2ERC20 = require('../node_modules/@uniswap/v2-core/build/UniswapV2ERC20.json');
 const ERC20 = require('../node_modules/@openzeppelin/contracts/build/contracts/ERC20.json');
 const contract = require("@truffle/contract");

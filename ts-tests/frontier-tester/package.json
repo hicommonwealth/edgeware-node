@@ -8,8 +8,8 @@
   },
   "scripts": {
     "compile": "truffle compile",
-    "add-liquidity": "mocha --timeout 1000000 --exit web3tests/addLiquidity.js",
-    "init-eth-balance": "ts-node initDefaultAccountBalance.ts",
+    "add-liquidity": "mocha --timeout 1000000 --exit tests/addLiquidity.js",
+    "init-eth-balance": "ts-node helpers/initDefaultAccountBalance.ts",
     "test": "ts-mocha --timeout 100000 --exit"
   },
   "author": "",

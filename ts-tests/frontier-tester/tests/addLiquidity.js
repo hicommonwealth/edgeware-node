@@ -1,7 +1,7 @@
 const contract = require("@truffle/contract");
 const { assert } = require("chai");
-const { account, initWeb3 } = require('../utils');
-const { deploy } = require('../deploy');
+const { account, initWeb3 } = require('../helpers/utils');
+const { deploy } = require('../helpers/deployUniswap');
 
 const TokenA = require('../build/contracts/TokenA.json');
 const TokenB = require('../build/contracts/TokenB.json');

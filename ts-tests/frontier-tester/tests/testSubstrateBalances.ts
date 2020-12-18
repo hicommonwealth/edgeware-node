@@ -2,8 +2,7 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import Web3 from 'web3';
 import { assert } from 'chai';
-const { convertToEvmAddress, convertToSubstrateAddress } = require('../utils.js');
-const EdgewarePrivateKeyProvider = require('../private-provider')
+const { convertToEvmAddress, convertToSubstrateAddress, initWeb3 } = require('../helpers/utils.js');
 import BN from 'bn.js';
 import { dev } from '@edgeware/node-types';
 import { TypeRegistry } from '@polkadot/types';
@@ -128,9 +127,8 @@ describe('Substrate <> EVM balances test', async () => {
   it('should update substrate balances from web3 tx', async () => {
     // start with an EVM account with a known private key
     const privKey = '99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E343';
-    const provider = new EdgewarePrivateKeyProvider(privKey, web3Url, id);
-    const web3 = new Web3(provider);
-    const senderAddress = provider.address;
+    const web3: Web3 = new initWeb3(privKey);
+    const senderAddress = web3.eth.defaultAccount;
     const senderSubstrateAddress: string = convertToSubstrateAddress(senderAddress, id);
 
     // give the EVM account some balance to send back via web3

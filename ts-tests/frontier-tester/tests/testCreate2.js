@@ -1,7 +1,7 @@
 const { assert } = require('chai');
 const Create2Factory = require('../build/contracts/Create2Factory.json');
 const ValueContract = require('../build/contracts/ValueContract.json');
-const { deployContract, account, initWeb3 } = require('../utils');
+const { deployContract, account, initWeb3 } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
 describe('Create2Factory test', async () => {

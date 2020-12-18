@@ -1,7 +1,7 @@
 const { assert } = require("chai");
 const IContractUser = require('../build/contracts/IContractUser.json');
 const ContractImpl = require('../build/contracts/ContractImpl.json');
-const { account, initWeb3 } = require('../utils');
+const { account, initWeb3 } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
 describe('Interfaces test', async () => {

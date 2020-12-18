@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 const contract = require("@truffle/contract");
-const { account, initWeb3, privKey } = require('../utils');
+const { account, initWeb3, privKey } = require('../helpers/utils');
 const HashingContract = require('../build/contracts/Hashing.json');
 const RIPEMD160 = require('ripemd160');
 const { sha256 } = require('js-sha256');

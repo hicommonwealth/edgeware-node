@@ -1,10 +1,10 @@
 const Lockdrop = require("../build/contracts/Lockdrop.json");
-const utility = require('../helpers/util');
+const utility = require('../helpers/lockdropWeb3Util');
 const rlp = require('rlp');
 const keccak = require('keccak');
 const { assert } = require('chai');
 const contract = require("@truffle/contract");
-const { deployContract, account, initWeb3 } = require('../utils');
+const { deployContract, account, initWeb3 } = require('../helpers/utils');
 
 describe("Lockdrop test", async () => {
   const SECONDS_IN_DAY = 86400;

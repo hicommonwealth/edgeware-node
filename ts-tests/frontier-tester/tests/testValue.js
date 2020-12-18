@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 const ValueContract = require('../build/contracts/ValueContract.json');
-const { deployContract, account, initWeb3 } = require('../utils');
+const { deployContract, account, initWeb3 } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
 describe("ValueContract test", async () => {

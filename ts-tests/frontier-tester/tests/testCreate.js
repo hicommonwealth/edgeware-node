@@ -1,7 +1,7 @@
 const { assert } = require("chai");
 const rlp = require('rlp');
 const keccak = require('keccak');
-const { account, initWeb3  } = require('../utils');
+const { account, initWeb3  } = require('../helpers/utils');
 
 const CreateContract = require('../build/contracts/CreateContract.json');
 const SubContract = require('../build/contracts/SubContract.json');
