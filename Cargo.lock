@@ -1316,7 +1316,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "hex-literal",
- "pallet-assets",
+ "orml-traits",
  "pallet-balances",
  "parity-scale-codec",
  "serde",
@@ -1589,6 +1589,8 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "hex-literal",
  "integer-sqrt",
+ "orml-tokens",
+ "orml-traits",
  "pallet-assets",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -4416,6 +4418,50 @@ name = "openssl-probe"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
+
+[[package]]
+name = "orml-tokens"
+version = "0.3.3-dev"
+source = "git+https://github.com/open-web3-stack/open-runtime-module-library?rev=266518ffaf5b9f664c1481330295a994dd71b01b#266518ffaf5b9f664c1481330295a994dd71b01b"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "orml-traits",
+ "parity-scale-codec",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "orml-traits"
+version = "0.3.3-dev"
+source = "git+https://github.com/open-web3-stack/open-runtime-module-library?rev=266518ffaf5b9f664c1481330295a994dd71b01b#266518ffaf5b9f664c1481330295a994dd71b01b"
+dependencies = [
+ "frame-support",
+ "impl-trait-for-tuples",
+ "num-traits",
+ "orml-utilities",
+ "parity-scale-codec",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "orml-utilities"
+version = "0.3.3-dev"
+source = "git+https://github.com/open-web3-stack/open-runtime-module-library?rev=266518ffaf5b9f664c1481330295a994dd71b01b#266518ffaf5b9f664c1481330295a994dd71b01b"
+dependencies = [
+ "frame-support",
+ "parity-scale-codec",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
 
 [[package]]
 name = "output_vt100"

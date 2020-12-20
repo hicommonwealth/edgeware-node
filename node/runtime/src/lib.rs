@@ -59,7 +59,7 @@ use sp_runtime::{
 };
 
 pub use sp_runtime::curve::PiecewiseLinear;
-use sp_runtime::traits::{
+use sp_runtime::traits::{AccountIdConversion,
 	self, BlakeTwo256, Block as BlockT, StaticLookup, SaturatedConversion,
 	ConvertInto, OpaqueKeys, NumberFor,
 };
@@ -100,6 +100,10 @@ use impls::{Author};
 pub mod constants;
 use constants::{currency::*, time::*};
 use sp_runtime::generic::Era;
+
+// For orml_tokens
+use orml_traits::parameter_type_with_key;
+
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
@@ -1089,18 +1093,40 @@ impl pallet_assets::Config for Runtime {
 
 parameter_types! {
 	pub const RenvmBridgeUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 16;
-	pub const RENBTCCurrencyId: CurrencyId = CurrencyId::Token(TokenSymbol::RENBTC);
-	pub const RenVmPublickKey: [u8; 20] = hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"];
-	pub const RENBTCIdentifier: [u8; 32] = hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"];
-	pun const RenVMBTCAssetId: constants::currency::AssetId = 10;
+
+	pub const RenVMModuleId: ModuleId = ModuleId(*b"RenToken");
 }
 
 impl edge_ren::Config for Runtime {
 	type Event = Event;
-	type RenVMBTCAssetId = RenVMBTCAssetId;
-	type PublicKey = RenVmPublickKey;
-	type CurrencyIdentifier = RENBTCIdentifier;
+	type RenVMTokenIdType= constants::currency::AssetId;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
+	type ControllerOrigin= EnsureRoot<AccountId>;
+	type ModuleId= RenVMModuleId;
+	type Assets = Tokens;
+}
+
+
+parameter_type_with_key! {
+	pub ExistentialDeposits: |currency_id: constants::currency::AssetId| -> Balance {
+		match currency_id {
+			_ => 0,
+		}
+	};
+}
+
+parameter_types! {
+	pub RenVMModuleAcount: AccountId = RenVMModuleId::get().into_account();
+}
+
+impl orml_tokens::Config for Runtime {
+	type Event = Event;
+	type Balance = Balance;
+	type Amount = i128;
+	type CurrencyId = constants::currency::AssetId;
+	type WeightInfo = ();
+	type ExistentialDeposits = ExistentialDeposits;
+	type OnDust = orml_tokens::TransferDust<Runtime, RenVMModuleAcount>;
 }
 
 construct_runtime!(
@@ -1150,6 +1176,8 @@ construct_runtime!(
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
+		Tokens: orml_tokens::{Module, Call, Storage, Event<T>},
+		RenVMBridge: edge_ren::{Module, Call, Storage, Event<T>},
 	}
 );
 
