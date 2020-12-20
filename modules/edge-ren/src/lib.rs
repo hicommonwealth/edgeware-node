@@ -264,7 +264,8 @@ decl_module! {
 			origin,
 			who: T::AccountId,
 			p_hash: [u8; 32],
-			#[compact] amount: BalanceOf<T>, //BalanceOf<T>,
+			// #[compact] amount: BalanceOf<T>, //BalanceOf<T>,
+			amount: BalanceOf<T>, //BalanceOf<T>,
 			n_hash: [u8; 32],
 			sig: EcdsaSignature,
 			#[compact] _ren_token_id: T::RenVMTokenIdType
@@ -325,7 +326,8 @@ impl<T: Config> Module<T> {
 	// ABI-encode the values for creating the signature hash.
 	fn signable_message(p_hash: &[u8; 32], amount: BalanceOf<T>, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
 
-		let amount_slice = Encode::encode(&amount);
+		let mut amount_slice = Encode::encode(&amount); // OR use BalanceOf<T>::encode(&amount)
+		amount_slice.reverse(); // Because BE required
 
 		// p_hash ++ amount ++ token ++ to ++ n_hash
 		let length = 32 + 32 + 32 + 32 + 32;
@@ -333,7 +335,8 @@ impl<T: Config> Module<T> {
 		v.extend_from_slice(&p_hash[..]);
 		v.extend_from_slice(&[0u8; 16][..]);
 		// v.extend_from_slice(&amount.to_be_bytes()[..]);
-		v.extend_from_slice(&amount_slice);
+		v.extend_from_slice(&amount_slice); // REVERSED because BE is required!!
+		// DO WE NEED [..] here?
 		v.extend_from_slice(&token[..]);
 		v.extend_from_slice(to);
 		v.extend_from_slice(&n_hash[..]);
