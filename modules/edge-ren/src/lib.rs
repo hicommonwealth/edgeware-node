@@ -27,7 +27,7 @@ type DestAddress = Vec<u8>;
 
 type TokenIdOf<T> = <<T as Config>::Assets as MultiCurrency<<T as frame_system::Config>::AccountId>>::CurrencyId;
 type BalanceOf<T> = <<T as Config>::Assets as MultiCurrency<<T as frame_system::Config>::AccountId>>::Balance;
-type BalanceU128 = u128;
+// type BalanceOf<T> = u128;
 
 pub trait Config: frame_system::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
@@ -98,7 +98,7 @@ decl_event!(
 
 		RenTokenSpent(RenVMTokenIdType, Balance),
 
-		RenTokenMinted(AccountId, RenVMTokenIdType, u128),
+		RenTokenMinted(AccountId, RenVMTokenIdType, Balance),
 
 	}
 );
@@ -264,7 +264,7 @@ decl_module! {
 			origin,
 			who: T::AccountId,
 			p_hash: [u8; 32],
-			#[compact] amount: u128, //BalanceOf<T>,
+			#[compact] amount: BalanceOf<T>, //BalanceOf<T>,
 			n_hash: [u8; 32],
 			sig: EcdsaSignature,
 			#[compact] _ren_token_id: T::RenVMTokenIdType
@@ -323,13 +323,17 @@ impl<T: Config> Module<T> {
     }
 
 	// ABI-encode the values for creating the signature hash.
-	fn signable_message(p_hash: &[u8; 32], amount: u128, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
+	fn signable_message(p_hash: &[u8; 32], amount: BalanceOf<T>, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
+
+		let amount_slice = Encode::encode(&amount);
+
 		// p_hash ++ amount ++ token ++ to ++ n_hash
 		let length = 32 + 32 + 32 + 32 + 32;
 		let mut v = Vec::with_capacity(length);
 		v.extend_from_slice(&p_hash[..]);
 		v.extend_from_slice(&[0u8; 16][..]);
-		v.extend_from_slice(&amount.to_be_bytes()[..]);
+		// v.extend_from_slice(&amount.to_be_bytes()[..]);
+		v.extend_from_slice(&amount_slice);
 		v.extend_from_slice(&token[..]);
 		v.extend_from_slice(to);
 		v.extend_from_slice(&n_hash[..]);
@@ -339,7 +343,7 @@ impl<T: Config> Module<T> {
 	// Verify that the signature has been signed by RenVM.
 	fn verify_signature(
 		p_hash: &[u8; 32],
-		amount: u128,
+		amount: BalanceOf<T>,
 		to: &[u8],
 		n_hash: &[u8; 32],
 		sig: &[u8; 65],
@@ -362,7 +366,6 @@ impl<T: Config> Module<T> {
 
 }
 
-// impl <T> From<u128> for
 
 #[allow(deprecated)]
 impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
