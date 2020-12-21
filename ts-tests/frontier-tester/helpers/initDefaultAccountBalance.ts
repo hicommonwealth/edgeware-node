@@ -39,7 +39,7 @@ let sendSubstrateBalance = async (): Promise<void> => {
   });
 
   // ensure the account has funds via web3
-  const web3 = initWeb3();
+  const web3 = await initWeb3();
   const web3Balance = await web3.eth.getBalance(account);
   console.log(`Transfer complete, web3 fetched balance: ${web3Balance}`);
 }

@@ -4,9 +4,9 @@ const rlp = require('rlp');
 const keccak = require('keccak');
 const { assert } = require('chai');
 const contract = require("@truffle/contract");
-const { deployContract, account, initWeb3 } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 
-describe("Lockdrop test", async () => {
+describeWithEdgeware("Lockdrop test", async () => {
   const SECONDS_IN_DAY = 86400;
   const THREE_MONTHS = 0;
   const SIX_MONTHS = 1;
@@ -15,7 +15,7 @@ describe("Lockdrop test", async () => {
   let web3;
 
   before(async function() {
-    web3 = initWeb3();
+    web3 = await initWeb3();
 
     LD = contract({
       abi: Lockdrop.abi,

@@ -1,11 +1,11 @@
 const { assert } = require('chai');
-const { account, initWeb3 } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 const FallbackContract = require('../build/contracts/FallbackContract.json');
 
-describe('Fallback test', async () => {
+describeWithEdgeware('Fallback test', async () => {
   it('should return funds sent to invalid function', async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
 
     // deploy contract
     const FB = contract({

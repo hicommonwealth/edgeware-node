@@ -1,12 +1,12 @@
 const { assert } = require("chai");
-const { account, initWeb3 } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 // const UniswapV2ERC20 = require('../node_modules/@uniswap/v2-core/build/UniswapV2ERC20.json');
 const ERC20 = require('../node_modules/@openzeppelin/contracts/build/contracts/ERC20.json');
 const contract = require("@truffle/contract");
 
-describe("Allowance test", async () => {
+describeWithEdgeware("Allowance test", async () => {
   it("should compute allowance", async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
 
     let erc = contract({
       abi: ERC20.abi,

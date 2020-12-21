@@ -1,12 +1,12 @@
 const { assert } = require('chai');
 const Create2Factory = require('../build/contracts/Create2Factory.json');
 const ValueContract = require('../build/contracts/ValueContract.json');
-const { deployContract, account, initWeb3 } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
-describe('Create2Factory test', async () => {
+describeWithEdgeware('Create2Factory test', async () => {
   it('should deploy with create2', async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
     let Create2 = contract({
       abi: Create2Factory.abi,
       unlinked_binary: Create2Factory.bytecode,

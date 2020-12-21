@@ -1,12 +1,12 @@
 const { assert } = require('chai');
 const Web3 = require('web3');
 const EventContract = require('../build/contracts/EventContract.json');
-const { deployContract, account, initWeb3, privKey } = require('../helpers/utils');
+const { deployContract, account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
-describe("EventContract test", async () => {
+describeWithEdgeware("EventContract test", async () => {
   it("should emit event", async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
     let EC = contract({
       abi: EventContract.abi,
       unlinked_binary: EventContract.bytecode,
@@ -20,7 +20,7 @@ describe("EventContract test", async () => {
 
   it('should receive event thru web3 subscribe', async () => {
     // init an HTTP web3 and use to set up another account for ws
-    const web3Http = initWeb3();
+    const web3Http = await initWeb3();
     const wsPrivKey = '99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342';
     const wsAccount = '0x6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b';
     const value = web3Http.utils.toWei(web3Http.utils.toBN('1'), 'ether');

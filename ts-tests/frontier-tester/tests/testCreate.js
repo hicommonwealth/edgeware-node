@@ -1,15 +1,13 @@
 const { assert } = require("chai");
-const rlp = require('rlp');
-const keccak = require('keccak');
-const { account, initWeb3  } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 
 const CreateContract = require('../build/contracts/CreateContract.json');
 const SubContract = require('../build/contracts/SubContract.json');
 const contract = require("@truffle/contract");
 
-describe("CreateContract test", async () => {
+describeWithEdgeware("CreateContract test", async () => {
   it("should spawn subcontract", async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
 
     let Create = contract({
       abi: CreateContract.abi,
@@ -17,7 +15,9 @@ describe("CreateContract test", async () => {
     });
     Create.setProvider(web3.currentProvider);
 
+    console.log('creating contract');
     let c = await Create.new({ from: account });
+    console.log('fetching nonce');
     let startNonce = await web3.eth.getTransactionCount(c.address);
     console.log(`CreateContract address: ${c.address}, nonce: ${startNonce}`);
     // create without value
@@ -39,7 +39,7 @@ describe("CreateContract test", async () => {
   });
 
   it("should spawn subcontract with value", async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
 
     let Create = contract({
       abi: CreateContract.abi,
@@ -53,7 +53,7 @@ describe("CreateContract test", async () => {
     // create with value
     const value = web3.utils.toWei('10', 'ether');
     await c.spawnWithValue({ value, from: account });
-    address = await c.deployed.call({ from: account });
+    const address = await c.deployed.call({ from: account });
     var Sub = contract({
       abi: SubContract.abi,
       unlinked_binary: SubContract.bytecode,

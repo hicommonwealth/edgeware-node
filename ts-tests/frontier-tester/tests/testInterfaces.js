@@ -1,12 +1,12 @@
 const { assert } = require("chai");
 const IContractUser = require('../build/contracts/IContractUser.json');
 const ContractImpl = require('../build/contracts/ContractImpl.json');
-const { account, initWeb3 } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
-describe('Interfaces test', async () => {
+describeWithEdgeware('Interfaces test', async () => {
   it('should access deployed interface', async () => {
-    const web3 = initWeb3();
+    const web3 = await initWeb3();
 
     console.log('Deploying something-doer...')
     let CIContract = contract({

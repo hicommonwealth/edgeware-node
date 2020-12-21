@@ -1,6 +1,6 @@
 const contract = require("@truffle/contract");
 const { assert } = require("chai");
-const { account, initWeb3 } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 const { deploy } = require('../helpers/deployUniswap');
 
 const TokenA = require('../build/contracts/TokenA.json');
@@ -9,18 +9,18 @@ const UniswapV2Router02 = require('../node_modules/@uniswap/v2-periphery/build/U
 const UniswapV2Factory = require('../node_modules/@uniswap/v2-core/build/UniswapV2Factory.json');
 const UniswapV2Pair = require('../node_modules/@uniswap/v2-core/build/UniswapV2Pair.json');
 
-describe('Add Liquidity Test', () => {
-   let FACTORY_ADDRESS
-   let ROUTER_ADDRESS
+describeWithEdgeware('Add Liquidity Test', async () => {
+   let FACTORY_ADDRESS;
+   let ROUTER_ADDRESS;
 
-   before(async function() {
+   before('Deploy uniswap contracts', async () => {
       const d = await deploy();
       [FACTORY_ADDRESS, ROUTER_ADDRESS] = d;
     });
 
-   it('should create uniswap pair', async () => {   
+   it('should create uniswap pair', async () => {
       // deploy two tokens
-      const web3 = initWeb3();
+      const web3 = await initWeb3();
       const amount0 = web3.utils.toWei('10');
       const amount1 = web3.utils.toWei('10');
    

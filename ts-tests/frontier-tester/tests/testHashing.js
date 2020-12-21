@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 const contract = require("@truffle/contract");
-const { account, initWeb3, privKey } = require('../helpers/utils');
+const { account, initWeb3, describeWithEdgeware } = require('../helpers/utils');
 const HashingContract = require('../build/contracts/Hashing.json');
 const RIPEMD160 = require('ripemd160');
 const { sha256 } = require('js-sha256');
@@ -12,7 +12,7 @@ const trimLeadingHex0s = (web3, n) => {
   return web3.utils.numberToHex(web3.utils.hexToNumberString(n));
 }
 
-describe('Hashing test', async () => {
+describeWithEdgeware('Hashing test', async () => {
   let web3;
   let c;
   const message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tubulum fuisse, qua illum, cuius is condemnatus est rogatione, P. Eaedem res maneant alio modo.'
@@ -21,7 +21,7 @@ describe('Hashing test', async () => {
 
   before(async () => {
     // setup web3 and contract instance
-    web3 = initWeb3();
+    web3 = await initWeb3();
     const Hashing = contract({
       abi: HashingContract.abi,
       unlinked_binary: HashingContract.bytecode,
