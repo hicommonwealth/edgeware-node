@@ -4,135 +4,119 @@
 
 use super::*;
 use frame_support::{impl_outer_event, impl_outer_origin, parameter_types};
+use orml_traits::parameter_type_with_key;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
+use frame_system::{EnsureRoot};
 
 pub type AccountId = H256;
 pub type BlockNumber = u64;
 
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct Test;
+pub struct Runtime;
 
-mod renvm {
+mod edge_ren {
 	pub use super::super::*;
 }
 
 impl_outer_origin! {
-	pub enum Origin for Test {}
+	pub enum Origin for Runtime {}
 }
 
 impl_outer_event! {
-	pub enum TestEvent for Test {
+	pub enum TestEvent for Runtime {
+		orml_tokens<T>,
 		frame_system<T>,
 		pallet_balances<T>,
-		pallet_assets<T>,
-		renvm<T>,
+		edge_ren<T>,
 	}
 }
 
-pub type RenvmBridgeCall = super::Call<Test>;
+pub type RenvmBridgeCall = super::Call<Runtime>;
 
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
-	pub const MaximumBlockWeight: u32 = 1024;
-	pub const MaximumBlockLength: u32 = 2 * 1024;
-	pub const AvailableBlockRatio: Perbill = Perbill::one();
 }
 
-impl frame_system::Config for Test {
+impl frame_system::Config for Runtime {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = BlockNumber;
 	type Call = ();
 	type Hash = H256;
-	type Hashing = ::sp_Test::traits::BlakeTwo256;
+	type Hashing = ::sp_runtime::traits::BlakeTwo256;
 	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
 	type Event = TestEvent;
 	type BlockHashCount = BlockHashCount;
-	type MaximumBlockWeight = MaximumBlockWeight;
-	type MaximumBlockLength = MaximumBlockLength;
-	type AvailableBlockRatio = AvailableBlockRatio;
+	type BlockWeights = ();
+	type BlockLength = ();
 	type Version = ();
 	type PalletInfo = ();
 	type AccountData = pallet_balances::AccountData<Balance>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type DbWeight = ();
-	type BlockExecutionWeight = ();
-	type ExtrinsicBaseWeight = ();
-	type MaximumExtrinsicWeight = ();
 	type BaseCallFilter = ();
 	type SystemWeightInfo = ();
 }
 
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 0;
-	pub const RenVmPublicKey: [u8; 20] = hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"];
-	pub const RENBTCIdentifier: [u8; 32] = hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"];
 }
 
-impl pallet_balances::Config for Test {
+impl pallet_balances::Config for Runtime {
+	type MaxLocks = ();
 	type Balance = Balance;
 	type DustRemoval = ();
 	type Event = TestEvent;
 	type ExistentialDeposit = ExistentialDeposit;
-	type AccountStore = frame_system::Module<Test>;
-	type MaxLocks = ();
+	type AccountStore = frame_system::Module<Runtime>;
 	type WeightInfo = ();
 }
-pub type Balances = pallet_balances::Module<Test>;
+pub type Balances = pallet_balances::Module<Runtime>;
+
 
 parameter_types! {
-	pub const UnsignedPriority: u64 = 1 << 20;
+	pub const RenvmBridgeUnsignedPriority: u64 = 1 << 20;
+
+	pub const RenVMModuleId: ModuleId = ModuleId(*b"RenToken");
 }
 
-pub type AdaptedBasicCurrency = orml_currencies::BasicCurrencyAdapter<Test, Balances, Amount, BlockNumber>;
+impl Config for Runtime {
+	type Event = TestEvent;
+	type RenVMTokenIdType= u32;
+	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
+	type ControllerOrigin= EnsureRoot<AccountId>;
+	type ModuleId= RenVMModuleId;
+	type Assets = Tokens;
+}
+pub type RenVmBridge = Module<Runtime>;
+
 
 parameter_type_with_key! {
-	pub ExistentialDeposits: |currency_id: CurrencyId| -> Balance {
-		Default::default()
+	pub ExistentialDeposits: |currency_id: u32| -> Balance {
+		match currency_id {
+			_ => 0,
+		}
 	};
 }
 
-impl pallet_balances::Config for Test {
-	type MaxLocks = ();
-	type Balance = Balance;
-	type Event = ();
-	type DustRemoval = ();
-	type ExistentialDeposit = ExistentialDeposit;
-	type AccountStore = System;
-	type WeightInfo = ();
-}
 
-parameter_types! {
-	pub const AssetDepositBase: u64 = 1;
-	pub const AssetDepositPerZombie: u64 = 1;
-}
-
-impl pallet_assets::Config for Test {
-	type Currency = Balances;
-	type Event = Event;
-	type Balance = u64;
-	type AssetId = u32;
-	type ForceOrigin = frame_system::EnsureRoot<u64>;
-	type AssetDepositBase = AssetDepositBase;
-	type AssetDepositPerZombie = AssetDepositPerZombie;
-	type WeightInfo = ();
-}
-
-impl Config for Test {
+impl orml_tokens::Config for Runtime {
 	type Event = TestEvent;
-	type Currency = Balances;
-	type PublicKey = RenVmPublicKey;
-	type CurrencyIdentifier = RENBTCIdentifier;
-	type UnsignedPriority = UnsignedPriority;
+	type Balance = Balance;
+	type Amount = i128;
+	type CurrencyId = u32;
+	type WeightInfo = ();
+	type ExistentialDeposits = ExistentialDeposits;
+	type OnDust = ();
 }
-pub type RenVmBridge = Module<Test>;
-pub type System = frame_system::Module<Test>;
-pub type Balances = pallet_balances::Module<Test>;
-pub type Assets = pallet_assets::Module<Test>;
+pub type Tokens = orml_tokens::Module<Runtime>;
+
+
+pub type System = frame_system::Module<Runtime>;
 
 pub struct ExtBuilder();
 
@@ -145,8 +129,186 @@ impl Default for ExtBuilder {
 impl ExtBuilder {
 	pub fn build(self) -> sp_io::TestExternalities {
 		let t = frame_system::GenesisConfig::default()
-			.build_storage::<Test>()
+			.build_storage::<Runtime>()
 			.unwrap();
 		t.into()
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //! Mocks for the airdrop module.
+//
+// #![cfg(test)]
+//
+// use super::*;
+// use frame_support::{impl_outer_event, impl_outer_origin, parameter_types};
+// use sp_core::H256;
+// use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
+//
+// pub type AccountId = H256;
+// pub type BlockNumber = u64;
+//
+// #[derive(Clone, PartialEq, Eq, Debug)]
+// pub struct Test;
+//
+// mod renvm {
+// 	pub use super::super::*;
+// }
+//
+// impl_outer_origin! {
+// 	pub enum Origin for Test {}
+// }
+//
+// impl_outer_event! {
+// 	pub enum TestEvent for Test {
+// 		frame_system<T>,
+// 		pallet_balances<T>,
+// 		pallet_assets<T>,
+// 		renvm<T>,
+// 	}
+// }
+//
+// pub type RenvmBridgeCall = super::Call<Test>;
+//
+// parameter_types! {
+// 	pub const BlockHashCount: u64 = 250;
+// 	pub const MaximumBlockWeight: u32 = 1024;
+// 	pub const MaximumBlockLength: u32 = 2 * 1024;
+// 	pub const AvailableBlockRatio: Perbill = Perbill::one();
+// }
+//
+// impl frame_system::Config for Test {
+// 	type Origin = Origin;
+// 	type Index = u64;
+// 	type BlockNumber = BlockNumber;
+// 	type Call = ();
+// 	type Hash = H256;
+// 	type Hashing = ::sp_Test::traits::BlakeTwo256;
+// 	type AccountId = AccountId;
+// 	type Lookup = IdentityLookup<Self::AccountId>;
+// 	type Header = Header;
+// 	type Event = TestEvent;
+// 	type BlockHashCount = BlockHashCount;
+// 	type MaximumBlockWeight = MaximumBlockWeight;
+// 	type MaximumBlockLength = MaximumBlockLength;
+// 	type AvailableBlockRatio = AvailableBlockRatio;
+// 	type Version = ();
+// 	type PalletInfo = ();
+// 	type AccountData = pallet_balances::AccountData<Balance>;
+// 	type OnNewAccount = ();
+// 	type OnKilledAccount = ();
+// 	type DbWeight = ();
+// 	type BlockExecutionWeight = ();
+// 	type ExtrinsicBaseWeight = ();
+// 	type MaximumExtrinsicWeight = ();
+// 	type BaseCallFilter = ();
+// 	type SystemWeightInfo = ();
+// }
+//
+// parameter_types! {
+// 	pub const ExistentialDeposit: Balance = 0;
+// 	pub const RenVmPublicKey: [u8; 20] = hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"];
+// 	pub const RENBTCIdentifier: [u8; 32] = hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"];
+// }
+//
+// impl pallet_balances::Config for Test {
+// 	type Balance = Balance;
+// 	type DustRemoval = ();
+// 	type Event = TestEvent;
+// 	type ExistentialDeposit = ExistentialDeposit;
+// 	type AccountStore = frame_system::Module<Test>;
+// 	type MaxLocks = ();
+// 	type WeightInfo = ();
+// }
+// pub type Balances = pallet_balances::Module<Test>;
+//
+// parameter_types! {
+// 	pub const UnsignedPriority: u64 = 1 << 20;
+// }
+//
+// pub type AdaptedBasicCurrency = orml_currencies::BasicCurrencyAdapter<Test, Balances, Amount, BlockNumber>;
+//
+// parameter_type_with_key! {
+// 	pub ExistentialDeposits: |currency_id: CurrencyId| -> Balance {
+// 		Default::default()
+// 	};
+// }
+//
+// impl pallet_balances::Config for Test {
+// 	type MaxLocks = ();
+// 	type Balance = Balance;
+// 	type Event = ();
+// 	type DustRemoval = ();
+// 	type ExistentialDeposit = ExistentialDeposit;
+// 	type AccountStore = System;
+// 	type WeightInfo = ();
+// }
+//
+// parameter_types! {
+// 	pub const AssetDepositBase: u64 = 1;
+// 	pub const AssetDepositPerZombie: u64 = 1;
+// }
+//
+// impl pallet_assets::Config for Test {
+// 	type Currency = Balances;
+// 	type Event = Event;
+// 	type Balance = u64;
+// 	type AssetId = u32;
+// 	type ForceOrigin = frame_system::EnsureRoot<u64>;
+// 	type AssetDepositBase = AssetDepositBase;
+// 	type AssetDepositPerZombie = AssetDepositPerZombie;
+// 	type WeightInfo = ();
+// }
+//
+// impl Config for Test {
+// 	type Event = TestEvent;
+// 	type Currency = Balances;
+// 	type PublicKey = RenVmPublicKey;
+// 	type CurrencyIdentifier = RENBTCIdentifier;
+// 	type UnsignedPriority = UnsignedPriority;
+// }
+// pub type RenVmBridge = Module<Test>;
+// pub type System = frame_system::Module<Test>;
+// pub type Balances = pallet_balances::Module<Test>;
+// pub type Assets = pallet_assets::Module<Test>;
+//
+// pub struct ExtBuilder();
+//
+// impl Default for ExtBuilder {
+// 	fn default() -> Self {
+// 		Self()
+// 	}
+// }
+//
+// impl ExtBuilder {
+// 	pub fn build(self) -> sp_io::TestExternalities {
+// 		let t = frame_system::GenesisConfig::default()
+// 			.build_storage::<Test>()
+// 			.unwrap();
+// 		t.into()
+// 	}
+// }

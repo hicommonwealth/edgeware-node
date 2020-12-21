@@ -1316,6 +1316,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "hex-literal",
+ "orml-tokens",
  "orml-traits",
  "pallet-balances",
  "parity-scale-codec",

@@ -17,8 +17,8 @@ use sp_runtime::{
 use sp_std::vec::Vec;
 use orml_traits::MultiCurrency;
 
-// mod mock;
-// mod tests;
+mod mock;
+mod tests;
 
 // const MODULE_ID: ModuleId = ModuleId(*b"edge-ren");
 
@@ -225,7 +225,7 @@ decl_module! {
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 
-			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
+			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
 
 			// Attempt to destroy the asset
 			// DESTROY CALL
@@ -245,7 +245,7 @@ decl_module! {
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
-			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
+			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
 
 			//let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).map_or_else(|| Error::<T>::RenTokenNotFound, |_ren_token_info| _ren_token_info.ren_token_asset_id);
 			let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
@@ -390,7 +390,7 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 				return InvalidTransaction::BadProof.into();
 			}
 
-			ValidTransaction::with_tag_prefix("renvm-bridge")
+			ValidTransaction::with_tag_prefix("edge-ren")
 				.priority(T::RenvmBridgeUnsignedPriority::get())
 				.and_provides(sig)
 				.longevity(64_u64)
