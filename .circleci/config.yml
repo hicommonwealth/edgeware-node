@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/base:2020.01
+      - image: cimg/node:15.4.0
         environment:
           DEBUG_BUILD: true
           DEBIAN_FRONTEND: noninteractive
@@ -19,6 +19,14 @@ jobs:
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
 
       # ts test cases
-      - run: sudo apt-get install npm -y
-      - run: cd ~/edgeware/ts-tests/frontier-tester && npm i
-      - run: cd ~/edgeware/ts-tests/frontier-tester && npm run test-ci
+      - restore_cache:
+          name: Restore Yarn Package Cache
+          keys:
+            - yarn-packages-{{ checksum "yarn.lock" }}
+      - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
+      - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci
+      - save_cache:
+          name: Save Yarn Package Cache
+          key: yarn-packages-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
