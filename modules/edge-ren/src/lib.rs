@@ -21,20 +21,19 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
-// const MODULE_ID: ModuleId = ModuleId(*b"edge-ren");
-
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
 
 type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::AssetId;
 type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
-// type BalanceOf<T> = u128;
+
+const NAME_MAX_LENGTH : u8 = 32;
 
 pub trait Config: frame_system::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 	type RenVMTokenIdType: Member + Parameter + Default + Copy + HasCompact;
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
-	type ControllerOrigin: EnsureOrigin<Self::Origin>; //Tmp config with EnsureRoot<AccountId>
+	type ControllerOrigin: EnsureOrigin<Self::Origin>;
 	type ModuleId: Get<ModuleId>;
 	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId>;
 }
@@ -50,11 +49,11 @@ pub trait Config: frame_system::Config {
 // ren_token_min_req min balance required below which assets will be lost and account may be removed
 
 #[derive(Encode,Decode, Clone, PartialEq, Eq, Debug, Default)]
-pub struct RenTokenInfo<RenVMTokenIdType, TokenIdOf, BalanceOf>//,RenTokenProofData>
+pub struct RenTokenInfo<RenVMTokenIdType, TokenIdOf, BalanceOf>
 	{
 	ren_token_id: RenVMTokenIdType,
 	ren_token_asset_id: TokenIdOf,
-	ren_token_name: Vec<u8>, // TODO: Max length
+	ren_token_name: Vec<u8>,
 	ren_token_renvm_id: [u8; 32],
 	ren_token_pub_key: [u8; 20],
 	// ren_token_proof: Vec<RenTokenProofData>,
@@ -72,10 +71,10 @@ decl_storage! {
 		/// Signature blacklist. This is required to prevent double claim.
 		Signatures get(fn signatures): map hasher(opaque_twox_256) EcdsaSignature => Option<()>;
 		/// Record burn event details
-		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(T::BlockNumber, DestAddress, BalanceOf<T>)>;
+		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(<T as Config>::RenVMTokenIdType, T::BlockNumber, DestAddress, BalanceOf<T>)>;
 		/// Next burn event ID
 		NextBurnEventId get(fn next_burn_event_id): u32;
-
+		/// Registry of all active tokens
 		RenTokenRegistry get(fn ren_token_registry): map hasher(blake2_128_concat) <T as Config>::RenVMTokenIdType => Option<RenTokenInfoType<T>>;
 	}
 }
@@ -86,11 +85,6 @@ decl_event!(
 		<T as Config>::RenVMTokenIdType,
 		Balance = BalanceOf<T>
 	{
-		/// Asset minted. \[owner, amount\]
-		Minted(AccountId, Balance),
-		/// Asset burnt in this chain \[owner, dest, amount\]
-		Burnt(AccountId, DestAddress, Balance),
-
 		RenTokenAdded(RenVMTokenIdType),
 
 		RenTokenUpdated(RenVMTokenIdType),
@@ -99,7 +93,9 @@ decl_event!(
 
 		RenTokenSpent(RenVMTokenIdType, Balance),
 
-		RenTokenMinted(AccountId, RenVMTokenIdType, Balance),
+		RenTokenMinted(RenVMTokenIdType, AccountId, Balance),
+
+		RenTokenBurnt(RenVMTokenIdType, AccountId, DestAddress, Balance),
 
 	}
 );
@@ -108,24 +104,15 @@ decl_error! {
 	pub enum Error for Module<T: Config> {
 		/// The mint signature is invalid.
 		InvalidMintSignature,
-		/// The mint signature has already been used.
-		SignatureAlreadyUsed,
 		/// Burn ID overflow.
 		BurnIdOverflow,
-		/// The AssetId not found in pallet-asset Asset Storage map
-		AssetIdDoesNotExist,
-		/// The AssetId does not match RenVMBTCTokenId
-		AssetIdDoesNotMatch,
-		/// The funds aren't enough to burn the amount
-		InsufficientFunds,
 		/// RenTokenAlready Exists
 		RenTokenAlreadyExists,
 		/// No token with this ren_token_id found
 		RenTokenNotFound,
+		/// Token name exceeds length limit
+		RenTokenNameLengthLimitExceeded,
 
-		AssetIssueFailed,
-
-		MintFailed,
 	}
 }
 
@@ -152,17 +139,10 @@ decl_module! {
 			T::ControllerOrigin::ensure_origin(origin)?;
 
 			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenAlreadyExists);
+			ensure!(_ren_token_name.len()<=NAME_MAX_LENGTH.into(), Error::<T>::RenTokenNameLengthLimitExceeded);
 
-			// CREATE CALL
-
-			// ?CHECK IF THE ASSET CAN BE CREATED BEFORE ATTEMPTING THIS: check if it already exists.
-			// pallet_assets::Module::<T>::force_create(
-			// 	RawOrigin::Root.into(),
-			// 	_ren_token_asset_id.into(),
-			// 	T::Lookup::unlookup(Self::account_id()),
-			// 	u32::MAX,
-			// 	_ren_token_min_req.into(),
-			// ).or_else(|_|{Err(Error::<T>::AssetIssueFailed)})?;
+			// TODO Need to check if asset exists in Assets
+			// Need a trait function for this
 
 			let _ren_token_info = RenTokenInfo{
 				ren_token_id: _ren_token_id,
@@ -197,6 +177,9 @@ decl_module! {
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 
+			if let Some(ref x) = _ren_token_name_option
+			{ensure!(x.len()<=NAME_MAX_LENGTH.into(), Error::<T>::RenTokenNameLengthLimitExceeded);}
+
 			RenTokenRegistry::<T>::try_mutate_exists(&_ren_token_id, |maybe_token_info| -> DispatchResult {
 					let mut token_info = maybe_token_info.as_mut().ok_or(Error::<T>::RenTokenNotFound)?;
 
@@ -228,9 +211,6 @@ decl_module! {
 
 			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
 
-			// Attempt to destroy the asset
-			// DESTROY CALL
-
 			RenTokenRegistry::<T>::remove(&_ren_token_id);
 
 			Self::deposit_event(RawEvent::RenTokenDeleted(_ren_token_id));
@@ -242,17 +222,14 @@ decl_module! {
 			origin,
 			#[compact] _ren_token_id: T::RenVMTokenIdType,
 			who: T::AccountId,
-			#[compact] amount: BalanceOf<T>,
+			amount: BalanceOf<T>,
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
 
-			//let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).map_or_else(|| Error::<T>::RenTokenNotFound, |_ren_token_info| _ren_token_info.ren_token_asset_id);
 			let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
 
-
-			// TRANSFER CALL
 			T::Assets::transfer(asset_id, Self::account_id().into(), who.clone(), amount)?;
 
 			Self::deposit_event(RawEvent::RenTokenSpent(_ren_token_id, amount));
@@ -263,18 +240,16 @@ decl_module! {
 		#[weight = 10_000]
 		fn mint(
 			origin,
+			#[compact] _ren_token_id: T::RenVMTokenIdType,
 			who: T::AccountId,
 			p_hash: [u8; 32],
-			// #[compact] amount: BalanceOf<T>, //BalanceOf<T>,
-			amount: BalanceOf<T>, //BalanceOf<T>,
+			amount: BalanceOf<T>,
 			n_hash: [u8; 32],
 			sig: EcdsaSignature,
-			#[compact] _ren_token_id: T::RenVMTokenIdType
 		) -> DispatchResult
 		{
 			ensure_none(origin)?;
 
-			//let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).map_or_else(|| Error::<T>::RenTokenNotFound, |_ren_token_info| _ren_token_info.ren_token_asset_id)?;
 			let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
 
 
@@ -282,7 +257,7 @@ decl_module! {
 			T::Assets::mint(asset_id, who.clone(), amount.into())?;
 
 			Signatures::insert(&sig, ());
-			Self::deposit_event(RawEvent::RenTokenMinted(who, _ren_token_id, amount));
+			Self::deposit_event(RawEvent::RenTokenMinted(_ren_token_id, who, amount));
 			Ok(())
 		}
 
@@ -291,11 +266,11 @@ decl_module! {
 			origin,
 			#[compact] _ren_token_id: T::RenVMTokenIdType,
 			to: DestAddress,
-			#[compact] amount: BalanceOf<T>,
+			amount: BalanceOf<T>,
 		) -> DispatchResult
 		{
 			let sender = ensure_signed(origin)?;
-			//let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).map_or_else(|| Error::<T>::RenTokenNotFound, |_ren_token_info| _ren_token_info.ren_token_asset_id)?;
+
 		 	let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
 
 			NextBurnEventId::try_mutate(|id| -> DispatchResult {
@@ -305,8 +280,8 @@ decl_module! {
 				// BURN CALL
 				T::Assets::burn(asset_id, sender.clone(), amount)?;
 
-				BurnEvents::<T>::insert(this_id, (frame_system::Module::<T>::block_number(), &to, amount));
-				Self::deposit_event(RawEvent::Burnt(sender, to, amount));
+				BurnEvents::<T>::insert(this_id, (_ren_token_id, frame_system::Module::<T>::block_number(), &to, amount));
+				Self::deposit_event(RawEvent::RenTokenBurnt(_ren_token_id, sender, to, amount));
 
 				Ok(())
 			})?;
@@ -319,7 +294,7 @@ decl_module! {
 
 impl<T: Config> Module<T> {
 
-	/// The account ID that holds the pallet's accumulated funds on pallet-assets; mostly fees for now, maybe for loss of exsistential deposit later.
+	/// The account ID that holds the pallet's accumulated funds on pallet-assets; mostly fees for now, maybe for loss of exsistential deposit in future.
     pub fn account_id() -> T::AccountId {
         T::ModuleId::get().into_account()
     }
@@ -327,17 +302,15 @@ impl<T: Config> Module<T> {
 	// ABI-encode the values for creating the signature hash.
 	fn signable_message(p_hash: &[u8; 32], amount: BalanceOf<T>, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
 
-		let mut amount_slice = Encode::encode(&amount); // OR use BalanceOf<T>::encode(&amount)
-		amount_slice.reverse(); // Because BE required
+		let mut amount_slice = Encode::encode(&amount);
+		amount_slice.reverse();
 
 		// p_hash ++ amount ++ token ++ to ++ n_hash
 		let length = 32 + 32 + 32 + 32 + 32;
 		let mut v = Vec::with_capacity(length);
 		v.extend_from_slice(&p_hash[..]);
 		v.extend_from_slice(&[0u8; 16][..]);
-		// v.extend_from_slice(&amount.to_be_bytes()[..]);
-		v.extend_from_slice(&amount_slice); // REVERSED because BE is required!!
-		// DO WE NEED [..] here?
+		v.extend_from_slice(&amount_slice);
 		v.extend_from_slice(&token[..]);
 		v.extend_from_slice(to);
 		v.extend_from_slice(&n_hash[..]);
@@ -346,14 +319,14 @@ impl<T: Config> Module<T> {
 
 	// Verify that the signature has been signed by RenVM.
 	fn verify_signature(
+		_ren_token_id: T::RenVMTokenIdType,
 		p_hash: &[u8; 32],
 		amount: BalanceOf<T>,
 		to: &[u8],
 		n_hash: &[u8; 32],
 		sig: &[u8; 65],
-		_ren_token_id: T::RenVMTokenIdType,
 	) -> DispatchResult {
-		// let identifier = RenTokenRegistry::<T>::get(&_ren_token_id).map_or_else(|| Error::<T>::RenTokenNotFound, |_ren_token_info| _ren_token_info.ren_token_renvm_id)?;
+
 		let identifier = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_renvm_id;
 
 		let signed_message_hash = keccak_256(&Self::signable_message(p_hash, amount, to, n_hash, &identifier));
@@ -376,14 +349,14 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 	type Call = Call<T>;
 
 	fn validate_unsigned(_source: TransactionSource, call: &Self::Call) -> TransactionValidity {
-		if let Call::mint(who, p_hash, amount, n_hash, sig, _ren_token_id) = call {
+		if let Call::mint(_ren_token_id, who, p_hash, amount, n_hash, sig) = call {
 			// check if already exists
 			if Signatures::contains_key(&sig) {
 				return InvalidTransaction::Stale.into();
 			}
 
 			let verify_result = Encode::using_encoded(&who, |encoded| -> DispatchResult {
-				Self::verify_signature(&p_hash, *amount, encoded, &n_hash, &sig.0, *_ren_token_id)
+				Self::verify_signature(*_ren_token_id, &p_hash, *amount, encoded, &n_hash, &sig.0)
 			});
 
 			// verify signature
