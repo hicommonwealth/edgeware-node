@@ -19,6 +19,6 @@ jobs:
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
 
       # ts test cases
-      - run: cd ~/edgeware && cargo build --release
+      - run: source ~/.cargo/env && cd ~/edgeware && cargo build --release
       - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
       - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci
