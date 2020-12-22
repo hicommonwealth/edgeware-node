@@ -55,7 +55,7 @@ dependencies = [
  "aes",
  "block-cipher",
  "ghash",
- "subtle 2.3.0",
+ "subtle 2.4.0",
 ]
 
 [[package]]
@@ -87,9 +87,9 @@ checksum = "e8fd72866655d1904d6b0997d0b07ba561047d070fbe29de039031c641b61217"
 
 [[package]]
 name = "ahash"
-version = "0.4.6"
+version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f6789e291be47ace86a60303502173d84af8327e3627ecf334356ee0f87a164c"
+checksum = "739f4a8db6605981345c5654f3a85b056ce52f37a39d34da03f25bf2151ea16e"
 
 [[package]]
 name = "aho-corasick"
@@ -120,9 +120,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.35"
+version = "1.0.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c0df63cb2955042487fad3aefd2c6e3ae7389ac5dc1beb28921de0b69f779d4"
+checksum = "68803225a7b13e47191bab76f2687382b60d259e8cf37f6e1893658b84bb9479"
 
 [[package]]
 name = "approx"
@@ -135,9 +135,9 @@ dependencies = [
 
 [[package]]
 name = "arc-swap"
-version = "0.4.7"
+version = "0.4.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4d25d88fd6b8041580a654f9d0c581a047baee2b3efee13275f2fc392fc75034"
+checksum = "dabe5a181f83789739c194cbe5a897dde195078fac08568d09221fd6137a7ba8"
 
 [[package]]
 name = "arrayref"
@@ -260,14 +260,32 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-std"
-version = "1.7.0"
+name = "async-process"
+version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7e82538bc65a25dbdff70e4c5439d52f068048ab97cdea0acd73f131594caa1"
+checksum = "4c8cea09c1fb10a317d1b5af8024eeba256d6554763e85ecd90ff8df31c7bbda"
 dependencies = [
+ "async-io",
+ "blocking",
+ "cfg-if 0.1.10",
+ "event-listener",
+ "futures-lite",
+ "once_cell",
+ "signal-hook",
+ "winapi 0.3.9",
+]
+
+[[package]]
+name = "async-std"
+version = "1.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f9f84f1280a2b436a2c77c2582602732b6c2f4321d5494d6e799e6c367859a8"
+dependencies = [
+ "async-channel",
  "async-global-executor",
  "async-io",
  "async-mutex",
+ "async-process",
  "blocking",
  "crossbeam-utils 0.8.1",
  "futures-channel",
@@ -280,7 +298,7 @@ dependencies = [
  "memchr",
  "num_cpus",
  "once_cell",
- "pin-project-lite 0.1.11",
+ "pin-project-lite 0.2.0",
  "pin-utils",
  "slab",
  "wasm-bindgen-futures",
@@ -294,9 +312,9 @@ checksum = "e91831deabf0d6d7ec49552e489aed63b7456a7a3c46cff62adad428110b0af0"
 
 [[package]]
 name = "async-tls"
-version = "0.10.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd0d8b6fc362bebff7502479fb5e9aed00c8cc3abc5af755536e73a128f0cb88"
+checksum = "2f23d769dbf1838d5df5156e7b1ad404f4c463d1ac2c6aeb6cd943630f8a8400"
 dependencies = [
  "futures-core",
  "futures-io",
@@ -781,9 +799,9 @@ dependencies = [
 
 [[package]]
 name = "const_fn"
-version = "0.4.3"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c478836e029dcef17fb47c89023448c64f781a046e0300e257ad8225ae59afab"
+checksum = "cd51eab21ab4fd6a3bf889e2d0958c0a6e3a61ad04260325e919e652a2a62826"
 
 [[package]]
 name = "constant_time_eq"
@@ -1073,7 +1091,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b584a330336237c1eecd3e94266efb216c56ed91225d634cb2991c5f3fd1aeab"
 dependencies = [
  "generic-array 0.14.4",
- "subtle 2.3.0",
+ "subtle 2.4.0",
 ]
 
 [[package]]
@@ -1137,7 +1155,7 @@ dependencies = [
  "byteorder",
  "digest 0.8.1",
  "rand_core 0.5.1",
- "subtle 2.3.0",
+ "subtle 2.4.0",
  "zeroize",
 ]
 
@@ -1150,7 +1168,7 @@ dependencies = [
  "byteorder",
  "digest 0.9.0",
  "rand_core 0.5.1",
- "subtle 2.3.0",
+ "subtle 2.4.0",
  "zeroize",
 ]
 
@@ -1316,8 +1334,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "hex-literal",
- "orml-tokens",
- "orml-traits",
+ "pallet-assets",
  "pallet-balances",
  "parity-scale-codec",
  "serde",
@@ -1590,13 +1607,12 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "hex-literal",
  "integer-sqrt",
- "orml-tokens",
- "orml-traits",
  "pallet-assets",
  "pallet-aura",
  "pallet-authority-discovery",
  "pallet-authorship",
  "pallet-balances",
+ "pallet-bounties",
  "pallet-collective",
  "pallet-contracts",
  "pallet-contracts-primitives",
@@ -2080,7 +2096,7 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 [[package]]
 name = "fork-tree"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
 ]
@@ -2133,7 +2149,7 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2151,8 +2167,9 @@ dependencies = [
 [[package]]
 name = "frame-benchmarking-cli"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
+ "Inflector",
  "chrono",
  "frame-benchmarking",
  "handlebars",
@@ -2173,7 +2190,7 @@ dependencies = [
 [[package]]
 name = "frame-executive"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2189,7 +2206,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "12.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -2200,7 +2217,7 @@ dependencies = [
 [[package]]
 name = "frame-support"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "bitflags",
  "frame-metadata",
@@ -2225,7 +2242,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support-procedural-tools",
  "proc-macro2",
@@ -2236,7 +2253,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate",
@@ -2248,7 +2265,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2258,7 +2275,7 @@ dependencies = [
 [[package]]
 name = "frame-system"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "impl-trait-for-tuples",
@@ -2289,7 +2306,7 @@ dependencies = [
 [[package]]
 name = "frame-system-rpc-runtime-api"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -2418,16 +2435,16 @@ checksum = "611834ce18aaa1bd13c4b374f5d653e1027cf99b6b502584ff8c9a64413b30bb"
 
 [[package]]
 name = "futures-lite"
-version = "1.11.2"
+version = "1.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e6c079abfac3ab269e2927ec048dabc89d009ebfdda6b8ee86624f30c689658"
+checksum = "b4481d0cd0de1d204a4fa55e7d45f07b1d958abcb06714b3446438e2eff695fb"
 dependencies = [
  "fastrand",
  "futures-core",
  "futures-io",
  "memchr",
  "parking",
- "pin-project-lite 0.1.11",
+ "pin-project-lite 0.2.0",
  "waker-fn",
 ]
 
@@ -2659,10 +2676,10 @@ dependencies = [
  "futures-core",
  "futures-sink",
  "futures-util",
- "http 0.2.1",
+ "http 0.2.2",
  "indexmap",
  "slab",
- "tokio 0.2.23",
+ "tokio 0.2.24",
  "tokio-util",
  "tracing",
  "tracing-futures",
@@ -2719,14 +2736,14 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
 dependencies = [
- "ahash 0.4.6",
+ "ahash 0.4.7",
 ]
 
 [[package]]
 name = "heck"
-version = "0.3.1"
+version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "20564e78d53d2bb135c343b3f47714a56af2061f1c928fdb541dc7b9fdd94205"
+checksum = "87cbf45460356b7deeb5e3415b5563308c0a9b057c85e12b06ad551f98d0a6ac"
 dependencies = [
  "unicode-segmentation",
 ]
@@ -2808,9 +2825,9 @@ dependencies = [
 
 [[package]]
 name = "http"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28d569972648b2c512421b5f2a405ad6ac9666547189d0c5477a3f200f3e02f9"
+checksum = "84129d298a6d57d246960ff8eb831ca4af3f96d29e2e28848dae275408658e26"
 dependencies = [
  "bytes 0.5.6",
  "fnv",
@@ -2836,7 +2853,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13d5ff830006f7646652e057693569bfe0d51760c0085a071769d142a205111b"
 dependencies = [
  "bytes 0.5.6",
- "http 0.2.1",
+ "http 0.2.2",
 ]
 
 [[package]]
@@ -2901,14 +2918,14 @@ dependencies = [
  "futures-core",
  "futures-util",
  "h2 0.2.7",
- "http 0.2.1",
+ "http 0.2.2",
  "http-body 0.3.1",
  "httparse",
  "httpdate",
  "itoa",
  "pin-project 1.0.2",
  "socket2",
- "tokio 0.2.23",
+ "tokio 0.2.24",
  "tower-service",
  "tracing",
  "want 0.3.0",
@@ -2927,7 +2944,7 @@ dependencies = [
  "log",
  "rustls 0.18.1",
  "rustls-native-certs",
- "tokio 0.2.23",
+ "tokio 0.2.24",
  "tokio-rustls",
  "webpki",
 ]
@@ -2976,6 +2993,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "if-watch"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16d7c5e361e6b05c882b4847dd98992534cebc6fcde7f4bc98225bcf10fd6d0d"
+dependencies = [
+ "async-io",
+ "futures 0.3.8",
+ "futures-lite",
+ "if-addrs",
+ "ipnet",
+ "libc",
+ "log",
+ "winapi 0.3.9",
+]
+
+[[package]]
 name = "impl-codec"
 version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3015,9 +3048,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "1.6.0"
+version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "55e2e4c765aa53a0424761bf9f41aa7a6ac1efa87238f59560640e27fca028f2"
+checksum = "4fb1fa934250de4de8aef298d81c729a7d33d8c239daa3a7575e6b92bfc7313b"
 dependencies = [
  "autocfg 1.0.1",
  "hashbrown 0.9.1",
@@ -3424,9 +3457,9 @@ checksum = "c7d73b3f436185384286bd8098d17ec07c9a7d2388a6599f824d8502b529702a"
 
 [[package]]
 name = "libp2p"
-version = "0.31.2"
+version = "0.32.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "724846a3194368fefcac7ebdab12e01b8ac382e3efe399ddbd28851ab34f396f"
+checksum = "022cdac4ab124be12de581e591796d4dfb7d1f1eef94669d2c1eaa0e98dd2f0e"
 dependencies = [
  "atomic",
  "bytes 0.5.6",
@@ -3615,24 +3648,23 @@ dependencies = [
 
 [[package]]
 name = "libp2p-mdns"
-version = "0.25.0"
+version = "0.26.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4458ec36b5ab2662fb4d5c8bb9b6e1591da0ab6efe8881c7a7670ef033bc8937"
+checksum = "7b934ee03a361f317df7d75defa4177b285534c58f49d5e6e240278e13ef3f65"
 dependencies = [
- "async-std",
+ "async-io",
  "data-encoding",
  "dns-parser",
- "either",
  "futures 0.3.8",
+ "if-watch",
  "lazy_static",
  "libp2p-core",
  "libp2p-swarm",
  "log",
- "net2",
  "rand 0.7.3",
  "smallvec 1.5.1",
+ "socket2",
  "void",
- "wasm-timer",
 ]
 
 [[package]]
@@ -3723,9 +3755,9 @@ dependencies = [
 
 [[package]]
 name = "libp2p-request-response"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e952dcc9d2d7e7e45ae8bfcff255723091bd43e3e9a7741a0af8a17fe55b3ed"
+checksum = "bd96c3580fe59a9379ac7906c2f61c7f5ad3b7515362af0e72153a7cc9a45550"
 dependencies = [
  "async-trait",
  "bytes 0.5.6",
@@ -3801,9 +3833,9 @@ dependencies = [
 
 [[package]]
 name = "libp2p-websocket"
-version = "0.26.1"
+version = "0.26.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "046031ad8ade16f2f0547350e4b2cea36c78cb10426e9c0d9eab35fa9943b969"
+checksum = "522a877ce42ededf1f5dd011dbc40ea116f1776818f09dacb3d7a206f3ad6305"
 dependencies = [
  "async-tls",
  "either",
@@ -3856,7 +3888,7 @@ dependencies = [
  "hmac-drbg",
  "rand 0.7.3",
  "sha2 0.8.2",
- "subtle 2.3.0",
+ "subtle 2.4.0",
  "typenum",
 ]
 
@@ -3938,9 +3970,9 @@ dependencies = [
 
 [[package]]
 name = "lru"
-version = "0.6.1"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "be716eb6878ca2263eb5d00a781aa13264a794f519fe6af4fbb2668b2d5441c0"
+checksum = "3aae342b73d57ad0b8b364bd12584819f2c1fe9114285dfcf8b0722607671635"
 dependencies = [
  "hashbrown 0.9.1",
 ]
@@ -4257,9 +4289,9 @@ dependencies = [
 
 [[package]]
 name = "net2"
-version = "0.2.36"
+version = "0.2.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7cf75f38f16cb05ea017784dc6dbfd354f76c223dba37701734c4f5a9337d02"
+checksum = "391630d12b68002ae1e25e8f974306474966550ad82dac6886fb8910c19568ae"
 dependencies = [
  "cfg-if 0.1.10",
  "libc",
@@ -4421,50 +4453,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 
 [[package]]
-name = "orml-tokens"
-version = "0.3.3-dev"
-source = "git+https://github.com/open-web3-stack/open-runtime-module-library?rev=266518ffaf5b9f664c1481330295a994dd71b01b#266518ffaf5b9f664c1481330295a994dd71b01b"
-dependencies = [
- "frame-support",
- "frame-system",
- "orml-traits",
- "parity-scale-codec",
- "serde",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "orml-traits"
-version = "0.3.3-dev"
-source = "git+https://github.com/open-web3-stack/open-runtime-module-library?rev=266518ffaf5b9f664c1481330295a994dd71b01b#266518ffaf5b9f664c1481330295a994dd71b01b"
-dependencies = [
- "frame-support",
- "impl-trait-for-tuples",
- "num-traits",
- "orml-utilities",
- "parity-scale-codec",
- "serde",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
-name = "orml-utilities"
-version = "0.3.3-dev"
-source = "git+https://github.com/open-web3-stack/open-runtime-module-library?rev=266518ffaf5b9f664c1481330295a994dd71b01b#266518ffaf5b9f664c1481330295a994dd71b01b"
-dependencies = [
- "frame-support",
- "parity-scale-codec",
- "serde",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "output_vt100"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4485,7 +4473,7 @@ dependencies = [
 [[package]]
 name = "pallet-assets"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4499,7 +4487,7 @@ dependencies = [
 [[package]]
 name = "pallet-aura"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4518,7 +4506,7 @@ dependencies = [
 [[package]]
 name = "pallet-authority-discovery"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4534,7 +4522,7 @@ dependencies = [
 [[package]]
 name = "pallet-authorship"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4549,7 +4537,7 @@ dependencies = [
 [[package]]
 name = "pallet-balances"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4561,9 +4549,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-bounties"
+version = "2.0.0"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-treasury",
+ "parity-scale-codec",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-collective"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4579,7 +4580,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4600,7 +4601,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-primitives"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "bitflags",
  "parity-scale-codec",
@@ -4611,7 +4612,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-proc-macro"
 version = "0.1.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4621,7 +4622,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -4640,7 +4641,7 @@ dependencies = [
 [[package]]
 name = "pallet-contracts-rpc-runtime-api"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "pallet-contracts-primitives",
  "parity-scale-codec",
@@ -4652,7 +4653,7 @@ dependencies = [
 [[package]]
 name = "pallet-democracy"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4667,7 +4668,7 @@ dependencies = [
 [[package]]
 name = "pallet-elections-phragmen"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4732,7 +4733,7 @@ dependencies = [
 [[package]]
 name = "pallet-grandpa"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4753,7 +4754,7 @@ dependencies = [
 [[package]]
 name = "pallet-identity"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "enumflags2",
  "frame-benchmarking",
@@ -4769,7 +4770,7 @@ dependencies = [
 [[package]]
 name = "pallet-im-online"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4788,7 +4789,7 @@ dependencies = [
 [[package]]
 name = "pallet-indices"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4804,7 +4805,7 @@ dependencies = [
 [[package]]
 name = "pallet-multisig"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4819,7 +4820,7 @@ dependencies = [
 [[package]]
 name = "pallet-offences"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4834,7 +4835,7 @@ dependencies = [
 [[package]]
 name = "pallet-proxy"
 version = "2.0.1"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4849,7 +4850,7 @@ dependencies = [
 [[package]]
 name = "pallet-randomness-collective-flip"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4862,7 +4863,7 @@ dependencies = [
 [[package]]
 name = "pallet-recovery"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -4877,7 +4878,7 @@ dependencies = [
 [[package]]
 name = "pallet-scheduler"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4892,7 +4893,7 @@ dependencies = [
 [[package]]
 name = "pallet-session"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4912,7 +4913,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4932,7 +4933,7 @@ dependencies = [
 [[package]]
 name = "pallet-staking-reward-curve"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -4943,7 +4944,7 @@ dependencies = [
 [[package]]
 name = "pallet-sudo"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4957,7 +4958,7 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
@@ -4974,7 +4975,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -4991,7 +4992,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -5009,7 +5010,7 @@ dependencies = [
 [[package]]
 name = "pallet-transaction-payment-rpc-runtime-api"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "parity-scale-codec",
@@ -5022,10 +5023,11 @@ dependencies = [
 [[package]]
 name = "pallet-treasury"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
+ "impl-trait-for-tuples",
  "pallet-balances",
  "parity-scale-codec",
  "serde",
@@ -5036,7 +5038,7 @@ dependencies = [
 [[package]]
 name = "pallet-utility"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5051,7 +5053,7 @@ dependencies = [
 [[package]]
 name = "pallet-vesting"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "enumflags2",
  "frame-support",
@@ -5239,7 +5241,7 @@ checksum = "6d7744ac029df22dca6284efe4e898991d28e3085c706c972bcd7da4a27a15eb"
 dependencies = [
  "instant",
  "lock_api 0.4.2",
- "parking_lot_core 0.8.1",
+ "parking_lot_core 0.8.2",
 ]
 
 [[package]]
@@ -5273,9 +5275,9 @@ dependencies = [
 
 [[package]]
 name = "parking_lot_core"
-version = "0.8.1"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d7c6d9b8427445284a09c55be860a15855ab580a417ccad9da88f5a06787ced0"
+checksum = "9ccb628cad4f84851442432c60ad8e1f607e29752d0bf072cbd0baf28aa34272"
 dependencies = [
  "cfg-if 1.0.0",
  "instant",
@@ -5497,10 +5499,11 @@ dependencies = [
 
 [[package]]
 name = "poly1305"
-version = "0.6.1"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22ce46de8e53ee414ca4d02bfefac75d8c12fba948b76622a40b4be34dfce980"
+checksum = "4b7456bc1ad2d4cf82b3a016be4c2ac48daf11bf990c1603ebd447fe6f30fca8"
 dependencies = [
+ "cpuid-bool 0.2.0",
  "universal-hash",
 ]
 
@@ -5737,9 +5740,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.7"
+version = "1.0.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aa563d17ecb180e500da1cfd2b028310ac758de548efdd203e18f283af693f37"
+checksum = "991431c3519a3f36861882da93630ce66b52918dcf1b8e2fd66b397fc96f28df"
 dependencies = [
  "proc-macro2",
 ]
@@ -5942,9 +5945,9 @@ dependencies = [
 
 [[package]]
 name = "raw-cpuid"
-version = "7.0.3"
+version = "7.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4a349ca83373cfa5d6dbb66fd76e58b2cca08da71a5f6400de0a0a6a9bceeaf"
+checksum = "beb71f708fe39b2c5e98076204c3cc094ee5a4c12c4cdb119a2b72dc34164f41"
 dependencies = [
  "bitflags",
  "cc",
@@ -6284,7 +6287,7 @@ dependencies = [
 [[package]]
 name = "sc-authority-discovery"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -6312,7 +6315,7 @@ dependencies = [
 [[package]]
 name = "sc-basic-authorship"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
@@ -6335,7 +6338,7 @@ dependencies = [
 [[package]]
 name = "sc-block-builder"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sc-client-api",
@@ -6352,7 +6355,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -6373,7 +6376,7 @@ dependencies = [
 [[package]]
 name = "sc-chain-spec-derive"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -6384,7 +6387,7 @@ dependencies = [
 [[package]]
 name = "sc-cli"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "atty",
  "chrono",
@@ -6418,7 +6421,7 @@ dependencies = [
  "structopt",
  "thiserror",
  "tiny-bip39",
- "tokio 0.2.23",
+ "tokio 0.2.24",
  "tracing",
  "tracing-log",
  "tracing-subscriber",
@@ -6427,7 +6430,7 @@ dependencies = [
 [[package]]
 name = "sc-cli-proc-macro"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -6438,7 +6441,7 @@ dependencies = [
 [[package]]
 name = "sc-client-api"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "fnv",
@@ -6472,7 +6475,7 @@ dependencies = [
 [[package]]
 name = "sc-client-db"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "blake2-rfc",
  "hash-db",
@@ -6502,7 +6505,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
@@ -6513,7 +6516,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "futures 0.3.8",
@@ -6544,7 +6547,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-babe"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "fork-tree",
@@ -6589,7 +6592,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-epochs"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "fork-tree",
  "parity-scale-codec",
@@ -6602,7 +6605,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-slots"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
@@ -6628,7 +6631,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-uncles"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "sc-client-api",
@@ -6642,7 +6645,7 @@ dependencies = [
 [[package]]
 name = "sc-executor"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "lazy_static",
@@ -6671,7 +6674,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-common"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "parity-scale-codec",
@@ -6687,7 +6690,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmi"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "parity-scale-codec",
@@ -6702,7 +6705,7 @@ dependencies = [
 [[package]]
 name = "sc-executor-wasmtime"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "parity-scale-codec",
@@ -6720,7 +6723,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "finality-grandpa",
@@ -6757,7 +6760,7 @@ dependencies = [
 [[package]]
 name = "sc-finality-grandpa-rpc"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "finality-grandpa",
@@ -6781,7 +6784,7 @@ dependencies = [
 [[package]]
 name = "sc-informant"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "ansi_term 0.12.1",
  "futures 0.3.8",
@@ -6799,7 +6802,7 @@ dependencies = [
 [[package]]
 name = "sc-keystore"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -6813,13 +6816,13 @@ dependencies = [
  "sp-application-crypto",
  "sp-core",
  "sp-keystore",
- "subtle 2.3.0",
+ "subtle 2.4.0",
 ]
 
 [[package]]
 name = "sc-light"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "hash-db",
  "lazy_static",
@@ -6838,7 +6841,7 @@ dependencies = [
 [[package]]
 name = "sc-network"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "async-std",
  "async-trait",
@@ -6892,7 +6895,7 @@ dependencies = [
 [[package]]
 name = "sc-network-gossip"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
@@ -6907,7 +6910,7 @@ dependencies = [
 [[package]]
 name = "sc-offchain"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "bytes 0.5.6",
  "fnv",
@@ -6934,7 +6937,7 @@ dependencies = [
 [[package]]
 name = "sc-peerset"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "libp2p",
@@ -6947,7 +6950,7 @@ dependencies = [
 [[package]]
 name = "sc-proposer-metrics"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "substrate-prometheus-endpoint",
@@ -6956,7 +6959,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "hash-db",
@@ -6990,7 +6993,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-api"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "futures 0.3.8",
@@ -7014,7 +7017,7 @@ dependencies = [
 [[package]]
 name = "sc-rpc-server"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.1.30",
  "jsonrpc-core 15.1.0",
@@ -7032,7 +7035,7 @@ dependencies = [
 [[package]]
 name = "sc-service"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "directories 3.0.1",
  "exit-future",
@@ -7096,7 +7099,7 @@ dependencies = [
 [[package]]
 name = "sc-state-db"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "parity-scale-codec",
@@ -7111,7 +7114,7 @@ dependencies = [
 [[package]]
 name = "sc-telemetry"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
@@ -7132,7 +7135,7 @@ dependencies = [
 [[package]]
 name = "sc-tracing"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "ansi_term 0.12.1",
  "erased-serde",
@@ -7156,7 +7159,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-graph"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "futures 0.3.8",
@@ -7178,7 +7181,7 @@ dependencies = [
 [[package]]
 name = "sc-transaction-pool"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-diagnose",
@@ -7224,8 +7227,9 @@ dependencies = [
  "merlin",
  "rand 0.7.3",
  "rand_core 0.5.1",
+ "serde",
  "sha2 0.8.2",
- "subtle 2.3.0",
+ "subtle 2.4.0",
  "zeroize",
 ]
 
@@ -7492,6 +7496,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7fdf1b9db47230893d76faad238fd6097fd6d6a9245cd7a4d90dbd639536bbd2"
 
 [[package]]
+name = "signal-hook"
+version = "0.1.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "604508c1418b99dfe1925ca9224829bb2a8a9a04dda655cc01fcad46f4ab05ed"
+dependencies = [
+ "libc",
+ "signal-hook-registry",
+]
+
+[[package]]
 name = "signal-hook-registry"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7597,19 +7611,18 @@ dependencies = [
  "ring",
  "rustc_version",
  "sha2 0.9.2",
- "subtle 2.3.0",
+ "subtle 2.4.0",
  "x25519-dalek",
 ]
 
 [[package]]
 name = "socket2"
-version = "0.3.17"
+version = "0.3.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c29947abdee2a218277abeca306f25789c938e500ea5a9d4b12a5a504466902"
+checksum = "122e570113d28d773067fab24266b66753f6ea915758651696b6e35e49f88d6e"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
- "redox_syscall",
  "winapi 0.3.9",
 ]
 
@@ -7632,7 +7645,7 @@ dependencies = [
 [[package]]
 name = "sp-allocator"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "sp-core",
@@ -7644,7 +7657,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "hash-db",
  "parity-scale-codec",
@@ -7660,7 +7673,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate",
@@ -7672,7 +7685,7 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -7684,7 +7697,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "integer-sqrt",
  "num-traits",
@@ -7697,7 +7710,7 @@ dependencies = [
 [[package]]
 name = "sp-authority-discovery"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7709,7 +7722,7 @@ dependencies = [
 [[package]]
 name = "sp-authorship"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-inherents",
@@ -7720,7 +7733,7 @@ dependencies = [
 [[package]]
 name = "sp-block-builder"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7732,7 +7745,7 @@ dependencies = [
 [[package]]
 name = "sp-blockchain"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "log",
@@ -7750,7 +7763,7 @@ dependencies = [
 [[package]]
 name = "sp-chain-spec"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "serde",
  "serde_json",
@@ -7759,7 +7772,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
@@ -7785,7 +7798,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-aura"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -7799,7 +7812,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-babe"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "merlin",
  "parity-scale-codec",
@@ -7819,7 +7832,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-slots"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -7828,7 +7841,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-vrf"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "schnorrkel",
@@ -7840,7 +7853,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -7884,7 +7897,7 @@ dependencies = [
 [[package]]
 name = "sp-database"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "kvdb",
  "parking_lot 0.10.2",
@@ -7893,7 +7906,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -7903,7 +7916,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -7914,7 +7927,7 @@ dependencies = [
 [[package]]
 name = "sp-finality-grandpa"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "finality-grandpa",
  "log",
@@ -7931,7 +7944,7 @@ dependencies = [
 [[package]]
 name = "sp-inherents"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "parking_lot 0.10.2",
@@ -7943,7 +7956,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "hash-db",
@@ -7967,7 +7980,7 @@ dependencies = [
 [[package]]
 name = "sp-keyring"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "lazy_static",
  "sp-core",
@@ -7978,7 +7991,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -7987,6 +8000,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.10.2",
  "schnorrkel",
+ "serde",
  "sp-core",
  "sp-externalities",
 ]
@@ -7994,7 +8008,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -8006,7 +8020,7 @@ dependencies = [
 [[package]]
 name = "sp-npos-elections-compact"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -8017,7 +8031,7 @@ dependencies = [
 [[package]]
 name = "sp-offchain"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "sp-api",
  "sp-core",
@@ -8027,7 +8041,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "backtrace",
 ]
@@ -8035,7 +8049,7 @@ dependencies = [
 [[package]]
 name = "sp-rpc"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "serde",
  "sp-core",
@@ -8044,7 +8058,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -8065,7 +8079,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -8082,7 +8096,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "Inflector",
  "proc-macro-crate",
@@ -8094,7 +8108,7 @@ dependencies = [
 [[package]]
 name = "sp-sandbox"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -8107,7 +8121,7 @@ dependencies = [
 [[package]]
 name = "sp-serializer"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "serde",
  "serde_json",
@@ -8116,7 +8130,7 @@ dependencies = [
 [[package]]
 name = "sp-session"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-api",
@@ -8129,7 +8143,7 @@ dependencies = [
 [[package]]
 name = "sp-staking"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "parity-scale-codec",
  "sp-runtime",
@@ -8139,7 +8153,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "hash-db",
  "log",
@@ -8161,12 +8175,12 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 
 [[package]]
 name = "sp-storage"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -8179,7 +8193,7 @@ dependencies = [
 [[package]]
 name = "sp-tasks"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "sp-core",
@@ -8192,7 +8206,7 @@ dependencies = [
 [[package]]
 name = "sp-timestamp"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -8206,7 +8220,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "log",
  "parity-scale-codec",
@@ -8219,7 +8233,7 @@ dependencies = [
 [[package]]
 name = "sp-transaction-pool"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "derive_more",
  "futures 0.3.8",
@@ -8235,7 +8249,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "hash-db",
  "memory-db",
@@ -8249,7 +8263,7 @@ dependencies = [
 [[package]]
 name = "sp-utils"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.3.8",
  "futures-core",
@@ -8261,7 +8275,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -8273,7 +8287,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "impl-trait-for-tuples",
  "parity-scale-codec",
@@ -8394,7 +8408,7 @@ dependencies = [
 [[package]]
 name = "substrate-browser-utils"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "chrono",
  "console_error_panic_hook",
@@ -8429,7 +8443,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-cli"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-system",
  "sc-cli",
@@ -8441,7 +8455,7 @@ dependencies = [
 [[package]]
 name = "substrate-frame-rpc-system"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.8",
@@ -8464,7 +8478,7 @@ dependencies = [
 [[package]]
 name = "substrate-prometheus-endpoint"
 version = "0.8.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "async-std",
  "derive_more",
@@ -8472,13 +8486,13 @@ dependencies = [
  "hyper 0.13.9",
  "log",
  "prometheus",
- "tokio 0.2.23",
+ "tokio 0.2.24",
 ]
 
 [[package]]
 name = "substrate-test-client"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
+source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
 dependencies = [
  "futures 0.1.30",
  "futures 0.3.8",
@@ -8526,15 +8540,15 @@ checksum = "2d67a5a62ba6e01cb2192ff309324cb4875d0c451d55fe2319433abe7a05a8ee"
 
 [[package]]
 name = "subtle"
-version = "2.3.0"
+version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "343f3f510c2915908f155e94f17220b19ccfacf2a64a2a5d8004f2c3e311e7fd"
+checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "syn"
-version = "1.0.54"
+version = "1.0.55"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a2af957a63d6bd42255c359c93d9bfdb97076bd3b820897ce55ffbfbf107f44"
+checksum = "a571a711dddd09019ccc628e1b17fe87c59b09d513c06c026877aa708334f37a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8724,9 +8738,9 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "0.2.23"
+version = "0.2.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a6d7ad61edd59bfcc7e80dababf0f4aed2e6d5e0ba1659356ae889752dfc12ff"
+checksum = "099837d3464c16a808060bb3f02263b412f6fafcb5d01c533d309985fbeebe48"
 dependencies = [
  "bytes 0.5.6",
  "fnv",
@@ -8848,7 +8862,7 @@ checksum = "e12831b255bcfa39dc0436b01e19fea231a37db570686c06ee72c423479f889a"
 dependencies = [
  "futures-core",
  "rustls 0.18.1",
- "tokio 0.2.23",
+ "tokio 0.2.24",
  "webpki",
 ]
 
@@ -8958,14 +8972,14 @@ dependencies = [
  "futures-sink",
  "log",
  "pin-project-lite 0.1.11",
- "tokio 0.2.23",
+ "tokio 0.2.24",
 ]
 
 [[package]]
 name = "toml"
-version = "0.5.7"
+version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75cf45bb0bef80604d001caaec0d09da99611b3c0fd39d3080468875cdb65645"
+checksum = "a31142970826733df8241ef35dc040ef98c679ab14d7c3e54d827099b3acecaa"
 dependencies = [
  "serde",
 ]
@@ -9193,7 +9207,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8326b2c654932e3e4f9196e69d08fdf7cfd718e1dc6f66b347e6024a0c961402"
 dependencies = [
  "generic-array 0.14.4",
- "subtle 2.3.0",
+ "subtle 2.4.0",
 ]
 
 [[package]]
@@ -9239,9 +9253,9 @@ dependencies = [
 
 [[package]]
 name = "vcpkg"
-version = "0.2.10"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6454029bf181f092ad1b853286f23e2c507d8e8194d01d92da4a55c274a5508c"
+checksum = "b00bca6106a5e23f3eee943593759b7fcddb00554332e856d990c893966879fb"
 
 [[package]]
 name = "vec-arena"
@@ -9634,18 +9648,18 @@ dependencies = [
 
 [[package]]
 name = "wast"
-version = "28.0.0"
+version = "30.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c0586061bfacc035034672c8d760802b428ab4c80a92e2a392425c516df9be1"
+checksum = "9b79907b22f740634810e882d8d1d9d0f9563095a8ab94e786e370242bff5cd2"
 dependencies = [
  "leb128",
 ]
 
 [[package]]
 name = "wat"
-version = "1.0.29"
+version = "1.0.31"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c06d55b5ec4f9d9396fa99abaafa0688597395e57827dffd89731412ae90c9bf"
+checksum = "a8279a02835bf12e61ed2b3c3cbc6ecf9918762fd97e036917c11a09ec20ca44"
 dependencies = [
  "wast",
 ]
@@ -9777,9 +9791,9 @@ dependencies = [
 
 [[package]]
 name = "zeroize"
-version = "1.1.1"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05f33972566adbd2d3588b0491eb94b98b43695c4ef897903470ede4f3f5a28a"
+checksum = "81a974bcdd357f0dca4d41677db03436324d45a4c9ed2d0b873a5a360ce41c36"
 dependencies = [
  "zeroize_derive",
 ]
@@ -9798,18 +9812,18 @@ dependencies = [
 
 [[package]]
 name = "zstd"
-version = "0.5.3+zstd.1.4.5"
+version = "0.5.4+zstd.1.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01b32eaf771efa709e8308605bbf9319bf485dc1503179ec0469b611937c0cd8"
+checksum = "69996ebdb1ba8b1517f61387a883857818a66c8a295f487b1ffd8fd9d2c82910"
 dependencies = [
  "zstd-safe",
 ]
 
 [[package]]
 name = "zstd-safe"
-version = "2.0.5+zstd.1.4.5"
+version = "2.0.6+zstd.1.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1cfb642e0d27f64729a639c52db457e0ae906e7bc6f5fe8f5c453230400f1055"
+checksum = "98aa931fb69ecee256d44589d19754e61851ae4769bf963b385119b1cc37a49e"
 dependencies = [
  "libc",
  "zstd-sys",
@@ -9817,9 +9831,9 @@ dependencies = [
 
 [[package]]
 name = "zstd-sys"
-version = "1.4.17+zstd.1.4.5"
+version = "1.4.18+zstd.1.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b89249644df056b522696b1bb9e7c18c87e8ffa3e2f0dc3b0155875d6498f01b"
+checksum = "a1e6e8778706838f43f771d80d37787cb2fe06dafe89dd3aebaf6721b9eaec81"
 dependencies = [
  "cc",
  "glob 0.3.0",

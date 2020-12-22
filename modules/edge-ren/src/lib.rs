@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Encode, Decode, HasCompact};
-use frame_support::{Parameter, decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
+use frame_support::{Parameter, decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin, FungibleAsset, MintableAsset, BurnableAsset}};
 use frame_system::{ensure_none, ensure_signed};
 use edgeware_primitives::Balance;
 use sp_core::ecdsa;
@@ -16,15 +16,17 @@ use sp_runtime::{
 };
 use sp_std::vec::Vec;
 
-// mod mock;
-// mod tests;
+#[cfg(test)]
+mod mock;
+#[cfg(test)]
+mod tests;
 
 // const MODULE_ID: ModuleId = ModuleId(*b"edge-ren");
 
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
 
-type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::CurrencyId;
+type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::AssetId;
 type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
 // type BalanceOf<T> = u128;
 
@@ -251,7 +253,7 @@ decl_module! {
 
 
 			// TRANSFER CALL
-			T::Assets::transfer(asset_id, &Self::account_id().into(), &who, amount)?;
+			T::Assets::transfer(asset_id, Self::account_id().into(), who.clone(), amount)?;
 
 			Self::deposit_event(RawEvent::RenTokenSpent(_ren_token_id, amount));
 			Ok(())
@@ -277,7 +279,7 @@ decl_module! {
 
 
 			// MINT CALL
-			T::Assets::mint(asset_id, &who, amount.into())?;
+			T::Assets::mint(asset_id, who.clone(), amount.into())?;
 
 			Signatures::insert(&sig, ());
 			Self::deposit_event(RawEvent::RenTokenMinted(who, _ren_token_id, amount));
@@ -301,7 +303,7 @@ decl_module! {
 				*id = id.checked_add(1).ok_or(Error::<T>::BurnIdOverflow)?;
 
 				// BURN CALL
-				T::Assets::burn(asset_id, &sender, amount)?;
+				T::Assets::burn(asset_id, sender.clone(), amount)?;
 
 				BurnEvents::<T>::insert(this_id, (frame_system::Module::<T>::block_number(), &to, amount));
 				Self::deposit_event(RawEvent::Burnt(sender, to, amount));
@@ -416,6 +418,7 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 	}
 
 	// #[cfg(feature = "runtime-benchmarks")]
+	#[cfg(not(test))]
 	fn successful_origin() -> T::Origin {
 		T::Origin::from(frame_system::RawOrigin::Root)
 	}

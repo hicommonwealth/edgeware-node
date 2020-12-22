@@ -1,7 +1,7 @@
 [package]
 name = "edge-ren"
 version = "1.0.0"
-authors = ["Drew Stone <drew@commonwealth.im>"]
+authors = ["Shoeb Siddiqui, Drew Stone <drew@commonwealth.im>"]
 edition = "2018"
 
 [dependencies]
@@ -17,9 +17,11 @@ sp-runtime = { version = "2.0.0", default-features = false }
 
 edgeware-primitives = { path = "../../node/primitives", default-features = false }
 
+
 [dev-dependencies]
 hex-literal = { version = "0.3.1" }
 pallet-balances = { version = "2.0.0", default-features = false }
+pallet-assets = { version = "2.0.0", default-features = false }
 
 [features]
 default = ["std"]

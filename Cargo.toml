@@ -208,3 +208,4 @@ substrate-frame-cli = { git = "https://github.com/drewstone/substrate.git", bran
 substrate-frame-rpc-system = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
 substrate-prometheus-endpoint = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
 substrate-test-client = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-bounties = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }

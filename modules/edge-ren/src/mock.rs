@@ -4,7 +4,6 @@
 
 use super::*;
 use frame_support::{impl_outer_event, impl_outer_origin, parameter_types};
-use orml_traits::parameter_type_with_key;
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
 use frame_system::{EnsureRoot};
@@ -25,7 +24,7 @@ impl_outer_origin! {
 
 impl_outer_event! {
 	pub enum TestEvent for Runtime {
-		orml_tokens<T>,
+		pallet_assets<T>,
 		frame_system<T>,
 		pallet_balances<T>,
 		edge_ren<T>,
@@ -90,32 +89,34 @@ impl Config for Runtime {
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
-	type Assets = Tokens;
+	type Assets = Assets;
 }
 pub type RenVmBridge = Module<Runtime>;
 
-
-parameter_type_with_key! {
-	pub ExistentialDeposits: |currency_id: u32| -> Balance {
-		match currency_id {
-			_ => 0,
-		}
-	};
+parameter_types! {
+	pub const AssetDepositBase: u64 = 1;
+	pub const AssetDepositPerZombie: u64 = 1;
+	pub const AssetsAllowFreezing: bool = true;
+	pub const AssetsAllowBurning: bool = true;
+	pub const AssetsAllowMinting: bool = true;
 }
 
-
-impl orml_tokens::Config for Runtime {
+impl pallet_assets::Config for Runtime {
+	type Currency = Balances;
 	type Event = TestEvent;
 	type Balance = Balance;
-	type Amount = i128;
-	type CurrencyId = u32;
+	type AssetId = u32;
+	type ForceOrigin = EnsureRoot<AccountId>;
+	type AssetDepositBase = AssetDepositBase;
+	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
-	type ExistentialDeposits = ExistentialDeposits;
-	type OnDust = ();
+	type AllowFreezing = AssetsAllowFreezing;
+	type AllowBurning = AssetsAllowBurning;
+	type AllowMinting = AssetsAllowMinting;
 }
-pub type Tokens = orml_tokens::Module<Runtime>;
 
 
+pub type Assets = pallet_assets::Module<Runtime>;
 pub type System = frame_system::Module<Runtime>;
 
 pub struct ExtBuilder();
