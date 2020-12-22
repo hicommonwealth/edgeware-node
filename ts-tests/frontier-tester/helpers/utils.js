@@ -86,8 +86,8 @@ async function startEdgewareNode() {
 		'--no-prometheus',
 		// '--tmp',
     '--base-path=./db',
-		// '-lrpc=trace',
-		// '-levm=trace',
+		'-lrpc=trace',
+		'-levm=trace',
 	];
 	const binary = child_process.spawn(cmd, args);
 
