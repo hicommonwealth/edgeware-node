@@ -90,8 +90,6 @@ pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-featu
 pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
 
 edge-ren = {path = "../../modules/edge-ren", default-features = false}
-orml-tokens = { git = "https://github.com/open-web3-stack/open-runtime-module-library", default-features = false, rev = "266518ffaf5b9f664c1481330295a994dd71b01b" }
-orml-traits = { git = "https://github.com/open-web3-stack/open-runtime-module-library", default-features = false, rev = "266518ffaf5b9f664c1481330295a994dd71b01b" }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
@@ -169,8 +167,6 @@ std = [
 	"fp-rpc/std",
 	"pallet-ethereum/std",
 	"evm/std",
-	"orml-traits/std",
-	"orml-tokens/std",
 ]
 
 runtime-benchmarks = [

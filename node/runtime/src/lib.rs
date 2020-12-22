@@ -101,9 +101,6 @@ pub mod constants;
 use constants::{currency::*, time::*};
 use sp_runtime::generic::Era;
 
-// For orml_tokens
-use orml_traits::parameter_type_with_key;
-
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
@@ -1078,6 +1075,9 @@ impl edge_chainbridge::Config for Runtime {
 parameter_types! {
 	pub const AssetDepositBase: u64 = 1;
 	pub const AssetDepositPerZombie: u64 = 1;
+	pub const AssetsAllowFreezing: bool = true;
+	pub const AssetsAllowBurning: bool = true;
+	pub const AssetsAllowMinting: bool = true;
 }
 
 impl pallet_assets::Config for Runtime {
@@ -1089,6 +1089,9 @@ impl pallet_assets::Config for Runtime {
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
+	type AllowFreezing = AssetsAllowFreezing;
+	type AllowBurning = AssetsAllowBurning;
+	type AllowMinting = AssetsAllowMinting;
 }
 
 parameter_types! {
@@ -1103,31 +1106,9 @@ impl edge_ren::Config for Runtime {
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
-	type Assets = Tokens;
+	type Assets = Assets;
 }
 
-
-parameter_type_with_key! {
-	pub ExistentialDeposits: |currency_id: constants::currency::AssetId| -> Balance {
-		match currency_id {
-			_ => 0,
-		}
-	};
-}
-
-parameter_types! {
-	pub RenVMModuleAcount: AccountId = RenVMModuleId::get().into_account();
-}
-
-impl orml_tokens::Config for Runtime {
-	type Event = Event;
-	type Balance = Balance;
-	type Amount = i128;
-	type CurrencyId = constants::currency::AssetId;
-	type WeightInfo = ();
-	type ExistentialDeposits = ExistentialDeposits;
-	type OnDust = orml_tokens::TransferDust<Runtime, RenVMModuleAcount>;
-}
 
 construct_runtime!(
 	pub enum Runtime where
@@ -1176,7 +1157,6 @@ construct_runtime!(
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
-		Tokens: orml_tokens::{Module, Call, Storage, Event<T>},
 		RenVMBridge: edge_ren::{Module, Call, Storage, Event<T>},
 	}
 );

@@ -73,138 +73,138 @@ zeroize = { opt-level = 3 }
 # Make sure to have cargo-lock installed with: `cargo install cargo-lock --features=cli`
 
 [patch.crates-io]
-fork-tree = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-executive = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-metadata = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-support = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-support-procedural = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-support-procedural-tools = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-support-procedural-tools-derive = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-system = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-assets = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-aura = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-balances = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-collective = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-contracts = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-contracts-primitives = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-contracts-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-contracts-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-democracy = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-identity = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-im-online = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-indices = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-multisig = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-offences = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-proxy = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-randomness-collective-flip = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-recovery = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-scheduler = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-session = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-staking = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-staking-reward-curve = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-sudo = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-timestamp = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-treasury = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-utility = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-pallet-vesting = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-basic-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-block-builder = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-chain-spec = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-chain-spec-derive = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-cli = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-cli-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-client-api = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-client-db = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-consensus = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-consensus-aura = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-consensus-babe = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-consensus-epochs = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-consensus-slots = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-consensus-uncles = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-executor = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-executor-common = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-executor-wasmi = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-executor-wasmtime = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-finality-grandpa-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-informant = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-keystore = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-light = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-network = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-network-gossip = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-offchain = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-peerset = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-proposer-metrics = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-rpc-api = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-rpc-server = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-service = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-state-db = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-telemetry = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-tracing = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-transaction-graph = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-allocator = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-api = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-api-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-application-crypto = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-arithmetic = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-block-builder = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-chain-spec = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-consensus = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-consensus-babe = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-consensus-slots = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-consensus-vrf = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-core = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-database = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-debug-derive = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-externalities = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-inherents = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-io = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-keyring = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-keystore = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-npos-elections = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-npos-elections-compact = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-offchain = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-panic-handler = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-runtime = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-runtime-interface-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-sandbox = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-serializer = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-session = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-staking = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-state-machine = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-std = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-storage = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-tasks = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-timestamp = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-tracing = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-trie = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-utils = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-version = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-sp-wasm-interface = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-substrate-browser-utils = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-substrate-frame-cli = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
-substrate-test-client = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
+fork-tree = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-benchmarking = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-benchmarking-cli = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-executive = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-metadata = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-support = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-support-procedural = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-support-procedural-tools = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-support-procedural-tools-derive = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-system = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+frame-system-rpc-runtime-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-assets = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-aura = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-authority-discovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-authorship = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-balances = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-collective = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-contracts = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-contracts-primitives = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-contracts-proc-macro = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-contracts-rpc = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-contracts-rpc-runtime-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-democracy = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-elections-phragmen = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-grandpa = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-identity = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-im-online = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-indices = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-multisig = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-offences = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-proxy = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-randomness-collective-flip = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-recovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-scheduler = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-session = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-staking = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-staking-reward-curve = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-sudo = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-timestamp = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-transaction-payment = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-transaction-payment-rpc = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-treasury = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-utility = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+pallet-vesting = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-authority-discovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-basic-authorship = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-block-builder = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-chain-spec = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-chain-spec-derive = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-cli = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-cli-proc-macro = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-client-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-client-db = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-consensus = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-consensus-aura = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-consensus-babe = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-consensus-epochs = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-consensus-slots = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-consensus-uncles = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-executor = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-executor-common = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-executor-wasmi = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-executor-wasmtime = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-finality-grandpa = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-finality-grandpa-rpc = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-informant = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-keystore = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-light = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-network = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-network-gossip = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-offchain = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-peerset = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-proposer-metrics = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-rpc = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-rpc-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-rpc-server = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-service = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-state-db = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-telemetry = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-tracing = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-transaction-graph = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sc-transaction-pool = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-allocator = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-api = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-api-proc-macro = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-application-crypto = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-arithmetic = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-authority-discovery = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-authorship = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-block-builder = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-blockchain = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-chain-spec = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-consensus = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-consensus-aura = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-consensus-babe = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-consensus-slots = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-consensus-vrf = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-core = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-database = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-debug-derive = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-externalities = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-finality-grandpa = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-inherents = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-io = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-keyring = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-keystore = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-npos-elections = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-npos-elections-compact = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-offchain = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-panic-handler = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-rpc = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-runtime = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-runtime-interface = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-runtime-interface-proc-macro = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-sandbox = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-serializer = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-session = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-staking = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-state-machine = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-std = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-storage = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-tasks = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-timestamp = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-tracing = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-transaction-pool = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-trie = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-utils = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-version = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+sp-wasm-interface = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+substrate-browser-utils = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+substrate-frame-cli = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+substrate-frame-rpc-system = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+substrate-prometheus-endpoint = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }
+substrate-test-client = { git = "https://github.com/drewstone/substrate.git", branch = "drew-assets-traits", rev = "801181657bf3e4fe7b1709b4a535b069c5417c0d" }

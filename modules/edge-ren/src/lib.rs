@@ -15,18 +15,17 @@ use sp_runtime::{
 	DispatchResult,
 };
 use sp_std::vec::Vec;
-use orml_traits::MultiCurrency;
 
-mod mock;
-mod tests;
+// mod mock;
+// mod tests;
 
 // const MODULE_ID: ModuleId = ModuleId(*b"edge-ren");
 
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
 
-type TokenIdOf<T> = <<T as Config>::Assets as MultiCurrency<<T as frame_system::Config>::AccountId>>::CurrencyId;
-type BalanceOf<T> = <<T as Config>::Assets as MultiCurrency<<T as frame_system::Config>::AccountId>>::Balance;
+type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::CurrencyId;
+type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
 // type BalanceOf<T> = u128;
 
 pub trait Config: frame_system::Config {
@@ -35,7 +34,7 @@ pub trait Config: frame_system::Config {
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
 	type ControllerOrigin: EnsureOrigin<Self::Origin>; //Tmp config with EnsureRoot<AccountId>
 	type ModuleId: Get<ModuleId>;
-	type Assets: MultiCurrency<Self::AccountId>;
+	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId>;
 }
 
 // struct RenTokenInfo
@@ -278,7 +277,7 @@ decl_module! {
 
 
 			// MINT CALL
-			T::Assets::deposit(asset_id, &who, amount.into())?;
+			T::Assets::mint(asset_id, &who, amount.into())?;
 
 			Signatures::insert(&sig, ());
 			Self::deposit_event(RawEvent::RenTokenMinted(who, _ren_token_id, amount));
@@ -302,7 +301,7 @@ decl_module! {
 				*id = id.checked_add(1).ok_or(Error::<T>::BurnIdOverflow)?;
 
 				// BURN CALL
-				T::Assets::withdraw(asset_id, &sender, amount)?;
+				T::Assets::burn(asset_id, &sender, amount)?;
 
 				BurnEvents::<T>::insert(this_id, (frame_system::Module::<T>::block_number(), &to, amount));
 				Self::deposit_event(RawEvent::Burnt(sender, to, amount));
