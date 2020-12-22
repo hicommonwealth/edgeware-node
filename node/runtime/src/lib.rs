@@ -945,6 +945,7 @@ impl pallet_evm::Config for Runtime {
 		pallet_evm_precompile_simple::ECRecover,
 		pallet_evm_precompile_simple::Sha256,
 		pallet_evm_precompile_simple::Ripemd160,
+		pallet_evm_precompile_simple::Identity,
 		pallet_evm_precompile_modexp::Modexp,
 		pallet_evm_precompile_bn128::Bn128Add,
 		pallet_evm_precompile_bn128::Bn128Mul,
