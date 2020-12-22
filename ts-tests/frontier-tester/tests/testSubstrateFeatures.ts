@@ -9,7 +9,7 @@ import BN from 'bn.js';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 const { describeWithEdgeware } = require('../helpers/utils.js');
 
-describeWithEdgeware('Upgrade Tests', async () => {
+describeWithEdgeware('Upgrade Tests', async (context) => {
   let api: ApiPromise;
   let pairs: TestKeyringMap;
 

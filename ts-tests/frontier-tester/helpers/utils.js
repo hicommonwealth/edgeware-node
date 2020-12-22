@@ -31,7 +31,7 @@ const initWeb3 = async (pkey = privKey) => {
 const deployContract = async (name, c, args = [], web3 = undefined) => {
   let deployer, pkey;
   if (!web3) {
-    web3 = await initWeb3();
+    web3 = context.web3;
     deployer = account;
     pkey = privKey;
   } else {
@@ -84,9 +84,10 @@ async function startEdgewareNode() {
     '--dev',
 		'--no-telemetry',
 		'--no-prometheus',
-		'--tmp',
-		'-lrpc=trace',
-		'-levm=trace',
+		// '--tmp',
+    '--base-path=./db',
+		// '-lrpc=trace',
+		// '-levm=trace',
 	];
 	const binary = child_process.spawn(cmd, args);
 
@@ -101,8 +102,8 @@ async function startEdgewareNode() {
 		process.exit(1);
 	});
 
-	const binaryLogs = [];
-	await new Promise((resolve) => {
+  const binaryLogs = [];
+	const web3 = await new Promise((resolve) => {
 		const errHandle = () => {
 			console.error(`\x1b[31m Failed to start Edgeware Node.\x1b[0m`);
 			console.error(`Command: ${cmd} ${args.join(" ")}`);
@@ -120,7 +121,7 @@ async function startEdgewareNode() {
 			if (chunk.toString().match(/Address already in use/)) {
 				clearTimeout(timer);
 				errHandle();
-			} else if (chunk.toString().match(/Prepared block for proposing at 1/)) {
+			} else if (chunk.toString().match(/Listening for new connections/)) {
 				const web3 = await initWeb3();
 				await web3.eth.getChainId();
 
@@ -129,25 +130,25 @@ async function startEdgewareNode() {
 					binary.stderr.off("data", onData);
 					binary.stdout.off("data", onData);
 				}
-				console.log(`\x1b[31m Starting RPC\x1b[0m`);
-				resolve();
+				// console.log(`\x1b[31m Starting RPC\x1b[0m`);
+				resolve(web3);
 			}
 		};
 
 		// hook interrupt handler
 		const exitHandler = () => {
+			// console.log(`\x1b[31m Exit Handler Called\x1b[0m`);
 			binary.kill();
 			process.exit();
 		};
 		process.on('SIGINT', exitHandler);
-		process.on('exit', exitHandler);
+		// process.on('exit', exitHandler);
 
 		// hook data printing
 		binary.stderr.on("data", onData);
 		binary.stdout.on("data", onData);
 	});
-
-	return binary;
+	return { web3, binary };
 }
 
 function sleep(ms) {
@@ -156,24 +157,30 @@ function sleep(ms) {
 
 function describeWithEdgeware(title, cb) {
 	describe(title, async () => {
-		let binary;
+		const context = { web3: null, binary: null };
 		before("Starting Edgeware Node", async () => {
-			binary = await startEdgewareNode();
+      const data = await startEdgewareNode();
+      context.binary = data.binary;
+      context.web3 = data.web3;
 		});
 
 		after('Exiting Edgeware Node', async () => {
-			console.log(`\x1b[31m Stopping RPC\x1b[0m`);
+      if (context.web3 && context.web3.currentProvider && context.web3.currentProvider.engine) {
+        context.web3.currentProvider.engine.stop();
+      }
+
+			// console.log(`\x1b[31m Stopping RPC\x1b[0m`);
 			await new Promise((resolve) => {
-				binary.on('exit', () => {
-					console.log('RPC STOPPED');
+				context.binary.on('exit', () => {
+					// console.log('RPC STOPPED');
 					resolve();
 				})
-				binary.kill();
+				context.binary.kill();
 			});
 			await sleep(2000);
-		});
+    });
 
-		await cb();
+    await cb(context);
   });
 }
 

@@ -1,11 +1,11 @@
 const { assert } = require('chai');
 const contract = require("@truffle/contract");
-const { account, initWeb3, privKey, describeWithEdgeware } = require('../helpers/utils');
+const { account, privKey, describeWithEdgeware } = require('../helpers/utils');
 const ECRecovery = require('../build/contracts/ECRecovery.json');
 
-describeWithEdgeware('ECRecovery test', async () => {
+describeWithEdgeware('ECRecovery test', async (context) => {
   it('should recover account from signature and hash', async () => {
-    const web3 = await initWeb3();
+    const web3 = context.web3;
 
     let ECR = contract({
       abi: ECRecovery.abi,
@@ -27,7 +27,7 @@ describeWithEdgeware('ECRecovery test', async () => {
   });
 
   it('should interact with precompile directly', async () => {
-    const web3 = await initWeb3();
+    const web3 = context.web3;
     const ECRECOVER_PRECOMPILE_ADDRESS = '0000000000000000000000000000000000000001';
 
     const message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tubulum fuisse, qua illum, cuius is condemnatus est rogatione, P. Eaedem res maneant alio modo.'

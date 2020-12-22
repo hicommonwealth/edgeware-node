@@ -1,6 +1,6 @@
 const { assert } = require("chai");
 const TimeContract = require("../build/contracts/TimeContract.json");
-const { initWeb3, account, describeWithEdgeware } = require('../helpers/utils');
+const { account, describeWithEdgeware } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
 const BLOCK_TIME_MS = 6000;
@@ -13,9 +13,9 @@ function blockTimeifyDate(n) {
   return Math.floor(n / 1000);
 }
 
-describeWithEdgeware("TimeContract test", async () => {
+describeWithEdgeware("TimeContract test", async (context) => {
   it("should be testable", async () => {
-    const web3 = await initWeb3();
+    const web3 = context.web3;
     let Time = contract({
       abi: TimeContract.abi,
       unlinked_binary: TimeContract.bytecode,
