@@ -19,6 +19,6 @@ jobs:
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
 
       # ts test cases
-      - run: sudo apt-get install yarn -y
-      - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
-      - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci
+      - run: sudo apt-get install npm -y
+      - run: cd ~/edgeware/ts-tests/frontier-tester && npm i
+      - run: cd ~/edgeware/ts-tests/frontier-tester && npm run test-ci
