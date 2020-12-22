@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - checkout
-      - run: apt-get update
+      - run: sudo apt-get update
       - run: ~/edgeware/scripts/init.sh
       - run: cd ~/edgeware && git submodule update --init --recursive
 
@@ -19,6 +19,6 @@ jobs:
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
 
       # ts test cases
-      - run: apt-get install yarn -y
+      - run: sudo apt-get install yarn -y
       - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
       - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci
