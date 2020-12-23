@@ -41,6 +41,7 @@ fn token_crud_works() {
 				true,
 				true,
 				0,
+				0
 			)
 		);
 
@@ -60,6 +61,7 @@ fn token_crud_works() {
 				None,
 				None,
 				None,
+				None
 			)
 		);
 
@@ -97,6 +99,7 @@ fn verify_signature_works() {
 				true,
 				true,
 				0,
+				0
 			)
 		);
 

@@ -7,6 +7,7 @@ use edgeware_primitives::Balance;
 use sp_core::ecdsa;
 use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
 use sp_runtime::{
+	Permill,
 	ModuleId,
 	traits::{Member, StaticLookup, AccountIdConversion},
 	transaction_validity::{
@@ -15,6 +16,7 @@ use sp_runtime::{
 	DispatchResult,
 };
 use sp_std::vec::Vec;
+use coinaddress as btc_address;
 
 #[cfg(test)]
 mod mock;
@@ -23,6 +25,8 @@ mod tests;
 
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
+
+
 
 type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::AssetId;
 type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
@@ -38,18 +42,19 @@ pub trait Config: frame_system::Config {
 	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId>;
 }
 
-// struct RenTokenInfo
-// ren_token_name String
-// ren_token_asset_id how our assets pallets identifies this token, bounds same as the ones for asset
-// ren_token_id What ren uses to identify this token on this chain (unique across chains and tokens)
-// ren_token_pub_key The Pub key used to check the signature against.
-// ren_token_proof proof of this token being registered on the RenVM, legitimizing and enabling stuff like recourse if burnAndRelease fails
-// ren_token_mint_enabled,ren_token_burn_enabled to enable/disable currency, instead of delete; you probably do not want to overwrite a token anyway.
-// ren_token_mint_fee, ren_token_burn_fee perentage fee on mint and burn
-// ren_token_min_req min balance required below which assets will be lost and account may be removed
+/// struct				RenTokenInfo
+/// ren_token_id		What this pallet uses to identify tokens ( unique for a given token on this pallet for a given chain )
+/// ren_token_asset_id	How the pallet used for Assets identifies the token
+/// ren_token_name 		Name of the token; used to determine the validation process if any
+/// ren_token_renvm_id	What RenVM uses to uniquely identify this token across different chains
+/// ren_token_pub_key 	The PublicKey used to check the RenVM signature against
+// /// ren_token_proof 	Proof of this token being registered on the RenVM legitimizing it
+/// ren_token_mint_enabled,ren_token_burn_enabled To enable/disable mint/burn temporarily
+/// ren_token_mint_fee, ren_token_burn_fee Parts-per-million fee on mint and burn sent to the pallet account
+/// ren_token_min_req 	Minimum balance required below which tokens will be lost and account may be removed
 
 #[derive(Encode,Decode, Clone, PartialEq, Eq, Debug, Default)]
-pub struct RenTokenInfo<RenVMTokenIdType, TokenIdOf, BalanceOf>
+pub struct RenTokenInfo<RenVMTokenIdType, TokenIdOf>
 	{
 	ren_token_id: RenVMTokenIdType,
 	ren_token_asset_id: TokenIdOf,
@@ -59,16 +64,16 @@ pub struct RenTokenInfo<RenVMTokenIdType, TokenIdOf, BalanceOf>
 	// ren_token_proof: Vec<RenTokenProofData>,
 	ren_token_mint_enabled: bool,
 	ren_token_burn_enabled: bool,
-	// ren_token_mint_fee: ,
-	// ren_token_burn_fee: ,
-	ren_token_min_req: BalanceOf,
+	ren_token_mint_fee: u32,
+	ren_token_burn_fee: u32,
+	// ren_token_min_req: BalanceOf,
 }
 
-type RenTokenInfoType<T> = RenTokenInfo<<T as Config>::RenVMTokenIdType, TokenIdOf<T>, BalanceOf<T>>;
+type RenTokenInfoType<T> = RenTokenInfo<<T as Config>::RenVMTokenIdType, TokenIdOf<T>>;
 
 decl_storage! {
 	trait Store for Module<T: Config> as Template {
-		/// Signature blacklist. This is required to prevent double claim.
+		/// Signature blacklist. This is required to prevent double claim. Unbounded
 		Signatures get(fn signatures): map hasher(opaque_twox_256) EcdsaSignature => Option<()>;
 		/// Record burn event details
 		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(<T as Config>::RenVMTokenIdType, T::BlockNumber, DestAddress, BalanceOf<T>)>;
@@ -112,6 +117,14 @@ decl_error! {
 		RenTokenNotFound,
 		/// Token name exceeds length limit
 		RenTokenNameLengthLimitExceeded,
+		/// The to address provided to the burn function failed validation corresponding to the token's name
+		InvalidBurnToAddress,
+		/// An operation that was not expected to fail failed
+		UnexpectedError,
+		/// Minting this token has been disabled
+		RenTokenMintDisabled,
+		/// Burning this token has been disabled
+		RenTokenBurnDisabled
 
 	}
 }
@@ -122,7 +135,9 @@ decl_module! {
 
 		fn deposit_event() = default;
 
-
+		/// Instantiates the token in the Registry
+		/// Must be done AFTER instantiating the asset in Assets
+		/// max length of the token name implemented
 		#[weight = 10_000]
 		fn add_ren_token(
 			origin,
@@ -133,7 +148,8 @@ decl_module! {
 			_ren_token_pub_key: [u8; 20],
 			_ren_token_mint_enabled: bool,
 			_ren_token_burn_enabled: bool,
-			_ren_token_min_req: BalanceOf<T>,
+			_ren_token_mint_fee: u32,
+			_ren_token_burn_fee: u32,
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
@@ -152,7 +168,8 @@ decl_module! {
 				ren_token_pub_key: _ren_token_pub_key,
 				ren_token_mint_enabled: _ren_token_mint_enabled,
 				ren_token_burn_enabled: _ren_token_burn_enabled,
-				ren_token_min_req: _ren_token_min_req,
+				ren_token_mint_fee: _ren_token_mint_fee,
+				ren_token_burn_fee: _ren_token_burn_fee,
 			};
 
 
@@ -162,6 +179,9 @@ decl_module! {
 			Ok(())
 		}
 
+
+		/// Method to update a tokens info using its ren_token_id, all other fields are optional
+		/// Max length of the token name implemented
 		#[weight = 10_000]
 		fn update_ren_token(
 			origin,
@@ -172,7 +192,8 @@ decl_module! {
 			_ren_token_pub_key_option: Option<[u8; 20]>,
 			_ren_token_mint_enabled_option: Option<bool>,
 			_ren_token_burn_enabled_option: Option<bool>,
-			_ren_token_min_req_option: Option<BalanceOf<T>>,
+			_ren_token_mint_fee_option: Option<u32>,
+			_ren_token_burn_fee_option: Option<u32>,
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
@@ -189,7 +210,8 @@ decl_module! {
 					if let Some(x) = _ren_token_pub_key_option { token_info.ren_token_pub_key = x; }
 					if let Some(x) = _ren_token_mint_enabled_option { token_info.ren_token_mint_enabled = x; }
 					if let Some(x) = _ren_token_burn_enabled_option { token_info.ren_token_burn_enabled = x; }
-					if let Some(x) = _ren_token_min_req_option { token_info.ren_token_min_req = x; }
+					if let Some(x) = _ren_token_mint_fee_option { token_info.ren_token_mint_fee = x; }
+					if let Some(x) = _ren_token_burn_fee_option { token_info.ren_token_burn_fee = x; }
 
 					Ok(())
 				}
@@ -200,7 +222,8 @@ decl_module! {
 			Ok(())
 		}
 
-
+		/// Deletes the token from the Registry
+		/// Must be done BEFORE deleting the asset from Assets.
 		#[weight = 10_000]
 		fn delete_ren_token(
 			origin,
@@ -217,6 +240,8 @@ decl_module! {
 			Ok(())
 		}
 
+
+		/// Transfers tokens from the pallet account to a specified account
 		#[weight = 10_000]
 		fn spend_tokens(
 			origin,
@@ -226,7 +251,6 @@ decl_module! {
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
-			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
 
 			let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
 
@@ -236,7 +260,7 @@ decl_module! {
 			Ok(())
 		}
 
-
+		/// Mints the token, after fee deduction, if the signature provided is valid over the provided arguments
 		#[weight = 10_000]
 		fn mint(
 			origin,
@@ -250,17 +274,32 @@ decl_module! {
 		{
 			ensure_none(origin)?;
 
-			let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
+			let ren_token = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?;
 
+			ensure!(ren_token.ren_token_mint_enabled, Error::<T>::RenTokenMintDisabled);
 
-			// MINT CALL
-			T::Assets::mint(asset_id, who.clone(), amount.into())?;
+			let asset_id = ren_token.ren_token_asset_id;
+
+			let mint_fee_value = Permill::from_parts(ren_token.ren_token_mint_fee).mul_floor(amount);
+
+			// Skipped checking if the mint call for fee might overflow or cause min_balance error
+			// as that should not prevent a user from his operation
+
+			// MINT CALL for user
+			T::Assets::mint(asset_id, who.clone(), (amount - mint_fee_value).into())?;
+			// Attempt mint call for fees
+			T::Assets::mint(asset_id, Self::account_id().into(), mint_fee_value.into());
 
 			Signatures::insert(&sig, ());
 			Self::deposit_event(RawEvent::RenTokenMinted(_ren_token_id, who, amount));
 			Ok(())
 		}
 
+
+		/// Burns the token so that the corresponding pegged currency can be released to the "to" address by RenVM
+		/// Checks if the token is bitcoin by name, "renBTC" (or "renTestBTC" for testnet) and validates the "to" address accordingly
+		/// The actual amount burnt is calculated based on the burn fee, and is the value of the corresponding pegged currency that the user will be granted from RenVM
+		/// The burn fee is transfered from the users account to the pallets account
 		#[weight = 10_000]
 		fn burn(
 			origin,
@@ -271,17 +310,43 @@ decl_module! {
 		{
 			let sender = ensure_signed(origin)?;
 
-		 	let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
+			let ren_token = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?;
+
+			ensure!(ren_token.ren_token_burn_enabled, Error::<T>::RenTokenBurnDisabled);
+
+		 	let asset_id = ren_token.ren_token_asset_id;
+
+
+			match sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).map_err(|_| Error::<T>::UnexpectedError) {
+				Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).unwrap_or_else(|_| ""))
+										.map_err(|_| Error::<T>::InvalidBurnToAddress)
+										.and_then(|x| { if [0,5].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
+				Ok("renTestBTC") 	=> btc_address::validate_btc_address(sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).unwrap_or_else(|_| ""))
+										.map_err(|_| Error::<T>::InvalidBurnToAddress)
+										.and_then(|x| { if [5,111].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
+				Err(x)				=> Err(x),
+				_					=> Ok(()),
+			}?;
+
 
 			NextBurnEventId::try_mutate(|id| -> DispatchResult {
 				let this_id = *id;
 				*id = id.checked_add(1).ok_or(Error::<T>::BurnIdOverflow)?;
 
-				// BURN CALL
-				T::Assets::burn(asset_id, sender.clone(), amount)?;
+				let burn_fee_value = Permill::from_parts(ren_token.ren_token_burn_fee).mul_floor(amount);
 
-				BurnEvents::<T>::insert(this_id, (_ren_token_id, frame_system::Module::<T>::block_number(), &to, amount));
-				Self::deposit_event(RawEvent::RenTokenBurnt(_ren_token_id, sender, to, amount));
+				let actual_burn = amount - burn_fee_value;
+
+				// Skipped checking if the mint call for fee might overflow or cause min_balance error
+				// as that should not prevent a user from his operation
+
+				// BURN CALL for user
+				T::Assets::burn(asset_id, sender.clone(), actual_burn)?;
+				// Attempt transfer call for fees
+				T::Assets::transfer(asset_id, sender.clone(), Self::account_id().into(), burn_fee_value);
+
+				BurnEvents::<T>::insert(this_id, (_ren_token_id, frame_system::Module::<T>::block_number(), &to, actual_burn));
+				Self::deposit_event(RawEvent::RenTokenBurnt(_ren_token_id, sender, to, actual_burn));
 
 				Ok(())
 			})?;
@@ -299,7 +364,7 @@ impl<T: Config> Module<T> {
         T::ModuleId::get().into_account()
     }
 
-	// ABI-encode the values for creating the signature hash.
+	/// Encode the values for creating the signature hash.
 	fn signable_message(p_hash: &[u8; 32], amount: BalanceOf<T>, to: &[u8], n_hash: &[u8; 32], token: &[u8; 32]) -> Vec<u8> {
 
 		let mut amount_slice = Encode::encode(&amount);
@@ -317,7 +382,7 @@ impl<T: Config> Module<T> {
 		v
 	}
 
-	// Verify that the signature has been signed by RenVM.
+	/// Verify that the signature has been signed by RenVM using the PublicKey of the token in token info
 	fn verify_signature(
 		_ren_token_id: T::RenVMTokenIdType,
 		p_hash: &[u8; 32],
@@ -348,6 +413,7 @@ impl<T: Config> Module<T> {
 impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 	type Call = Call<T>;
 
+	/// The entry point for the validation process of unsigned transactions
 	fn validate_unsigned(_source: TransactionSource, call: &Self::Call) -> TransactionValidity {
 		if let Call::mint(_ren_token_id, who, p_hash, amount, n_hash, sig) = call {
 			// check if already exists
@@ -378,7 +444,6 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 
 
 /// Simple ensure origin for the RenVM account
-//
 pub struct EnsureRenVM<T>(sp_std::marker::PhantomData<T>);
 impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 	type Success = T::AccountId;
