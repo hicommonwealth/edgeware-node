@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-cli"
-version = "3.2.0"
+version = "0.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 build = "build.rs"
@@ -86,7 +86,7 @@ pallet-im-online = { version = "2.0.0", default-features = false }
 pallet-authority-discovery = { version = "2.0.0" }
 pallet-staking = { version = "2.0.0" }
 pallet-grandpa = { version = "2.0.0" }
-pallet-evm = { path = "../../vendor/frontier/frame/evm" }
+pallet-evm = { git = "https://github.com/purestake/frontier", branch = "v0.4-hotfixes" }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime" }
@@ -97,8 +97,22 @@ edgeware-executor = { path = "../executor" }
 # CLI-specific dependencies
 sc-cli = { version = "0.8.0", optional = true }
 frame-benchmarking-cli = { version = "2.0.0", optional = true }
-edgeware-inspect = { optional = true, path = "../inspect" }
-fc-consensus = { version = "0.1.0", path = "../../vendor/frontier/client/consensus" }
+fc-consensus = { git = "https://github.com/purestake/frontier", branch = "v0.4-hotfixes" }
+
+# cumulus dependencies
+cumulus-consensus = { git = "https://github.com/paritytech/cumulus", branch = "master" }
+cumulus-collator = { git = "https://github.com/paritytech/cumulus", branch = "master" }
+cumulus-network = { git = "https://github.com/paritytech/cumulus", branch = "master" }
+cumulus-primitives = { git = "https://github.com/paritytech/cumulus", branch = "master" }
+cumulus-service = { git = "https://github.com/paritytech/cumulus", branch = "master" }
+
+# Polkadot dependencies
+# polkadot-primitives = { git = "https://github.com/paritytech/polkadot", branch = "master" }
+# polkadot-collator = { git = "https://github.com/paritytech/polkadot", branch = "master" }
+# polkadot-service = { git = "https://github.com/paritytech/polkadot", branch = "master" }
+polkadot-cli = { git = "https://github.com/paritytech/polkadot", branch = "master" }
+# polkadot-test-service = { git = "https://github.com/paritytech/polkadot", branch = "master" }
+# polkadot-parachain = { git = "https://github.com/paritytech/polkadot", branch = "master" }
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
@@ -124,33 +138,18 @@ regex = "1"
 platforms = "0.2.1"
 
 [build-dependencies]
-structopt = { version = "0.3.8", optional = true }
-edgeware-inspect = { optional = true, path = "../inspect" }
-frame-benchmarking-cli = { version = "2.0.0", optional = true }
-substrate-build-script-utils = { version = "2.0.0", optional = true }
-substrate-frame-cli = { version = "2.0.0", optional = true }
 sc-cli = { version = "0.8.0", optional = true }
-
+polkadot-cli = { git = "https://github.com/paritytech/polkadot", optional = true, branch = "master" }
+build-script-utils = { version = "2.0.0", package = "substrate-build-script-utils" }
+structopt = { version = "0.3.8", optional = true }
+vergen = { version = "3.0.4", optional = true }
 
 [features]
-default = [ "cli" ]
-browser = [
-	"browser-utils",
-	"wasm-bindgen",
-	"wasm-bindgen-futures",
-]
+default = ["cli"]
 cli = [
-	"edgeware-executor/wasmi-errno",
-	"edgeware-inspect",
-	"sc-cli",
-	"frame-benchmarking-cli",
-	"substrate-frame-cli",
-	"sc-service/db",
-	"structopt",
-	"substrate-build-script-utils",
-]
-
-runtime-benchmarks = [
-	"edgeware-runtime/runtime-benchmarks",
-	"frame-benchmarking-cli",
+    "sc-cli",
+    "polkadot-cli",
+    "sc-service/db",
+    "structopt",
+	"vergen",
 ]

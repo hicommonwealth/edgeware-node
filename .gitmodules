@@ -1,4 +1,0 @@
-[submodule "vendor/frontier"]
-	path = vendor/frontier
-	url = https://github.com/paritytech/frontier.git
-	

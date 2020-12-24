@@ -92,6 +92,7 @@ pub use frame_system::Call as SystemCall;
 pub use pallet_staking::StakerStatus;
 /// Public precompiles from evm module
 pub use pallet_evm::precompiles::{Sha256, Ripemd160, ECRecover};
+
 /// Implementations of some helper traits passed into runtime modules as associated types.
 pub mod impls;
 use impls::{Author};
@@ -115,15 +116,15 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("edgeware"),
-	impl_name: create_runtime_str!("edgeware-node"),
+	spec_name: create_runtime_str!("hedgeware-parachain"),
+	impl_name: create_runtime_str!("hedgeware-node"),
 	authoring_version: 16,
 	// Per convention: if the runtime behavior changes, increment spec_version
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 45,
-	impl_version: 45,
+	spec_version: 1,
+	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -633,20 +634,23 @@ impl pallet_elections_phragmen::Config for Runtime {
 
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1_000 * DOLLARS;
+	pub const ProposalBondMinimum: Balance = 1000 * DOLLARS;
 	pub const SpendPeriod: BlockNumber = 14 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(0);
 	pub const TipCountdown: BlockNumber = 1 * DAYS;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
 	pub const TipReportDepositBase: Balance = 1 * DOLLARS;
 	pub const DataDepositPerByte: Balance = 1 * CENTS;
+	pub const SevenDays: BlockNumber = 7 * DAYS;
+	pub const ZeroDay: BlockNumber = 0;
+	pub const OneDay: BlockNumber = 1 * DAYS;
 	pub const BountyDepositBase: Balance = 10 * DOLLARS;
 	pub const BountyDepositPayoutDelay: BlockNumber = 7 * DAYS;
-	pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
 	pub const BountyUpdatePeriod: BlockNumber = 14 * DAYS;
-	pub const MaximumReasonLength: u32 = 16384;
 	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
 	pub const BountyValueMinimum: Balance = 100 * DOLLARS;
+	pub const MaximumReasonLength: u32 = 16384;
+	pub const TreasuryModuleId: ModuleId = ModuleId(*b"py/trsry");
 }
 
 impl pallet_treasury::Config for Runtime {
@@ -1008,38 +1012,10 @@ impl pallet_ethereum::Config for Runtime {
 	type FindAuthor = EthereumFindAuthor<Aura>;
 }
 
-parameter_types! {
-	pub const MaxVotersPerProposal: u32 = 256;
-	pub const MaxOutcomes: u32 = 16;
-}
-
-impl voting::Config for Runtime {
-	type Event = Event;
-	type MaxVotersPerProposal = MaxVotersPerProposal;
-	type MaxOutcomes = MaxOutcomes;
-	type WeightInfo = voting::default_weight::SubstrateWeight<Runtime>;
-}
-
-parameter_types! {
-	pub const MaxSignalingProposals: u32 = 32;
-	pub const MaxTitleLength: u32 = 128;
-	pub const MaxContentsLength: u32 = 16_384;
-}
-
-impl signaling::Config for Runtime {
-	type Event = Event;
-	type Currency = Balances;
-	type MaxSignalingProposals = MaxSignalingProposals;
-	type MaxTitleLength = MaxTitleLength;
-	type MaxContentsLength = MaxContentsLength;
-	type WeightInfo = signaling::default_weight::SubstrateWeight<Runtime>;
-}
-
 impl treasury_reward::Config for Runtime {
 	type Event = Event;
 	type Currency = Balances;
 }
-
 
 parameter_types! {
     pub const ChainId: u8 = 5;
@@ -1067,24 +1043,20 @@ impl edge_chainbridge::Config for Runtime {
     type Event = Event;
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
 	type Currency = Balances;
-    type NativeTokenId = NativeTokenId;    
+    type NativeTokenId = NativeTokenId;
     type NativeTransferFee = NativeTransferFee;
 }
 
-parameter_types! {
-	pub const AssetDepositBase: u64 = 1;
-	pub const AssetDepositPerZombie: u64 = 1;
+impl parachain_info::Config for Runtime {}
+
+impl cumulus_message_broker::Config for Runtime {
+    type DownwardMessageHandlers = ();
+    type HrmpMessageHandlers = ();
 }
 
-impl pallet_assets::Config for Runtime {
-	type Currency = Balances;
-	type Event = Event;
-	type Balance = Balance;
-	type AssetId = constants::currency::AssetId;
-	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
-	type AssetDepositBase = AssetDepositBase;
-	type AssetDepositPerZombie = AssetDepositPerZombie;
-	type WeightInfo = ();
+impl cumulus_parachain_upgrade::Config for Runtime {
+    type Event = Event;
+    type OnValidationData = ();
 }
 
 construct_runtime!(
@@ -1101,7 +1073,7 @@ construct_runtime!(
 		Authorship: pallet_authorship::{Module, Call, Storage, Inherent},
 		Indices: pallet_indices::{Module, Call, Storage, Config<T>, Event<T>},
 		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
-		TransactionPayment: pallet_transaction_payment::{Module, Storage},
+        TransactionPayment: pallet_transaction_payment::{Module, Storage},
 
 		Staking: pallet_staking::{Module, Call, Config<T>, Storage, Event<T>, ValidateUnsigned},
 		Session: pallet_session::{Module, Call, Storage, Event, Config<T>},
@@ -1111,6 +1083,9 @@ construct_runtime!(
 
 		Grandpa: pallet_grandpa::{Module, Call, Storage, Config, Event, ValidateUnsigned},
 		Treasury: pallet_treasury::{Module, Call, Storage, Config, Event<T>},
+		Bounties: pallet_bounties::{Module, Call, Storage, Event<T>},
+		Tips: pallet_tips::{Module, Call, Storage, Event<T>},
+
 		Contracts: pallet_contracts::{Module, Call, Config<T>, Storage, Event<T>},
 		Ethereum: pallet_ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned},
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>},
@@ -1127,13 +1102,15 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>},
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>},
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>},
-		Assets: pallet_assets::{Module, Call, Storage, Event<T>},
 
-		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>},
-		Voting: voting::{Module, Call, Storage, Event<T>},
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>},
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>},
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>},
+
+		// Parachain
+		ParachainUpgrade: cumulus_parachain_upgrade::{Module, Call, Storage, Inherent, Event},
+		MessageBroker: cumulus_message_broker::{Module, Storage, Call, Inherent},
+		ParachainInfo: parachain_info::{Module, Storage, Config},
 	}
 );
 
@@ -1493,3 +1470,5 @@ impl_runtime_apis! {
 		}
 	}
 }
+
+cumulus_runtime::register_validate_block!(Block, Executive);

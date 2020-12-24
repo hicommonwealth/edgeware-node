@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "3.2.0"
+version = "0.1.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
@@ -42,7 +42,7 @@ sp-offchain = { version = "2.0.0", default-features = false }
 edgeware-primitives = { path = "../primitives", default-features = false }
 
 # pallet dependencies
-pallet-assets = { version = "2.0.0", default-features = false }
+# pallet-assets = { version = "2.0.0", default-features = false }
 pallet-authority-discovery = { version = "2.0.0", default-features = false }
 pallet-authorship = { version = "2.0.0", default-features = false }
 pallet-aura = { version = "2.0.0", default-features = false }
@@ -78,6 +78,9 @@ pallet-transaction-payment = { version = "2.0.0", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-features = false }
 pallet-vesting = { version = "2.0.0", default-features = false }
 
+# pallet-bounties = { git = "https://github.com/paritytech/substrate.git", rev = "987a9723920217917f2708388d150add5ef52ef7", default-features = false }
+# pallet-tips = { git = "https://github.com/paritytech/substrate.git", rev = "987a9723920217917f2708388d150add5ef52ef7", default-features = false }
+
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
@@ -85,9 +88,15 @@ voting = { package = "edge-voting", path = "../../modules/edge-voting", default-
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
 chainbridge = { path = "../../modules/chainbridge", default-features = false }
 
-fp-rpc = { path = "../../vendor/frontier/primitives/rpc", default-features = false }
-pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-features = false }
-pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
+pallet-evm = { git = "https://github.com/purestake/frontier", default-features = false, branch = "v0.4-hotfixes" }
+fp-rpc = { default-features = false, git = "https://github.com/purestake/frontier", branch = "v0.4-hotfixes" }
+pallet-ethereum = { default-features = false, git = "https://github.com/purestake/frontier", branch = "v0.4-hotfixes" }
+
+# Cumulus depedencies for Rococo
+cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false, branch = "master" }
+cumulus-message-broker = { git = "https://github.com/paritytech/cumulus", default-features = false, branch = "master" }
+cumulus-parachain-upgrade = { git = "https://github.com/paritytech/cumulus", default-features = false, branch = "master" }
+parachain-info = { git = "https://github.com/paritytech/cumulus", default-features = false, branch = "master" }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
@@ -103,68 +112,81 @@ sp-io = { version = "2.0.0" }
 [features]
 default = ["std"]
 std = [
+	"codec/std",
+	"rustc-hex",
+	"safe-mix/std",
+	"serde",
+	"sp-api/std",
+	"sp-runtime/std",
+	"sp-staking/std",
 	"sp-authority-discovery/std",
-	"pallet-assets/std",
+	"sp-block-builder/std",
+	"sp-consensus-aura/std",
+	"sp-inherents/std",
+	"sp-core/std",
+	"sp-io/std",
+	"sp-std/std",
+	"sp-keyring",
+	"sp-session/std",
+	"sp-transaction-pool/std",
+	"sp-version/std",
+	"sp-offchain/std",
+
+	"frame-executive/std",
+	"frame-support/std",
+	"frame-system-rpc-runtime-api/std",
+	"frame-system/std",
+
+#	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
-	"sp-consensus-aura/std",
 	"pallet-aura/std",
 	"pallet-balances/std",
-	"sp-block-builder/std",
-	"codec/std",
 	"pallet-collective/std",
 	"pallet-contracts/std",
 	"pallet-contracts-primitives/std",
 	"pallet-contracts-rpc-runtime-api/std",
 	"pallet-democracy/std",
 	"pallet-elections-phragmen/std",
-	"frame-executive/std",
 	"pallet-grandpa/std",
 	"pallet-identity/std",
 	"pallet-im-online/std",
 	"pallet-indices/std",
 	"pallet-multisig/std",
-	"sp-inherents/std",
 	"pallet-offences/std",
 	"pallet-proxy/std",
 	"pallet-recovery/std",
-	"sp-core/std",
-	"sp-io/std",
 	"pallet-randomness-collective-flip/std",
-	"sp-std/std",
-	"rustc-hex",
-	"safe-mix/std",
-	"serde",
 	"pallet-session/std",
-	"sp-api/std",
-	"sp-runtime/std",
-	"sp-staking/std",
 	"pallet-staking/std",
-	"sp-keyring",
-	"sp-session/std",
 	"pallet-sudo/std",
 	"pallet-scheduler/std",
-	"frame-support/std",
-	"frame-system-rpc-runtime-api/std",
-	"frame-system/std",
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
 	"pallet-treasury/std",
-	"sp-transaction-pool/std",
+
+# 	"pallet-bounties/std",
+#	"pallet-tips/std",
+
 	"pallet-utility/std",
 	"pallet-vesting/std",
-	"sp-version/std",
-	"sp-offchain/std",
+
+	"fp-rpc/std",
+	"pallet-ethereum/std",
+	"evm/std",
+
 	"edgeware-primitives/std",
 	"signaling/std",
 	"treasury-reward/std",
 	"voting/std",
 	"edge-chainbridge/std",
 	"chainbridge/std",
-	"fp-rpc/std",
-	"pallet-ethereum/std",
-	"evm/std",
+
+    "parachain-info/std",
+    "cumulus-runtime/std",
+    "cumulus-message-broker/std",
+    "cumulus-parachain-upgrade/std",
 ]
 
 runtime-benchmarks = [

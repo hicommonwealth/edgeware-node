@@ -21,8 +21,9 @@ use edgeware_runtime::Block;
 use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
 	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig,
+	ParachainInfoConfig,
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -159,6 +160,7 @@ pub fn testnet_genesis(
 	balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
+	parachain_id: ParaId,
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
@@ -255,14 +257,11 @@ pub fn testnet_genesis(
 		pallet_evm: Some(EVMConfig { accounts: evm_accounts }),
 		pallet_contracts: Some(Default::default()),
 		pallet_ethereum: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
-		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		}),
+		parachain_info: Some(ParachainInfoConfig { parachain_id }),
 	}
 }
 
@@ -302,6 +301,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		balances,
 		vesting,
 		crate::mainnet_fixtures::get_commonwealth_allocation(),
+		2021.into(),
 	)
 }
 
@@ -349,6 +349,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		2021.into(),
 	)
 }
 
@@ -362,6 +363,7 @@ pub fn development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		2021.into(),
 	)
 }
 
@@ -422,6 +424,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		2021.into(),
 	)
 }
 
@@ -436,158 +439,6 @@ pub fn local_testnet_config() -> ChainSpec {
 		None,
 		None,
 		None,
-		Default::default(),
-	)
-}
-
-/// Helper function to create GenesisConfig for testing
-pub fn mainnet_genesis(
-	initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		Balance,
-		AuraId,
-		GrandpaId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-	)>,
-	founder_allocation: Vec<(AccountId, Balance)>,
-	balances: Vec<(AccountId, Balance)>,
-	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
-) -> GenesisConfig {
-	GenesisConfig {
-		frame_system: Some(SystemConfig {
-			code: wasm_binary_unwrap().to_vec(),
-			changes_trie_config: Default::default(),
-		}),
-		pallet_balances: Some(BalancesConfig {
-			balances: founder_allocation
-				.iter()
-				.map(|x| (x.0.clone(), x.1.clone()))
-				.chain(balances.clone())
-				.collect(),
-		}),
-		pallet_indices: Some(IndicesConfig { indices: vec![] }),
-		pallet_session: Some(SessionConfig {
-			keys: initial_authorities
-				.iter()
-				.map(|x| {
-					(
-						x.0.clone(),
-						x.0.clone(),
-						session_keys(x.4.clone(), x.3.clone(), x.5.clone(), x.6.clone()),
-					)
-				})
-				.collect::<Vec<_>>(),
-		}),
-		pallet_staking: Some(StakingConfig {
-			validator_count: 60,
-			minimum_validator_count: initial_authorities.len() as u32,
-			stakers: initial_authorities
-				.iter()
-				.map(|x| {
-					(
-						x.0.clone(),
-						x.1.clone(),
-						x.2.clone(),
-						StakerStatus::Validator,
-					)
-				})
-				.collect(),
-			invulnerables: vec![],
-			slash_reward_fraction: Perbill::from_percent(10),
-			..Default::default()
-		}),
-		pallet_democracy: Some(DemocracyConfig::default()),
-		pallet_collective_Instance1: Some(CouncilConfig {
-			members: crate::mainnet_fixtures::get_mainnet_election_members(),
-			phantom: Default::default(),
-		}),
-		pallet_aura: Some(AuraConfig {
-			authorities: vec![],
-		}),
-		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
-		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
-		pallet_grandpa: Some(GrandpaConfig {
-			authorities: vec![],
-		}),
-		pallet_treasury: Some(Default::default()),
-		pallet_elections_phragmen: Some(Default::default()),
-		pallet_sudo: Some(SudoConfig {
-			key: crate::mainnet_fixtures::get_mainnet_root_key(),
-		}),
-		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(Default::default()),
-		pallet_contracts: Some(Default::default()),
-		pallet_ethereum: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
-		}),
-		treasury_reward: Some(TreasuryRewardConfig {
-			current_payout: 95 * DOLLARS,
-			minting_interval: One::one(),
-		}),
-	}
-}
-
-/// Mainnet config
-fn edgeware_mainnet_config_genesis() -> GenesisConfig {
-	let allocation = get_lockdrop_participants_allocation().unwrap();
-	let balances = allocation
-		.balances
-		.iter()
-		.map(|b| {
-			let balance = b.1.to_string().parse::<Balance>().unwrap();
-			return (<[u8; 32]>::from_hex(b.0.clone()).unwrap().into(), balance);
-		})
-		.filter(|b| b.1 > 0)
-		.collect();
-	let vesting = allocation
-		.vesting
-		.iter()
-		.map(|b| {
-			let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
-			return (
-				(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
-				b.1,
-				b.2,
-				vesting_balance,
-			);
-		})
-		.filter(|b| b.3 > 0)
-		.collect();
-
-	mainnet_genesis(
-		crate::mainnet_fixtures::get_cw_mainnet_validators(),
-		crate::mainnet_fixtures::get_commonwealth_allocation(),
-		balances,
-		vesting,
-	)
-}
-
-/// Edgeware config (8 validators)
-pub fn edgeware_mainnet_config() -> ChainSpec {
-	let data = r#"
-		{
-			"ss58Format": 7,
-			"tokenDecimals": 18,
-			"tokenSymbol": "EDG"
-		}"#;
-	let properties = serde_json::from_str(data).unwrap();
-	let boot_nodes = crate::mainnet_fixtures::get_mainnet_bootnodes();
-	ChainSpec::from_genesis(
-		"Edgeware",
-		"edgeware",
-		ChainType::Live,
-		edgeware_mainnet_config_genesis,
-		boot_nodes,
-		Some(
-			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-				.expect("Staging telemetry url is valid; qed"),
-		),
-		Some(DEFAULT_PROTOCOL_ID),
-		properties,
 		Default::default(),
 	)
 }
