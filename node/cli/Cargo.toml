@@ -147,9 +147,15 @@ vergen = { version = "3.0.4", optional = true }
 [features]
 default = ["cli"]
 cli = [
-    "sc-cli",
-    "polkadot-cli",
-    "sc-service/db",
-    "structopt",
-	"vergen",
+	"edgeware-executor/wasmi-errno",
+	"frame-benchmarking-cli",
+	"polkadot-cli",
+	"sc-cli",
+	"sc-service/db",
+	"structopt",
+]
+
+runtime-benchmarks = [
+	"edgeware-runtime/runtime-benchmarks",
+	"frame-benchmarking-cli",
 ]

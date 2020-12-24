@@ -78,8 +78,8 @@ pallet-transaction-payment = { version = "2.0.0", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-features = false }
 pallet-vesting = { version = "2.0.0", default-features = false }
 
-# pallet-bounties = { git = "https://github.com/paritytech/substrate.git", rev = "987a9723920217917f2708388d150add5ef52ef7", default-features = false }
-# pallet-tips = { git = "https://github.com/paritytech/substrate.git", rev = "987a9723920217917f2708388d150add5ef52ef7", default-features = false }
+pallet-bounties = { git = "https://github.com/paritytech/substrate.git", rev = "987a9723920217917f2708388d150add5ef52ef7", default-features = false }
+pallet-tips = { git = "https://github.com/paritytech/substrate.git", rev = "987a9723920217917f2708388d150add5ef52ef7", default-features = false }
 
 signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
@@ -88,9 +88,10 @@ voting = { package = "edge-voting", path = "../../modules/edge-voting", default-
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
 chainbridge = { path = "../../modules/chainbridge", default-features = false }
 
-pallet-evm = { git = "https://github.com/purestake/frontier", default-features = false, branch = "v0.4-hotfixes" }
-fp-rpc = { default-features = false, git = "https://github.com/purestake/frontier", branch = "v0.4-hotfixes" }
-pallet-ethereum = { default-features = false, git = "https://github.com/purestake/frontier", branch = "v0.4-hotfixes" }
+pallet-evm = { git = "https://github.com/paritytech/frontier", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/paritytech/frontier", default-features = false }
+fp-rpc = { default-features = false, git = "https://github.com/paritytech/frontier" }
+pallet-ethereum = { default-features = false, git = "https://github.com/paritytech/frontier" }
 
 # Cumulus depedencies for Rococo
 cumulus-runtime = { git = "https://github.com/paritytech/cumulus", default-features = false, branch = "master" }
@@ -166,8 +167,8 @@ std = [
 	"pallet-transaction-payment/std",
 	"pallet-treasury/std",
 
-# 	"pallet-bounties/std",
-#	"pallet-tips/std",
+ 	"pallet-bounties/std",
+	"pallet-tips/std",
 
 	"pallet-utility/std",
 	"pallet-vesting/std",
