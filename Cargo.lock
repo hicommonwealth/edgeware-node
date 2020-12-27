@@ -1367,6 +1367,7 @@ version = "1.0.0"
 dependencies = [
  "coinaddress",
  "edgeware-primitives",
+ "frame-benchmarking",
  "frame-support",
  "frame-system",
  "hex-literal",

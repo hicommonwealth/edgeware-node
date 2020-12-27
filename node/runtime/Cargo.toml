@@ -168,6 +168,7 @@ std = [
 	"fp-rpc/std",
 	"pallet-ethereum/std",
 	"evm/std",
+	"edge-ren/std",
 ]
 
 runtime-benchmarks = [
@@ -179,4 +180,5 @@ runtime-benchmarks = [
 	"signaling/runtime-benchmarks",
 	"voting/runtime-benchmarks",
 	"chainbridge/runtime-benchmarks",
+	"edge-ren/runtime-benchmarks",
 ]

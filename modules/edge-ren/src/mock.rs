@@ -1,6 +1,6 @@
 //! Mocks for the airdrop module.
 
-#![cfg(test)]
+// #![cfg(test)]
 
 use super::*;
 use frame_support::{impl_outer_event, impl_outer_origin, parameter_types};
@@ -85,7 +85,6 @@ parameter_types! {
 
 impl Config for Runtime {
 	type Event = TestEvent;
-	type RenVMTokenIdType= u32;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;

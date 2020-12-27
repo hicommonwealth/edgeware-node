@@ -9,7 +9,7 @@ use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
 use sp_runtime::{
 	Permill,
 	ModuleId,
-	traits::{Member, StaticLookup, AccountIdConversion},
+	traits::{Member, StaticLookup, AccountIdConversion, AtLeast32BitUnsigned},
 	transaction_validity::{
 		InvalidTransaction, TransactionPriority, TransactionSource, TransactionValidity, ValidTransaction,
 	},
@@ -22,6 +22,8 @@ use coinaddress as btc_address;
 mod mock;
 #[cfg(test)]
 mod tests;
+// #[cfg(feature = "runtime-benchmarks")]
+// mod benchmarking;
 
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
@@ -33,74 +35,71 @@ type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::
 
 const NAME_MAX_LENGTH : u8 = 32;
 
-pub trait Config: frame_system::Config {
+pub trait Config: frame_system::Config + pallet_assets::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
-	type RenVMTokenIdType: Member + Parameter + Default + Copy + HasCompact;
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
 	type ControllerOrigin: EnsureOrigin<Self::Origin>;
 	type ModuleId: Get<ModuleId>;
 	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId>;
 }
 
-/// struct				RenTokenInfo
-/// ren_token_id		What this pallet uses to identify tokens ( unique for a given token on this pallet for a given chain )
-/// ren_token_asset_id	How the pallet used for Assets identifies the token
-/// ren_token_name 		Name of the token; used to determine the validation process if any
-/// ren_token_renvm_id	What RenVM uses to uniquely identify this token across different chains
-/// ren_token_pub_key 	The PublicKey used to check the RenVM signature against
-// /// ren_token_proof 	Proof of this token being registered on the RenVM legitimizing it
-/// ren_token_mint_enabled,ren_token_burn_enabled To enable/disable mint/burn temporarily
-/// ren_token_mint_fee, ren_token_burn_fee Parts-per-million fee on mint and burn sent to the pallet account
-/// ren_token_min_req 	Minimum balance required below which tokens will be lost and account may be removed
 
+
+/// struct	RenTokenInfo
 #[derive(Encode,Decode, Clone, PartialEq, Eq, Debug, Default)]
-pub struct RenTokenInfo<RenVMTokenIdType, TokenIdOf>
+pub struct RenTokenInfo<TokenIdOf>
 	{
-	ren_token_id: RenVMTokenIdType,
-	ren_token_asset_id: TokenIdOf,
+	/// ren_token_id		What the Assets pallet uses to identify tokens ( unique for a given token/asset on this pallet for a given chain )
+	ren_token_id: TokenIdOf,
+	/// ren_token_name 		Name of the token; used to determine the validation process if any
 	ren_token_name: Vec<u8>,
+	/// ren_token_renvm_id	What RenVM uses to uniquely identify this token across different chains
 	ren_token_renvm_id: [u8; 32],
+	/// ren_token_pub_key 	The PublicKey used to check the RenVM signature against
 	ren_token_pub_key: [u8; 20],
-	// ren_token_proof: Vec<RenTokenProofData>,
+	/// ren_token_mint_enabled To enable/disable mint temporarily
 	ren_token_mint_enabled: bool,
+	/// ren_token_burn_enabled To enable/disable burn temporarily
 	ren_token_burn_enabled: bool,
+	/// ren_token_mint_fee	Parts-per-million fee on mint sent to the pallet account
 	ren_token_mint_fee: u32,
+	/// ren_token_burn_fee	Parts-per-million fee on burn sent to the pallet account
 	ren_token_burn_fee: u32,
-	// ren_token_min_req: BalanceOf,
 }
 
-type RenTokenInfoType<T> = RenTokenInfo<<T as Config>::RenVMTokenIdType, TokenIdOf<T>>;
+type RenTokenInfoType<T> = RenTokenInfo<TokenIdOf<T>>;
 
 decl_storage! {
 	trait Store for Module<T: Config> as Template {
-		/// Signature blacklist. This is required to prevent double claim. Unbounded
+		/// Signature blacklist. This is required to prevent double claim. Bounded only by the range of EcdsaSignature(s)
 		Signatures get(fn signatures): map hasher(opaque_twox_256) EcdsaSignature => Option<()>;
 		/// Record burn event details
-		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(<T as Config>::RenVMTokenIdType, T::BlockNumber, DestAddress, BalanceOf<T>)>;
+		BurnEvents get(fn burn_events): map hasher(twox_64_concat) u32 => Option<(TokenIdOf<T>, T::BlockNumber, DestAddress, BalanceOf<T>)>;
 		/// Next burn event ID
 		NextBurnEventId get(fn next_burn_event_id): u32;
 		/// Registry of all active tokens
-		RenTokenRegistry get(fn ren_token_registry): map hasher(blake2_128_concat) <T as Config>::RenVMTokenIdType => Option<RenTokenInfoType<T>>;
+		RenTokenRegistry get(fn ren_token_registry): map hasher(blake2_128_concat) TokenIdOf<T> => Option<RenTokenInfoType<T>>;
 	}
 }
 
 decl_event!(
 	pub enum Event<T> where
 		<T as frame_system::Config>::AccountId,
-		<T as Config>::RenVMTokenIdType,
+		TokenId = TokenIdOf<T>,
 		Balance = BalanceOf<T>
 	{
-		RenTokenAdded(RenVMTokenIdType),
-
-		RenTokenUpdated(RenVMTokenIdType),
-
-		RenTokenDeleted(RenVMTokenIdType),
-
-		RenTokenSpent(RenVMTokenIdType, Balance),
-
-		RenTokenMinted(RenVMTokenIdType, AccountId, Balance),
-
-		RenTokenBurnt(RenVMTokenIdType, AccountId, DestAddress, Balance),
+		/// Event trigger when token is added to the Registry
+		RenTokenAdded(TokenId),
+		/// Event trigger when token is updates in the Registry
+		RenTokenUpdated(TokenId),
+		/// Event trigger when token is deleted from the Registry
+		RenTokenDeleted(TokenId),
+		/// Event trigger when token is spent from the pallet account
+		RenTokenSpent(TokenId, AccountId, Balance),
+		/// Event trigger when token is minted to a user account
+		RenTokenMinted(TokenId, AccountId, Balance),
+		/// Event trigger when token is burnt from a user account
+		RenTokenBurnt(TokenId, AccountId, DestAddress, Balance),
 
 	}
 );
@@ -115,6 +114,8 @@ decl_error! {
 		RenTokenAlreadyExists,
 		/// No token with this ren_token_id found
 		RenTokenNotFound,
+		/// Asset for the token does not exist
+		RenTokenAssetNotFound,
 		/// Token name exceeds length limit
 		RenTokenNameLengthLimitExceeded,
 		/// The to address provided to the burn function failed validation corresponding to the token's name
@@ -141,8 +142,7 @@ decl_module! {
 		#[weight = 10_000]
 		fn add_ren_token(
 			origin,
-			#[compact] _ren_token_id: T::RenVMTokenIdType,
-			_ren_token_asset_id: TokenIdOf<T>,
+			#[compact] _ren_token_id: TokenIdOf<T>,
 			_ren_token_name: Vec<u8>,
 			_ren_token_renvm_id: [u8; 32],
 			_ren_token_pub_key: [u8; 20],
@@ -154,15 +154,13 @@ decl_module! {
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 
-			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenAlreadyExists);
 			ensure!(_ren_token_name.len()<=NAME_MAX_LENGTH.into(), Error::<T>::RenTokenNameLengthLimitExceeded);
-
-			// TODO Need to check if asset exists in Assets
-			// Need a trait function for this
+			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenAlreadyExists);
+			// ensure!(<T as pallet_assets::Config>::Asset::contains_key(&_ren_token_id), Error::<T>::RenTokenAssetNotFound);
+			ensure!(pallet_assets::Asset::<T>::contains_key(&_ren_token_id), Error::<T>::RenTokenAssetNotFound);
 
 			let _ren_token_info = RenTokenInfo{
 				ren_token_id: _ren_token_id,
-				ren_token_asset_id: _ren_token_asset_id,
 				ren_token_name: _ren_token_name,
 				ren_token_renvm_id: _ren_token_renvm_id,
 				ren_token_pub_key: _ren_token_pub_key,
@@ -185,8 +183,7 @@ decl_module! {
 		#[weight = 10_000]
 		fn update_ren_token(
 			origin,
-			#[compact] _ren_token_id: T::RenVMTokenIdType,
-			_ren_token_asset_id_option: Option<TokenIdOf<T>>,
+			#[compact] _ren_token_id: TokenIdOf<T>,
 			_ren_token_name_option: Option<Vec<u8>>,
 			_ren_token_renvm_id_option: Option<[u8; 32]>,
 			_ren_token_pub_key_option: Option<[u8; 20]>,
@@ -201,10 +198,11 @@ decl_module! {
 			if let Some(ref x) = _ren_token_name_option
 			{ensure!(x.len()<=NAME_MAX_LENGTH.into(), Error::<T>::RenTokenNameLengthLimitExceeded);}
 
-			RenTokenRegistry::<T>::try_mutate_exists(&_ren_token_id, |maybe_token_info| -> DispatchResult {
+			RenTokenRegistry::<T>::try_mutate_exists(
+				&_ren_token_id,
+				|maybe_token_info| -> DispatchResult {
 					let mut token_info = maybe_token_info.as_mut().ok_or(Error::<T>::RenTokenNotFound)?;
 
-					if let Some(x) = _ren_token_asset_id_option { token_info.ren_token_asset_id = x; }
 					if let Some(x) = _ren_token_name_option { token_info.ren_token_name = x; }
 					if let Some(x) = _ren_token_renvm_id_option { token_info.ren_token_renvm_id = x; }
 					if let Some(x) = _ren_token_pub_key_option { token_info.ren_token_pub_key = x; }
@@ -227,7 +225,7 @@ decl_module! {
 		#[weight = 10_000]
 		fn delete_ren_token(
 			origin,
-			#[compact] _ren_token_id: T::RenVMTokenIdType,
+			#[compact] _ren_token_id: TokenIdOf<T>,
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
@@ -245,18 +243,18 @@ decl_module! {
 		#[weight = 10_000]
 		fn spend_tokens(
 			origin,
-			#[compact] _ren_token_id: T::RenVMTokenIdType,
+			#[compact] _ren_token_id: TokenIdOf<T>,
 			who: T::AccountId,
 			amount: BalanceOf<T>,
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 
-			let asset_id = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_asset_id;
+			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
 
-			T::Assets::transfer(asset_id, Self::account_id().into(), who.clone(), amount)?;
+			T::Assets::transfer(_ren_token_id, Self::account_id().into(), who.clone(), amount)?;
 
-			Self::deposit_event(RawEvent::RenTokenSpent(_ren_token_id, amount));
+			Self::deposit_event(RawEvent::RenTokenSpent(_ren_token_id, who, amount));
 			Ok(())
 		}
 
@@ -264,7 +262,7 @@ decl_module! {
 		#[weight = 10_000]
 		fn mint(
 			origin,
-			#[compact] _ren_token_id: T::RenVMTokenIdType,
+			#[compact] _ren_token_id: TokenIdOf<T>,
 			who: T::AccountId,
 			p_hash: [u8; 32],
 			amount: BalanceOf<T>,
@@ -278,17 +276,15 @@ decl_module! {
 
 			ensure!(ren_token.ren_token_mint_enabled, Error::<T>::RenTokenMintDisabled);
 
-			let asset_id = ren_token.ren_token_asset_id;
-
 			let mint_fee_value = Permill::from_parts(ren_token.ren_token_mint_fee).mul_floor(amount);
 
 			// Skipped checking if the mint call for fee might overflow or cause min_balance error
 			// as that should not prevent a user from his operation
 
 			// MINT CALL for user
-			T::Assets::mint(asset_id, who.clone(), (amount - mint_fee_value).into())?;
+			T::Assets::mint(_ren_token_id, who.clone(), (amount - mint_fee_value).into())?;
 			// Attempt mint call for fees
-			T::Assets::mint(asset_id, Self::account_id().into(), mint_fee_value.into());
+			T::Assets::mint(_ren_token_id, Self::account_id().into(), mint_fee_value.into());
 
 			Signatures::insert(&sig, ());
 			Self::deposit_event(RawEvent::RenTokenMinted(_ren_token_id, who, amount));
@@ -303,7 +299,7 @@ decl_module! {
 		#[weight = 10_000]
 		fn burn(
 			origin,
-			#[compact] _ren_token_id: T::RenVMTokenIdType,
+			#[compact] _ren_token_id: TokenIdOf<T>,
 			to: DestAddress,
 			amount: BalanceOf<T>,
 		) -> DispatchResult
@@ -313,9 +309,6 @@ decl_module! {
 			let ren_token = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?;
 
 			ensure!(ren_token.ren_token_burn_enabled, Error::<T>::RenTokenBurnDisabled);
-
-		 	let asset_id = ren_token.ren_token_asset_id;
-
 
 			match sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).map_err(|_| Error::<T>::UnexpectedError) {
 				Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).unwrap_or_else(|_| ""))
@@ -341,9 +334,9 @@ decl_module! {
 				// as that should not prevent a user from his operation
 
 				// BURN CALL for user
-				T::Assets::burn(asset_id, sender.clone(), actual_burn)?;
+				T::Assets::burn(_ren_token_id, sender.clone(), actual_burn)?;
 				// Attempt transfer call for fees
-				T::Assets::transfer(asset_id, sender.clone(), Self::account_id().into(), burn_fee_value);
+				T::Assets::transfer(_ren_token_id, sender.clone(), Self::account_id().into(), burn_fee_value);
 
 				BurnEvents::<T>::insert(this_id, (_ren_token_id, frame_system::Module::<T>::block_number(), &to, actual_burn));
 				Self::deposit_event(RawEvent::RenTokenBurnt(_ren_token_id, sender, to, actual_burn));
@@ -384,7 +377,7 @@ impl<T: Config> Module<T> {
 
 	/// Verify that the signature has been signed by RenVM using the PublicKey of the token in token info
 	fn verify_signature(
-		_ren_token_id: T::RenVMTokenIdType,
+		_ren_token_id: TokenIdOf<T>,
 		p_hash: &[u8; 32],
 		amount: BalanceOf<T>,
 		to: &[u8],
@@ -392,14 +385,15 @@ impl<T: Config> Module<T> {
 		sig: &[u8; 65],
 	) -> DispatchResult {
 
-		let identifier = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_renvm_id;
+		let ren_token = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?;
+		let identifier = ren_token.ren_token_renvm_id;
 
 		let signed_message_hash = keccak_256(&Self::signable_message(p_hash, amount, to, n_hash, &identifier));
 		let recoverd =
 			secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| Error::<T>::InvalidMintSignature)?;
 		let addr = &keccak_256(&recoverd)[12..];
 
-		let pub_key = RenTokenRegistry::<T>::get(&_ren_token_id).ok_or_else(|| Error::<T>::RenTokenNotFound)?.ren_token_pub_key;
+		let pub_key = ren_token.ren_token_pub_key;
 
 		ensure!(addr == pub_key, Error::<T>::InvalidMintSignature);
 
@@ -456,9 +450,10 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 	}
 
 	// #[cfg(feature = "runtime-benchmarks")]
-	#[cfg(not(test))]
-	fn successful_origin() -> T::Origin {
-		T::Origin::from(frame_system::RawOrigin::Root)
-	}
+
+	// #[cfg(not(test))]
+	// fn successful_origin() -> T::Origin {
+	// 	T::Origin::from(frame_system::RawOrigin::Root)
+	// }
 
 }

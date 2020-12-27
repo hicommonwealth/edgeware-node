@@ -34,7 +34,6 @@ fn token_crud_works() {
 			RenVmBridge::add_ren_token(
 				Origin::root(),
 				0,
-				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
 				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
@@ -54,7 +53,6 @@ fn token_crud_works() {
 			RenVmBridge::update_ren_token(
 				Origin::root(),
 				0,
-				None,
 				Some("edgeRenBTC".as_bytes().to_vec()),
 				None,
 				None,
@@ -91,7 +89,6 @@ fn verify_signature_works() {
 		assert_ok!(
 			RenVmBridge::add_ren_token(
 				Origin::root(),
-				0,
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
