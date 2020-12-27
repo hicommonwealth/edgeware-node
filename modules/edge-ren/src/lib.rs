@@ -33,9 +33,10 @@ type DestAddress = Vec<u8>;
 type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::AssetId;
 type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
 
+
 const NAME_MAX_LENGTH : u8 = 32;
 
-pub trait Config: frame_system::Config + pallet_assets::Config {
+pub trait Config: frame_system::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
 	type ControllerOrigin: EnsureOrigin<Self::Origin>;
@@ -156,8 +157,6 @@ decl_module! {
 
 			ensure!(_ren_token_name.len()<=NAME_MAX_LENGTH.into(), Error::<T>::RenTokenNameLengthLimitExceeded);
 			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenAlreadyExists);
-			// ensure!(<T as pallet_assets::Config>::Asset::contains_key(&_ren_token_id), Error::<T>::RenTokenAssetNotFound);
-			ensure!(pallet_assets::Asset::<T>::contains_key(&_ren_token_id), Error::<T>::RenTokenAssetNotFound);
 
 			let _ren_token_info = RenTokenInfo{
 				ren_token_id: _ren_token_id,
