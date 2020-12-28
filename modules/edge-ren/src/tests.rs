@@ -6,17 +6,19 @@
 use super::*;
 use frame_support::{assert_err, assert_noop, assert_ok, unsigned::ValidateUnsigned};
 use hex_literal::hex;
-use mock::{AccountId, Balances, ExtBuilder, Origin, RenVmBridge, RenvmBridgeCall, System};
+use mock::{Call, AssetsPallet, AccountId, Balances, ExtBuilder, Origin, RenVmBridge, RenvmBridgeCall, System};
 use sp_core::H256;
 use sp_runtime::transaction_validity::TransactionValidityError;
+use sp_runtime::traits::Dispatchable;
 
-fn mint_ren_btc(
+
+fn mint_ren_token(
+	_ren_token_id: u32,
 	who: AccountId,
 	p_hash: [u8; 32],
 	amount: Balance,
 	n_hash: [u8; 32],
 	sig: EcdsaSignature,
-	_ren_token_id: u32
 ) -> Result<DispatchResult, TransactionValidityError> {
 	<RenVmBridge as ValidateUnsigned>::validate_unsigned(
 		TransactionSource::External,
@@ -25,6 +27,72 @@ fn mint_ren_btc(
 
 	Ok(RenVmBridge::mint(Origin::none(), _ren_token_id, who, p_hash, amount, n_hash, sig))
 }
+
+
+#[test]
+fn token_mint_works() {
+	ExtBuilder::default().build().execute_with(|| {
+
+		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
+				0,
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				u32::max_value(),
+				1u128
+			)).dispatch(Origin::root())
+		);
+
+		assert_eq!(
+			// pallet_assets::Asset::<mock::Runtime>::get(0).and_then(|x| {x.min_balance}),
+			pallet_assets::Asset::<mock::Runtime>::contains_key(0),
+			true
+		);
+
+		assert_ok!(
+			RenVmBridge::add_ren_token(
+				Origin::root(),
+				0,
+				"renBTC".as_bytes().to_vec(),
+				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
+				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
+				true,
+				true,
+				0,
+				0
+			)
+		);
+
+		// assert_ok!(
+		// 	RenVmBridge::mint(
+		// 		Origin::none(),
+		// 		0,
+		// 		hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+		// 		hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+		// 		93963,
+		// 		hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+		// 		EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
+		// 	)
+		// );
+
+		assert_ok!(
+			mint_ren_token(
+				0,
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+				93963,
+				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
+			)
+		);
+
+		assert_eq!(
+			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			93963
+		);
+
+
+	});
+}
+
 
 #[test]
 fn token_crud_works() {
@@ -170,6 +238,8 @@ fn verify_signature_works() {
 
 	});
 }
+
+
 
 
 

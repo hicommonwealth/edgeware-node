@@ -3,7 +3,7 @@
 // #![cfg(test)]
 
 use super::*;
-use frame_support::{impl_outer_event, impl_outer_origin, parameter_types};
+use frame_support::{impl_outer_dispatch, impl_outer_event, impl_outer_origin, parameter_types};
 use sp_core::H256;
 use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
 use frame_system::{EnsureRoot};
@@ -17,6 +17,16 @@ pub struct Runtime;
 mod edge_ren {
 	pub use super::super::*;
 }
+
+impl_outer_dispatch! {
+	pub enum Call for Runtime where origin: Origin {
+		frame_system::System,
+		pallet_assets::AssetsPallet,
+		pallet_balances::Balances,
+		edge_ren::RenVmBridge,
+	}
+}
+
 
 impl_outer_origin! {
 	pub enum Origin for Runtime {}
@@ -41,7 +51,7 @@ impl frame_system::Config for Runtime {
 	type Origin = Origin;
 	type Index = u64;
 	type BlockNumber = BlockNumber;
-	type Call = ();
+	type Call = Call;
 	type Hash = H256;
 	type Hashing = ::sp_runtime::traits::BlakeTwo256;
 	type AccountId = AccountId;
@@ -88,7 +98,7 @@ impl Config for Runtime {
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
-	type Assets = Assets;
+	type Assets = AssetsPallet;
 }
 pub type RenVmBridge = Module<Runtime>;
 
@@ -115,7 +125,7 @@ impl pallet_assets::Config for Runtime {
 }
 
 
-pub type Assets = pallet_assets::Module<Runtime>;
+pub type AssetsPallet = pallet_assets::Module<Runtime>;
 pub type System = frame_system::Module<Runtime>;
 
 pub struct ExtBuilder();
