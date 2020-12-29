@@ -26,9 +26,3 @@ fi
 rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-
-if [[ $(wasm-gc) ]]; then
-    echo "Found wasm-gc"
-else
-    cargo install --git https://github.com/alexcrichton/wasm-gc
-fi

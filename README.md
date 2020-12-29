@@ -52,7 +52,6 @@ curl https://sh.rustup.rs -sSf | sh
 rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-cargo install --git https://github.com/alexcrichton/wasm-gc
 ```
 
 Build Edgeware:
