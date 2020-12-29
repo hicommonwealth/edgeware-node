@@ -4755,6 +4755,7 @@ dependencies = [
  "ed25519-dalek",
  "evm",
  "fp-evm",
+ "frame-support",
  "sp-core",
  "sp-io",
 ]
