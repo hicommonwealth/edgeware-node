@@ -15,10 +15,29 @@ jobs:
       - run: ~/edgeware/scripts/init.sh
       - run: cd ~/edgeware && git submodule update --init --recursive
 
+      # get cached edgeware build
+      - restore_cache:
+          key: edgeware-{{ checksum "Cargo.lock" }}
+
       # module test cases
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
 
-      # ts test cases
+      # full build
       - run: source ~/.cargo/env && cd ~/edgeware && cargo build --release
+
+      # save edgeware build
+      - save_cache:
+          key: edgeware-{{ checksum "Cargo.lock" }}
+          paths:
+            - target
+
+      # ts test cases with node_modules caching
+      - restore_cache:
+          key: edgeware-tests-{{ checksum "ts-tests/frontier-tester/yarn.lock" }}
       - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
+      - save_cache:
+          key: edgeware-tests-{{ checksum "ts-tests/frontier-tester/yarn.lock" }}
+          paths:
+            - ts-tests/frontier-tester/node_modules
+
       - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci
