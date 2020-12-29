@@ -20,7 +20,7 @@ const initWeb3 = async (pkey = privKey) => {
     providerOrUrl: "http://localhost:9933/",
   });
   const web3 = new Web3(provider);
-	const chainId = await web3.eth.getChainId();
+  const chainId = await web3.eth.getChainId();
 
   // ensure native web3 sending works as well as truffle provider
   web3.eth.accounts.wallet.add(privKey);
@@ -79,105 +79,105 @@ const convertToSubstrateAddress = (evmAddress, prefix = 42) => {
 }
 
 async function startEdgewareNode() {
-	const cmd = BINARY_PATH;
-	const args = [
+  const cmd = BINARY_PATH;
+  const args = [
     '--dev',
-		'--no-telemetry',
-		'--no-prometheus',
-		// '--tmp',
+    '--no-telemetry',
+    '--no-prometheus',
+    // '--tmp',
     '--base-path=./db',
-		// '-lrpc=trace',
-		// '-levm=trace',
-	];
-	const binary = child_process.spawn(cmd, args);
+    // '-lrpc=trace',
+    // '-levm=trace',
+  ];
+  const binary = child_process.spawn(cmd, args);
 
-	binary.on("error", (err) => {
-		if (err.errno == "ENOENT") {
-			console.error(
-				`\x1b[31mMissing Frontier binary (${BINARY_PATH}).\nPlease compile the Frontier project:\ncargo build\x1b[0m`
-			);
-		} else {
-			console.error(err);
-		}
-		process.exit(1);
-	});
+  binary.on("error", (err) => {
+    if (err.errno == "ENOENT") {
+      console.error(
+        `\x1b[31mMissing Frontier binary (${BINARY_PATH}).\nPlease compile the Frontier project:\ncargo build\x1b[0m`
+      );
+    } else {
+      console.error(err);
+    }
+    process.exit(1);
+  });
 
   const binaryLogs = [];
-	const web3 = await new Promise((resolve) => {
-		const errHandle = () => {
-			console.error(`\x1b[31m Failed to start Edgeware Node.\x1b[0m`);
-			console.error(`Command: ${cmd} ${args.join(" ")}`);
-			console.error(`Logs:`);
-			console.error(binaryLogs.map((chunk) => chunk.toString()).join("\n"));
-			process.exit(1);
-		};
-		const timer = setTimeout(errHandle, SPAWNING_TIME - 2000);
+  const web3 = await new Promise((resolve) => {
+    const errHandle = () => {
+      console.error(`\x1b[31m Failed to start Edgeware Node.\x1b[0m`);
+      console.error(`Command: ${cmd} ${args.join(" ")}`);
+      console.error(`Logs:`);
+      console.error(binaryLogs.map((chunk) => chunk.toString()).join("\n"));
+      process.exit(1);
+    };
+    const timer = setTimeout(errHandle, SPAWNING_TIME - 2000);
 
-		const onData = async (chunk) => {
-			if (DISPLAY_LOG) {
-				console.log(chunk.toString());
-			}
-			binaryLogs.push(chunk);
-			if (chunk.toString().match(/Address already in use/)) {
-				clearTimeout(timer);
-				errHandle();
-			} else if (chunk.toString().match(/Listening for new connections/)) {
-				const web3 = await initWeb3();
-				await web3.eth.getChainId();
+    const onData = async (chunk) => {
+      if (DISPLAY_LOG) {
+        console.log(chunk.toString());
+      }
+      binaryLogs.push(chunk);
+      if (chunk.toString().match(/Address already in use/)) {
+        clearTimeout(timer);
+        errHandle();
+      } else if (chunk.toString().match(/Listening for new connections/)) {
+        const web3 = await initWeb3();
+        await web3.eth.getChainId();
 
-				clearTimeout(timer);
-				if (!DISPLAY_LOG) {
-					binary.stderr.off("data", onData);
-					binary.stdout.off("data", onData);
-				}
-				// console.log(`\x1b[31m Starting RPC\x1b[0m`);
-				resolve(web3);
-			}
-		};
+        clearTimeout(timer);
+        if (!DISPLAY_LOG) {
+          binary.stderr.off("data", onData);
+          binary.stdout.off("data", onData);
+        }
+        // console.log(`\x1b[31m Starting RPC\x1b[0m`);
+        resolve(web3);
+      }
+    };
 
-		// hook interrupt handler
-		const exitHandler = () => {
-			// console.log(`\x1b[31m Exit Handler Called\x1b[0m`);
-			binary.kill();
-			process.exit();
-		};
-		process.on('SIGINT', exitHandler);
-		// process.on('exit', exitHandler);
+    // hook interrupt handler
+    const exitHandler = () => {
+      // console.log(`\x1b[31m Exit Handler Called\x1b[0m`);
+      binary.kill();
+      process.exit();
+    };
+    process.on('SIGINT', exitHandler);
+    // process.on('exit', exitHandler);
 
-		// hook data printing
-		binary.stderr.on("data", onData);
-		binary.stdout.on("data", onData);
-	});
-	return { web3, binary };
+    // hook data printing
+    binary.stderr.on("data", onData);
+    binary.stdout.on("data", onData);
+  });
+  return { web3, binary };
 }
 
 function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function describeWithEdgeware(title, cb) {
-	describe(title, async () => {
-		const context = { web3: null, binary: null };
-		before("Starting Edgeware Node", async () => {
+  describe(title, async () => {
+    const context = { web3: null, binary: null };
+    before("Starting Edgeware Node", async () => {
       const data = await startEdgewareNode();
       context.binary = data.binary;
       context.web3 = data.web3;
-		});
+    });
 
-		after('Exiting Edgeware Node', async () => {
+    after('Exiting Edgeware Node', async () => {
       if (context.web3 && context.web3.currentProvider && context.web3.currentProvider.engine) {
         context.web3.currentProvider.engine.stop();
       }
 
-			// console.log(`\x1b[31m Stopping RPC\x1b[0m`);
-			await new Promise((resolve) => {
-				context.binary.on('exit', () => {
-					// console.log('RPC STOPPED');
-					resolve();
-				})
-				context.binary.kill();
-			});
-			await sleep(2000);
+      // console.log(`\x1b[31m Stopping RPC\x1b[0m`);
+      await new Promise((resolve) => {
+        context.binary.on('exit', () => {
+          // console.log('RPC STOPPED');
+          resolve();
+        })
+        context.binary.kill();
+      });
+      await sleep(2000);
     });
 
     await cb(context);
