@@ -891,7 +891,7 @@ impl FeeCalculator for FixedGasPrice {
 }
 
 parameter_types! {
-	pub const EthChainId: u64 = 7;
+	pub const EthChainId: u64 = 2021;
 }
 
 /// Clone of Istanbul config with `create_contract_limit` raised.
