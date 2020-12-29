@@ -7,10 +7,9 @@ const UniswapV2Factory = require('@uniswap/v2-core/build/UniswapV2Factory.json')
 const UniswapV2Router02 = require('@uniswap/v2-periphery/build/UniswapV2Router02.json');
 
 // Initialization
-const { account, privKey, initWeb3 } = require('./utils');
-const web3 = initWeb3();
+const { account } = require('./utils');
 
-const deploy = async () => {
+const deploy = async (web3) => {
    const d = async (name, Contract, args = []) => {
       let c = contract({
          abi: Contract.abi,
@@ -34,4 +33,4 @@ const deploy = async () => {
 
 module.exports = {
    deploy,
- }
+}

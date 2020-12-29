@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: phusion/baseimage:0.11
+      - image: cimg/node:15.4.0
         environment:
           DEBUG_BUILD: true
           DEBIAN_FRONTEND: noninteractive
@@ -11,9 +11,14 @@ jobs:
 
     steps:
       - checkout
-      - run: apt-get update
+      - run: sudo apt-get update
       - run: ~/edgeware/scripts/init.sh
       - run: cd ~/edgeware && git submodule update --init --recursive
 
       # module test cases
       - run: source ~/.cargo/env && cd ~/edgeware && ./scripts/test.sh
+
+      # ts test cases
+      - run: source ~/.cargo/env && cd ~/edgeware && cargo build --release
+      - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
+      - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci

@@ -1,11 +1,11 @@
 const { assert } = require('chai');
 const ValueContract = require('../build/contracts/ValueContract.json');
-const { deployContract, account, initWeb3 } = require('../helpers/utils');
+const { account, describeWithEdgeware } = require('../helpers/utils');
 const contract = require("@truffle/contract");
 
-describe("ValueContract test", async () => {
+describeWithEdgeware("ValueContract test", async (context) => {
   it("should have value", async () => {
-    const web3 = initWeb3();
+    const web3 = context.web3;
     const gasPrice = web3.utils.toWei("1", 'gwei');
     let Value = contract({
       abi: ValueContract.abi,
@@ -33,7 +33,7 @@ describe("ValueContract test", async () => {
 
   
   it("should setup ValueContract with non-zero value", async () => {
-    const web3 = initWeb3();
+    const web3 = context.web3;
     const gasPrice = web3.utils.toWei("1", 'gwei');
     let Value = contract({
       abi: ValueContract.abi,

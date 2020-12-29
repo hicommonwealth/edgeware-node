@@ -2,12 +2,12 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import Web3 from 'web3';
 import { assert } from 'chai';
-const { convertToEvmAddress, convertToSubstrateAddress, initWeb3 } = require('../helpers/utils.js');
+const { convertToEvmAddress, convertToSubstrateAddress, describeWithEdgeware } = require('../helpers/utils.js');
 import BN from 'bn.js';
 import { dev } from '@edgeware/node-types';
 import { TypeRegistry } from '@polkadot/types';
 
-describe('Substrate <> EVM balances test', async () => {
+describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
   let web3: Web3;
   let web3Url: string;
   let api: ApiPromise;
@@ -76,6 +76,7 @@ describe('Substrate <> EVM balances test', async () => {
     assert.isTrue(polkadotStartBalance.gt(value), 'sender account must have sufficient balance');
     assert.equal(web3StartBalance, evmSubstrateStartBalance.toString(), 'substrate balance does not match web3 balance');
 
+    // TODO: recompute fees for existential balance
     const fees = await sendSubstrateBalance(value);
 
     // query final balances
@@ -127,8 +128,10 @@ describe('Substrate <> EVM balances test', async () => {
   it('should update substrate balances from web3 tx', async () => {
     // start with an EVM account with a known private key
     const privKey = '99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E343';
-    const web3: Web3 = new initWeb3(privKey);
-    const senderAddress = web3.eth.defaultAccount;
+    const web3 = context.web3;
+    web3.eth.accounts.wallet.add(privKey);
+    web3.eth.defaultAccount = web3.eth.accounts.wallet[0].address;
+    const senderAddress = web3.eth.accounts.wallet[0].address;
     const senderSubstrateAddress: string = convertToSubstrateAddress(senderAddress, id);
 
     // give the EVM account some balance to send back via web3
@@ -142,9 +145,11 @@ describe('Substrate <> EVM balances test', async () => {
     assert.equal(senderWeb3StartBalance, senderEvmSubstrateStartBalance.toString(), 'substrate balance does not match web3 balance');
 
     // perform web3 call, send value back to the original substrate/alice account
-    const gasPrice = web3.utils.toWei("1", 'gwei');
     const receipt = await web3.eth.sendTransaction({
-      from: senderAddress, to: evmAddress, value: value.toString(), gasPrice
+      from: senderAddress,
+      to: evmAddress,
+      value: value.toString(),
+      gas: web3.utils.toWei('1', 'ether'),
     });
     const gasUsed = web3.utils.toBN(web3.utils.toWei(`${receipt.gasUsed}`, 'gwei'));
 

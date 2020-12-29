@@ -4,13 +4,12 @@ import { createTestPairs, TestKeyringMap } from '@polkadot/keyring/testingPairs'
 import { u8aToString } from '@polkadot/util';
 import { assert } from 'chai';
 import { dev } from '@edgeware/node-types';
-import { TypeRegistry, bool } from '@polkadot/types';
+import { TypeRegistry } from '@polkadot/types';
 import BN from 'bn.js';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
-import { CodePromise, BlueprintPromise, ContractPromise } from '@polkadot/api-contract';
-import fs from 'fs';
+const { describeWithEdgeware } = require('../helpers/utils.js');
 
-describe('Upgrade Tests', async () => {
+describeWithEdgeware('Upgrade Tests', async (context) => {
   let api: ApiPromise;
   let pairs: TestKeyringMap;
 

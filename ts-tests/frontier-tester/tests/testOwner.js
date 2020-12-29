@@ -1,14 +1,14 @@
 const { assert } = require('chai');
 const OwnerContract = require('../build/contracts/OwnerContract.json');
 const contract = require("@truffle/contract");
-const { deployContract, account, initWeb3 } = require('../helpers/utils');
+const { account, describeWithEdgeware } = require('../helpers/utils');
 
-describe("OwnerContract test", async () => {
+describeWithEdgeware("OwnerContract test", async (context) => {
   let OC;
   let web3;
 
   before(async function() {
-    web3 = initWeb3();
+    web3 = context.web3;
 
     OCDeploy = contract({
       abi: OwnerContract.abi,
