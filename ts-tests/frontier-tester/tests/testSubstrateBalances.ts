@@ -16,6 +16,7 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
   let address: string;
   let evmAddress: string;
   let substrateEvmAddress: string;
+  const FEE_ACCURACY = 10000;
 
   const value = new BN('10000000000000000000');
 
@@ -45,7 +46,7 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
     web3Url = 'http://localhost:9933';
     web3 = new Web3(web3Url);
     id = await web3.eth.net.getId();
-    assert.equal(id, 7);
+    assert.equal(id, 2021);
 
     // init polkadot
     const polkadotUrl = 'ws://localhost:9944';
@@ -57,14 +58,18 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
     })).isReady;
     const { ss58Format } = await api.rpc.system.properties();
     const substrateId = +ss58Format.unwrap();
-    // NOTE: in dev mode, the eth id will still be 7 but the substrate id will be 42
-    // assert.equal(substrateId, id);
 
     // init addresses
-    keyring = new Keyring({ ss58Format: id, type: 'sr25519' }).addFromUri('//Alice');
+    keyring = new Keyring({ ss58Format: substrateId, type: 'sr25519' }).addFromUri('//Alice');
     address = keyring.address;
     evmAddress = convertToEvmAddress(address);
     substrateEvmAddress = convertToSubstrateAddress(evmAddress);
+  });
+
+  after(async () => {
+    if (api) {
+      await api.disconnect();
+    }
   });
 
   it('should fund account via transfer', async () => {
@@ -76,15 +81,18 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
     assert.isTrue(polkadotStartBalance.gt(value), 'sender account must have sufficient balance');
     assert.equal(web3StartBalance, evmSubstrateStartBalance.toString(), 'substrate balance does not match web3 balance');
 
-    // TODO: recompute fees for existential balance
-    const fees = await sendSubstrateBalance(value);
+    let fees = await sendSubstrateBalance(value);
 
     // query final balances
     const polkadotEndBalance = await fetchBalance(address);
     const evmSubstrateEndBalance = await fetchBalance(substrateEvmAddress);
     const web3EndBalance = await web3.eth.getBalance(evmAddress);
 
-    assert.equal(polkadotEndBalance.toString(), polkadotStartBalance.sub(value).sub(fees).toString(), 'incorrect sender account balance');
+    assert.equal(
+      polkadotEndBalance.divn(FEE_ACCURACY).toString(),
+      polkadotStartBalance.sub(value).sub(fees).divn(FEE_ACCURACY).toString(),
+      'incorrect sender account balance'
+    );
     assert.equal(web3EndBalance, evmSubstrateEndBalance.toString(), 'substrate balance does not match web3 balance');
     assert.equal(evmSubstrateEndBalance.toString(), evmSubstrateStartBalance.add(value).toString(), 'incorrect web3 account balance');
   });
@@ -151,7 +159,8 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
       value: value.toString(),
       gas: web3.utils.toWei('1', 'ether'),
     });
-    const gasUsed = web3.utils.toBN(web3.utils.toWei(`${receipt.gasUsed}`, 'gwei'));
+    // const gasUsed = web3.utils.toBN(web3.utils.toWei(`${receipt.gasUsed}`, 'gwei'));
+    const gasUsed = web3.utils.toBN(`${receipt.gasUsed}`);
 
     // verify end balances
     const web3EndBalance = await web3.eth.getBalance(evmAddress);
@@ -159,7 +168,7 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
     const senderWeb3EndBalance = await web3.eth.getBalance(senderAddress);
     const senderEvmSubstrateEndBalance = await fetchBalance(senderSubstrateAddress);
     assert.equal(senderWeb3EndBalance, senderEvmSubstrateEndBalance.toString(), 'sender substrate balance does not match web3 balance');
-    assert.equal(senderWeb3EndBalance, web3.utils.toBN(senderWeb3StartBalance).sub(value).sub(gasUsed).toString(), 'incorrect web3 sender balance');
+    assert.equal(senderWeb3EndBalance, (web3.utils.toBN(senderWeb3StartBalance).sub(value)).sub(gasUsed).toString(), 'incorrect web3 sender balance');
     assert.equal(web3EndBalance, web3.utils.toBN(web3StartBalance).add(value).toString(), 'incorrect web3 recipient balance');
     assert.equal(web3EndBalance, evmSubstrateEndBalance.toString(), 'recipient substrate balance does not match web3 balance')
   });

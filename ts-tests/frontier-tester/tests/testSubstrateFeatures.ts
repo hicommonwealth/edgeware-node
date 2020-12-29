@@ -12,6 +12,7 @@ const { describeWithEdgeware } = require('../helpers/utils.js');
 describeWithEdgeware('Upgrade Tests', async (context) => {
   let api: ApiPromise;
   let pairs: TestKeyringMap;
+  const FEE_ACCURACY = 10000;
 
   before(async () => {
     const polkadotUrl = 'ws://localhost:9944';
@@ -23,6 +24,12 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
       ...dev,
     }).isReady;
     pairs = createTestPairs();
+  });
+
+  after(async () => {
+    if (api) {
+      await api.disconnect();
+    }
   });
 
   const submitTxWithFee = async (tx: SubmittableExtrinsic<'promise'>, from: KeyringPair): Promise<BN> => {
@@ -59,7 +66,10 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
     const charlieEndBal = await fetchBalance(charlie.address);
     const daveEndBal = await fetchBalance(dave.address);
     assert.equal(daveStartBal.add(value).toString(), daveEndBal.toString());
-    assert.equal((charlieStartBal.sub(value)).sub(fees).toString(), charlieEndBal.toString());
+    assert.equal(
+      charlieStartBal.sub(value).sub(fees).divn(FEE_ACCURACY).toString(),
+      charlieEndBal.divn(FEE_ACCURACY).toString()
+    );
   });
 
   it('should create and second democracy proposal', async () => {

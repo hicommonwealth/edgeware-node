@@ -41,6 +41,7 @@ let sendSubstrateBalance = async (): Promise<void> => {
   // ensure the account has funds via web3
   const web3 = await initWeb3();
   const web3Balance = await web3.eth.getBalance(account);
+  await api.disconnect();
   console.log(`Transfer complete, web3 fetched balance: ${web3Balance}`);
 }
 
