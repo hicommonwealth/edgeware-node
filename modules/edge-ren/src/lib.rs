@@ -310,10 +310,10 @@ decl_module! {
 			ensure!(ren_token.ren_token_burn_enabled, Error::<T>::RenTokenBurnDisabled);
 
 			match sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).map_err(|_| Error::<T>::UnexpectedError) {
-				Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).unwrap_or_else(|_| ""))
+				Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
 										.map_err(|_| Error::<T>::InvalidBurnToAddress)
 										.and_then(|x| { if [0,5].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
-				Ok("renTestBTC") 	=> btc_address::validate_btc_address(sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).unwrap_or_else(|_| ""))
+				Ok("renTestBTC") 	=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
 										.map_err(|_| Error::<T>::InvalidBurnToAddress)
 										.and_then(|x| { if [5,111].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
 				Err(x)				=> Err(x),
