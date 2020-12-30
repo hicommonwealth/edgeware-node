@@ -10,21 +10,16 @@ class BalanceQueryTest extends StateTest {
     if (accountSeeds.length === 0) throw new Error(`${this.name} requires at least one account!`);
   }
 
-  public readonly actions = {
-    2: {
-      name: 'fetch initial account balances',
-      fn: async (api: ApiPromise) => {
-        const bal = await api.query.balances.account(this.account(0));
-        this._bal = JSON.stringify(bal);
-      },
-    },
-    5: {
-      name: 'ensure balances equal',
-      fn: async (api: ApiPromise) => {
-        const bal = await api.query.balances.account(this.account(0));
-        chai.assert.equal(this._bal, JSON.stringify(bal));
-      }
-    }
+  public async before(api: ApiPromise) {
+    const bal = await api.query.balances.account(this.account(0));
+    this._bal = JSON.stringify(bal);
+    await super.before(api);
+  }
+
+  public async after(api: ApiPromise) {
+    const bal = await api.query.balances.account(this.account(0));
+    chai.assert.equal(this._bal, JSON.stringify(bal));
+    await super.after(api);
   }
 }
 

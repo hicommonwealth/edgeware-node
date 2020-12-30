@@ -43,9 +43,6 @@ export interface ITestOptions {
     // path to a file containing the WASM hex string used in `setCode`
     codePath: string,
 
-    // block to send upgrade tx
-    block: number;
-
     // seed of sudo account, which can execute `setCode`
     sudoSeed: string;
 
@@ -63,11 +60,15 @@ class TestRunner {
   private _chainOutfile: fs.WriteStream;
   private _chainOutstream: NodeJS.WritableStream;
   private _chainProcess: child_process.ChildProcess;
+  private _upgradeBlock: number;
 
   constructor(
     private tests: StateTest[],
     private options: ITestOptions,
   ) {
+    // default upgrade block to (n tests + 2) (1 test per block + first block)
+    this._upgradeBlock = tests.length + 2;
+
     // verify options args
     if (!options.chainspec) {
       throw new Error('missing chainspec!');
@@ -85,13 +86,10 @@ class TestRunner {
       if (!options.upgrade.codePath || !fs.existsSync(options.upgrade.codePath)) {
         throw new Error('cannot find upgrade codepath!');
       }
-      if (!options.upgrade.block) {
-        throw new Error('invalid upgrade block!');
-      }
       if (!options.upgrade.sudoSeed) {
         throw new Error('invalid sudo seed!');
       }
-      log.info(`Will perform upgrade on block ${options.upgrade.block}.`);
+      log.info(`Will perform upgrade on block ${this._upgradeBlock}.`);
     } else {
       log.info('Will not perform upgrade during testing.');
     }
@@ -108,9 +106,7 @@ class TestRunner {
   private _startChain(clearBasePath: boolean) {
     // pass through SIGINT to chain process
     process.on('SIGINT', () => {
-      if (this._chainProcess && this._chainProcess.connected) {
-        this._chainProcess.kill('SIGINT');
-      }
+      this._stopChain();
     });
 
     if (clearBasePath) {
@@ -177,6 +173,11 @@ class TestRunner {
         this._chainProcess = undefined;
       });
     }
+
+    if (this._api) {
+      this._api.disconnect();
+    }
+    delete this._api;
   }
 
   // With a valid chain running, construct a polkadot-js API and
@@ -198,21 +199,13 @@ class TestRunner {
 
     // initialize the API itself
     const registry = new TypeRegistry();
-    this._api = new ApiPromise({ provider, registry, ...dev });
+    this._api = new ApiPromise({ provider, registry, typesBundle: dev.typesBundle });
     await this._api.isReady;
 
     // fetch and print chain information
     const chainInfo = await this._api.rpc.state.getRuntimeVersion();
     log.info(`API connected to chain ${chainInfo.specName.toString()}:${+chainInfo.specVersion}!`);
     return +chainInfo.specVersion;
-  }
-
-  // Disconnect an active polkadot-js API from the chain.
-  private _stopApi() {
-    if (this._api) {
-      this._api.disconnect();
-    }
-    delete this._api;
   }
 
   // Performs an upgrade via a `sudo(setCode())` API call.
@@ -282,22 +275,27 @@ class TestRunner {
         log.info(`Got block ${blockNumber}.`);
 
         // perform upgrade after delay
-        if (this.options.upgrade && blockNumber === this.options.upgrade.block) {
+        if (this.options.upgrade && blockNumber === this._upgradeBlock) {
           resolve(true);
         }
 
-        const runnableTests = this.tests.filter((t) => !!t.actions[blockNumber]);
-        // run the selected tests
-        await Promise.all(runnableTests.map(async (t) => {
-          const { name, fn } = t.actions[blockNumber];
+        const t = blockNumber <= this.tests.length
+          ? this.tests[blockNumber - 1]
+          : this.tests[blockNumber - (this._upgradeBlock + 2)];
+        if (t) {
+          const name = blockNumber < this._upgradeBlock ? 'before' : 'after';
           try {
-            await fn(this._api);
+            if (blockNumber < this._upgradeBlock) {
+              await t.before(this._api);
+            } else {
+              await t.after(this._api);
+            }
             log.info(`Test '${t.name}' action '${name}' succeeded.`);
           } catch (e) {
             log.info(`Test '${t.name}' action '${name}' failed: ${e.message}.`);
           }
-        }));
-        if (this.tests.every((test) => test.isComplete(blockNumber))) {
+        }
+        if (this.tests.every((test) => test.isComplete())) {
           log.info('All tests complete!');
           resolve(false);
         }
@@ -326,7 +324,6 @@ class TestRunner {
 
     // end run if no upgrade needed
     if (!needsUpgrade) {
-      this._stopApi();
       await this._stopChain();
       return;
     }
@@ -335,7 +332,6 @@ class TestRunner {
     await this._doUpgrade();
 
     // [6.] Restart chain with upgraded binary (if needed)
-    this._stopApi();
     if (this.options.upgrade.binaryPath
         && this.options.binaryPath !== this.options.upgrade.binaryPath) {
       await this._stopChain();
@@ -346,7 +342,6 @@ class TestRunner {
     // [7.] Reconstruct API
     const newVersion = await this._startApi();
     if (startVersion >= newVersion) {
-      this._stopApi();
       await this._stopChain();
       throw new Error('Upgrade failed! Version did not change.');
     }
@@ -355,7 +350,6 @@ class TestRunner {
     await this._runTests();
 
     // Cleanup and exit
-    this._stopApi();
     await this._stopChain();
   }
 }
