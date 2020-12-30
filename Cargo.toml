@@ -6,6 +6,7 @@ members = [
 	"modules/chainbridge",
 	"modules/edge-chainbridge",
 	"modules/edge-ren",
+	"modules/edge-ren/benchmarking",
 	"node/cli",
 	"node/executor",
 	"node/primitives",

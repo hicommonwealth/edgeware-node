@@ -1,12 +1,13 @@
 //! Mocks for the airdrop module.
 
-// #![cfg(test)]
+#![cfg(test)]
 
 use super::*;
 use frame_support::{impl_outer_dispatch, impl_outer_event, impl_outer_origin, parameter_types};
 use sp_core::H256;
-use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
+use sp_runtime::{ModuleId, testing::Header, traits::IdentityLookup, Perbill};
 use frame_system::{EnsureRoot};
+use edgeware_primitives::Balance;
 
 pub type AccountId = H256;
 pub type BlockNumber = u64;
@@ -14,9 +15,6 @@ pub type BlockNumber = u64;
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct Runtime;
 
-mod edge_ren {
-	pub use super::super::*;
-}
 
 impl_outer_dispatch! {
 	pub enum Call for Runtime where origin: Origin {
@@ -33,7 +31,7 @@ impl_outer_origin! {
 }
 
 impl_outer_event! {
-	pub enum TestEvent for Runtime {
+	pub enum Event for Runtime {
 		pallet_assets<T>,
 		frame_system<T>,
 		pallet_balances<T>,
@@ -41,7 +39,7 @@ impl_outer_event! {
 	}
 }
 
-pub type RenvmBridgeCall = super::Call<Runtime>;
+pub type RenvmBridgeCall = edge_ren::Call<Runtime>;
 
 parameter_types! {
 	pub const BlockHashCount: u64 = 250;
@@ -57,7 +55,7 @@ impl frame_system::Config for Runtime {
 	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = TestEvent;
+	type Event = Event;
 	type BlockHashCount = BlockHashCount;
 	type BlockWeights = ();
 	type BlockLength = ();
@@ -79,7 +77,7 @@ impl pallet_balances::Config for Runtime {
 	type MaxLocks = ();
 	type Balance = Balance;
 	type DustRemoval = ();
-	type Event = TestEvent;
+	type Event = Event;
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Runtime>;
 	type WeightInfo = ();
@@ -93,14 +91,14 @@ parameter_types! {
 	pub const RenVMModuleId: ModuleId = ModuleId(*b"RenToken");
 }
 
-impl Config for Runtime {
-	type Event = TestEvent;
+impl edge_ren::Config for Runtime {
+	type Event = Event;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
-	type ControllerOrigin= EnsureRenVM<Runtime>;
+	type ControllerOrigin= frame_system::EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
 	type Assets = AssetsPallet;
 }
-pub type RenVmBridge = Module<Runtime>;
+pub type RenVmBridge = edge_ren::Module<Runtime>;
 
 parameter_types! {
 	pub const AssetDepositBase: u64 = 1;
@@ -112,10 +110,10 @@ parameter_types! {
 
 impl pallet_assets::Config for Runtime {
 	type Currency = Balances;
-	type Event = TestEvent;
+	type Event = Event;
 	type Balance = Balance;
 	type AssetId = u32;
-	type ForceOrigin = EnsureRenVM<Runtime>;
+	type ForceOrigin = EnsureRoot<AccountId>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
@@ -124,6 +122,7 @@ impl pallet_assets::Config for Runtime {
 	type AllowMinting = AssetsAllowMinting;
 }
 
+impl crate::Config for Runtime {}
 
 pub type AssetsPallet = pallet_assets::Module<Runtime>;
 pub type System = frame_system::Module<Runtime>;

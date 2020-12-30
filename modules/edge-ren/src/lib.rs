@@ -22,8 +22,6 @@ use coinaddress as btc_address;
 mod mock;
 #[cfg(test)]
 mod tests;
-// #[cfg(feature = "runtime-benchmarks")]
-// mod benchmarking;
 
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
@@ -141,7 +139,7 @@ decl_module! {
 		/// Must be done AFTER instantiating the asset in Assets
 		/// max length of the token name implemented
 		#[weight = 10_000]
-		fn add_ren_token(
+		pub fn add_ren_token(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
 			_ren_token_name: Vec<u8>,
@@ -448,11 +446,9 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 		})
 	}
 
-	// #[cfg(feature = "runtime-benchmarks")]
-
-	// #[cfg(not(test))]
-	// fn successful_origin() -> T::Origin {
-	// 	T::Origin::from(frame_system::RawOrigin::Root)
-	// }
+	#[cfg(feature = "runtime-benchmarks")]
+	fn successful_origin() -> T::Origin {
+		T::Origin::from(frame_system::RawOrigin::Root)
+	}
 
 }

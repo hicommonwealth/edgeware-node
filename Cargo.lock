@@ -4770,6 +4770,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-edge-ren-benchmarking"
+version = "1.0.0"
+dependencies = [
+ "edge-ren",
+ "edgeware-primitives",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "hex-literal",
+ "pallet-assets",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-elections-phragmen"
 version = "2.0.0"
 source = "git+https://github.com/drewstone/substrate.git?branch=drew-assets-traits#801181657bf3e4fe7b1709b4a535b069c5417c0d"
