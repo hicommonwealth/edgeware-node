@@ -67,7 +67,7 @@ class TestRunner {
     private options: ITestOptions,
   ) {
     // default upgrade block to (n tests + 2) (1 test per block + first block)
-    this._upgradeBlock = tests.length + 2;
+    this._upgradeBlock = tests.length + 1;
 
     // verify options args
     if (!options.chainspec) {
@@ -106,13 +106,14 @@ class TestRunner {
   private _startChain(clearBasePath: boolean) {
     // pass through SIGINT to chain process
     process.on('SIGINT', () => {
-      this._stopChain();
+      this._stopChain().then(() => process.exit(1));
     });
 
     if (clearBasePath) {
       // clear base path and replace with an empty directory
       if (fs.existsSync(this.options.chainBasePath)) {
         // we use rimraf because fs.remove doesn't support recursive removal
+        log.info(`rimraf ${this.options.chainBasePath}`);
         rimraf.sync(this.options.chainBasePath);
       }
       fs.mkdirSync(this.options.chainBasePath);
@@ -162,6 +163,11 @@ class TestRunner {
     //   this._chainOutfile.close();
     //   this._chainOutfile = undefined;
     // }
+    if (this._api) {
+      this._api.disconnect();
+    }
+    delete this._api;
+
     if (this._chainProcess) {
       await new Promise<void>((resolve) => {
         this._chainProcess.on('close', (code) => {
@@ -173,11 +179,6 @@ class TestRunner {
         this._chainProcess = undefined;
       });
     }
-
-    if (this._api) {
-      this._api.disconnect();
-    }
-    delete this._api;
   }
 
   // With a valid chain running, construct a polkadot-js API and
@@ -295,7 +296,8 @@ class TestRunner {
             log.info(`Test '${t.name}' action '${name}' failed: ${e.message}.`);
           }
         }
-        if (this.tests.every((test) => test.isComplete())) {
+        if (this.tests.every((test) => test.isComplete())
+          || blockNumber > ((this.tests.length * 2) + 2)) {
           log.info('All tests complete!');
           resolve(false);
         }
@@ -351,6 +353,7 @@ class TestRunner {
 
     // Cleanup and exit
     await this._stopChain();
+    process.exit(0);
   }
 }
 

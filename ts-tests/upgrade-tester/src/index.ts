@@ -7,7 +7,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const CHAINSPEC = 'dev';
 const BINARY_PATH = '../../../edgeware-node-3.0.8/target/release/edgeware';
-const CHAIN_BASE_PATH = './db';
+const CHAIN_BASE_PATH = __dirname + '/../db';
 const ACCOUNTS = [ '//Alice' ];
 const SS58_PREFIX = 42; // default for testing chain specs
 
@@ -19,8 +19,10 @@ async function main() {
   // construct some migration tests
   // TODO: make this a part of the arg initialization
   const tests: StateTest[] = [];
-  const BalanceQueryTest = (await import('./tests/balanceQuery')).default;
-  tests.push(new BalanceQueryTest(ACCOUNTS, SS58_PREFIX));
+  tests.push(
+    new ((await import('./tests/balanceQuery')).default)(),
+    new ((await import('./tests/identity')).default)(),
+  );
 
   // construct tester
   const tester = new TestRunner(tests, {
