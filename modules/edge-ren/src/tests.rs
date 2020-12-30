@@ -50,7 +50,7 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_noop!(
@@ -67,7 +67,7 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -114,7 +114,7 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -143,7 +143,7 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 
@@ -177,7 +177,7 @@ fn token_mint_works() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_eq!(
@@ -187,7 +187,7 @@ fn token_mint_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -214,7 +214,7 @@ fn token_mint_works() {
 
 		assert_ok!(
 			RenVmBridge::update_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				None,
 				None,
@@ -297,7 +297,7 @@ fn token_mint_works() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_eq!(
@@ -308,7 +308,7 @@ fn token_mint_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				1,
 				"renBTC_withFee".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -370,7 +370,7 @@ fn token_spend_works() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_eq!(
@@ -381,7 +381,7 @@ fn token_spend_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				1,
 				"renBTC_withFee".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -433,7 +433,7 @@ fn token_spend_works() {
 
 		assert_ok!(
 			RenVmBridge::spend_tokens(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				1,
 				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
 				2000,
@@ -459,7 +459,7 @@ fn token_crud_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -478,7 +478,7 @@ fn token_crud_works() {
 
 		assert_ok!(
 			RenVmBridge::update_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				Some("edgeRenBTC".as_bytes().to_vec()),
 				None,
@@ -497,7 +497,7 @@ fn token_crud_works() {
 
 		assert_ok!(
 			RenVmBridge::delete_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0
 			)
 		);
@@ -515,7 +515,7 @@ fn verify_signature_works() {
 	ExtBuilder::default().build().execute_with(|| {
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -608,7 +608,7 @@ fn token_burn_works() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_eq!(
@@ -619,7 +619,7 @@ fn token_burn_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -663,7 +663,7 @@ fn token_burn_works() {
 
 		assert_ok!(
 			RenVmBridge::update_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				0,
 				None,
 				None,
@@ -739,7 +739,7 @@ fn token_burn_works() {
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
 				1u128
-			)).dispatch(Origin::root())
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_eq!(
@@ -750,7 +750,7 @@ fn token_burn_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::root(),
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
 				1,
 				"renTestBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],

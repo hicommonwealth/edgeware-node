@@ -96,7 +96,7 @@ parameter_types! {
 impl Config for Runtime {
 	type Event = TestEvent;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
-	type ControllerOrigin= EnsureRoot<AccountId>;
+	type ControllerOrigin= EnsureRenVM<Runtime>;
 	type ModuleId= RenVMModuleId;
 	type Assets = AssetsPallet;
 }
@@ -115,7 +115,7 @@ impl pallet_assets::Config for Runtime {
 	type Event = TestEvent;
 	type Balance = Balance;
 	type AssetId = u32;
-	type ForceOrigin = EnsureRoot<AccountId>;
+	type ForceOrigin = EnsureRenVM<Runtime>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
