@@ -185,7 +185,6 @@ fn token_mint_works() {
 			true
 		);
 
-
 		assert_ok!(
 			RenVmBridge::add_ren_token(
 				Origin::root(),
@@ -193,10 +192,37 @@ fn token_mint_works() {
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
 				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
-				true,
+				false,
 				true,
 				0,
 				0
+			)
+		);
+
+
+		assert_noop!(
+			mint_ren_token(
+				0,
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+				93963,
+				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
+			).unwrap_or_else(|_| Err(DispatchError::from(Error::<mock::Runtime>::UnexpectedError))),
+			Error::<mock::Runtime>::RenTokenMintDisabled
+		);
+
+		assert_ok!(
+			RenVmBridge::update_ren_token(
+				Origin::root(),
+				0,
+				None,
+				None,
+				None,
+				Some(true),
+				None,
+				None,
+				None
 			)
 		);
 
@@ -335,6 +361,97 @@ fn token_mint_works() {
 	});
 }
 
+#[test]
+fn token_spend_works() {
+	ExtBuilder::default().build().execute_with(|| {
+
+		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
+				1,
+				super::Module::<mock::Runtime>::account_id().into(),
+				u32::max_value(),
+				1u128
+			)).dispatch(Origin::root())
+		);
+
+		assert_eq!(
+			pallet_assets::Asset::<mock::Runtime>::contains_key(1),
+			true
+		);
+
+
+		assert_ok!(
+			RenVmBridge::add_ren_token(
+				Origin::root(),
+				1,
+				"renBTC_withFee".as_bytes().to_vec(),
+				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
+				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
+				true,
+				true,
+				100_000,
+				100_000
+			)
+		);
+
+
+		assert_ok!(
+			mint_ren_token(
+				1,
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+				93963,
+				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
+			)
+		);
+
+		assert_eq!(
+			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			93963 - (93963/10)
+		);
+
+		assert_ok!(
+			mint_ren_token(
+				1,
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				hex!["425673f98610064b76dbd334783f45ea192f0e954db75ba2ae6b6058a8143d67"],
+				87266,
+				hex!["fe125f912d2de05e3e34b96a0ce8a8e35d9ed883e830b978871f3e1f5d393726"],
+				EcdsaSignature::from_slice(&hex!["acd463fa396c54995e444234e96d793d3977e75f445da219c10bc4947c22622f325f24dfc31e8e56ec21f04fc7669e91db861778a8367444bde6dfb5f95e15ed1b"]),
+			)
+		);
+
+		assert_eq!(
+			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			93963 + 87266 - ((93963 + 87266)/10)
+		);
+
+		assert_eq!(
+			AssetsPallet::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			((93963 + 87266)/10)
+		);
+
+		assert_ok!(
+			RenVmBridge::spend_tokens(
+				Origin::root(),
+				1,
+				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
+				2000,
+			)
+		);
+
+		assert_eq!(
+			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			93963 + 87266 - ((93963 + 87266)/10) + 2000
+		);
+
+		assert_eq!(
+			AssetsPallet::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			((93963 + 87266)/10) - 2000
+		);
+
+	});
+}
 
 #[test]
 fn token_crud_works() {
@@ -508,7 +625,7 @@ fn token_burn_works() {
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
 				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
 				true,
-				true,
+				false,
 				0,
 				0
 			)
@@ -533,6 +650,30 @@ fn token_burn_works() {
 
 
 		assert_eq!(RenVmBridge::burn_events(0), None);
+
+		assert_noop!(
+			RenVmBridge::burn(
+				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+				0,
+				"17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(),
+				1000
+			),
+			Error::<mock::Runtime>::RenTokenBurnDisabled
+		);
+
+		assert_ok!(
+			RenVmBridge::update_ren_token(
+				Origin::root(),
+				0,
+				None,
+				None,
+				None,
+				None,
+				Some(true),
+				None,
+				None
+			)
+		);
 
 		assert_ok!(
 			RenVmBridge::burn(
