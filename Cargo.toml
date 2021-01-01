@@ -5,6 +5,8 @@ members = [
 	"modules/edge-treasury-reward",
 	"modules/chainbridge",
 	"modules/edge-chainbridge",
+	"modules/edge-assets",
+	"modules/edge-ren",
 	"node/cli",
 	"node/executor",
 	"node/primitives",
