@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Encode, Decode, HasCompact};
-use frame_support::{Parameter, decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin, FungibleAsset, MintableAsset, BurnableAsset}};
+use frame_support::{Parameter, decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
 use frame_system::{ensure_none, ensure_signed};
 use sp_core::ecdsa;
 use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
@@ -16,6 +16,7 @@ use sp_runtime::{
 };
 use sp_std::vec::Vec;
 use coinaddress as btc_address;
+use edge_assets::traits::{FungibleAsset, MintableAsset, BurnableAsset, ManageableAsset};
 
 #[cfg(test)]
 mod mock;
@@ -40,7 +41,7 @@ pub trait Config: frame_system::Config {
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
 	type ControllerOrigin: EnsureOrigin<Self::Origin>;
 	type ModuleId: Get<ModuleId>;
-	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId>;
+	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId> + ManageableAsset<Self::AccountId>;
 }
 
 
@@ -50,21 +51,21 @@ pub trait Config: frame_system::Config {
 pub struct RenTokenInfo<TokenIdOf>
 	{
 	/// ren_token_id		What the Assets pallet uses to identify tokens ( unique for a given token/asset on this pallet for a given chain )
-	ren_token_id: TokenIdOf,
+	pub ren_token_id: TokenIdOf,
 	/// ren_token_name 		Name of the token; used to determine the validation process if any
-	ren_token_name: Vec<u8>,
+	pub ren_token_name: Vec<u8>,
 	/// ren_token_renvm_id	What RenVM uses to uniquely identify this token across different chains
-	ren_token_renvm_id: [u8; 32],
+	pub ren_token_renvm_id: [u8; 32],
 	/// ren_token_pub_key 	The PublicKey used to check the RenVM signature against
-	ren_token_pub_key: [u8; 20],
+	pub ren_token_pub_key: [u8; 20],
 	/// ren_token_mint_enabled To enable/disable mint temporarily
-	ren_token_mint_enabled: bool,
+	pub ren_token_mint_enabled: bool,
 	/// ren_token_burn_enabled To enable/disable burn temporarily
-	ren_token_burn_enabled: bool,
+	pub ren_token_burn_enabled: bool,
 	/// ren_token_mint_fee	Parts-per-million fee on mint sent to the pallet account
-	ren_token_mint_fee: u32,
+	pub ren_token_mint_fee: u32,
 	/// ren_token_burn_fee	Parts-per-million fee on burn sent to the pallet account
-	ren_token_burn_fee: u32,
+	pub ren_token_burn_fee: u32,
 }
 
 type RenTokenInfoType<T> = RenTokenInfo<TokenIdOf<T>>;
@@ -136,9 +137,9 @@ decl_module! {
 
 		fn deposit_event() = default;
 
-		/// Instantiates the token in the Registry
-		/// Must be done AFTER instantiating the asset in Assets
-		/// max length of the token name implemented
+		/// Instantiates the token in the Registry AFTER instantiating the asset in Assets
+		/// Requries max_zombies and min_balance as inputs to Assets
+		/// Max length of the token name implemented
 		#[weight = 10_000]
 		pub fn add_ren_token(
 			origin,
@@ -150,12 +151,16 @@ decl_module! {
 			_ren_token_burn_enabled: bool,
 			_ren_token_mint_fee: u32,
 			_ren_token_burn_fee: u32,
+			_ren_token_max_zombies: u32,
+			_ren_token_min_balance: BalanceOf<T>,
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 
 			ensure!(_ren_token_name.len()<=NAME_MAX_LENGTH.into(), Error::<T>::RenTokenNameLengthLimitExceeded);
 			ensure!(!<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenAlreadyExists);
+
+			T::Assets::force_create_asset(_ren_token_id, Self::account_id(), _ren_token_max_zombies, _ren_token_min_balance)?;
 
 			let _ren_token_info = RenTokenInfo{
 				ren_token_id: _ren_token_id,
@@ -179,7 +184,7 @@ decl_module! {
 		/// Method to update a tokens info using its ren_token_id, all other fields are optional
 		/// Max length of the token name implemented
 		#[weight = 10_000]
-		fn update_ren_token(
+		pub fn update_ren_token(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
 			_ren_token_name_option: Option<Vec<u8>>,
@@ -218,17 +223,20 @@ decl_module! {
 			Ok(())
 		}
 
-		/// Deletes the token from the Registry
-		/// Must be done BEFORE deleting the asset from Assets.
+		/// Deletes the token from the Registry AFTER deleting the asset from Assets
+		/// Requires zombies_witness as input to Assets
 		#[weight = 10_000]
-		fn delete_ren_token(
+		pub fn delete_ren_token(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
+			_ren_token_zombies_witness: u32
 		) -> DispatchResult
 		{
 			T::ControllerOrigin::ensure_origin(origin)?;
 
 			ensure!(<RenTokenRegistry<T>>::contains_key(&_ren_token_id), Error::<T>::RenTokenNotFound);
+
+			T::Assets::force_destroy_asset(_ren_token_id, _ren_token_zombies_witness)?;
 
 			RenTokenRegistry::<T>::remove(&_ren_token_id);
 
@@ -239,7 +247,7 @@ decl_module! {
 
 		/// Transfers tokens from the pallet account to a specified account
 		#[weight = 10_000]
-		fn spend_tokens(
+		pub fn spend_tokens(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
 			who: T::AccountId,
@@ -258,7 +266,7 @@ decl_module! {
 
 		/// Mints the token, after fee deduction, if the signature provided is valid over the provided arguments
 		#[weight = 10_000]
-		fn mint(
+		pub fn mint(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
 			who: T::AccountId,
@@ -295,7 +303,7 @@ decl_module! {
 		/// The actual amount burnt is calculated based on the burn fee, and is the value of the corresponding pegged currency that the user will be granted from RenVM
 		/// The burn fee is transfered from the users account to the pallets account
 		#[weight = 10_000]
-		fn burn(
+		pub fn burn(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
 			to: DestAddress,

@@ -16,7 +16,7 @@ fn mint_ren_token(
 	_ren_token_id: u32,
 	who: AccountId,
 	p_hash: [u8; 32],
-	amount: Balance,
+	amount: mock::Balance,
 	n_hash: [u8; 32],
 	sig: EcdsaSignature,
 ) -> Result<DispatchResult, TransactionValidityError> {
@@ -29,23 +29,12 @@ fn mint_ren_token(
 }
 
 
+
 #[test]
-fn token_mint_fails_on_premature_init_but_works_after() {
+fn token_mint_fails_on_bad_init_but_works_after() {
 	ExtBuilder::default().build().execute_with(|| {
 
-		assert_noop!(
-			mint_ren_token(
-				0,
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
-				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
-				93963,
-				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
-				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
-			),
-			TransactionValidityError::Invalid(InvalidTransaction::BadProof)
-		);
-
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
+		assert_ok!(mock::Call::AssetsPallet(edge_assets::Call::force_create(
 				0,
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
@@ -53,6 +42,11 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
+		assert_eq!(
+			edge_assets::Asset::<mock::Runtime>::contains_key(0),
+			true
+		);
+
 		assert_noop!(
 			mint_ren_token(
 				0,
@@ -63,6 +57,30 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
 			),
 			TransactionValidityError::Invalid(InvalidTransaction::BadProof)
+		);
+
+		assert_noop!(
+			RenVmBridge::add_ren_token(
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				0,
+				"renBTC".as_bytes().to_vec(),
+				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
+				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
+				true,
+				true,
+				0,
+				0,
+				u32::max_value(),
+				1u32.into()
+			),
+			edge_assets::Error::<mock::Runtime>::InUse
+		);
+
+
+		assert_ok!(mock::Call::AssetsPallet(edge_assets::Call::force_destroy(
+				0,
+				0,
+			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
 		);
 
 		assert_ok!(
@@ -75,7 +93,9 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 				true,
 				true,
 				0,
-				0
+				0,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
@@ -96,74 +116,28 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 			93963
 		);
 
-	});
-
-	ExtBuilder::default().build().execute_with(|| {
+		assert_ok!(
+			RenVmBridge::delete_ren_token(
+				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				0,
+				1
+			)
+		);
 
 		assert_noop!(
 			mint_ren_token(
 				0,
 				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
-				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
-				93963,
-				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
-				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
+				hex!["425673f98610064b76dbd334783f45ea192f0e954db75ba2ae6b6058a8143d67"],
+				87266,
+				hex!["fe125f912d2de05e3e34b96a0ce8a8e35d9ed883e830b978871f3e1f5d393726"],
+				EcdsaSignature::from_slice(&hex!["acd463fa396c54995e444234e96d793d3977e75f445da219c10bc4947c22622f325f24dfc31e8e56ec21f04fc7669e91db861778a8367444bde6dfb5f95e15ed1b"]),
 			),
 			TransactionValidityError::Invalid(InvalidTransaction::BadProof)
 		);
 
-		assert_ok!(
-			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
-				0,
-				"renBTC".as_bytes().to_vec(),
-				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
-				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
-				true,
-				true,
-				0,
-				0
-			)
-		);
-
-		assert_noop!(
-			mint_ren_token(
-				0,
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
-				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
-				93963,
-				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
-				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
-			).unwrap_or_else(|_| Err(DispatchError::from(Error::<mock::Runtime>::UnexpectedError))),
-			pallet_assets::Error::<mock::Runtime>::Unknown
-		);
-
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
-				0,
-				super::Module::<mock::Runtime>::account_id().into(),
-				u32::max_value(),
-				1u128
-			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
-		);
-
-
-		assert_ok!(
-			mint_ren_token(
-				0,
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
-				hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
-				93963,
-				hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
-				EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"]),
-			)
-		);
-
-		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-			93963
-		);
-
 	});
+
 }
 
 
@@ -171,19 +145,6 @@ fn token_mint_fails_on_premature_init_but_works_after() {
 #[test]
 fn token_mint_works() {
 	ExtBuilder::default().build().execute_with(|| {
-
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
-				0,
-				super::Module::<mock::Runtime>::account_id().into(),
-				u32::max_value(),
-				1u128
-			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
-		);
-
-		assert_eq!(
-			pallet_assets::Asset::<mock::Runtime>::contains_key(0),
-			true
-		);
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
@@ -195,7 +156,9 @@ fn token_mint_works() {
 				false,
 				true,
 				0,
-				0
+				0,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
@@ -292,20 +255,6 @@ fn token_mint_works() {
 
 	ExtBuilder::default().build().execute_with(|| {
 
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
-				1,
-				super::Module::<mock::Runtime>::account_id().into(),
-				u32::max_value(),
-				1u128
-			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
-		);
-
-		assert_eq!(
-			pallet_assets::Asset::<mock::Runtime>::contains_key(1),
-			true
-		);
-
-
 		assert_ok!(
 			RenVmBridge::add_ren_token(
 				Origin::signed(super::Module::<mock::Runtime>::account_id()),
@@ -316,7 +265,9 @@ fn token_mint_works() {
 				true,
 				true,
 				100_000,
-				100_000
+				100_000,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
@@ -365,20 +316,6 @@ fn token_mint_works() {
 fn token_spend_works() {
 	ExtBuilder::default().build().execute_with(|| {
 
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
-				1,
-				super::Module::<mock::Runtime>::account_id().into(),
-				u32::max_value(),
-				1u128
-			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
-		);
-
-		assert_eq!(
-			pallet_assets::Asset::<mock::Runtime>::contains_key(1),
-			true
-		);
-
-
 		assert_ok!(
 			RenVmBridge::add_ren_token(
 				Origin::signed(super::Module::<mock::Runtime>::account_id()),
@@ -389,7 +326,9 @@ fn token_spend_works() {
 				true,
 				true,
 				100_000,
-				100_000
+				100_000,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
@@ -467,13 +406,20 @@ fn token_crud_works() {
 				true,
 				true,
 				0,
-				0
+				0,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
 		assert_eq!(
 			RenVmBridge::ren_token_registry(0).map_or_else(||{[0u8;32]}, |x| {x.ren_token_renvm_id}),
 			hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"]
+		);
+
+		assert_eq!(
+			edge_assets::Asset::<mock::Runtime>::contains_key(0),
+			true
 		);
 
 		assert_ok!(
@@ -498,6 +444,7 @@ fn token_crud_works() {
 		assert_ok!(
 			RenVmBridge::delete_ren_token(
 				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				0,
 				0
 			)
 		);
@@ -505,6 +452,11 @@ fn token_crud_works() {
 		assert_eq!(
 			RenVmBridge::ren_token_registry(0),
 			None
+		);
+
+		assert_eq!(
+			edge_assets::Asset::<mock::Runtime>::contains_key(0),
+			false
 		);
 
 	});
@@ -523,7 +475,9 @@ fn verify_signature_works() {
 				true,
 				true,
 				0,
-				0
+				0,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
@@ -603,20 +557,6 @@ fn verify_signature_works() {
 fn token_burn_works() {
 	ExtBuilder::default().build().execute_with(|| {
 
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
-				0,
-				super::Module::<mock::Runtime>::account_id().into(),
-				u32::max_value(),
-				1u128
-			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
-		);
-
-		assert_eq!(
-			pallet_assets::Asset::<mock::Runtime>::contains_key(0),
-			true
-		);
-
-
 		assert_ok!(
 			RenVmBridge::add_ren_token(
 				Origin::signed(super::Module::<mock::Runtime>::account_id()),
@@ -627,7 +567,9 @@ fn token_burn_works() {
 				true,
 				false,
 				0,
-				0
+				0,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 
@@ -732,22 +674,6 @@ fn token_burn_works() {
 			Error::<mock::Runtime>::InvalidBurnToAddress
 		);
 
-
-
-		assert_ok!(mock::Call::AssetsPallet(pallet_assets::Call::force_create(
-				1,
-				super::Module::<mock::Runtime>::account_id().into(),
-				u32::max_value(),
-				1u128
-			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
-		);
-
-		assert_eq!(
-			pallet_assets::Asset::<mock::Runtime>::contains_key(0),
-			true
-		);
-
-
 		assert_ok!(
 			RenVmBridge::add_ren_token(
 				Origin::signed(super::Module::<mock::Runtime>::account_id()),
@@ -758,7 +684,9 @@ fn token_burn_works() {
 				true,
 				true,
 				0,
-				0
+				0,
+				u32::max_value(),
+				1u32.into()
 			)
 		);
 

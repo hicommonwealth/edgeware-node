@@ -18,10 +18,12 @@ mod edge_ren {
 	pub use super::super::*;
 }
 
+pub type Balance = u128;
+
 impl_outer_dispatch! {
 	pub enum Call for Runtime where origin: Origin {
 		frame_system::System,
-		pallet_assets::AssetsPallet,
+		edge_assets::AssetsPallet,
 		pallet_balances::Balances,
 		edge_ren::RenVmBridge,
 	}
@@ -34,7 +36,7 @@ impl_outer_origin! {
 
 impl_outer_event! {
 	pub enum TestEvent for Runtime {
-		pallet_assets<T>,
+		edge_assets<T>,
 		frame_system<T>,
 		pallet_balances<T>,
 		edge_ren<T>,
@@ -110,7 +112,7 @@ parameter_types! {
 	pub const AssetsAllowMinting: bool = true;
 }
 
-impl pallet_assets::Config for Runtime {
+impl edge_assets::Config for Runtime {
 	type Currency = Balances;
 	type Event = TestEvent;
 	type Balance = Balance;
@@ -125,7 +127,7 @@ impl pallet_assets::Config for Runtime {
 }
 
 
-pub type AssetsPallet = pallet_assets::Module<Runtime>;
+pub type AssetsPallet = edge_assets::Module<Runtime>;
 pub type System = frame_system::Module<Runtime>;
 
 pub struct ExtBuilder();

@@ -113,7 +113,7 @@
 mod benchmarking;
 pub mod weights;
 
-mod traits;
+pub mod traits;
 use crate::traits::{FungibleAsset, BurnableAsset, MintableAsset, FreezableAsset, ManageableAsset};
 
 use sp_std::{fmt::Debug};
