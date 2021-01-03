@@ -16,12 +16,16 @@ sp-io = { version = "2.0.0", default-features = false }
 sp-core = { version = "2.0.0", default-features = false }
 sp-runtime = { version = "2.0.0", default-features = false }
 coinaddress = { version = "1.1.3", default-features = false }
-frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
+
+# Just for traits
 edge-assets = { version = "1.0.0", default-features = false, path = "../../modules/edge-assets" }
+
+# for benchmarking
+hex-literal = { version = "0.3.1" }
+frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
 
 
 [dev-dependencies]
-hex-literal = { version = "0.3.1" }
 pallet-balances = { version = "2.0.0", default-features = false }
 
 

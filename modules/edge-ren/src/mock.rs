@@ -23,7 +23,7 @@ pub type Balance = u128;
 impl_outer_dispatch! {
 	pub enum Call for Runtime where origin: Origin {
 		frame_system::System,
-		edge_assets::AssetsPallet,
+		edge_assets::EdgeAssets,
 		pallet_balances::Balances,
 		edge_ren::RenVmBridge,
 	}
@@ -98,9 +98,9 @@ parameter_types! {
 impl Config for Runtime {
 	type Event = TestEvent;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
-	type ControllerOrigin= EnsureRenVM<Runtime>;
+	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
-	type Assets = AssetsPallet;
+	type Assets = EdgeAssets;
 }
 pub type RenVmBridge = Module<Runtime>;
 
@@ -127,7 +127,7 @@ impl edge_assets::Config for Runtime {
 }
 
 
-pub type AssetsPallet = edge_assets::Module<Runtime>;
+pub type EdgeAssets = edge_assets::Module<Runtime>;
 pub type System = frame_system::Module<Runtime>;
 
 pub struct ExtBuilder();

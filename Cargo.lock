@@ -1625,7 +1625,9 @@ name = "edgeware-runtime"
 version = "3.2.0"
 dependencies = [
  "chainbridge",
+ "edge-assets",
  "edge-chainbridge",
+ "edge-ren",
  "edge-signaling",
  "edge-treasury-reward",
  "edge-voting",

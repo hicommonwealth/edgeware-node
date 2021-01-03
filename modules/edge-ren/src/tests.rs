@@ -6,7 +6,7 @@
 use super::*;
 use frame_support::{assert_err, assert_noop, assert_ok, unsigned::ValidateUnsigned};
 use hex_literal::hex;
-use mock::{Call, AssetsPallet, AccountId, Balances, ExtBuilder, Origin, RenVmBridge, RenvmBridgeCall, System};
+use mock::{Call, EdgeAssets, AccountId, Balances, ExtBuilder, Origin, RenVmBridge, RenvmBridgeCall, System};
 use sp_core::H256;
 use sp_runtime::transaction_validity::TransactionValidityError;
 use sp_runtime::{DispatchError,traits::Dispatchable};
@@ -34,7 +34,7 @@ fn mint_ren_token(
 fn token_mint_fails_on_bad_init_but_works_after() {
 	ExtBuilder::default().build().execute_with(|| {
 
-		assert_ok!(mock::Call::AssetsPallet(edge_assets::Call::force_create(
+		assert_ok!(mock::Call::EdgeAssets(edge_assets::Call::force_create(
 				0,
 				super::Module::<mock::Runtime>::account_id().into(),
 				u32::max_value(),
@@ -61,7 +61,7 @@ fn token_mint_fails_on_bad_init_but_works_after() {
 
 		assert_noop!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -77,7 +77,7 @@ fn token_mint_fails_on_bad_init_but_works_after() {
 		);
 
 
-		assert_ok!(mock::Call::AssetsPallet(edge_assets::Call::force_destroy(
+		assert_ok!(mock::Call::EdgeAssets(edge_assets::Call::force_destroy(
 				0,
 				0,
 			)).dispatch(Origin::signed(super::Module::<mock::Runtime>::account_id()))
@@ -85,7 +85,7 @@ fn token_mint_fails_on_bad_init_but_works_after() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -112,13 +112,13 @@ fn token_mint_fails_on_bad_init_but_works_after() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963
 		);
 
 		assert_ok!(
 			RenVmBridge::delete_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				1
 			)
@@ -148,7 +148,7 @@ fn token_mint_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -177,7 +177,7 @@ fn token_mint_works() {
 
 		assert_ok!(
 			RenVmBridge::update_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				None,
 				None,
@@ -202,7 +202,7 @@ fn token_mint_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963
 		);
 
@@ -218,12 +218,12 @@ fn token_mint_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963 + 87266
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(0, super::Module::<mock::Runtime>::account_id().into()),
+			EdgeAssets::balance(0, super::Module::<mock::Runtime>::account_id().into()),
 			0
 		);
 
@@ -257,7 +257,7 @@ fn token_mint_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				1,
 				"renBTC_withFee".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -284,7 +284,7 @@ fn token_mint_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963 - (93963/10)
 		);
 
@@ -300,12 +300,12 @@ fn token_mint_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963 + 87266 - ((93963 + 87266)/10)
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
 			((93963 + 87266)/10)
 		);
 
@@ -318,7 +318,7 @@ fn token_spend_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				1,
 				"renBTC_withFee".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -345,7 +345,7 @@ fn token_spend_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963 - (93963/10)
 		);
 
@@ -361,18 +361,18 @@ fn token_spend_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963 + 87266 - ((93963 + 87266)/10)
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
 			((93963 + 87266)/10)
 		);
 
 		assert_ok!(
 			RenVmBridge::spend_tokens(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				1,
 				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
 				2000,
@@ -380,12 +380,12 @@ fn token_spend_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963 + 87266 - ((93963 + 87266)/10) + 2000
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
 			((93963 + 87266)/10) - 2000
 		);
 
@@ -398,7 +398,7 @@ fn token_crud_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -424,7 +424,7 @@ fn token_crud_works() {
 
 		assert_ok!(
 			RenVmBridge::update_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				Some("edgeRenBTC".as_bytes().to_vec()),
 				None,
@@ -443,7 +443,7 @@ fn token_crud_works() {
 
 		assert_ok!(
 			RenVmBridge::delete_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				0
 			)
@@ -467,7 +467,7 @@ fn verify_signature_works() {
 	ExtBuilder::default().build().execute_with(|| {
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -559,7 +559,7 @@ fn token_burn_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				"renBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -586,7 +586,7 @@ fn token_burn_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			93963
 		);
 
@@ -605,7 +605,7 @@ fn token_burn_works() {
 
 		assert_ok!(
 			RenVmBridge::update_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				0,
 				None,
 				None,
@@ -628,7 +628,7 @@ fn token_burn_works() {
 
 
 		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			92963
 		);
 
@@ -647,7 +647,7 @@ fn token_burn_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(0, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			90963
 		);
 
@@ -676,7 +676,7 @@ fn token_burn_works() {
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
-				Origin::signed(super::Module::<mock::Runtime>::account_id()),
+				Origin::root(),
 				1,
 				"renTestBTC".as_bytes().to_vec(),
 				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
@@ -703,7 +703,7 @@ fn token_burn_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			87266
 		);
 
@@ -719,7 +719,7 @@ fn token_burn_works() {
 
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			86266
 		);
 
@@ -738,7 +738,7 @@ fn token_burn_works() {
 		);
 
 		assert_eq!(
-			AssetsPallet::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
 			84266
 		);
 

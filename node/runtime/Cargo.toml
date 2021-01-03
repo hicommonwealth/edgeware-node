@@ -94,6 +94,8 @@ pallet-evm-precompile-bn128 = { path = "../../vendor/frontier/frame/evm/precompi
 pallet-evm-precompile-blake2 = { path = "../../vendor/frontier/frame/evm/precompile/blake2", default-features = false }
 pallet-evm-precompile-ed25519 = { path = "../../vendor/frontier/frame/evm/precompile/ed25519", default-features = false }
 
+edge-assets = { path = "../../modules/edge-assets", default-features = false }
+edge-ren = { path = "../../modules/edge-ren", default-features = false }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
@@ -172,6 +174,8 @@ std = [
 	"pallet-ethereum/std",
 	"evm/std",
 	"pallet-evm-precompile-simple/std",
+	"edge-assets/std",
+	"edge-ren/std"
 ]
 
 runtime-benchmarks = [
@@ -183,4 +187,6 @@ runtime-benchmarks = [
 	"signaling/runtime-benchmarks",
 	"voting/runtime-benchmarks",
 	"chainbridge/runtime-benchmarks",
+	"edge-assets/runtime-benchmarks",
+	"edge-ren/runtime-benchmarks"
 ]
