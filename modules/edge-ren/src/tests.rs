@@ -29,7 +29,6 @@ fn mint_ren_token(
 }
 
 
-
 #[test]
 fn token_mint_fails_on_bad_init_but_works_after() {
 	ExtBuilder::default().build().execute_with(|| {
@@ -265,7 +264,7 @@ fn token_mint_works() {
 				true,
 				true,
 				100_000,
-				100_000,
+				0,
 				u32::max_value(),
 				1u32.into()
 			)
@@ -326,7 +325,7 @@ fn token_spend_works() {
 				true,
 				true,
 				100_000,
-				100_000,
+				0,
 				u32::max_value(),
 				1u32.into()
 			)
@@ -567,7 +566,7 @@ fn token_burn_works() {
 				true,
 				false,
 				0,
-				0,
+				200_000,
 				u32::max_value(),
 				1u32.into()
 			)
@@ -632,7 +631,12 @@ fn token_burn_works() {
 			92963
 		);
 
-		assert_eq!(RenVmBridge::burn_events(0), Some((0, 0, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(), 1000)));
+		assert_eq!(
+			EdgeAssets::balance(0, super::Module::<mock::Runtime>::account_id().into()),
+			1000*20/100
+		);
+
+		assert_eq!(RenVmBridge::burn_events(0), Some((0, 0, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(), 1000*80/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 1);
 
 		System::set_block_number(15);
@@ -651,7 +655,12 @@ fn token_burn_works() {
 			90963
 		);
 
-		assert_eq!(RenVmBridge::burn_events(1), Some((0, 15, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000)));
+		assert_eq!(
+			EdgeAssets::balance(0, super::Module::<mock::Runtime>::account_id().into()),
+			1000*20/100 + 2000*20/100
+		);
+
+		assert_eq!(RenVmBridge::burn_events(1), Some((0, 15, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000*80/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 2);
 
 		assert_noop!(
@@ -684,7 +693,7 @@ fn token_burn_works() {
 				true,
 				true,
 				0,
-				0,
+				100_000,
 				u32::max_value(),
 				1u32.into()
 			)
@@ -723,7 +732,12 @@ fn token_burn_works() {
 			86266
 		);
 
-		assert_eq!(RenVmBridge::burn_events(2), Some((1, 15, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(), 1000)));
+		assert_eq!(
+			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			1000*10/100
+		);
+
+		assert_eq!(RenVmBridge::burn_events(2), Some((1, 15, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(), 1000*90/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 3);
 
 		System::set_block_number(30);
@@ -742,7 +756,12 @@ fn token_burn_works() {
 			84266
 		);
 
-		assert_eq!(RenVmBridge::burn_events(3), Some((1, 30, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000)));
+		assert_eq!(
+			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
+			1000*10/100 + 2000*10/100
+		);
+
+		assert_eq!(RenVmBridge::burn_events(3), Some((1, 30, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000*90/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 4);
 
 		assert_noop!(

@@ -30,8 +30,8 @@ type DestAddress = Vec<u8>;
 
 
 
-type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::AssetId;
-type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
+pub type TokenIdOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::AssetId;
+pub type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_system::Config>::AccountId>>::Balance;
 
 
 const NAME_MAX_LENGTH : u8 = 32;
@@ -370,7 +370,7 @@ impl<T: Config> Module<T> {
 		amount_slice.reverse();
 
 		// p_hash ++ amount ++ token ++ to ++ n_hash
-		let length = 32 + 32 + 32 + 32 + 32;
+		let length = 32 + 32 + 32 + to.len() + 32;
 		let mut v = Vec::with_capacity(length);
 		v.extend_from_slice(&p_hash[..]);
 		v.extend_from_slice(&[0u8; 16][..]);

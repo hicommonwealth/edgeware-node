@@ -35,7 +35,7 @@ impl_outer_origin! {
 }
 
 impl_outer_event! {
-	pub enum TestEvent for Runtime {
+	pub enum Event for Runtime {
 		edge_assets<T>,
 		frame_system<T>,
 		pallet_balances<T>,
@@ -59,7 +59,7 @@ impl frame_system::Config for Runtime {
 	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type Header = Header;
-	type Event = TestEvent;
+	type Event = Event;
 	type BlockHashCount = BlockHashCount;
 	type BlockWeights = ();
 	type BlockLength = ();
@@ -81,7 +81,7 @@ impl pallet_balances::Config for Runtime {
 	type MaxLocks = ();
 	type Balance = Balance;
 	type DustRemoval = ();
-	type Event = TestEvent;
+	type Event = Event;
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = frame_system::Module<Runtime>;
 	type WeightInfo = ();
@@ -96,7 +96,7 @@ parameter_types! {
 }
 
 impl Config for Runtime {
-	type Event = TestEvent;
+	type Event = Event;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
@@ -114,7 +114,7 @@ parameter_types! {
 
 impl edge_assets::Config for Runtime {
 	type Currency = Balances;
-	type Event = TestEvent;
+	type Event = Event;
 	type Balance = Balance;
 	type AssetId = u32;
 	type ForceOrigin = EnsureRenVM<Runtime>;

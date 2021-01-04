@@ -1040,7 +1040,7 @@ impl edge_chainbridge::Config for Runtime {
     type Event = Event;
     type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
 	type Currency = Balances;
-    type NativeTokenId = NativeTokenId;    
+    type NativeTokenId = NativeTokenId;
     type NativeTransferFee = NativeTransferFee;
 }
 
@@ -1058,6 +1058,40 @@ impl pallet_assets::Config for Runtime {
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const RenvmBridgeUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 16;
+
+	pub const RenVMModuleId: ModuleId = ModuleId(*b"RenToken");
+}
+
+impl edge_ren::Config for Runtime {
+	type Event = Event;
+	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
+	type ControllerOrigin= EnsureRoot<AccountId>;
+	type ModuleId= RenVMModuleId;
+	type Assets = EdgeAssets;
+}
+
+parameter_types! {
+	pub const AssetsAllowFreezing: bool = true;
+	pub const AssetsAllowBurning: bool = true;
+	pub const AssetsAllowMinting: bool = true;
+}
+
+impl edge_assets::Config for Runtime {
+	type Currency = Balances;
+	type Event = Event;
+	type Balance = Balance;
+	type AssetId = u32;
+	type ForceOrigin = EnsureRenVM<Runtime>;
+	type AssetDepositBase = AssetDepositBase;
+	type AssetDepositPerZombie = AssetDepositPerZombie;
+	type WeightInfo = ();
+	type AllowFreezing = AssetsAllowFreezing;
+	type AllowBurning = AssetsAllowBurning;
+	type AllowMinting = AssetsAllowMinting;
 }
 
 construct_runtime!(
@@ -1107,6 +1141,9 @@ construct_runtime!(
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>} = 34,
 		ChainBridge: chainbridge::{Module, Call, Storage, Event<T>} = 35,
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>} = 36,
+
+		EdgeAssets: edge_assets::{Module, Call, Storage, Event<T>} = 37,
+		EdgeRen: edge_ren::{Module, Call, Storage, Origin<T>, Event<T>, ValidateUnsigned} = 38,
 	}
 );
 
@@ -1460,6 +1497,8 @@ impl_runtime_apis! {
 			add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
 			add_benchmark!(params, batches, signaling, Signaling);
 			add_benchmark!(params, batches, voting, Voting);
+			add_benchmark!(params, batches, edge_assets, EdgeAssets);
+			add_benchmark!(params, batches, edge_ren, EdgeRen);
 
 			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			Ok(batches)

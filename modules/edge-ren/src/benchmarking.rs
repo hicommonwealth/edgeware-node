@@ -1,11 +1,14 @@
 
 use super::*;
-use sp_std::prelude::*;
+use sp_std::{prelude::*, convert::TryInto};
 use sp_runtime::traits::Bounded;
 use frame_system::RawOrigin as SystemOrigin;
 use frame_benchmarking::{benchmarks, account, whitelisted_caller};
 use hex_literal::hex;
-
+use sp_core::{
+	crypto::{Pair, Public, CryptoTypePublicPair},
+	ecdsa,
+};
 
 use crate::Module as EdgeRen;
 
@@ -13,20 +16,29 @@ const SEED: u32 = 0;
 
 
 
-//
-// fn create_default_minted_ren_token<T: Config>(max_zombies: u32, amount: T::Balance)
-// 	-> (T::AccountId, <T::Lookup as StaticLookup>::Source)
-// {
-// 	let (caller, caller_lookup)  = create_default_asset::<T>(max_zombies);
-// 	assert!(Assets::<T>::mint(
-// 		SystemOrigin::Signed(caller.clone()).into(),
-// 		Default::default(),
-// 		caller_lookup.clone(),
-// 		amount,
-// 	).is_ok());
-// 	(caller, caller_lookup)
-// }
-//
+
+
+fn ren_token_add_signatures<T: Config>(n: u32){
+	let ecdsa_pair = ecdsa::Pair::generate().0;
+	for x in 1..=n{
+		let v: Vec<u8> = Encode::encode(&x);
+		let tmp_sig = ecdsa_pair.sign(v.as_slice());
+		Signatures::insert(&tmp_sig, ());
+	}
+}
+
+fn sign_paramters_with_ecdsa_pair<T: Config>(p_hash: &[u8; 32], amount: BalanceOf<T>, who: T::AccountId, n_hash: &[u8; 32], token: &[u8; 32])
+	-> ([u8;20], [u8;65])
+{
+	let ecdsa_pair = ecdsa::Pair::generate().0;
+	let msg = Encode::using_encoded(&who, |encoded| {Module::<T>::signable_message(p_hash, amount, encoded, n_hash, token)});
+	let sig: [u8;65] = ecdsa_pair.sign(&msg).into();
+	let signed_message_hash = keccak_256(&msg);
+	let recoverd =
+		secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| "").unwrap();
+	let addr_array: [u8; 20] = keccak_256(&recoverd)[12..].try_into().unwrap();
+	(addr_array, sig)
+}
 
 fn ren_token_add_zombies<T: Config>(n: u32) {
 	for i in 0..n {
@@ -138,33 +150,58 @@ benchmarks! {
 		assert_last_event::<T>(RawEvent::RenTokenSpent(Default::default(), to_acc, 50_000u32.into()).into());
 	}
 
-
-	mint{
+	// TODO
+	// This is NOT DONE yet
+	// Need to benchmark against number of signatures in Signatures
+	// Need to use AccountId as generic instead of H256, so need to create custom signatures
+	validate_and_mint{
+		let z in 0 .. 10_000;
+		let to_acc: T::AccountId = account("to_acc", 0, SEED);
+		let (pubkey, sig) = sign_paramters_with_ecdsa_pair::<T>(
+			&hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+			93963.into(),
+			to_acc.clone(),
+			&hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+			&hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"]
+		);
 		assert!(EdgeRen::<T>::add_ren_token(
 			SystemOrigin::Root.into(),
 			Default::default(),
 			"renBTC".as_bytes().to_vec(),
 			hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
-			hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
+			pubkey,
 			true,
 			true,
-			20,
-			20,
+			200_000,
+			200_000,
 			u32::max_value(),
 			1u32.into()
 		).is_ok());
-		let target: T::AccountId = account("target", 0, SEED);
-	}: _(
-		SystemOrigin::None,
-		Default::default(),
-		target.clone(),
-		hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
-		93963.into(),
-		hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
-		EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"])
-		)
+
+		ren_token_add_signatures::<T>(z);
+
+		let call = Call::<T>::mint(
+			Default::default(),
+			to_acc.clone(),
+			hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+			93963.into(),
+			hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+			EcdsaSignature::from_slice(&sig)
+		);
+	}: {
+		<Module<T> as frame_support::unsigned::ValidateUnsigned>::validate_unsigned(TransactionSource::InBlock, &call)?;
+		EdgeRen::<T>::mint(
+			SystemOrigin::None.into(),
+			Default::default(),
+			to_acc.clone(),
+			hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
+			93963.into(),
+			hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
+			EcdsaSignature::from_slice(&sig)
+		)?;
+	}
 	verify{
-		assert_last_event::<T>(RawEvent::RenTokenMinted(Default::default(), target, 93963.into()).into());
+		assert_last_event::<T>(RawEvent::RenTokenMinted(Default::default(), to_acc, 93963.into()).into());
 	}
 
 	burn{
@@ -176,29 +213,29 @@ benchmarks! {
 			hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
 			true,
 			true,
-			20,
-			20,
+			200_000,
+			200_000,
 			u32::max_value(),
 			1u32.into()
 		).is_ok());
-		let target: T::AccountId = account("target", 0, SEED);
+		let acc: T::AccountId = account("acc", 0, SEED);
 		assert!(EdgeRen::<T>::mint(
 			SystemOrigin::None.into(),
 			Default::default(),
-			target.clone(),
+			acc.clone(),
 			hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
 			93963.into(),
 			hex!["f6a75cc370a2dda6dfc8d016529766bb6099d7fa0d787d9fe5d3a7e60c9ac2a0"],
 			EcdsaSignature::from_slice(&hex!["defda6eef01da2e2a90ce30ba73e90d32204ae84cae782b485f01d16b69061e0381a69cafed3deb6112af044c42ed0f7c73ee0eec7b533334d31a06db50fc40e1b"])
 		).is_ok());
 	}: _(
-		SystemOrigin::Signed(target.clone()),
+		SystemOrigin::Signed(acc.clone()),
 		Default::default(),
 		"17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(),
 		10000.into()
 		)
 	verify{
-		assert_last_event::<T>(RawEvent::RenTokenBurnt(Default::default(), target, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(), (10000*19/20).into()).into());
+		assert_last_event::<T>(RawEvent::RenTokenBurnt(Default::default(), acc, "17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(), (10000*80/100).into()).into());
 	}
 
 }
@@ -216,8 +253,8 @@ mod tests {
 			assert_ok!(test_benchmark_update_ren_token::<Runtime>());
 			assert_ok!(test_benchmark_delete_ren_token::<Runtime>());
 			assert_ok!(test_benchmark_spend_tokens::<Runtime>());
-			assert_ok!(test_benchmark_mint::<Runtime>());
-			// assert_ok!(test_benchmark_burn::<Runtime>());
+			assert_ok!(test_benchmark_validate_and_mint::<Runtime>());
+			assert_ok!(test_benchmark_burn::<Runtime>());
 		});
 	}
 }
