@@ -1085,7 +1085,7 @@ impl edge_assets::Config for Runtime {
 	type Event = Event;
 	type Balance = Balance;
 	type AssetId = u32;
-	type ForceOrigin = EnsureRenVM<Runtime>;
+	type ForceOrigin = EnsureOneOf< AccountId, EnsureRoot<AccountId>, edge_ren::EnsureRenVM<Runtime>>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();
@@ -1143,7 +1143,7 @@ construct_runtime!(
 		EdgeBridge: edge_chainbridge::{Module, Call, Event<T>} = 36,
 
 		EdgeAssets: edge_assets::{Module, Call, Storage, Event<T>} = 37,
-		EdgeRen: edge_ren::{Module, Call, Storage, Origin<T>, Event<T>, ValidateUnsigned} = 38,
+		EdgeRen: edge_ren::{Module, Call, Storage, Event<T>, ValidateUnsigned} = 38,
 	}
 );
 

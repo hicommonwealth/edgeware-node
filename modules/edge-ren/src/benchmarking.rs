@@ -5,24 +5,23 @@ use sp_runtime::traits::Bounded;
 use frame_system::RawOrigin as SystemOrigin;
 use frame_benchmarking::{benchmarks, account, whitelisted_caller};
 use hex_literal::hex;
-use sp_core::{
-	crypto::{Pair, Public, CryptoTypePublicPair},
-	ecdsa,
-};
+// use sp_core::{
+// 	crypto::{Pair, Public, CryptoTypePublicPair},
+// 	ecdsa,
+// };
+use sp_io::crypto::{ecdsa_generate, ecdsa_sign};
+use sp_core::testing::ECDSA;
 
 use crate::Module as EdgeRen;
 
 const SEED: u32 = 0;
 
 
-
-
-
 fn ren_token_add_signatures<T: Config>(n: u32){
-	let ecdsa_pair = ecdsa::Pair::generate().0;
+	let ecdsa_key = ecdsa_generate(ECDSA, None);
 	for x in 1..=n{
 		let v: Vec<u8> = Encode::encode(&x);
-		let tmp_sig = ecdsa_pair.sign(v.as_slice());
+		let tmp_sig = ecdsa_sign(ECDSA, &ecdsa_key, v.as_slice()).unwrap();
 		Signatures::insert(&tmp_sig, ());
 	}
 }
@@ -30,15 +29,40 @@ fn ren_token_add_signatures<T: Config>(n: u32){
 fn sign_paramters_with_ecdsa_pair<T: Config>(p_hash: &[u8; 32], amount: BalanceOf<T>, who: T::AccountId, n_hash: &[u8; 32], token: &[u8; 32])
 	-> ([u8;20], [u8;65])
 {
-	let ecdsa_pair = ecdsa::Pair::generate().0;
+	let ecdsa_key = ecdsa_generate(ECDSA, None);
 	let msg = Encode::using_encoded(&who, |encoded| {Module::<T>::signable_message(p_hash, amount, encoded, n_hash, token)});
-	let sig: [u8;65] = ecdsa_pair.sign(&msg).into();
+	let sig: [u8;65] = ecdsa_sign(ECDSA, &ecdsa_key, &msg).unwrap().into();
 	let signed_message_hash = keccak_256(&msg);
 	let recoverd =
 		secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| "").unwrap();
 	let addr_array: [u8; 20] = keccak_256(&recoverd)[12..].try_into().unwrap();
 	(addr_array, sig)
 }
+
+
+// fn ren_token_add_signatures<T: Config>(n: u32){
+// 	let ecdsa_pair = ecdsa::Pair::generate().0;
+// 	for x in 1..=n{
+// 		let v: Vec<u8> = Encode::encode(&x);
+// 		let tmp_sig = ecdsa_pair.sign(v.as_slice());
+// 		Signatures::insert(&tmp_sig, ());
+// 	}
+// }
+
+// fn sign_paramters_with_ecdsa_pair<T: Config>(p_hash: &[u8; 32], amount: BalanceOf<T>, who: T::AccountId, n_hash: &[u8; 32], token: &[u8; 32])
+// 	-> ([u8;20], [u8;65])
+// {
+// 	let ecdsa_pair = ecdsa::Pair::generate().0;
+// 	let msg = Encode::using_encoded(&who, |encoded| {Module::<T>::signable_message(p_hash, amount, encoded, n_hash, token)});
+// 	let sig: [u8;65] = ecdsa_pair.sign(&msg).into();
+// 	let signed_message_hash = keccak_256(&msg);
+// 	let recoverd =
+// 		secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| "").unwrap();
+// 	let addr_array: [u8; 20] = keccak_256(&recoverd)[12..].try_into().unwrap();
+// 	(addr_array, sig)
+// }
+
+
 
 fn ren_token_add_zombies<T: Config>(n: u32) {
 	for i in 0..n {

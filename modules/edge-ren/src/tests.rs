@@ -663,25 +663,25 @@ fn token_burn_works() {
 		assert_eq!(RenVmBridge::burn_events(1), Some((0, 15, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000*80/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 2);
 
-		assert_noop!(
-			RenVmBridge::burn(
-				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-				0,
-				"mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(),
-				2000
-			),
-			Error::<mock::Runtime>::InvalidBurnToAddress
-		);
-
-		assert_noop!(
-			RenVmBridge::burn(
-				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-				0,
-				"LRELGDJyeCPRDXz4Dh1kWorMN9hTBB7CEz".as_bytes().to_vec(),
-				2000
-			),
-			Error::<mock::Runtime>::InvalidBurnToAddress
-		);
+		// assert_noop!(
+		// 	RenVmBridge::burn(
+		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+		// 		0,
+		// 		"mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(),
+		// 		2000
+		// 	),
+		// 	Error::<mock::Runtime>::InvalidBurnToAddress
+		// );
+		//
+		// assert_noop!(
+		// 	RenVmBridge::burn(
+		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+		// 		0,
+		// 		"LRELGDJyeCPRDXz4Dh1kWorMN9hTBB7CEz".as_bytes().to_vec(),
+		// 		2000
+		// 	),
+		// 	Error::<mock::Runtime>::InvalidBurnToAddress
+		// );
 
 		assert_ok!(
 			RenVmBridge::add_ren_token(
@@ -764,25 +764,25 @@ fn token_burn_works() {
 		assert_eq!(RenVmBridge::burn_events(3), Some((1, 30, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000*90/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 4);
 
-		assert_noop!(
-			RenVmBridge::burn(
-				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-				1,
-				"17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(),
-				2000
-			),
-			Error::<mock::Runtime>::InvalidBurnToAddress
-		);
-
-		assert_noop!(
-			RenVmBridge::burn(
-				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-				1,
-				"LRELGDJyeCPRDXz4Dh1kWorMN9hTBB7CEz".as_bytes().to_vec(),
-				2000
-			),
-			Error::<mock::Runtime>::InvalidBurnToAddress
-		);
+		// assert_noop!(
+		// 	RenVmBridge::burn(
+		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+		// 		1,
+		// 		"17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(),
+		// 		2000
+		// 	),
+		// 	Error::<mock::Runtime>::InvalidBurnToAddress
+		// );
+		//
+		// assert_noop!(
+		// 	RenVmBridge::burn(
+		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
+		// 		1,
+		// 		"LRELGDJyeCPRDXz4Dh1kWorMN9hTBB7CEz".as_bytes().to_vec(),
+		// 		2000
+		// 	),
+		// 	Error::<mock::Runtime>::InvalidBurnToAddress
+		// );
 
 	});
 }

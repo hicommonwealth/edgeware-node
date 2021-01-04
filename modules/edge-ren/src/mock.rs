@@ -31,7 +31,8 @@ impl_outer_dispatch! {
 
 
 impl_outer_origin! {
-	pub enum Origin for Runtime {}
+	pub enum Origin for Runtime where system = frame_system {
+	}
 }
 
 impl_outer_event! {

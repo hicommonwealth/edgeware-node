@@ -15,7 +15,7 @@ use sp_runtime::{
 	DispatchResult,
 };
 use sp_std::vec::Vec;
-use coinaddress as btc_address;
+// use coinaddress as btc_address;
 use edge_assets::traits::{FungibleAsset, MintableAsset, BurnableAsset, ManageableAsset};
 
 #[cfg(test)]
@@ -316,16 +316,16 @@ decl_module! {
 
 			ensure!(ren_token.ren_token_burn_enabled, Error::<T>::RenTokenBurnDisabled);
 
-			match sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).map_err(|_| Error::<T>::UnexpectedError) {
-				Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
-										.map_err(|_| Error::<T>::InvalidBurnToAddress)
-										.and_then(|x| { if [0,5].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
-				Ok("renTestBTC") 	=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
-										.map_err(|_| Error::<T>::InvalidBurnToAddress)
-										.and_then(|x| { if [5,111].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
-				Err(x)				=> Err(x),
-				_					=> Ok(()),
-			}?;
+			// match sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).map_err(|_| Error::<T>::UnexpectedError) {
+			// 	Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
+			// 							.map_err(|_| Error::<T>::InvalidBurnToAddress)
+			// 							.and_then(|x| { if [0,5].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
+			// 	Ok("renTestBTC") 	=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
+			// 							.map_err(|_| Error::<T>::InvalidBurnToAddress)
+			// 							.and_then(|x| { if [5,111].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
+			// 	Err(x)				=> Err(x),
+			// 	_					=> Ok(()),
+			// }?;
 
 
 			NextBurnEventId::try_mutate(|id| -> DispatchResult {
@@ -455,7 +455,8 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 		})
 	}
 
-	#[cfg(feature = "runtime-benchmarks")]
+	// #[cfg(feature = "runtime-benchmarks")]
+	// #[cfg(not(test))]
 	fn successful_origin() -> T::Origin {
 		T::Origin::from(frame_system::RawOrigin::Root)
 	}
