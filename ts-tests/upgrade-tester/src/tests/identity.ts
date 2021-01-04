@@ -23,8 +23,17 @@ export default class extends StateTest {
       image: { none: null },
       twitter: { none: null },
     });
-    // TODO: handle errors
-    await api.tx.identity.setIdentity(identityInfo).signAndSend(this.accounts.alice);
+
+    await new Promise<void>((resolve, reject) => {
+      api.tx.identity.setIdentity(identityInfo)
+        .signAndSend(this.accounts.alice, (status) => {
+          if (status.isCompleted) {
+            resolve();
+          } else if (status.isError) {
+            reject(new Error('got tx error for setIdentity'));
+          }
+        });
+    });
     await super.before(api);
   }
 

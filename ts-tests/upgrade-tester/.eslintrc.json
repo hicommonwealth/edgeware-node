@@ -53,6 +53,7 @@
     "dot-notation": 0,
     "no-lonely-if": 0,
     "no-multi-spaces": 0,
-    "new-cap": 0
+    "new-cap": 0,
+    "no-await-in-loop": 0
   }
 }

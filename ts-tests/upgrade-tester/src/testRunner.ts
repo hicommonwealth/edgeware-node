@@ -251,7 +251,7 @@ class TestRunner {
   }
 
   // with a valid chain and API connection, init tests
-  private async _runTests(): Promise<boolean> {
+  private async _runTests(preUpgrade: boolean): Promise<boolean> {
     if (!this._api) throw new Error('API not initialized!');
 
     // TODO: move this set-balance into a test case
@@ -267,45 +267,34 @@ class TestRunner {
     }
 
     let rpcSubscription: UnsubscribePromise;
-    // subscribe to new blocks and run tests as they occur
-    // Promise resolves to "true" if an upgrade is pending,
-    //   otherwise "false" if testing is completed.
-    const testCompleteP: Promise<boolean> = new Promise((resolve) => {
-      rpcSubscription = this._api.rpc.chain.subscribeNewHeads(async (header) => {
-        const blockNumber = +header.number;
-        log.info(`Got block ${blockNumber}.`);
 
-        // perform upgrade after delay
-        if (this.options.upgrade && blockNumber === this._upgradeBlock) {
-          resolve(true);
+    // run all tests, then perform upgrade if needed
+    let needsUpgrade = false;
+    if (preUpgrade) {
+      for (const t of this.tests) {
+        try {
+          await t.before(this._api);
+          log.info(`Test '${t.name}' action 'before' succeeded.`);
+        } catch (e) {
+          log.info(`Test '${t.name}' action 'before' failed: ${e.message}.`);
         }
+      }
 
-        const t = blockNumber <= this.tests.length
-          ? this.tests[blockNumber - 1]
-          : this.tests[blockNumber - (this._upgradeBlock + 2)];
-        if (t) {
-          const name = blockNumber < this._upgradeBlock ? 'before' : 'after';
-          try {
-            if (blockNumber < this._upgradeBlock) {
-              await t.before(this._api);
-            } else {
-              await t.after(this._api);
-            }
-            log.info(`Test '${t.name}' action '${name}' succeeded.`);
-          } catch (e) {
-            log.info(`Test '${t.name}' action '${name}' failed: ${e.message}.`);
-          }
+      // set flag to run upgrade
+      if (this.options.upgrade) {
+        needsUpgrade = true;
+      }
+    } else {
+      for (const t of this.tests) {
+        try {
+          await t.after(this._api);
+          log.info(`Test '${t.name}' action 'after' succeeded.`);
+        } catch (e) {
+          log.info(`Test '${t.name}' action 'after' failed: ${e.message}.`);
         }
-        if (this.tests.every((test) => test.isComplete())
-          || blockNumber > ((this.tests.length * 2) + 2)) {
-          log.info('All tests complete!');
-          resolve(false);
-        }
-      });
-    });
-
-    // wait for the tests to complete
-    const needsUpgrade = await testCompleteP;
+      }
+      log.info('All tests complete!');
+    }
 
     // once all tests complete, kill the chain subscription
     if (rpcSubscription) (await rpcSubscription)();
@@ -322,7 +311,7 @@ class TestRunner {
     const startVersion = await this._startApi();
 
     // 4. Run tests via API
-    const needsUpgrade = await this._runTests();
+    const needsUpgrade = await this._runTests(true);
 
     // end run if no upgrade needed
     if (!needsUpgrade) {
@@ -349,7 +338,7 @@ class TestRunner {
     }
 
     // [8.] Run additional tests post-upgrade
-    await this._runTests();
+    await this._runTests(false);
 
     // Cleanup and exit
     await this._stopChain();
