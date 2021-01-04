@@ -77,7 +77,7 @@ use pallet_evm::{
 	EnsureAddressTruncated, Runner
 };
 use fp_rpc::{TransactionStatus};
-use evm::Config as EvmConfig;
+use evm_runtime::Config as EvmConfig;
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -948,7 +948,7 @@ impl pallet_evm::Config for Runtime {
 		pallet_evm_precompile_simple::Identity,
 	);
 	type ChainId = EthChainId;
-	type GasToWeight = ();
+	type GasWeightMapping = ();
 
 	/// EVM config used in the module.
 	fn config() -> &'static EvmConfig {
