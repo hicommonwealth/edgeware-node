@@ -946,12 +946,6 @@ impl pallet_evm::Config for Runtime {
 		pallet_evm_precompile_simple::Sha256,
 		pallet_evm_precompile_simple::Ripemd160,
 		pallet_evm_precompile_simple::Identity,
-		pallet_evm_precompile_modexp::Modexp,
-		pallet_evm_precompile_bn128::Bn128Add,
-		pallet_evm_precompile_bn128::Bn128Mul,
-		pallet_evm_precompile_bn128::Bn128Pairing,
-		pallet_evm_precompile_blake2::Blake2F,
-		pallet_evm_precompile_ed25519::Ed25519Verify,
 	);
 	type ChainId = EthChainId;
 	type GasToWeight = ();
