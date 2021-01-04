@@ -1,10 +1,12 @@
 import { ApiPromise } from '@polkadot/api';
 import { u8aToString } from '@polkadot/util';
+import { IdentityInfo } from '@polkadot/types/interfaces';
 import chai from 'chai';
 import StateTest from '../stateTest';
+import { makeTx } from './util';
 
 export default class extends StateTest {
-  private _name: string;
+  private _identity: IdentityInfo;
 
   constructor() {
     super('identity test');
@@ -12,10 +14,9 @@ export default class extends StateTest {
 
   public async before(api: ApiPromise) {
     // register an identity
-    this._name = 'i am test';
     const identityInfo = api.createType('IdentityInfo', {
       additional: [],
-      display: { raw: this._name },
+      display: { raw: 'i am test' },
       legal: { none: null },
       web: { none: null },
       riot: { none: null },
@@ -24,25 +25,30 @@ export default class extends StateTest {
       twitter: { none: null },
     });
 
-    await new Promise<void>((resolve, reject) => {
-      api.tx.identity.setIdentity(identityInfo)
-        .signAndSend(this.accounts.alice, (status) => {
-          if (status.isCompleted) {
-            resolve();
-          } else if (status.isError) {
-            reject(new Error('got tx error for setIdentity'));
-          }
-        });
-    });
+    await makeTx(api.tx.identity.setIdentity(identityInfo), this.accounts.alice);
+    const registration = await api.query.identity.identityOf(this.accounts.alice.address);
+    if (!registration.isSome) {
+      throw new Error('identity registration not found');
+    }
+
+    this._identity = registration.unwrap().info;
     await super.before(api);
   }
 
   public async after(api: ApiPromise) {
+    if (!this._identity) {
+      throw new Error('stored identity not found');
+    }
+
     // query the identity
-    const identity = await api.query.identity.identityOf(this.accounts.alice.address);
-    chai.assert.equal(
-      u8aToString(identity.unwrap().info.display.toU8a()).replace(/[^\x20-\x7E]/g, ''),
-      this._name,
+    const registration = await api.query.identity.identityOf(this.accounts.alice.address);
+    if (!registration.isSome) {
+      throw new Error('identity registration not found');
+    }
+
+    chai.assert.deepEqual(
+      registration.unwrap().info.toHuman(),
+      this._identity.toHuman(),
       'identity should not change',
     );
     await super.after(api);
