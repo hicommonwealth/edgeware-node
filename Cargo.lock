@@ -1309,25 +1309,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "edge-signaling"
-version = "1.0.0"
-dependencies = [
- "edge-voting",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-balances",
- "parity-scale-codec",
- "safe-mix",
- "serde",
- "serde_derive",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "edge-treasury-reward"
 version = "1.0.0"
 dependencies = [
@@ -1347,23 +1328,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-staking",
- "sp-std",
-]
-
-[[package]]
-name = "edge-voting"
-version = "1.0.0"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "pallet-balances",
- "parity-scale-codec",
- "safe-mix",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
  "sp-std",
 ]
 
@@ -1556,9 +1520,7 @@ version = "3.2.0"
 dependencies = [
  "chainbridge",
  "edge-chainbridge",
- "edge-signaling",
  "edge-treasury-reward",
- "edge-voting",
  "edgeware-primitives",
  "evm",
  "fp-rpc",
@@ -1648,7 +1610,6 @@ name = "edgeware-testing"
 version = "3.2.0"
 dependencies = [
  "criterion",
- "edge-signaling",
  "edge-treasury-reward",
  "edgeware-executor",
  "edgeware-primitives",

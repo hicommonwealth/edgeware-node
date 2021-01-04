@@ -981,38 +981,10 @@ impl pallet_ethereum::Config for Runtime {
 	type FindAuthor = EthereumFindAuthor<Aura>;
 }
 
-parameter_types! {
-	pub const MaxVotersPerProposal: u32 = 256;
-	pub const MaxOutcomes: u32 = 16;
-}
-
-impl voting::Config for Runtime {
-	type Event = Event;
-	type MaxVotersPerProposal = MaxVotersPerProposal;
-	type MaxOutcomes = MaxOutcomes;
-	type WeightInfo = voting::default_weight::SubstrateWeight<Runtime>;
-}
-
-parameter_types! {
-	pub const MaxSignalingProposals: u32 = 32;
-	pub const MaxTitleLength: u32 = 128;
-	pub const MaxContentsLength: u32 = 16_384;
-}
-
-impl signaling::Config for Runtime {
-	type Event = Event;
-	type Currency = Balances;
-	type MaxSignalingProposals = MaxSignalingProposals;
-	type MaxTitleLength = MaxTitleLength;
-	type MaxContentsLength = MaxContentsLength;
-	type WeightInfo = signaling::default_weight::SubstrateWeight<Runtime>;
-}
-
 impl treasury_reward::Config for Runtime {
 	type Event = Event;
 	type Currency = Balances;
 }
-
 
 parameter_types! {
     pub const ChainId: u8 = 5;
@@ -1100,8 +1072,6 @@ construct_runtime!(
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 28,
 		Assets: pallet_assets::{Module, Call, Storage, Event<T>} = 29,
 
-		Signaling: signaling::{Module, Call, Storage, Config<T>, Event<T>} = 30,
-		Voting: voting::{Module, Call, Storage, Event<T>} = 31,
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>} = 32,
 		Ethereum: pallet_ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned} = 33,
 		EVM: pallet_evm::{Module, Config, Call, Storage, Event<T>} = 34,
@@ -1458,8 +1428,6 @@ impl_runtime_apis! {
 			let params = (&config, &whitelist);
 
 			add_benchmark!(params, batches, frame_system, SystemBench::<Runtime>);
-			add_benchmark!(params, batches, signaling, Signaling);
-			add_benchmark!(params, batches, voting, Voting);
 
 			if batches.is_empty() { return Err("Benchmark not found for this pallet.".into()) }
 			Ok(batches)
