@@ -1,0 +1,248 @@
+./target/release/edgeware benchmark --chain dev --execution=wasm --wasm-execution=compiled --pallet edge_ren --extrinsic "*" --steps 50 --repeat 20 --output .
+2021-01-04 21:59:28  💸 new validator set of size 1 has been elected via ElectionCompute::OnChain for era 0
+Pallet: "edge_ren", Extrinsic: "add_ren_token", Lowest values: [], Highest values: [], Steps: [50], Repeat: 20
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    63.84
+              µs
+
+Reads = 2
+Writes = 2
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    63.84
+              µs
+
+Reads = 2
+Writes = 2
+Pallet: "edge_ren", Extrinsic: "update_ren_token", Lowest values: [], Highest values: [], Steps: [50], Repeat: 20
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    36.52
+              µs
+
+Reads = 1
+Writes = 1
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    36.52
+              µs
+
+Reads = 1
+Writes = 1
+Pallet: "edge_ren", Extrinsic: "delete_ren_token", Lowest values: [], Highest values: [], Steps: [50], Repeat: 20
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=        0
+    + z    1.581
+              µs
+
+Reads = 2 + (0 * z)
+Writes = 2 + (1 * z)
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Data points distribution:
+    z   mean µs  sigma µs       %
+    0     64.41     0.516    0.8%
+  200     323.9      2.62    0.8%
+  400     576.8     9.279    1.6%
+  600     923.6     64.43    6.9%
+  800      1087     38.29    3.5%
+ 1000      1355     46.45    3.4%
+ 1200      1612     86.37    5.3%
+ 1400      1791     46.82    2.6%
+ 1600      2094     59.56    2.8%
+ 1800      2283     66.62    2.9%
+ 2000      2557     73.35    2.8%
+ 2200      2906     88.06    3.0%
+ 2400      3106     87.75    2.8%
+ 2600      3317     41.23    1.2%
+ 2800      3668     70.73    1.9%
+ 3000      3912     77.42    1.9%
+ 3200      4125     74.54    1.8%
+ 3400      4470     63.89    1.4%
+ 3600      4845     104.7    2.1%
+ 3800      5150     85.83    1.6%
+ 4000      5433      54.2    0.9%
+ 4200      5660     107.1    1.8%
+ 4400      5966     68.24    1.1%
+ 4600      6212     77.92    1.2%
+ 4800      6451     70.29    1.0%
+ 5000      7145     161.1    2.2%
+ 5200      7281     38.58    0.5%
+ 5400      7687     161.4    2.1%
+ 5600      7872     59.73    0.7%
+ 5800      8291     124.8    1.5%
+ 6000      8577     142.3    1.6%
+ 6200      8855       185    2.0%
+ 6400      8959     53.28    0.5%
+ 6600      9561     229.9    2.4%
+ 6800     10130     156.5    1.5%
+ 7000     10290     98.33    0.9%
+ 7200     11070     233.5    2.1%
+ 7400     11460     239.2    2.0%
+ 7600     11910     264.3    2.2%
+ 7800     12500     131.5    1.0%
+ 8000     12230     161.5    1.3%
+ 8200     12460     129.1    1.0%
+ 8400     13240     199.3    1.5%
+ 8600     13410     486.2    3.6%
+ 8800     13710     421.7    3.0%
+ 9000     14510     585.6    4.0%
+ 9200     14700     504.9    3.4%
+ 9400     15480     377.3    2.4%
+ 9600     16340     315.7    1.9%
+ 9800     16300     352.1    2.1%
+10000     16240     319.9    1.9%
+
+Quality and confidence:
+param     error
+z         0.008
+
+Model:
+Time ~=        0
+    + z    1.643
+              µs
+
+Reads = 2 + (0 * z)
+Writes = 2 + (1 * z)
+Pallet: "edge_ren", Extrinsic: "spend_tokens", Lowest values: [], Highest values: [], Steps: [50], Repeat: 20
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    114.5
+              µs
+
+Reads = 6
+Writes = 3
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    114.5
+              µs
+
+Reads = 6
+Writes = 3
+Pallet: "edge_ren", Extrinsic: "validate_and_mint", Lowest values: [], Highest values: [], Steps: [50], Repeat: 20
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    398.7
+    + z    0.007
+              µs
+
+Reads = 7 + (0 * z)
+Writes = 4 + (0 * z)
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Data points distribution:
+    z   mean µs  sigma µs       %
+    0     342.5      4.88    1.4%
+  200     379.6     1.174    0.3%
+  400     391.2     2.612    0.6%
+  600     406.8     6.232    1.5%
+  800     418.7     5.523    1.3%
+ 1000     391.7      5.49    1.4%
+ 1200     399.3      5.72    1.4%
+ 1400       402     6.592    1.6%
+ 1600     414.4       2.9    0.6%
+ 1800     414.7     2.255    0.5%
+ 2000       415     2.027    0.4%
+ 2200     420.7     2.435    0.5%
+ 2400     414.1     3.208    0.7%
+ 2600     412.5     1.527    0.3%
+ 2800     416.1     2.013    0.4%
+ 3000     422.2     3.741    0.8%
+ 3200     425.3     4.672    1.0%
+ 3400     433.1     4.524    1.0%
+ 3600     433.1      3.69    0.8%
+ 3800     434.3     4.326    0.9%
+ 4000     439.4     3.659    0.8%
+ 4200     446.1     8.418    1.8%
+ 4400     447.9     4.559    1.0%
+ 4600     441.7     3.994    0.9%
+ 4800     442.2     5.594    1.2%
+ 5000     468.1     16.41    3.5%
+ 5200     447.4     9.497    2.1%
+ 5400     440.2     6.238    1.4%
+ 5600       438     2.607    0.5%
+ 5800     438.4     3.193    0.7%
+ 6000     439.5     1.859    0.4%
+ 6200       444      3.22    0.7%
+ 6400     444.8      1.77    0.3%
+ 6600     446.4     2.601    0.5%
+ 6800     449.2     3.975    0.8%
+ 7000     453.7     2.266    0.4%
+ 7200     454.8     5.489    1.2%
+ 7400     452.4      2.81    0.6%
+ 7600     447.8     3.331    0.7%
+ 7800     448.2     2.093    0.4%
+ 8000     465.8     7.012    1.5%
+ 8200     464.1     12.27    2.6%
+ 8400     478.4     12.13    2.5%
+ 8600     475.1     11.76    2.4%
+ 8800     478.3     12.45    2.6%
+ 9000     466.7     3.504    0.7%
+ 9200     458.8     2.793    0.6%
+ 9400     453.6     2.393    0.5%
+ 9600     458.9     2.855    0.6%
+ 9800     463.7     2.798    0.6%
+10000     460.9     2.429    0.5%
+
+Quality and confidence:
+param     error
+z             0
+
+Model:
+Time ~=    395.8
+    + z    0.008
+              µs
+
+Reads = 7 + (0 * z)
+Writes = 4 + (0 * z)
+Pallet: "edge_ren", Extrinsic: "burn", Lowest values: [], Highest values: [], Steps: [50], Repeat: 20
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    150.7
+              µs
+
+Reads = 6
+Writes = 5
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=    150.7
+              µs
+
+Reads = 6
+Writes = 5

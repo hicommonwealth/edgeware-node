@@ -1,14 +1,9 @@
 
 use super::*;
 use sp_std::{prelude::*, convert::TryInto};
-use sp_runtime::traits::Bounded;
 use frame_system::RawOrigin as SystemOrigin;
 use frame_benchmarking::{benchmarks, account, whitelisted_caller};
 use hex_literal::hex;
-// use sp_core::{
-// 	crypto::{Pair, Public, CryptoTypePublicPair},
-// 	ecdsa,
-// };
 use sp_io::crypto::{ecdsa_generate, ecdsa_sign};
 use sp_core::testing::ECDSA;
 
@@ -38,31 +33,6 @@ fn sign_paramters_with_ecdsa_pair<T: Config>(p_hash: &[u8; 32], amount: BalanceO
 	let addr_array: [u8; 20] = keccak_256(&recoverd)[12..].try_into().unwrap();
 	(addr_array, sig)
 }
-
-
-// fn ren_token_add_signatures<T: Config>(n: u32){
-// 	let ecdsa_pair = ecdsa::Pair::generate().0;
-// 	for x in 1..=n{
-// 		let v: Vec<u8> = Encode::encode(&x);
-// 		let tmp_sig = ecdsa_pair.sign(v.as_slice());
-// 		Signatures::insert(&tmp_sig, ());
-// 	}
-// }
-
-// fn sign_paramters_with_ecdsa_pair<T: Config>(p_hash: &[u8; 32], amount: BalanceOf<T>, who: T::AccountId, n_hash: &[u8; 32], token: &[u8; 32])
-// 	-> ([u8;20], [u8;65])
-// {
-// 	let ecdsa_pair = ecdsa::Pair::generate().0;
-// 	let msg = Encode::using_encoded(&who, |encoded| {Module::<T>::signable_message(p_hash, amount, encoded, n_hash, token)});
-// 	let sig: [u8;65] = ecdsa_pair.sign(&msg).into();
-// 	let signed_message_hash = keccak_256(&msg);
-// 	let recoverd =
-// 		secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| "").unwrap();
-// 	let addr_array: [u8; 20] = keccak_256(&recoverd)[12..].try_into().unwrap();
-// 	(addr_array, sig)
-// }
-
-
 
 fn ren_token_add_zombies<T: Config>(n: u32) {
 	for i in 0..n {
@@ -174,12 +144,8 @@ benchmarks! {
 		assert_last_event::<T>(RawEvent::RenTokenSpent(Default::default(), to_acc, 50_000u32.into()).into());
 	}
 
-	// TODO
-	// This is NOT DONE yet
-	// Need to benchmark against number of signatures in Signatures
-	// Need to use AccountId as generic instead of H256, so need to create custom signatures
 	validate_and_mint{
-		let z in 0 .. 10_000;
+		let z in 100_000 .. 1_000_000;
 		let to_acc: T::AccountId = account("to_acc", 0, SEED);
 		let (pubkey, sig) = sign_paramters_with_ecdsa_pair::<T>(
 			&hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
@@ -242,7 +208,7 @@ benchmarks! {
 			u32::max_value(),
 			1u32.into()
 		).is_ok());
-		let acc: T::AccountId = account("acc", 0, SEED);
+		let acc: T::AccountId = whitelisted_caller();
 		assert!(EdgeRen::<T>::mint(
 			SystemOrigin::None.into(),
 			Default::default(),

@@ -1069,9 +1069,13 @@ parameter_types! {
 impl edge_ren::Config for Runtime {
 	type Event = Event;
 	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
-	type ControllerOrigin= EnsureRoot<AccountId>;
+	type ControllerOrigin= frame_system::EnsureOneOf<AccountId,
+		pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
+		frame_system::EnsureRoot<AccountId>,
+	>;
 	type ModuleId= RenVMModuleId;
 	type Assets = EdgeAssets;
+	type WeightInfo = edge_ren::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -1088,7 +1092,7 @@ impl edge_assets::Config for Runtime {
 	type ForceOrigin = EnsureOneOf< AccountId, EnsureRoot<AccountId>, edge_ren::EnsureRenVM<Runtime>>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
-	type WeightInfo = ();
+	type WeightInfo = edge_assets::weights::SubstrateWeight<Runtime>;
 	type AllowFreezing = AssetsAllowFreezing;
 	type AllowBurning = AssetsAllowBurning;
 	type AllowMinting = AssetsAllowMinting;

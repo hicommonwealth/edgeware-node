@@ -6,8 +6,7 @@
 use super::*;
 use frame_support::{assert_err, assert_noop, assert_ok, unsigned::ValidateUnsigned};
 use hex_literal::hex;
-use mock::{Call, EdgeAssets, AccountId, Balances, ExtBuilder, Origin, RenVmBridge, RenvmBridgeCall, System};
-use sp_core::H256;
+use mock::{EdgeAssets, AccountId, ExtBuilder, Origin, RenVmBridge, RenvmBridgeCall, System};
 use sp_runtime::transaction_validity::TransactionValidityError;
 use sp_runtime::{DispatchError,traits::Dispatchable};
 

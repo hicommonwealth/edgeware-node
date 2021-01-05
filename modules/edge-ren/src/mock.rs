@@ -5,7 +5,7 @@
 use super::*;
 use frame_support::{impl_outer_dispatch, impl_outer_event, impl_outer_origin, parameter_types};
 use sp_core::H256;
-use sp_runtime::{testing::Header, traits::IdentityLookup, Perbill};
+use sp_runtime::{testing::Header, traits::IdentityLookup};
 use frame_system::{EnsureRoot};
 
 pub type AccountId = H256;
@@ -102,6 +102,7 @@ impl Config for Runtime {
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
 	type Assets = EdgeAssets;
+	type WeightInfo = ();
 }
 pub type RenVmBridge = Module<Runtime>;
 

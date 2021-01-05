@@ -1,0 +1,41 @@
+Pallet: "edge_ren", Extrinsic: "validate_and_mint", Lowest values: [], Highest values: [], Steps: [2], Repeat: 2
+z,extrinsic_time,storage_root_time,reads,repeat_reads,writes,repeat_writes
+100000,1879448,23630,7,9,4,2
+100000,1907096,9410,7,9,4,2
+550000,153891068,10454,7,9,4,2
+550000,154217963,10342,7,9,4,2
+1000000,600092146,11619,7,9,4,2
+1000000,599957357,11951,7,9,4,2
+
+Median Slopes Analysis
+========
+-- Extrinsic Time --
+
+Model:
+Time ~=        0
+    + z    0.664
+              µs
+
+Reads = 7 + (0 * z)
+Writes = 4 + (0 * z)
+Min Squares Analysis
+========
+-- Extrinsic Time --
+
+Data points distribution:
+    z   mean µs  sigma µs       %
+100000      1893     13.82    0.7%
+550000    154000     163.4    0.1%
+1000000    600000     67.39    0.0%
+
+Quality and confidence:
+param     error
+z         0.094
+
+Model:
+Time ~=        0
+    + z    0.665
+              µs
+
+Reads = 7 + (0 * z)
+Writes = 4 + (0 * z)

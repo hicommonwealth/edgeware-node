@@ -1,14 +1,14 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use codec::{Encode, Decode, HasCompact};
-use frame_support::{Parameter, decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
+use codec::{Encode, Decode};
+use frame_support::{decl_error, decl_event, decl_module, decl_storage, ensure, traits::{Get, EnsureOrigin}};
 use frame_system::{ensure_none, ensure_signed};
 use sp_core::ecdsa;
 use sp_io::{crypto::secp256k1_ecdsa_recover, hashing::keccak_256};
 use sp_runtime::{
 	Permill,
 	ModuleId,
-	traits::{Member, StaticLookup, AccountIdConversion, AtLeast32BitUnsigned},
+	traits::{AccountIdConversion},
 	transaction_validity::{
 		InvalidTransaction, TransactionPriority, TransactionSource, TransactionValidity, ValidTransaction,
 	},
@@ -25,6 +25,9 @@ mod tests;
 #[cfg(feature = "runtime-benchmarks")]
 pub mod benchmarking;
 
+pub mod weights;
+pub use weights::WeightInfo;
+
 type EcdsaSignature = ecdsa::Signature;
 type DestAddress = Vec<u8>;
 
@@ -37,11 +40,24 @@ pub type BalanceOf<T> = <<T as Config>::Assets as FungibleAsset<<T as frame_syst
 const NAME_MAX_LENGTH : u8 = 32;
 
 pub trait Config: frame_system::Config {
+
+	/// Ubiquitous Event type
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
+
+	/// Priority level for  unsigned extrinsics of this pallet
 	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
+
+	/// The privileged origin for this pallet for token crud and spending
 	type ControllerOrigin: EnsureOrigin<Self::Origin>;
+
+	/// The module id for this pallet
 	type ModuleId: Get<ModuleId>;
+
+	/// The pallet used for multiple fungible assets
 	type Assets: FungibleAsset<Self::AccountId> + MintableAsset<Self::AccountId> + BurnableAsset<Self::AccountId> + ManageableAsset<Self::AccountId>;
+
+	/// Weight information for extrinsics in this pallet.
+	type WeightInfo: WeightInfo;
 }
 
 
@@ -140,7 +156,7 @@ decl_module! {
 		/// Instantiates the token in the Registry AFTER instantiating the asset in Assets
 		/// Requries max_zombies and min_balance as inputs to Assets
 		/// Max length of the token name implemented
-		#[weight = 10_000]
+		#[weight = T::WeightInfo::add_ren_token()]
 		pub fn add_ren_token(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
@@ -183,7 +199,7 @@ decl_module! {
 
 		/// Method to update a tokens info using its ren_token_id, all other fields are optional
 		/// Max length of the token name implemented
-		#[weight = 10_000]
+		#[weight = T::WeightInfo::update_ren_token()]
 		pub fn update_ren_token(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
@@ -225,7 +241,7 @@ decl_module! {
 
 		/// Deletes the token from the Registry AFTER deleting the asset from Assets
 		/// Requires zombies_witness as input to Assets
-		#[weight = 10_000]
+		#[weight = T::WeightInfo::delete_ren_token(*_ren_token_zombies_witness)]
 		pub fn delete_ren_token(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
@@ -246,7 +262,7 @@ decl_module! {
 
 
 		/// Transfers tokens from the pallet account to a specified account
-		#[weight = 10_000]
+		#[weight = T::WeightInfo::spend_tokens()]
 		pub fn spend_tokens(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
@@ -265,7 +281,7 @@ decl_module! {
 		}
 
 		/// Mints the token, after fee deduction, if the signature provided is valid over the provided arguments
-		#[weight = 10_000]
+		#[weight = T::WeightInfo::validate_and_mint()]
 		pub fn mint(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
@@ -290,7 +306,7 @@ decl_module! {
 			// MINT CALL for user
 			T::Assets::mint(_ren_token_id, who.clone(), (amount - mint_fee_value).into())?;
 			// Attempt mint call for fees
-			T::Assets::mint(_ren_token_id, Self::account_id().into(), mint_fee_value.into());
+			let _ = T::Assets::mint(_ren_token_id, Self::account_id().into(), mint_fee_value.into());
 
 			Signatures::insert(&sig, ());
 			Self::deposit_event(RawEvent::RenTokenMinted(_ren_token_id, who, amount));
@@ -302,7 +318,7 @@ decl_module! {
 		/// Checks if the token is bitcoin by name, "renBTC" (or "renTestBTC" for testnet) and validates the "to" address accordingly
 		/// The actual amount burnt is calculated based on the burn fee, and is the value of the corresponding pegged currency that the user will be granted from RenVM
 		/// The burn fee is transfered from the users account to the pallets account
-		#[weight = 10_000]
+		#[weight = T::WeightInfo::burn()]
 		pub fn burn(
 			origin,
 			#[compact] _ren_token_id: TokenIdOf<T>,
@@ -342,7 +358,7 @@ decl_module! {
 				// BURN CALL for user
 				T::Assets::burn(_ren_token_id, sender.clone(), actual_burn)?;
 				// Attempt transfer call for fees
-				T::Assets::transfer(_ren_token_id, sender.clone(), Self::account_id().into(), burn_fee_value);
+				let _ = T::Assets::transfer(_ren_token_id, sender.clone(), Self::account_id().into(), burn_fee_value);
 
 				BurnEvents::<T>::insert(this_id, (_ren_token_id, frame_system::Module::<T>::block_number(), &to, actual_burn));
 				Self::deposit_event(RawEvent::RenTokenBurnt(_ren_token_id, sender, to, actual_burn));
@@ -455,10 +471,10 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 		})
 	}
 
-	// #[cfg(feature = "runtime-benchmarks")]
 	// #[cfg(not(test))]
+	#[cfg(feature = "runtime-benchmarks")]
 	fn successful_origin() -> T::Origin {
-		T::Origin::from(frame_system::RawOrigin::Root)
+		T::Origin::from(frame_system::RawOrigin::Signed(Module::<T>::account_id()))
 	}
 
 }
