@@ -512,13 +512,13 @@ impl pallet_staking::Config for Runtime {
 }
 
 parameter_types! {
-	pub const LaunchPeriod: BlockNumber = 1 * MINUTES;
-	pub const VotingPeriod: BlockNumber = 2 * MINUTES;
-	pub const FastTrackVotingPeriod: BlockNumber = 1 * MINUTES;
+	pub const LaunchPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 4 * 24 * 60 * MINUTES;
+	pub const FastTrackVotingPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	pub const InstantAllowed: bool = false;
-	pub const EnactmentPeriod: BlockNumber = 1 * MINUTES;
-	pub const CooloffPeriod: BlockNumber = 1 * MINUTES;
+	pub const EnactmentPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
+	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1 * CENTS;
 	pub const MaxVotes: u32 = 100;
 	pub const MaxProposals: u32 = 100;
