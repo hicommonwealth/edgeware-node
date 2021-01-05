@@ -5,7 +5,6 @@ import BN from 'bn.js';
 
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { UnsubscribePromise } from '@polkadot/api/types';
-import { TypeRegistry } from '@polkadot/types';
 import { compactAddLength } from '@polkadot/util';
 import { spec } from '@edgeware/node-types';
 import StateTest from './stateTest';
@@ -268,7 +267,7 @@ class TestRunner {
       const setBalanceTx = this._api.tx.sudo.sudo(
         this._api.tx.balances.setBalance(sudoKeyring.address, newBalance, 0)
       );
-      await makeTx(setBalanceTx, sudoKeyring);
+      await makeTx(this._api, setBalanceTx, sudoKeyring);
     }
 
     let rpcSubscription: UnsubscribePromise;

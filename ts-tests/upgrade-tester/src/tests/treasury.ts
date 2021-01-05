@@ -13,7 +13,7 @@ export default class extends StateTest {
 
   public async before(api: ApiPromise) {
     // create a treasury proposal
-    await makeTx(api.tx.treasury.proposeSpend('1000000000000', this.accounts.bob.address), this.accounts.alice);
+    await makeTx(api, api.tx.treasury.proposeSpend('1000000000000', this.accounts.bob.address), this.accounts.alice);
     const proposalCount = await api.query.treasury.proposalCount();
     const p = await api.query.treasury.proposals(+proposalCount - 1);
     if (!p.isSome) {

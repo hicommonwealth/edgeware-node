@@ -11,7 +11,8 @@
     "url": "git+https://github.com/hicommonwealth/edgeware-state-tester.git"
   },
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "start": "ts-node src/index.ts",
+    "democracy-upgrade": "ts-node src/scripts/democracyUpgrade.ts"
   },
   "dependencies": {
     "@edgeware/node-types": "^3.1.0-beta.14",

@@ -1,3 +1,4 @@
+import { ApiPromise } from '@polkadot/api';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DispatchError } from '@polkadot/types/interfaces';
 import { KeyringPair } from '@polkadot/keyring/types';
@@ -5,7 +6,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-export function makeTx(tx: SubmittableExtrinsic<'promise'>, signer: KeyringPair): Promise<void> {
+export function makeTx(api: ApiPromise, tx: SubmittableExtrinsic<'promise'>, signer: KeyringPair): Promise<void> {
   log.info(`Making tx: ${tx.method.section}::${tx.method.method}`);
   return new Promise((resolve, reject) => {
     tx.signAndSend(signer, async (status) => {
@@ -19,7 +20,7 @@ export function makeTx(tx: SubmittableExtrinsic<'promise'>, signer: KeyringPair)
               const errorData = data[0] as DispatchError;
               let errorInfo: string;
               if (errorData.isModule) {
-                const details = this.registry.findMetaError(errorData.asModule.toU8a());
+                const details = api.registry.findMetaError(errorData.asModule.toU8a());
                 errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
               } else if (errorData.isBadOrigin) {
                 errorInfo = 'TX Error: invalid sender origin';

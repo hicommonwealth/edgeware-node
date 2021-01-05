@@ -25,7 +25,7 @@ export default class extends StateTest {
       twitter: { none: null },
     });
 
-    await makeTx(api.tx.identity.setIdentity(identityInfo), this.accounts.alice);
+    await makeTx(api, api.tx.identity.setIdentity(identityInfo), this.accounts.alice);
     const registration = await api.query.identity.identityOf(this.accounts.alice.address);
     if (!registration.isSome) {
       throw new Error('identity registration not found');

@@ -16,14 +16,14 @@ export default class extends StateTest {
   public async before(api: ApiPromise) {
     // create a democracy proposal
     const call = api.tx.system.fillBlock(1);
-    await makeTx(api.tx.democracy.propose(call.hash, api.consts.democracy.minimumDeposit), this.accounts.alice);
+    await makeTx(api, api.tx.democracy.propose(call.hash, api.consts.democracy.minimumDeposit), this.accounts.alice);
 
     const proposals = await api.query.democracy.publicProps();
     chai.assert.lengthOf(proposals, 1, 'proposal should be in publicProps array');
     this._proposal = proposals[0];
 
     // submit the preimage
-    await makeTx(api.tx.democracy.notePreimage(call.toHex()), this.accounts.alice);
+    await makeTx(api, api.tx.democracy.notePreimage(call.toHex()), this.accounts.alice);
     const preimage = await api.query.democracy.preimages(call.hash);
     if (!preimage.isSome || !preimage.unwrap().isAvailable) {
       throw new Error('preimage not found');
