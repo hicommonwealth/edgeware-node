@@ -1,8 +1,9 @@
 [workspace]
 members = [
-	"modules/edge-treasury-reward",
 	"modules/chainbridge",
+	"modules/edge-assets",
 	"modules/edge-chainbridge",
+	"modules/edge-treasury-reward",
 	"node/cli",
 	"node/executor",
 	"node/primitives",

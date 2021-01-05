@@ -1292,6 +1292,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-assets"
+version = "2.0.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "edge-chainbridge"
 version = "1.0.0"
 dependencies = [
