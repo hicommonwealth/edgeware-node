@@ -17,6 +17,7 @@ export default class extends StateTest {
 
   public async after(api: ApiPromise) {
     const bal = await api.query.system.account(this.accounts.eve.address);
+    console.log(JSON.stringify(this._bal), JSON.stringify(bal.data.toHuman()));
     chai.assert.deepEqual(this._bal, bal.data.toHuman(), 'eve balance should not change');
     await super.after(api);
   }

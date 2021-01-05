@@ -65,15 +65,11 @@ class TestRunner {
   private _chainOutfile: fs.WriteStream;
   private _chainOutstream: NodeJS.WritableStream;
   private _chainProcess: child_process.ChildProcess;
-  private _upgradeBlock: number;
 
   constructor(
     private tests: StateTest[],
     private options: ITestOptions,
   ) {
-    // default upgrade block to (n tests + 2) (1 test per block + first block)
-    this._upgradeBlock = tests.length + 1;
-
     // verify options args
     if (!options.chainspec) {
       throw new Error('missing chainspec!');
@@ -94,7 +90,6 @@ class TestRunner {
       if (!options.upgrade.sudoSeed) {
         throw new Error('invalid sudo seed!');
       }
-      log.info(`Will perform upgrade on block ${this._upgradeBlock}.`);
     } else {
       log.info('Will not perform upgrade during testing.');
     }
@@ -138,6 +133,7 @@ class TestRunner {
     const args = [
       '--chain', this.options.chainspec,
       '--base-path', this.options.chainBasePath,
+      '--wasm-execution', 'Compiled',
       '--alice', // TODO: abstract this into accounts somehow
       '-l', 'ws::handler=info'
     ];
