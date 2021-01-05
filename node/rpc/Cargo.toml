@@ -34,3 +34,4 @@ substrate-frame-rpc-system = { version = "2.0.0" }
 pallet-ethereum = { version = "0.1.0" }
 fc-rpc = { version = "0.1.0" }
 fp-rpc = { version = "0.1.0" }
+fc-rpc-core = { version = "0.1.0" }

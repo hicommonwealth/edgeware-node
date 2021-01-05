@@ -19,7 +19,9 @@
 //! Service implementation. Specialized wrapper over substrate service.
 
 use sc_service::ChainSpec;
-use std::sync::Arc;
+use std::{sync::{Arc, Mutex}, collections::HashMap};
+use fc_rpc_core::types::PendingTransactions;
+use sc_client_api::{ExecutorProvider, RemoteBackend, BlockchainEvents};
 use sc_consensus_aura;
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
 use fc_consensus::FrontierBlockImport;
@@ -33,7 +35,6 @@ use sp_inherents::InherentDataProviders;
 use sc_network::{Event, NetworkService};
 use sp_runtime::traits::Block as BlockT;
 use futures::prelude::*;
-use sc_client_api::{ExecutorProvider, RemoteBackend};
 use edgeware_executor::Executor;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
@@ -78,6 +79,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 			sp_consensus_aura::ed25519::AuthorityPair
 		>,
 		sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
+		PendingTransactions,
 	)
 >, ServiceError> {
 	let (client, backend, keystore_container, task_manager) =
@@ -92,6 +94,9 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		task_manager.spawn_handle(),
 		client.clone(),
 	);
+
+	let pending_transactions: PendingTransactions
+		= Some(Arc::new(Mutex::new(HashMap::new())));
 
 	let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
 		client.clone(),
@@ -127,7 +132,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 	Ok(sc_service::PartialComponents {
 		client, backend, task_manager, import_queue, keystore_container, select_chain, transaction_pool,
 		inherent_data_providers,
-		other: (aura_block_import.clone(), grandpa_link,)
+		other: (aura_block_import.clone(), grandpa_link, pending_transactions,)
 	})
 }
 
@@ -152,7 +157,7 @@ pub fn new_full_base(
 	let sc_service::PartialComponents {
 		client, backend, mut task_manager, import_queue, keystore_container,
 		select_chain, transaction_pool, inherent_data_providers,
-		other: (block_import, grandpa_link),
+		other: (block_import, grandpa_link, pending_transactions),
 	} = new_partial(&config)?;
 
 	let (network, network_status_sinks, system_rpc_tx, network_starter) =
@@ -191,6 +196,7 @@ pub fn new_full_base(
 		let pool = transaction_pool.clone();
 		let select_chain = select_chain.clone();
 		let network = network.clone();
+		let pending = pending_transactions.clone();
 		let is_authority = config.role.clone().is_authority();
 		let _keystore = keystore_container.sync_keystore();
 		let subscription_executor = sc_rpc::SubscriptionTaskExecutor::new(task_manager.spawn_handle());
@@ -201,6 +207,7 @@ pub fn new_full_base(
 				pool: pool.clone(),
 				select_chain: select_chain.clone(),
 				network: network.clone(),
+				pending_transactions: pending.clone(),
 				is_authority,
 				enable_dev_signer,
 				deny_unsafe,
@@ -234,6 +241,48 @@ pub fn new_full_base(
 		network_status_sinks: network_status_sinks.clone(),
 		system_rpc_tx,
 	})?;
+
+	// Spawn Frontier pending transactions maintenance task (as essential, otherwise we leak).
+	if pending_transactions.is_some() {
+		use futures::StreamExt;
+		use fp_consensus::{FRONTIER_ENGINE_ID, ConsensusLog};
+		use sp_runtime::generic::OpaqueDigestItemId;
+
+		const TRANSACTION_RETAIN_THRESHOLD: u64 = 5;
+		task_manager.spawn_essential_handle().spawn(
+			"frontier-pending-transactions",
+			client.import_notification_stream().for_each(move |notification| {
+
+				if let Ok(locked) = &mut pending_transactions.clone().unwrap().lock() {
+					// As pending transactions have a finite lifespan anyway
+					// we can ignore MultiplePostRuntimeLogs error checks.
+					let mut frontier_log: Option<_> = None;
+					for log in notification.header.digest.logs {
+						let log = log.try_to::<ConsensusLog>(OpaqueDigestItemId::Consensus(&FRONTIER_ENGINE_ID));
+						if let Some(log) = log {
+							frontier_log = Some(log);
+						}
+					}
+
+					let imported_number: u64 = notification.header.number as u64;
+
+					if let Some(ConsensusLog::EndBlock {
+						block_hash: _, transaction_hashes,
+					}) = frontier_log {
+						// Retain all pending transactions that were not
+						// processed in the current block.
+						locked.retain(|&k, _| !transaction_hashes.contains(&k));
+					}
+					locked.retain(|_, v| {
+						// Drop all the transactions that exceeded the given lifespan.
+						let lifespan_limit = v.at_block + TRANSACTION_RETAIN_THRESHOLD;
+						lifespan_limit > imported_number
+					});
+				}
+				futures::future::ready(())
+			})
+		);
+	}
 
 	let (shared_voter_state, _finality_proof_provider) = rpc_setup;
 
