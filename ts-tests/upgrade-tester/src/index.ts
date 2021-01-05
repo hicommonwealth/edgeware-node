@@ -6,7 +6,7 @@ import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const CHAINSPEC = 'dev';
-const BINARY_PATH = '../../../edgeware-node-3.0.8/target/release/edgeware';
+const BINARY_PATH = '../../../edgeware-node-3.1.0/target/release/edgeware';
 const CHAIN_BASE_PATH = `${__dirname}/../db`;
 const ACCOUNTS = [ '//Alice' ];
 const SS58_PREFIX = 42; // default for testing chain specs
@@ -14,7 +14,11 @@ const SS58_PREFIX = 42; // default for testing chain specs
 const UPGRADE_BINARY = '../../target/release/edgeware';
 const UPGRADE_CODE = '../../edgeware_runtime.wasm';
 const SUDO_SEED = '//Alice';
-const UPGRADE_ON_NEW_NODE = false;
+const UPGRADE_ON_NEW_NODE = true;
+const POST_UPGRADE_COMMAND = {
+  env: { BASE_PATH: `${__dirname}/../db` },
+  cmd: `cd ${__dirname}/../../frontier-tester && yarn init-eth-balance && yarn test-ci`,
+};
 
 async function main() {
   // construct some migration tests
@@ -41,6 +45,7 @@ async function main() {
       binaryPath: UPGRADE_BINARY,
       sudoSeed: SUDO_SEED,
       upgradeOnNewNode: UPGRADE_ON_NEW_NODE,
+      postUpgradeCommand: POST_UPGRADE_COMMAND,
     },
   });
 

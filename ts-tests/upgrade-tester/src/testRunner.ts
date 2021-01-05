@@ -54,6 +54,9 @@ export interface ITestOptions {
     // run upgrade on new node with older runtime as specified in binaryPath
     // if false or unset, will run upgrade on old node then switch to new node
     upgradeOnNewNode?: boolean;
+
+    // command to run after all tests, will not exit chain until complete
+    postUpgradeCommand?: { cmd: string, env: NodeJS.Dict<string> };
   }
 }
 
@@ -359,6 +362,31 @@ class TestRunner {
 
     // Cleanup and exit
     await this._stopChain();
+
+    // [9.] Run post-upgrade command if present
+    if (this.options.upgrade.postUpgradeCommand) {
+      log.info(`Running post-upgrade command: ${this.options.upgrade.postUpgradeCommand.cmd}`
+        + `\n\t(env: ${JSON.stringify(this.options.upgrade.postUpgradeCommand.env)})`
+        + '\n\t...(may take some time)...');
+      await new Promise<void>((resolve, reject) => {
+        child_process.exec(
+          this.options.upgrade.postUpgradeCommand.cmd,
+          { env: this.options.upgrade.postUpgradeCommand.env },
+          (error, stdout, stderr) => {
+            if (error) {
+              log.error(`error: ${error.message}`);
+              reject(new Error('post-upgrade command failed'));
+            }
+            if (stderr) {
+              log.error(`stderr: ${stderr}`);
+            }
+            log.info(`stdout: ${stdout}`);
+            resolve();
+          }
+        );
+      });
+    }
+
     process.exit(0);
   }
 }

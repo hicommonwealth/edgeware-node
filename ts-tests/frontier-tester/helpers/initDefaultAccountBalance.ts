@@ -1,11 +1,12 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { createTestPairs } from '@polkadot/keyring/testingPairs';
 import { assert } from 'chai';
-const { account, convertToSubstrateAddress, initWeb3 } = require('./utils.js');
+const { account, convertToSubstrateAddress, describeWithEdgeware } = require('./utils.js');
 import { dev } from '@edgeware/node-types';
 import { TypeRegistry } from '@polkadot/types';
+import Web3 from 'web3';
 
-let sendSubstrateBalance = async (): Promise<void> => {
+let sendSubstrateBalance = async (web3: Web3): Promise<void> => {
   // initialize polkadot API
   const polkadotUrl = 'ws://localhost:9944';
   const registry = new TypeRegistry();
@@ -21,7 +22,7 @@ let sendSubstrateBalance = async (): Promise<void> => {
   if (balance.data.free.eqn(0)) {
     throw new Error(`Fetched no balance for address ${keyring.address}`);
   }
-  const value = balance.data.free.divn(2); // onl; send half of Bob's balance
+  const value = balance.data.free.divn(2); // only send half of Bob's balance
   const target = convertToSubstrateAddress(account);
 
   // send funds from Bob to the target account
@@ -39,10 +40,14 @@ let sendSubstrateBalance = async (): Promise<void> => {
   });
 
   // ensure the account has funds via web3
-  const web3 = await initWeb3();
   const web3Balance = await web3.eth.getBalance(account);
   await api.disconnect();
   console.log(`Transfer complete, web3 fetched balance: ${web3Balance}`);
 }
 
-sendSubstrateBalance().then(() => process.exit(0));
+describeWithEdgeware('init default account balance', (context) => {
+  it('should initialize default account balance', async () => {
+    const web3 = context.web3;
+    await sendSubstrateBalance(web3);
+  });
+});
