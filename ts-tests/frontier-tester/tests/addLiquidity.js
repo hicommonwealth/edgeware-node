@@ -64,7 +64,7 @@ describeWithEdgeware('Add Liquidity Test', async (context) => {
          "0", "0",
          account,
          Math.ceil(Date.now() / 1000) + (60 * 20), // 1 day
-         { from: account, gas: web3.utils.toWei('100') }, // { from: account, gasLimit: 10000000, gasPrice: 1500000000 },
+         { from: account },
       ];
       console.log('Adding liquidity with args: ', args);
       const liquidityReceipt = await router.addLiquidity(...args);

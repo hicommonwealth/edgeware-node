@@ -21,7 +21,7 @@ use edgeware_runtime::Block;
 use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
 	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig,
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
@@ -255,10 +255,6 @@ pub fn testnet_genesis(
 		pallet_evm: Some(EVMConfig { accounts: evm_accounts }),
 		pallet_contracts: Some(Default::default()),
 		pallet_ethereum: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
-		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
@@ -520,10 +516,6 @@ pub fn mainnet_genesis(
 		pallet_evm: Some(Default::default()),
 		pallet_contracts: Some(Default::default()),
 		pallet_ethereum: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
-		}),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),

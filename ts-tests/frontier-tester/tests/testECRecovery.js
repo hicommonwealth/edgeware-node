@@ -28,7 +28,7 @@ describeWithEdgeware('ECRecovery test', async (context) => {
 
   it('should interact with precompile directly', async () => {
     const web3 = context.web3;
-    const ECRECOVER_PRECOMPILE_ADDRESS = '0000000000000000000000000000000000000001';
+    const ECRECOVER_PRECOMPILE_ADDRESS = '0000000000000000000000000000000000000000';
 
     const message = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tubulum fuisse, qua illum, cuius is condemnatus est rogatione, P. Eaedem res maneant alio modo.'
     const messageHex = '0x' + Buffer.from(message).toString('hex');
@@ -41,8 +41,7 @@ describeWithEdgeware('ECRecovery test', async (context) => {
 
     const RAW_TX = {
       from: account,
-      gasPrice: "0x01",
-      gas: web3.utils.toWei('1', 'ether'),
+      gas: '27720',
       to: ECRECOVER_PRECOMPILE_ADDRESS,
       value: "0x0",
       data: `0x${hash.toString('hex')}${sigPart}`,
@@ -57,7 +56,7 @@ describeWithEdgeware('ECRecovery test', async (context) => {
       from: account,
       to: ECRECOVER_PRECOMPILE_ADDRESS,
       value: '0x0',
-      gas: web3.utils.toWei('1', 'ether'),
+      gas: '27720',
       data: `0x${hash.toString('hex')}${sigPart}`,
     });
 
