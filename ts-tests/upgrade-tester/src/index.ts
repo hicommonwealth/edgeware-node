@@ -6,7 +6,7 @@ import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const CHAINSPEC = 'dev';
-const BINARY_PATH = '../../../edgeware-node-3.1.0/target/release/edgeware';
+const BINARY_PATH = '../../../edgeware-node-3.0.8/target/release/edgeware';
 const CHAIN_BASE_PATH = `${__dirname}/../db`;
 const ACCOUNTS = [ '//Alice' ];
 const SS58_PREFIX = 42; // default for testing chain specs

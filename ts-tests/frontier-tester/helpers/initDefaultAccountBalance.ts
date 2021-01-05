@@ -2,19 +2,16 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { createTestPairs } from '@polkadot/keyring/testingPairs';
 import { assert } from 'chai';
 const { account, convertToSubstrateAddress, describeWithEdgeware } = require('./utils.js');
-import { dev } from '@edgeware/node-types';
-import { TypeRegistry } from '@polkadot/types';
+import { spec } from '@edgeware/node-types';
 import Web3 from 'web3';
 
 let sendSubstrateBalance = async (web3: Web3): Promise<void> => {
   // initialize polkadot API
   const polkadotUrl = 'ws://localhost:9944';
-  const registry = new TypeRegistry();
-  const api = await (new ApiPromise({
+  const api = await ApiPromise.create({
     provider: new WsProvider(polkadotUrl),
-    registry,
-    ...dev,
-  })).isReady;
+    ...spec,
+  });
 
   // configure funded substrate account, target account, and balance to send
   const keyring = createTestPairs().dave;

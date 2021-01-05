@@ -207,9 +207,7 @@ class TestRunner {
     unsubscribe();
 
     // initialize the API itself
-    const registry = new TypeRegistry();
-    this._api = new ApiPromise({ provider, registry, ...spec });
-    await this._api.isReady;
+    this._api = await ApiPromise.create({ provider, ...spec });
 
     // fetch and print chain information
     const chainInfo = await this._api.rpc.state.getRuntimeVersion();
@@ -365,9 +363,9 @@ class TestRunner {
 
     // [9.] Run post-upgrade command if present
     if (this.options.upgrade.postUpgradeCommand) {
-      log.info(`Running post-upgrade command: ${this.options.upgrade.postUpgradeCommand.cmd}`
-        + `\n\t(env: ${JSON.stringify(this.options.upgrade.postUpgradeCommand.env)})`
-        + '\n\t...(may take some time)...');
+      log.info(`Running post-upgrade command:\n\t${this.options.upgrade.postUpgradeCommand.cmd}`
+        + `\n\t\t(env: ${JSON.stringify(this.options.upgrade.postUpgradeCommand.env)})`
+        + '\n\t\t...(may take some time)...');
       await new Promise<void>((resolve, reject) => {
         child_process.exec(
           this.options.upgrade.postUpgradeCommand.cmd,
