@@ -18,7 +18,7 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
-evm = { version = "0.19.0", default-features = false, features = ["with-codec"] }
+evm-runtime = { version = "0.20.0", default-features = false }
 
 # primitives
 sp-application-crypto = { version = "2.0.0", default-features = false }
@@ -78,10 +78,7 @@ pallet-transaction-payment = { version = "2.0.0", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-features = false }
 pallet-vesting = { version = "2.0.0", default-features = false }
 
-signaling = { package = "edge-signaling", path = "../../modules/edge-signaling", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
-voting = { package = "edge-voting", path = "../../modules/edge-voting", default-features = false }
-
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
 chainbridge = { path = "../../modules/chainbridge", default-features = false }
 
@@ -89,11 +86,6 @@ fp-rpc = { path = "../../vendor/frontier/primitives/rpc", default-features = fal
 pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-features = false }
 pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
 pallet-evm-precompile-simple = { path = "../../vendor/frontier/frame/evm/precompile/simple", default-features = false }
-pallet-evm-precompile-modexp = { path = "../../vendor/frontier/frame/evm/precompile/modexp", default-features = false }
-pallet-evm-precompile-bn128 = { path = "../../vendor/frontier/frame/evm/precompile/bn128", default-features = false }
-pallet-evm-precompile-blake2 = { path = "../../vendor/frontier/frame/evm/precompile/blake2", default-features = false }
-pallet-evm-precompile-ed25519 = { path = "../../vendor/frontier/frame/evm/precompile/ed25519", default-features = false }
-
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
@@ -163,14 +155,12 @@ std = [
 	"sp-version/std",
 	"sp-offchain/std",
 	"edgeware-primitives/std",
-	"signaling/std",
 	"treasury-reward/std",
-	"voting/std",
 	"edge-chainbridge/std",
 	"chainbridge/std",
 	"fp-rpc/std",
 	"pallet-ethereum/std",
-	"evm/std",
+	"evm-runtime/std",
 	"pallet-evm-precompile-simple/std",
 ]
 
@@ -180,7 +170,5 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"frame-system-benchmarking",
 	"hex-literal",
-	"signaling/runtime-benchmarks",
-	"voting/runtime-benchmarks",
 	"chainbridge/runtime-benchmarks",
 ]

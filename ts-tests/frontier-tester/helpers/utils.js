@@ -46,14 +46,15 @@ const deployContract = async (name, c, args = [], web3 = undefined) => {
      data: c.bytecode,
      arguments: args,
   });
+  const estimatedGas = await contractTx.estimateGas();
+  console.log(estimatedGas);
 
   const data = contractTx.encodeABI();
   const createTransaction = await web3.eth.accounts.signTransaction(
      {
         from: deployer,
         data,
-        gasLimit: 8000000,
-        gasPrice: 1000000000,
+        gas: estimatedGas,
      },
      pkey
   );
@@ -86,7 +87,7 @@ async function startEdgewareNode() {
     '--no-prometheus',
     // '--tmp',
     '--base-path=./db',
-    // '-lrpc=trace',
+    '-lrpc=trace',
     // '-levm=trace',
   ];
   const binary = child_process.spawn(cmd, args);

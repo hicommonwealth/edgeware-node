@@ -24,8 +24,11 @@ describeWithEdgeware("EventContract test", async (context) => {
     const wsPrivKey = '99B3C12287537E38C90A9219D4CB074A89A16E9CDB20BF85728EBD97C343E342';
     const wsAccount = '0x6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b';
     const value = web3Http.utils.toWei(web3Http.utils.toBN('1'), 'ether');
+    const gasEstimate = await web3Http.eth.estimateGas({
+      from: account, to: wsAccount, value,
+    });
     const balanceTx = await web3Http.eth.sendTransaction({
-      from: account, to: wsAccount, value, gas: value,
+      from: account, to: wsAccount, value, gas: gasEstimate,
     });
 
     // init web3 with wsprovider

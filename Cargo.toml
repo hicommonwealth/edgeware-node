@@ -1,7 +1,5 @@
 [workspace]
 members = [
-	"modules/edge-signaling",
-	"modules/edge-voting",
 	"modules/edge-treasury-reward",
 	"modules/chainbridge",
 	"modules/edge-chainbridge",
