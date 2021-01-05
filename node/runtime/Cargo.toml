@@ -82,10 +82,10 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
 chainbridge = { path = "../../modules/chainbridge", default-features = false }
 
-fp-rpc = { path = "../../vendor/frontier/primitives/rpc", default-features = false }
-pallet-ethereum = { path = "../../vendor/frontier/frame/ethereum", default-features = false }
-pallet-evm = { path = "../../vendor/frontier/frame/evm", default-features = false }
-pallet-evm-precompile-simple = { path = "../../vendor/frontier/frame/evm/precompile/simple", default-features = false }
+fp-rpc = { version = "0.1.0", default-features = false }
+pallet-ethereum = { version = "0.1.0", default-features = false }
+pallet-evm = { version = "2.0.0", default-features = false }
+pallet-evm-precompile-simple = { version = "2.0.0", default-features = false }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }

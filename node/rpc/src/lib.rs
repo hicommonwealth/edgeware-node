@@ -30,6 +30,7 @@
 #![warn(missing_docs)]
 
 use std::{sync::Arc};
+use fc_rpc_core::types::PendingTransactions;
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use jsonrpc_pubsub::manager::SubscriptionManager;
 use sc_finality_grandpa::{
@@ -92,6 +93,8 @@ pub struct FullDeps<C, P, SC, B> {
 	pub enable_dev_signer: bool,
 	/// Network service
 	pub network: Arc<NetworkService<Block, Hash>>,
+	/// Ethereum pending transactions.
+	pub pending_transactions: PendingTransactions,
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
@@ -135,6 +138,7 @@ pub fn create_full<C, P, SC, B>(
 		enable_dev_signer,
 		is_authority,
 		network,
+		pending_transactions,
 		deny_unsafe,
 		grandpa,
 	} = deps;
@@ -169,6 +173,7 @@ pub fn create_full<C, P, SC, B>(
 			pool.clone(),
 			edgeware_runtime::TransactionConverter,
 			network.clone(),
+			pending_transactions.clone(),
 			signers,
 			is_authority,
 		))
