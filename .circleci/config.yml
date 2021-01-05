@@ -13,7 +13,6 @@ jobs:
       - checkout
       - run: sudo apt-get update
       - run: ~/edgeware/scripts/init.sh
-      - run: cd ~/edgeware && git submodule update --init --recursive
 
       # get cached edgeware build
       - restore_cache:
