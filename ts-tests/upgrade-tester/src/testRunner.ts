@@ -7,7 +7,7 @@ import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { UnsubscribePromise } from '@polkadot/api/types';
 import { TypeRegistry } from '@polkadot/types';
 import { compactAddLength } from '@polkadot/util';
-import { dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import StateTest from './stateTest';
 
 import { makeTx } from './util';
@@ -209,7 +209,7 @@ class TestRunner {
 
     // initialize the API itself
     const registry = new TypeRegistry();
-    this._api = new ApiPromise({ provider, registry, typesBundle: dev.typesBundle });
+    this._api = new ApiPromise({ provider, registry, ...spec });
     await this._api.isReady;
 
     // fetch and print chain information
@@ -284,7 +284,7 @@ class TestRunner {
           await t.before(this._api);
           log.info(`Test '${t.name}' action 'before' succeeded.`);
         } catch (e) {
-          log.info(`Test '${t.name}' action 'before' failed: ${e.message}.`);
+          log.error(`Test '${t.name}' action 'before' failed: ${e.message}.`);
         }
       }
 
@@ -298,7 +298,7 @@ class TestRunner {
           await t.after(this._api);
           log.info(`Test '${t.name}' action 'after' succeeded.`);
         } catch (e) {
-          log.info(`Test '${t.name}' action 'after' failed: ${e.message}.`);
+          log.error(`Test '${t.name}' action 'after' failed: ${e.message}.`);
         }
       }
       log.info('All tests complete!');

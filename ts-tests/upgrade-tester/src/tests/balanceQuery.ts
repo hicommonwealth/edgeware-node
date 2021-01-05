@@ -10,14 +10,14 @@ export default class extends StateTest {
 
   public async before(api: ApiPromise) {
     const bal = await api.query.system.account(this.accounts.eve.address);
-    chai.assert.isTrue(bal.data.free.gtn(0), 'alice should have balance');
+    chai.assert.isTrue(bal.data.free.gtn(0), 'eve should have balance');
     this._bal = bal.data.toHuman();
     await super.before(api);
   }
 
   public async after(api: ApiPromise) {
     const bal = await api.query.system.account(this.accounts.eve.address);
-    chai.assert.deepEqual(this._bal, bal.data.toHuman(), 'alice balance should not change');
+    chai.assert.deepEqual(this._bal, bal.data.toHuman(), 'eve balance should not change');
     await super.after(api);
   }
 }
