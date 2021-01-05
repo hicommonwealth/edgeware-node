@@ -1013,6 +1013,9 @@ impl edge_chainbridge::Config for Runtime {
 parameter_types! {
 	pub const AssetDepositBase: u64 = 1;
 	pub const AssetDepositPerZombie: u64 = 1;
+	pub const AllowFreezing: bool = true;
+	pub const AllowBurning: bool = true;
+	pub const AllowMinting: bool = true;
 }
 
 impl edge_assets::Config for Runtime {
