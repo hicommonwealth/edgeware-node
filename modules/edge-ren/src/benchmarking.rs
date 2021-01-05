@@ -145,7 +145,7 @@ benchmarks! {
 	}
 
 	validate_and_mint{
-		let z in 100_000 .. 1_000_000;
+		let z in 1.. 10_000;
 		let to_acc: T::AccountId = account("to_acc", 0, SEED);
 		let (pubkey, sig) = sign_paramters_with_ecdsa_pair::<T>(
 			&hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],

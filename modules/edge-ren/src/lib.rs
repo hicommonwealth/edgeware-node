@@ -471,7 +471,6 @@ impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
 		})
 	}
 
-	// #[cfg(not(test))]
 	#[cfg(feature = "runtime-benchmarks")]
 	fn successful_origin() -> T::Origin {
 		T::Origin::from(frame_system::RawOrigin::Signed(Module::<T>::account_id()))
