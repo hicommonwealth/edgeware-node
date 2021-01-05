@@ -2,7 +2,7 @@ import { ApiPromise } from '@polkadot/api';
 import { TreasuryProposal } from '@polkadot/types/interfaces';
 import chai from 'chai';
 import StateTest from '../stateTest';
-import { makeTx } from './util';
+import { makeTx } from '../util';
 
 export default class extends StateTest {
   private _proposal: TreasuryProposal;

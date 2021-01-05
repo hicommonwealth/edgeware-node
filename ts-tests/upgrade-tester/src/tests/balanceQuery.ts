@@ -1,10 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import chai from 'chai';
 import StateTest from '../stateTest';
-
-import { factory, formatFilename } from '../logging';
-const log = factory.getLogger(formatFilename(__filename));
-
 export default class extends StateTest {
   private _bal: any;
 

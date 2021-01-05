@@ -2,7 +2,11 @@ import { SubmittableExtrinsic } from '@polkadot/api/types';
 import { DispatchError } from '@polkadot/types/interfaces';
 import { KeyringPair } from '@polkadot/keyring/types';
 
+import { factory, formatFilename } from './logging';
+const log = factory.getLogger(formatFilename(__filename));
+
 export function makeTx(tx: SubmittableExtrinsic<'promise'>, signer: KeyringPair): Promise<void> {
+  log.info(`Making tx: ${tx.method.section}::${tx.method.method}`);
   return new Promise((resolve, reject) => {
     tx.signAndSend(signer, async (status) => {
       if (status.isFinalized) {

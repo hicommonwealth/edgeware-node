@@ -3,7 +3,7 @@ import { u8aToString } from '@polkadot/util';
 import { IdentityInfo } from '@polkadot/types/interfaces';
 import chai from 'chai';
 import StateTest from '../stateTest';
-import { makeTx } from './util';
+import { makeTx } from '../util';
 
 export default class extends StateTest {
   private _identity: IdentityInfo;

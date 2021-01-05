@@ -10,6 +10,7 @@ import { compactAddLength } from '@polkadot/util';
 import { dev } from '@edgeware/node-types';
 import StateTest from './stateTest';
 
+import { makeTx } from './util';
 import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,6 +50,10 @@ export interface ITestOptions {
     // path to the binary file containing the upgraded chain executable
     // leave blank to upgrade without requiring a chain restart/change in chain binary
     binaryPath?: string;
+
+    // run upgrade on new node with older runtime as specified in binaryPath
+    // if false or unset, will run upgrade on old node then switch to new node
+    upgradeOnNewNode?: boolean;
   }
 }
 
@@ -164,7 +169,7 @@ class TestRunner {
     //   this._chainOutfile = undefined;
     // }
     if (this._api) {
-      this._api.disconnect();
+      await this._api.disconnect();
     }
     delete this._api;
 
@@ -179,6 +184,10 @@ class TestRunner {
         this._chainProcess = undefined;
       });
     }
+
+    // wait 5s for port to reopen
+    log.info('Waiting 5s for chain to exit...');
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
   }
 
   // With a valid chain running, construct a polkadot-js API and
@@ -255,15 +264,14 @@ class TestRunner {
     if (!this._api) throw new Error('API not initialized!');
 
     // TODO: move this set-balance into a test case
-    if (this.options.upgrade.sudoSeed) {
+    if (this.options.upgrade.sudoSeed && preUpgrade) {
       const sudoKeyring = (new Keyring({ ss58Format: this.options.ss58Prefix, type: 'sr25519' }))
         .addFromUri(this.options.upgrade.sudoSeed);
       const newBalance = new BN('1000000000000000000000000');
       const setBalanceTx = this._api.tx.sudo.sudo(
         this._api.tx.balances.setBalance(sudoKeyring.address, newBalance, 0)
       );
-      const hash = await setBalanceTx.signAndSend(sudoKeyring);
-      log.info('Set sudo balance!');
+      await makeTx(setBalanceTx, sudoKeyring);
     }
 
     let rpcSubscription: UnsubscribePromise;
@@ -310,6 +318,18 @@ class TestRunner {
     // 3. Construct API via websockets
     const startVersion = await this._startApi();
 
+    // [3.5.] If upgradeOnNewNode is set, restart chain immediately on new node
+    if (this.options.upgrade.binaryPath && this.options.upgrade.upgradeOnNewNode) {
+      await this._stopChain();
+      this.options.binaryPath = this.options.upgrade.binaryPath;
+      this._startChain(false);
+      const version = await this._startApi();
+      if (version !== startVersion) {
+        await this._stopChain();
+        throw new Error('Version should not change on node switch!');
+      }
+    }
+
     // 4. Run tests via API
     const needsUpgrade = await this._runTests(true);
 
@@ -324,7 +344,8 @@ class TestRunner {
 
     // [6.] Restart chain with upgraded binary (if needed)
     if (this.options.upgrade.binaryPath
-        && this.options.binaryPath !== this.options.upgrade.binaryPath) {
+        && this.options.binaryPath !== this.options.upgrade.binaryPath
+        && !this.options.upgrade.upgradeOnNewNode) {
       await this._stopChain();
       this.options.binaryPath = this.options.upgrade.binaryPath;
       this._startChain(false);
