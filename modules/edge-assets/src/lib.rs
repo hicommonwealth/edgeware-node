@@ -1075,6 +1075,7 @@ mod tests {
 		type AllowMinting = AllowMinting;
 		type WeightInfo = ();
 	}
+
 	type System = frame_system::Module<Test>;
 	type Balances = pallet_balances::Module<Test>;
 	type Assets = Module<Test>;
