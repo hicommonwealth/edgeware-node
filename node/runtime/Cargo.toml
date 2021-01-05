@@ -42,7 +42,6 @@ sp-offchain = { version = "2.0.0", default-features = false }
 edgeware-primitives = { path = "../primitives", default-features = false }
 
 # pallet dependencies
-pallet-assets = { version = "2.0.0", default-features = false }
 pallet-authority-discovery = { version = "2.0.0", default-features = false }
 pallet-authorship = { version = "2.0.0", default-features = false }
 pallet-aura = { version = "2.0.0", default-features = false }
@@ -78,6 +77,7 @@ pallet-transaction-payment = { version = "2.0.0", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-features = false }
 pallet-vesting = { version = "2.0.0", default-features = false }
 
+edge-assets = { version = "2.0.0", path = "../../modules/edge-assets", default-features = false }
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
 chainbridge = { path = "../../modules/chainbridge", default-features = false }
@@ -102,7 +102,6 @@ sp-io = { version = "2.0.0" }
 default = ["std"]
 std = [
 	"sp-authority-discovery/std",
-	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"sp-consensus-aura/std",
@@ -162,6 +161,7 @@ std = [
 	"pallet-ethereum/std",
 	"evm-runtime/std",
 	"pallet-evm-precompile-simple/std",
+	"edge-assets/std",
 ]
 
 runtime-benchmarks = [
@@ -171,4 +171,5 @@ runtime-benchmarks = [
 	"frame-system-benchmarking",
 	"hex-literal",
 	"chainbridge/runtime-benchmarks",
+	"edge-assets/runtime-benchmarks",
 ]
