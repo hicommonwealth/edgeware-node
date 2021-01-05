@@ -8,6 +8,7 @@ import { compactAddLength } from '@polkadot/util';
 import { makeTx } from '../util';
 
 import { factory, formatFilename } from '../logging';
+import { UnsubscribePromise } from '@polkadot/api/types';
 const log = factory.getLogger(formatFilename(__filename));
 
 // submits the upgrade as a democracy proposal + its associated preimage
@@ -30,10 +31,18 @@ async function submitUpgrade(api: ApiPromise, pairs: TestKeyringMap, codePath: s
 }
 
 // waits for the proposal to get tabled and the referendum to start
-function waitForReferendum(api: ApiPromise): Promise<number> {
+async function waitForReferendum(api: ApiPromise): Promise<number> {
   log.info('Waiting for upgrade proposal to table.');
-  return new Promise((resolve) => {
-    api.query.system.events((events) => {
+  // check if proposal already began and return immediately if so
+  const refCount = await api.query.democracy.referendumCount();
+  if (+refCount > 0) {
+    return +refCount - 1;
+  }
+
+  // otherwise, listen to events until it starts
+  let unsubscribe: UnsubscribePromise;
+  const refIdx = await new Promise<number>((resolve) => {
+    unsubscribe = api.query.system.events((events) => {
       events.forEach((record) => {
         const { event } = record;
         if (event.method !== 'TreasuryMinting' && event.method !== 'ExtrinsicSuccess') {
@@ -46,6 +55,10 @@ function waitForReferendum(api: ApiPromise): Promise<number> {
       });
     });
   });
+  if (unsubscribe) {
+    await unsubscribe;
+  }
+  return refIdx;
 }
 
 // votes on the upgrade so it passes, then waits for the referendum to execute
