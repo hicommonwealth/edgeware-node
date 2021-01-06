@@ -1,5 +1,4 @@
 import { ApiPromise } from '@polkadot/api';
-import { u8aToString } from '@polkadot/util';
 import { IdentityInfo } from '@polkadot/types/interfaces';
 import { assert } from 'chai';
 import StateTest from '../stateTest';

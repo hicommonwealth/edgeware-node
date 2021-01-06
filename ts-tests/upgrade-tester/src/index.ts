@@ -25,10 +25,11 @@ async function main() {
   // TODO: make this a part of the arg initialization
   const tests: StateTest[] = [];
   tests.push(
+    new ((await import('./tests/staking')).default)(),
+    new ((await import('./tests/identity')).default)(),
     new ((await import('./tests/democracy')).default)(),
-    // new ((await import('./tests/staking')).default)(),
-    // new ((await import('./tests/identity')).default)(),
-    // new ((await import('./tests/treasury')).default)(),
+    new ((await import('./tests/council')).default)(),
+    new ((await import('./tests/treasury')).default)(),
   );
 
   // construct tester
