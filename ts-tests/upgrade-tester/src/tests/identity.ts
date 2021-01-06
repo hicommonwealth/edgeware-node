@@ -1,7 +1,7 @@
 import { ApiPromise } from '@polkadot/api';
 import { u8aToString } from '@polkadot/util';
 import { IdentityInfo } from '@polkadot/types/interfaces';
-import chai from 'chai';
+import { assert } from 'chai';
 import StateTest from '../stateTest';
 import { makeTx } from '../util';
 
@@ -46,7 +46,7 @@ export default class extends StateTest {
       throw new Error('identity registration not found');
     }
 
-    chai.assert.deepEqual(
+    assert.deepEqual(
       registration.unwrap().info.toHuman(),
       this._identity.toHuman(),
       'identity should not change',

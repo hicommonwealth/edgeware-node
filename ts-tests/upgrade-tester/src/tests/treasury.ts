@@ -1,6 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { TreasuryProposal } from '@polkadot/types/interfaces';
-import chai from 'chai';
+import { assert } from 'chai';
 import StateTest from '../stateTest';
 import { makeTx } from '../util';
 
@@ -32,7 +32,7 @@ export default class extends StateTest {
     // query the proposal
     const proposalCount = await api.query.treasury.proposalCount();
     const p = await api.query.treasury.proposals(+proposalCount - 1);
-    chai.assert.deepEqual(
+    assert.deepEqual(
       this._proposal.toHuman(),
       p.toHuman(),
       'treasury proposal should not change',
