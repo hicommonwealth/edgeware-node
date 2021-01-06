@@ -1029,7 +1029,7 @@ impl edge_assets::Config for Runtime {
 	type AllowFreezing = AllowFreezing;
 	type AllowBurning = AllowBurning;
 	type AllowMinting = AllowMinting;
-	type WeightInfo = edge_assets::weights::WeightInfo;
+	type WeightInfo = edge_assets::weights::SubstrateWeight<Runtime>;
 }
 
 construct_runtime!(
