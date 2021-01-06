@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { assert } from 'chai';
 const { convertToEvmAddress, convertToSubstrateAddress, describeWithEdgeware } = require('../helpers/utils.js');
 import BN from 'bn.js';
-import { dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { TypeRegistry } from '@polkadot/types';
 
 describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
@@ -50,12 +50,10 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
 
     // init polkadot
     const polkadotUrl = 'ws://localhost:9944';
-    const registry = new TypeRegistry();
-    api = await (new ApiPromise({
+    api = await ApiPromise.create({
       provider: new WsProvider(polkadotUrl),
-      registry,
-      ...dev,
-    })).isReady;
+      ...spec,
+    });
     const { ss58Format } = await api.rpc.system.properties();
     const substrateId = +ss58Format.unwrap();
 

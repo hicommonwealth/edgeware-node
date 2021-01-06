@@ -70,6 +70,17 @@ zeroize = { opt-level = 3 }
 # Make sure to have cargo-lock installed with: `cargo install cargo-lock --features=cli`
 
 [patch.crates-io]
+# frontier deps
+pallet-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+pallet-evm-precompile-simple = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+pallet-ethereum = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fc-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fc-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fp-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fp-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fc-rpc-core = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+
+# substrate deps
 fork-tree = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
 frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }
 frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate.git", rev = "4b8c862ae3b0d34ecdc351888469f81704df68e2" }

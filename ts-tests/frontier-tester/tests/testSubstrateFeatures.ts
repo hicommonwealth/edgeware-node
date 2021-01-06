@@ -3,7 +3,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { createTestPairs, TestKeyringMap } from '@polkadot/keyring/testingPairs';
 import { u8aToString } from '@polkadot/util';
 import { assert } from 'chai';
-import { dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import { TypeRegistry } from '@polkadot/types';
 import BN from 'bn.js';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
@@ -17,12 +17,10 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
   before(async () => {
     const polkadotUrl = 'ws://localhost:9944';
     const provider = new WsProvider(polkadotUrl);
-    const registry = new TypeRegistry();
-    api = await new ApiPromise({
+    api = await ApiPromise.create({
       provider,
-      registry,
-      ...dev,
-    }).isReady;
+      ...spec,
+    });
     pairs = createTestPairs();
   });
 

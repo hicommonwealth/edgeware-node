@@ -31,6 +31,7 @@ sp-consensus-aura = { version = "0.8.0" }
 sp-runtime = { version = "2.0.0" }
 sp-transaction-pool = { version = "2.0.0" }
 substrate-frame-rpc-system = { version = "2.0.0" }
-pallet-ethereum = { version = "0.1.0", path = "../../vendor/frontier/frame/ethereum" }
-fc-rpc = { version = "0.1.0", path = "../../vendor/frontier/client/rpc" }
-fp-rpc = { version = "0.1.0", path = "../../vendor/frontier/primitives/rpc" }
+pallet-ethereum = { version = "0.1.0" }
+fc-rpc = { version = "0.1.0" }
+fp-rpc = { version = "0.1.0" }
+fc-rpc-core = { version = "0.1.0" }

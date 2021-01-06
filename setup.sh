@@ -9,6 +9,4 @@ fi
 
 source $HOME/.cargo/env
 
-git submodule update --init --recursive
-
 cargo build $RELEASE

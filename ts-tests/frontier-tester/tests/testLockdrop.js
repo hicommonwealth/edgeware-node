@@ -56,7 +56,7 @@ describeWithEdgeware("Lockdrop test", async (context) => {
     let startNonce = await web3.eth.getTransactionCount(lockdrop.address);
     assert.equal(startNonce, '1', 'start nonce of deployed contract should be 1');
 
-    let senderBalance = await web3.eth.getBalance(account);
+    let senderBalance = new web3.utils.BN(await web3.eth.getBalance(account));
 
     const bcontractAddr1 = getContractAddress(lockdrop.address, startNonce);
     const bcontractAddr2 = getContractAddress(lockdrop.address, startNonce + 1)
@@ -82,8 +82,9 @@ describeWithEdgeware("Lockdrop test", async (context) => {
     assert.equal(0, balLock3, 'balance of future third lock does not match expected');
     assert.equal(0, balLock4, 'balance of future fourth lock does not match expected');
 
-    let senderBalanceAfter = await web3.eth.getBalance(account);
-    assert.isAtLeast(Number(senderBalance - senderBalanceAfter), Number(value), 'sent balance should be greater than lock value');
+    let senderBalanceAfter = new web3.utils.BN(await web3.eth.getBalance(account));
+    let sentBalance = senderBalance.sub(senderBalanceAfter);
+    assert.isTrue(sentBalance.gt(new web3.utils.BN(value)), 'sent balance should be greater than lock value');
 
     const nonce = (await web3.eth.getTransactionCount(lockdrop.address));
     const contractAddr = getContractAddress(lockdrop.address, nonce - 1);
