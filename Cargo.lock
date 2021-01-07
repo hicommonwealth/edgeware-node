@@ -1292,6 +1292,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-assets"
+version = "2.0.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "edge-chainbridge"
 version = "1.0.0"
 dependencies = [
@@ -1337,7 +1353,6 @@ version = "3.2.0"
 dependencies = [
  "assert_cmd",
  "edgeware-executor",
- "edgeware-inspect",
  "edgeware-primitives",
  "edgeware-rpc",
  "edgeware-runtime",
@@ -1443,22 +1458,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "edgeware-inspect"
-version = "3.2.0"
-dependencies = [
- "derive_more",
- "log",
- "parity-scale-codec",
- "sc-cli",
- "sc-client-api",
- "sc-service",
- "sp-blockchain",
- "sp-core",
- "sp-runtime",
- "structopt",
-]
-
-[[package]]
 name = "edgeware-primitives"
 version = "3.2.0"
 dependencies = [
@@ -1522,6 +1521,7 @@ name = "edgeware-runtime"
 version = "3.2.0"
 dependencies = [
  "chainbridge",
+ "edge-assets",
  "edge-chainbridge",
  "edge-treasury-reward",
  "edgeware-primitives",
@@ -1535,7 +1535,6 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "hex-literal",
  "integer-sqrt",
- "pallet-assets",
  "pallet-aura",
  "pallet-authority-discovery",
  "pallet-authorship",
@@ -4385,20 +4384,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6ff55baddef9e4ad00f88b6c743a2a8062d4c6ade126c2a528644b8e444d52ce"
 dependencies = [
  "stable_deref_trait",
-]
-
-[[package]]
-name = "pallet-assets"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "serde",
- "sp-runtime",
- "sp-std",
 ]
 
 [[package]]
@@ -9743,3 +9728,8 @@ dependencies = [
  "itertools 0.9.0",
  "libc",
 ]
+
+[[patch.unused]]
+name = "pallet-assets"
+version = "2.0.0"
+source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
