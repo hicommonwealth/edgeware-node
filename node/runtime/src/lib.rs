@@ -1013,17 +1013,23 @@ impl edge_chainbridge::Config for Runtime {
 parameter_types! {
 	pub const AssetDepositBase: u64 = 1;
 	pub const AssetDepositPerZombie: u64 = 1;
+	pub const AllowFreezing: bool = true;
+	pub const AllowBurning: bool = true;
+	pub const AllowMinting: bool = true;
 }
 
-impl pallet_assets::Config for Runtime {
+impl edge_assets::Config for Runtime {
 	type Currency = Balances;
 	type Event = Event;
 	type Balance = Balance;
-	type AssetId = constants::currency::AssetId;
-	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
+	type AssetId = u32;
+	type ForceOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
-	type WeightInfo = ();
+	type AllowFreezing = AllowFreezing;
+	type AllowBurning = AllowBurning;
+	type AllowMinting = AllowMinting;
+	type WeightInfo = edge_assets::weights::SubstrateWeight<Runtime>;
 }
 
 construct_runtime!(
@@ -1064,7 +1070,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Module, Call, Storage, Event<T>} = 26,
 		Proxy: pallet_proxy::{Module, Call, Storage, Event<T>} = 27,
 		Multisig: pallet_multisig::{Module, Call, Storage, Event<T>} = 28,
-		Assets: pallet_assets::{Module, Call, Storage, Event<T>} = 29,
+		Assets: edge_assets::{Module, Call, Storage, Event<T>} = 29,
 
 		TreasuryReward: treasury_reward::{Module, Call, Storage, Config<T>, Event<T>} = 32,
 		Ethereum: pallet_ethereum::{Module, Call, Storage, Event, Config, ValidateUnsigned} = 33,
