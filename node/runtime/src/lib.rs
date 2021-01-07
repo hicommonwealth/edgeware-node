@@ -1022,7 +1022,7 @@ impl edge_assets::Config for Runtime {
 	type Currency = Balances;
 	type Event = Event;
 	type Balance = Balance;
-	type AssetId = u32;
+	type AssetId = constants::currency::AssetId;
 	type ForceOrigin = frame_system::EnsureRoot<Self::AccountId>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
