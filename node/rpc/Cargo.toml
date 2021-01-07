@@ -31,6 +31,6 @@ sp-consensus-aura = { version = "0.8.0" }
 sp-runtime = { version = "2.0.0" }
 sp-transaction-pool = { version = "2.0.0" }
 substrate-frame-rpc-system = { version = "2.0.0" }
-pallet-ethereum = { version = "0.1.0", path = "../../vendor/frontier/frame/ethereum" }
-fc-rpc = { version = "0.1.0", path = "../../vendor/frontier/client/rpc" }
-fp-rpc = { version = "0.1.0", path = "../../vendor/frontier/primitives/rpc" }
+pallet-ethereum = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fc-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
+fp-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "fb59cf3932491dda1963f4c3f6aba96a08d5e6cc" }
