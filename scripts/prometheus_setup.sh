@@ -9,7 +9,7 @@ sudo apt-get install prometheus -y
 
 # Configure prometheus
 sudo echo "" >> /etc/prometheus/prometheus.yml
-sudo echo "  - job_name: 'substrate_node'" >> /etc/prometheus/prometheus.yml
+sudo echo "  - job_name: substrate_node" >> /etc/prometheus/prometheus.yml
 sudo echo "    scrape_interval: 5s" >> /etc/prometheus/prometheus.yml
 sudo echo "    static_configs:" >> /etc/prometheus/prometheus.yml
 sudo echo "      - targets: ['127.0.0.1:9615']" >> /etc/prometheus/prometheus.yml
