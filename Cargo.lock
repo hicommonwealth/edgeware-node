@@ -9728,8 +9728,3 @@ dependencies = [
  "itertools 0.9.0",
  "libc",
 ]
-
-[[patch.unused]]
-name = "pallet-assets"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
