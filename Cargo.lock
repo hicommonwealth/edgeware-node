@@ -318,6 +318,12 @@ dependencies = [
 
 [[package]]
 name = "atomic"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "64f46ca51dca4837f1520754d1c8c36636356b81553d928dc9c177025369a06e"
+
+[[package]]
+name = "atomic"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3410529e8288c463bedb5930f82833bc0c90e5d2fe639a56582a4d09220b281"
@@ -469,6 +475,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "blake2s_simd"
+version = "0.5.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e461a7034e85b211a4acb57ee2e6730b32912b06c08cc242243c39fc21ae6a2"
+dependencies = [
+ "arrayref",
+ "arrayvec 0.5.2",
+ "constant_time_eq",
+]
+
+[[package]]
 name = "block-buffer"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -527,6 +544,12 @@ dependencies = [
  "futures-lite",
  "once_cell",
 ]
+
+[[package]]
+name = "bs58"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "476e9cd489f9e121e02ffa6014a8ef220ecb15c05ed23fc34cca13925dc283fb"
 
 [[package]]
 name = "bs58"
@@ -1372,7 +1395,7 @@ dependencies = [
  "pallet-authority-discovery",
  "pallet-balances",
  "pallet-contracts",
- "pallet-evm",
+ "pallet-evm 2.0.1",
  "pallet-grandpa",
  "pallet-im-online",
  "pallet-indices",
@@ -1406,7 +1429,7 @@ dependencies = [
  "serde_json",
  "sp-authority-discovery",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.1",
  "sp-consensus-aura",
  "sp-core",
  "sp-finality-grandpa",
@@ -1496,7 +1519,7 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.1",
  "sp-consensus-aura",
  "sp-runtime",
  "sp-transaction-pool",
@@ -1525,7 +1548,7 @@ dependencies = [
  "edge-chainbridge",
  "edge-treasury-reward",
  "edgeware-primitives",
- "evm-runtime",
+ "evm-runtime 0.20.0",
  "fp-rpc",
  "frame-benchmarking",
  "frame-executive",
@@ -1546,7 +1569,7 @@ dependencies = [
  "pallet-democracy",
  "pallet-elections-phragmen",
  "pallet-ethereum",
- "pallet-evm",
+ "pallet-evm 2.0.1",
  "pallet-evm-precompile-simple",
  "pallet-grandpa",
  "pallet-identity",
@@ -1636,7 +1659,7 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.1",
  "sp-core",
  "sp-inherents",
  "sp-io",
@@ -1738,6 +1761,23 @@ dependencies = [
 
 [[package]]
 name = "ethereum"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "df706418ff7d3874b9506424b04ea0bef569a2b39412b43a27ea86e679be108e"
+dependencies = [
+ "ethereum-types",
+ "hash-db",
+ "hash256-std-hasher",
+ "parity-scale-codec",
+ "rlp",
+ "rlp-derive",
+ "serde",
+ "sha3 0.9.1",
+ "triehash",
+]
+
+[[package]]
+name = "ethereum"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "01ea35e1b0845310ade8eb048d401b0b899b8eff05c4d2a3454d29ef4eb1b8af"
@@ -1776,20 +1816,48 @@ checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
 
 [[package]]
 name = "evm"
-version = "0.20.0"
+version = "0.17.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52494176f51e37ac07f10f0368a162391a3c368d6c859b69d4ebc52cfc090952"
+checksum = "16c8deca0ec3efa361b03d9cae6fe94321a1d2d0a523437edd720b3d140e3c08"
 dependencies = [
- "ethereum",
- "evm-core",
- "evm-gasometer",
- "evm-runtime",
+ "ethereum 0.4.2",
+ "evm-core 0.17.2",
+ "evm-gasometer 0.17.2",
+ "evm-runtime 0.17.2",
  "log",
  "parity-scale-codec",
  "primitive-types",
  "rlp",
  "serde",
  "sha3 0.8.2",
+]
+
+[[package]]
+name = "evm"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52494176f51e37ac07f10f0368a162391a3c368d6c859b69d4ebc52cfc090952"
+dependencies = [
+ "ethereum 0.5.1",
+ "evm-core 0.20.0",
+ "evm-gasometer 0.20.0",
+ "evm-runtime 0.20.0",
+ "log",
+ "parity-scale-codec",
+ "primitive-types",
+ "rlp",
+ "serde",
+ "sha3 0.8.2",
+]
+
+[[package]]
+name = "evm-core"
+version = "0.17.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cf2d732b3c36df36833761cf67df8f65866be1d368d20508bc3e13e6f256c8c5"
+dependencies = [
+ "log",
+ "primitive-types",
 ]
 
 [[package]]
@@ -1805,13 +1873,35 @@ dependencies = [
 
 [[package]]
 name = "evm-gasometer"
+version = "0.17.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "46de1b91ccd744627484183729f1b5af484b3bf15505007fc28cc54264cb9ea1"
+dependencies = [
+ "evm-core 0.17.2",
+ "evm-runtime 0.17.2",
+ "primitive-types",
+]
+
+[[package]]
+name = "evm-gasometer"
 version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8aed6fc83d542d58a63b7827bd9e4808e1e2a9324b503c255f9e2acccfa0bef9"
 dependencies = [
- "evm-core",
- "evm-runtime",
+ "evm-core 0.20.0",
+ "evm-runtime 0.20.0",
  "primitive-types",
+]
+
+[[package]]
+name = "evm-runtime"
+version = "0.17.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2c1d1ffe96f833788512c890d702457d790dba4917ac6f64f8f60fbd9bc40b8"
+dependencies = [
+ "evm-core 0.17.2",
+ "primitive-types",
+ "sha3 0.8.2",
 ]
 
 [[package]]
@@ -1820,7 +1910,7 @@ version = "0.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "507a6d0c3377f34335a264b387e13dc56c7946c34073e0c1250b923018bdf3fa"
 dependencies = [
- "evm-core",
+ "evm-core 0.20.0",
  "primitive-types",
  "sha3 0.8.2",
 ]
@@ -1880,7 +1970,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
  "derive_more",
  "fp-consensus",
@@ -1891,7 +1981,7 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.1",
  "sp-core",
  "sp-inherents",
  "sp-runtime",
@@ -1902,9 +1992,9 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
- "ethereum",
+ "ethereum 0.5.1",
  "ethereum-types",
  "fc-consensus",
  "fc-rpc-core",
@@ -1917,7 +2007,7 @@ dependencies = [
  "libsecp256k1",
  "log",
  "pallet-ethereum",
- "pallet-evm",
+ "pallet-evm 2.0.0",
  "parity-scale-codec",
  "rand 0.7.3",
  "rlp",
@@ -1938,7 +2028,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core 15.1.0",
@@ -2042,7 +2132,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -2053,9 +2143,9 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "0.8.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
- "evm",
+ "evm 0.20.0",
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "serde",
@@ -2066,14 +2156,15 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
- "ethereum",
+ "ethereum 0.5.1",
  "ethereum-types",
  "fp-evm",
  "parity-scale-codec",
  "sp-api",
  "sp-core",
+ "sp-io",
  "sp-runtime",
  "sp-std",
 ]
@@ -3372,16 +3463,37 @@ checksum = "c7d73b3f436185384286bd8098d17ec07c9a7d2388a6599f824d8502b529702a"
 
 [[package]]
 name = "libp2p"
+version = "0.28.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "571f5a4604c1a40d75651da141dfde29ad15329f537a779528803297d2220274"
+dependencies = [
+ "atomic 0.4.6",
+ "bytes 0.5.6",
+ "futures 0.3.8",
+ "lazy_static",
+ "libp2p-core 0.22.1",
+ "libp2p-core-derive 0.20.2",
+ "libp2p-swarm 0.22.0",
+ "multihash 0.11.4",
+ "parity-multiaddr 0.9.6",
+ "parking_lot 0.10.2",
+ "pin-project 0.4.27",
+ "smallvec 1.5.1",
+ "wasm-timer",
+]
+
+[[package]]
+name = "libp2p"
 version = "0.31.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "724846a3194368fefcac7ebdab12e01b8ac382e3efe399ddbd28851ab34f396f"
 dependencies = [
- "atomic",
+ "atomic 0.5.0",
  "bytes 0.5.6",
  "futures 0.3.8",
  "lazy_static",
- "libp2p-core",
- "libp2p-core-derive",
+ "libp2p-core 0.25.2",
+ "libp2p-core-derive 0.21.0",
  "libp2p-deflate",
  "libp2p-dns",
  "libp2p-floodsub",
@@ -3395,17 +3507,51 @@ dependencies = [
  "libp2p-plaintext",
  "libp2p-pnet",
  "libp2p-request-response",
- "libp2p-swarm",
+ "libp2p-swarm 0.25.1",
  "libp2p-tcp",
  "libp2p-uds",
  "libp2p-wasm-ext",
  "libp2p-websocket",
  "libp2p-yamux",
- "parity-multiaddr",
+ "parity-multiaddr 0.10.0",
  "parking_lot 0.11.1",
  "pin-project 1.0.2",
  "smallvec 1.5.1",
  "wasm-timer",
+]
+
+[[package]]
+name = "libp2p-core"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52f13ba8c7df0768af2eb391696d562c7de88cc3a35122531aaa6a7d77754d25"
+dependencies = [
+ "asn1_der",
+ "bs58 0.3.1",
+ "ed25519-dalek",
+ "either",
+ "fnv",
+ "futures 0.3.8",
+ "futures-timer 3.0.2",
+ "lazy_static",
+ "libsecp256k1",
+ "log",
+ "multihash 0.11.4",
+ "multistream-select 0.8.5",
+ "parity-multiaddr 0.9.6",
+ "parking_lot 0.10.2",
+ "pin-project 0.4.27",
+ "prost",
+ "prost-build",
+ "rand 0.7.3",
+ "ring",
+ "rw-stream-sink",
+ "sha2 0.8.2",
+ "smallvec 1.5.1",
+ "thiserror",
+ "unsigned-varint 0.4.0",
+ "void",
+ "zeroize",
 ]
 
 [[package]]
@@ -3415,7 +3561,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc9c96d3a606a696a3a6c0ad3c3352c57bda2082ec9090930f1bd9daf787039f"
 dependencies = [
  "asn1_der",
- "bs58",
+ "bs58 0.4.0",
  "bytes 0.5.6",
  "ed25519-dalek",
  "either",
@@ -3425,9 +3571,9 @@ dependencies = [
  "lazy_static",
  "libsecp256k1",
  "log",
- "multihash",
- "multistream-select",
- "parity-multiaddr",
+ "multihash 0.13.2",
+ "multistream-select 0.9.1",
+ "parity-multiaddr 0.10.0",
  "parking_lot 0.11.1",
  "pin-project 1.0.2",
  "prost",
@@ -3438,9 +3584,19 @@ dependencies = [
  "sha2 0.9.2",
  "smallvec 1.5.1",
  "thiserror",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
  "void",
  "zeroize",
+]
+
+[[package]]
+name = "libp2p-core-derive"
+version = "0.20.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f753d9324cd3ec14bf04b8a8cd0d269c87f294153d6bf2a84497a63a5ad22213"
+dependencies = [
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -3461,7 +3617,7 @@ checksum = "5a579d7dd506d0620ba88ccc1754436b7de35ed6c884234f9a226bbfce382640"
 dependencies = [
  "flate2",
  "futures 0.3.8",
- "libp2p-core",
+ "libp2p-core 0.25.2",
 ]
 
 [[package]]
@@ -3471,7 +3627,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "15dea5933f570844d7b5222b12b58f7bd52e9ca38cd65a1bd4f35341f053f012"
 dependencies = [
  "futures 0.3.8",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
 ]
 
@@ -3484,8 +3640,8 @@ dependencies = [
  "cuckoofilter",
  "fnv",
  "futures 0.3.8",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "prost",
  "prost-build",
@@ -3506,8 +3662,8 @@ dependencies = [
  "futures 0.3.8",
  "futures_codec",
  "hex_fmt",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "lru_time_cache",
  "prost",
@@ -3515,7 +3671,7 @@ dependencies = [
  "rand 0.7.3",
  "sha2 0.9.2",
  "smallvec 1.5.1",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
  "wasm-timer",
 ]
 
@@ -3526,8 +3682,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "802fb973a7e0dde3fb9a2113a62bad90338ebe01983b706e1d576d0c2af93cda"
 dependencies = [
  "futures 0.3.8",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "prost",
  "prost-build",
@@ -3547,8 +3703,8 @@ dependencies = [
  "fnv",
  "futures 0.3.8",
  "futures_codec",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "prost",
  "prost-build",
@@ -3556,7 +3712,7 @@ dependencies = [
  "sha2 0.9.2",
  "smallvec 1.5.1",
  "uint",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
  "void",
  "wasm-timer",
 ]
@@ -3573,8 +3729,8 @@ dependencies = [
  "either",
  "futures 0.3.8",
  "lazy_static",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "net2",
  "rand 0.7.3",
@@ -3592,13 +3748,13 @@ dependencies = [
  "bytes 0.5.6",
  "futures 0.3.8",
  "futures_codec",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
  "nohash-hasher",
  "parking_lot 0.11.1",
  "rand 0.7.3",
  "smallvec 1.5.1",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
 ]
 
 [[package]]
@@ -3611,7 +3767,7 @@ dependencies = [
  "curve25519-dalek 3.0.0",
  "futures 0.3.8",
  "lazy_static",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
  "prost",
  "prost-build",
@@ -3630,8 +3786,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "659adf89356e04f65398bb74ee791b269e63da9e41b37f8dc19eaacd12487bfe"
 dependencies = [
  "futures 0.3.8",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "rand 0.7.3",
  "void",
@@ -3647,11 +3803,11 @@ dependencies = [
  "bytes 0.5.6",
  "futures 0.3.8",
  "futures_codec",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
  "prost",
  "prost-build",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
  "void",
 ]
 
@@ -3678,14 +3834,30 @@ dependencies = [
  "async-trait",
  "bytes 0.5.6",
  "futures 0.3.8",
- "libp2p-core",
- "libp2p-swarm",
+ "libp2p-core 0.25.2",
+ "libp2p-swarm 0.25.1",
  "log",
  "lru",
  "minicbor",
  "rand 0.7.3",
  "smallvec 1.5.1",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
+ "wasm-timer",
+]
+
+[[package]]
+name = "libp2p-swarm"
+version = "0.22.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7193e444210132237b81b755ec7fe53f1c4bd2f53cf719729b94c0c72eb6eaa1"
+dependencies = [
+ "either",
+ "futures 0.3.8",
+ "libp2p-core 0.22.1",
+ "log",
+ "rand 0.7.3",
+ "smallvec 1.5.1",
+ "void",
  "wasm-timer",
 ]
 
@@ -3697,7 +3869,7 @@ checksum = "a6ecee54e85513a7301eb4681b3a6aac5b6d11f60d43097cf7624fd4450d7dfe"
 dependencies = [
  "either",
  "futures 0.3.8",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
  "rand 0.7.3",
  "smallvec 1.5.1",
@@ -3716,7 +3888,7 @@ dependencies = [
  "futures-timer 3.0.2",
  "if-addrs",
  "ipnet",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
  "socket2",
 ]
@@ -3729,7 +3901,7 @@ checksum = "9d821208d4b9af4b293a56dde470edd9f9fac8bb94a51f4f5327cc29a471b3f3"
 dependencies = [
  "async-std",
  "futures 0.3.8",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
 ]
 
@@ -3741,7 +3913,7 @@ checksum = "1e6ef400b231ba78e866b860445480ca21ee447e03034138c6d57cf2969d6bf4"
 dependencies = [
  "futures 0.3.8",
  "js-sys",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "parity-send-wrapper",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -3756,7 +3928,7 @@ dependencies = [
  "async-tls",
  "either",
  "futures 0.3.8",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "log",
  "quicksink",
  "rustls 0.19.0",
@@ -3774,7 +3946,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3be7ac000fa3e42ac09a6e658e48de34ac8ef9fff64a4e6e6b08dcc8f4b0e5f6"
 dependencies = [
  "futures 0.3.8",
- "libp2p-core",
+ "libp2p-core 0.25.2",
  "parking_lot 0.11.1",
  "thiserror",
  "yamux",
@@ -4121,6 +4293,21 @@ checksum = "0debeb9fcf88823ea64d64e4a815ab1643f33127d995978e099942ce38f25238"
 
 [[package]]
 name = "multihash"
+version = "0.11.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "567122ab6492f49b59def14ecc36e13e64dca4188196dd0cd41f9f3f979f3df6"
+dependencies = [
+ "blake2b_simd",
+ "blake2s_simd",
+ "digest 0.9.0",
+ "sha-1 0.9.2",
+ "sha2 0.9.2",
+ "sha3 0.9.1",
+ "unsigned-varint 0.5.1",
+]
+
+[[package]]
+name = "multihash"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4dac63698b887d2d929306ea48b63760431ff8a24fac40ddb22f9c7f49fb7cab"
@@ -4129,7 +4316,7 @@ dependencies = [
  "generic-array 0.14.4",
  "multihash-derive",
  "sha2 0.9.2",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
 ]
 
 [[package]]
@@ -4154,6 +4341,20 @@ checksum = "1255076139a83bb467426e7f8d0134968a8118844faa755985e077cf31850333"
 
 [[package]]
 name = "multistream-select"
+version = "0.8.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "93faf2e41f9ee62fb01680ed48f3cc26652352327aa2e59869070358f6b7dd75"
+dependencies = [
+ "bytes 0.5.6",
+ "futures 0.3.8",
+ "log",
+ "pin-project 1.0.2",
+ "smallvec 1.5.1",
+ "unsigned-varint 0.5.1",
+]
+
+[[package]]
+name = "multistream-select"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dda822043bba2d6da31c4e14041f9794f8fb130a5959289038d0b809d8888614"
@@ -4163,7 +4364,7 @@ dependencies = [
  "log",
  "pin-project 1.0.2",
  "smallvec 1.5.1",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
 ]
 
 [[package]]
@@ -4571,11 +4772,11 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
- "ethereum",
+ "ethereum 0.5.1",
  "ethereum-types",
- "evm",
+ "evm 0.20.0",
  "fp-consensus",
  "fp-evm",
  "fp-rpc",
@@ -4583,7 +4784,7 @@ dependencies = [
  "frame-system",
  "libsecp256k1",
  "pallet-balances",
- "pallet-evm",
+ "pallet-evm 2.0.0",
  "pallet-timestamp",
  "parity-scale-codec",
  "rlp",
@@ -4598,11 +4799,11 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
- "evm",
- "evm-gasometer",
- "evm-runtime",
+ "evm 0.20.0",
+ "evm-gasometer 0.20.0",
+ "evm-runtime 0.20.0",
  "fp-evm",
  "frame-support",
  "frame-system",
@@ -4620,11 +4821,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-evm"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b59d3bfd2c8199922b93cd71853ad809a9a1972f9016bd9c5fa4ed25a0ee4ba"
+dependencies = [
+ "evm 0.17.3",
+ "frame-support",
+ "frame-system",
+ "impl-trait-for-tuples",
+ "pallet-balances",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "primitive-types",
+ "ripemd160",
+ "rlp",
+ "serde",
+ "sha3 0.8.2",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d#c048b11f7eac80c543b5ea45a1f2da3f60c5fd5d"
 dependencies = [
- "evm",
+ "evm 0.20.0",
  "fp-evm",
  "ripemd160",
  "sp-core",
@@ -4980,19 +5205,37 @@ dependencies = [
 
 [[package]]
 name = "parity-multiaddr"
+version = "0.9.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43244a26dc1ddd3097216bb12eaa6cf8a07b060c72718d9ebd60fd297d6401df"
+dependencies = [
+ "arrayref",
+ "bs58 0.4.0",
+ "byteorder",
+ "data-encoding",
+ "multihash 0.11.4",
+ "percent-encoding 2.1.0",
+ "serde",
+ "static_assertions",
+ "unsigned-varint 0.5.1",
+ "url 2.2.0",
+]
+
+[[package]]
+name = "parity-multiaddr"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2f51a30667591b14f96068b2d12f1306d07a41ebd98239d194356d4d9707ac16"
 dependencies = [
  "arrayref",
- "bs58",
+ "bs58 0.4.0",
  "byteorder",
  "data-encoding",
- "multihash",
+ "multihash 0.13.2",
  "percent-encoding 2.1.0",
  "serde",
  "static_assertions",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
  "url 2.2.0",
 ]
 
@@ -6193,7 +6436,7 @@ dependencies = [
  "either",
  "futures 0.3.8",
  "futures-timer 3.0.2",
- "libp2p",
+ "libp2p 0.31.2",
  "log",
  "parity-scale-codec",
  "prost",
@@ -6226,7 +6469,7 @@ dependencies = [
  "sc-telemetry",
  "sp-api",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-inherents",
  "sp-runtime",
@@ -6244,7 +6487,7 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-inherents",
  "sp-runtime",
@@ -6293,7 +6536,7 @@ dependencies = [
  "fdlimit",
  "futures 0.3.8",
  "hex 0.4.2",
- "libp2p",
+ "libp2p 0.31.2",
  "log",
  "names",
  "parity-scale-codec",
@@ -6354,7 +6597,7 @@ dependencies = [
  "sc-executor",
  "sp-api",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-database",
  "sp-externalities",
@@ -6392,7 +6635,7 @@ dependencies = [
  "sc-state-db",
  "sp-arithmetic",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-database",
  "sp-runtime",
@@ -6408,7 +6651,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecd
 dependencies = [
  "sc-client-api",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-runtime",
 ]
 
@@ -6431,7 +6674,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-consensus-aura",
  "sp-core",
  "sp-inherents",
@@ -6474,7 +6717,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-consensus-babe",
  "sp-consensus-vrf",
  "sp-core",
@@ -6517,7 +6760,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-arithmetic",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-consensus-slots",
  "sp-core",
  "sp-inherents",
@@ -6535,7 +6778,7 @@ dependencies = [
  "log",
  "sc-client-api",
  "sp-authorship",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-inherents",
  "sp-runtime",
@@ -6646,7 +6889,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-arithmetic",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-finality-grandpa",
  "sp-inherents",
@@ -6745,7 +6988,7 @@ dependencies = [
  "async-std",
  "async-trait",
  "bitflags",
- "bs58",
+ "bs58 0.4.0",
  "bytes 0.5.6",
  "derive_more",
  "either",
@@ -6757,7 +7000,7 @@ dependencies = [
  "futures_codec",
  "hex 0.4.2",
  "ip_network",
- "libp2p",
+ "libp2p 0.31.2",
  "linked-hash-map",
  "linked_hash_set",
  "log",
@@ -6779,13 +7022,13 @@ dependencies = [
  "smallvec 1.5.1",
  "sp-arithmetic",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-runtime",
  "sp-utils",
  "substrate-prometheus-endpoint",
  "thiserror",
- "unsigned-varint",
+ "unsigned-varint 0.5.1",
  "void",
  "wasm-timer",
  "zeroize",
@@ -6798,7 +7041,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecd
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
- "libp2p",
+ "libp2p 0.31.2",
  "log",
  "lru",
  "sc-network",
@@ -6839,7 +7082,7 @@ version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
 dependencies = [
  "futures 0.3.8",
- "libp2p",
+ "libp2p 0.31.2",
  "log",
  "serde_json",
  "sp-utils",
@@ -6973,7 +7216,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-block-builder",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-externalities",
  "sp-inherents",
@@ -7017,7 +7260,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecd
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
- "libp2p",
+ "libp2p 0.31.2",
  "log",
  "parking_lot 0.10.2",
  "pin-project 0.4.27",
@@ -7642,7 +7885,7 @@ dependencies = [
  "parity-scale-codec",
  "parking_lot 0.10.2",
  "sp-api",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-database",
  "sp-runtime",
  "sp-state-machine",
@@ -7665,7 +7908,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecd
 dependencies = [
  "futures 0.3.8",
  "futures-timer 3.0.2",
- "libp2p",
+ "libp2p 0.31.2",
  "log",
  "parity-scale-codec",
  "parking_lot 0.10.2",
@@ -7681,6 +7924,33 @@ dependencies = [
  "sp-version",
  "substrate-prometheus-endpoint",
  "thiserror",
+ "wasm-timer",
+]
+
+[[package]]
+name = "sp-consensus"
+version = "0.8.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a6cb095bf31d07e6b48489b68e127eabd55534c3ac8dc2c04d2fec581bd5f407"
+dependencies = [
+ "derive_more",
+ "futures 0.3.8",
+ "futures-timer 3.0.2",
+ "libp2p 0.28.1",
+ "log",
+ "parity-scale-codec",
+ "parking_lot 0.10.2",
+ "serde",
+ "sp-api",
+ "sp-core",
+ "sp-inherents",
+ "sp-runtime",
+ "sp-state-machine",
+ "sp-std",
+ "sp-trie",
+ "sp-utils",
+ "sp-version",
+ "substrate-prometheus-endpoint",
  "wasm-timer",
 ]
 
@@ -7707,7 +7977,7 @@ dependencies = [
  "parity-scale-codec",
  "sp-api",
  "sp-application-crypto",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-consensus-slots",
  "sp-consensus-vrf",
  "sp-core",
@@ -8396,7 +8666,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sp-blockchain",
- "sp-consensus",
+ "sp-consensus 0.8.0",
  "sp-core",
  "sp-keyring",
  "sp-keystore",
@@ -9097,6 +9367,12 @@ dependencies = [
  "generic-array 0.14.4",
  "subtle 2.3.0",
 ]
+
+[[package]]
+name = "unsigned-varint"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "669d776983b692a906c881fcd0cfb34271a48e197e4d6cb8df32b05bfc3d3fa5"
 
 [[package]]
 name = "unsigned-varint"
