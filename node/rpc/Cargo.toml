@@ -26,7 +26,7 @@ sc-rpc = { version = "2.0.0" }
 sp-api = { version = "2.0.0" }
 sp-block-builder = { version = "2.0.0" }
 sp-blockchain = { version = "2.0.0" }
-sp-consensus = { version = "0.8.1" }
+sp-consensus = { version = "0.8.0" }
 sp-consensus-aura = { version = "0.8.0" }
 sp-runtime = { version = "2.0.0" }
 sp-transaction-pool = { version = "2.0.0" }

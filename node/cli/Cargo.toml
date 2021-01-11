@@ -53,7 +53,7 @@ sp-timestamp = { version = "2.0.0", default-features = false }
 sp-inherents = { version = "2.0.0" }
 sp-keyring = { version = "2.0.0" }
 sp-io = { version = "2.0.0" }
-sp-consensus = { version = "0.8.1" }
+sp-consensus = { version = "0.8.0" }
 sp-transaction-pool = { version = "2.0.0" }
 
 # client dependencies
