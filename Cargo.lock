@@ -1292,6 +1292,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-assets"
+version = "2.0.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "edge-chainbridge"
 version = "1.0.0"
 dependencies = [
@@ -1337,7 +1353,6 @@ version = "3.2.0"
 dependencies = [
  "assert_cmd",
  "edgeware-executor",
- "edgeware-inspect",
  "edgeware-primitives",
  "edgeware-rpc",
  "edgeware-runtime",
@@ -1443,22 +1458,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "edgeware-inspect"
-version = "3.2.0"
-dependencies = [
- "derive_more",
- "log",
- "parity-scale-codec",
- "sc-cli",
- "sc-client-api",
- "sc-service",
- "sp-blockchain",
- "sp-core",
- "sp-runtime",
- "structopt",
-]
-
-[[package]]
 name = "edgeware-primitives"
 version = "3.2.0"
 dependencies = [
@@ -1522,6 +1521,7 @@ name = "edgeware-runtime"
 version = "3.2.0"
 dependencies = [
  "chainbridge",
+ "edge-assets",
  "edge-chainbridge",
  "edge-treasury-reward",
  "edgeware-primitives",
@@ -1535,7 +1535,6 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "hex-literal",
  "integer-sqrt",
- "pallet-assets",
  "pallet-aura",
  "pallet-authority-discovery",
  "pallet-authorship",
@@ -1881,7 +1880,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "derive_more",
  "fp-consensus",
@@ -1903,7 +1902,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -1939,7 +1938,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core 15.1.0",
@@ -2043,7 +2042,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -2054,7 +2053,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "0.8.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "evm",
  "impl-trait-for-tuples",
@@ -2067,7 +2066,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4388,20 +4387,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-assets"
-version = "2.0.0"
-source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "serde",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "pallet-aura"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/substrate.git?rev=4b8c862ae3b0d34ecdc351888469f81704df68e2#4b8c862ae3b0d34ecdc351888469f81704df68e2"
@@ -4586,7 +4571,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4613,7 +4598,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -4637,7 +4622,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d4701ab1bf978b62c5e912ef3a7a532acf5a171a#d4701ab1bf978b62c5e912ef3a7a532acf5a171a"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=fb59cf3932491dda1963f4c3f6aba96a08d5e6cc#fb59cf3932491dda1963f4c3f6aba96a08d5e6cc"
 dependencies = [
  "evm",
  "fp-evm",

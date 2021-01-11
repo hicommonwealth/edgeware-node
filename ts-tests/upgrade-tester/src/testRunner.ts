@@ -5,11 +5,11 @@ import BN from 'bn.js';
 
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { UnsubscribePromise } from '@polkadot/api/types';
-import { TypeRegistry } from '@polkadot/types';
 import { compactAddLength } from '@polkadot/util';
-import { dev } from '@edgeware/node-types';
+import { spec } from '@edgeware/node-types';
 import StateTest from './stateTest';
 
+import { makeTx } from './util';
 import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -43,15 +43,19 @@ export interface ITestOptions {
     // path to a file containing the WASM hex string used in `setCode`
     codePath: string,
 
-    // block to send upgrade tx
-    block: number;
-
     // seed of sudo account, which can execute `setCode`
     sudoSeed: string;
 
     // path to the binary file containing the upgraded chain executable
     // leave blank to upgrade without requiring a chain restart/change in chain binary
     binaryPath?: string;
+
+    // run upgrade on new node with older runtime as specified in binaryPath
+    // if false or unset, will run upgrade on old node then switch to new node
+    upgradeOnNewNode?: boolean;
+
+    // command to run after all tests, will not exit chain until complete
+    postUpgradeCommand?: { cmd: string, env: NodeJS.Dict<string> };
   }
 }
 
@@ -85,13 +89,9 @@ class TestRunner {
       if (!options.upgrade.codePath || !fs.existsSync(options.upgrade.codePath)) {
         throw new Error('cannot find upgrade codepath!');
       }
-      if (!options.upgrade.block) {
-        throw new Error('invalid upgrade block!');
-      }
       if (!options.upgrade.sudoSeed) {
         throw new Error('invalid sudo seed!');
       }
-      log.info(`Will perform upgrade on block ${options.upgrade.block}.`);
     } else {
       log.info('Will not perform upgrade during testing.');
     }
@@ -108,15 +108,14 @@ class TestRunner {
   private _startChain(clearBasePath: boolean) {
     // pass through SIGINT to chain process
     process.on('SIGINT', () => {
-      if (this._chainProcess && this._chainProcess.connected) {
-        this._chainProcess.kill('SIGINT');
-      }
+      this._stopChain().then(() => process.exit(1));
     });
 
     if (clearBasePath) {
       // clear base path and replace with an empty directory
       if (fs.existsSync(this.options.chainBasePath)) {
         // we use rimraf because fs.remove doesn't support recursive removal
+        log.info(`rimraf ${this.options.chainBasePath}`);
         rimraf.sync(this.options.chainBasePath);
       }
       fs.mkdirSync(this.options.chainBasePath);
@@ -136,6 +135,7 @@ class TestRunner {
     const args = [
       '--chain', this.options.chainspec,
       '--base-path', this.options.chainBasePath,
+      '--wasm-execution', 'Compiled',
       '--alice', // TODO: abstract this into accounts somehow
       '-l', 'ws::handler=info'
     ];
@@ -166,6 +166,11 @@ class TestRunner {
     //   this._chainOutfile.close();
     //   this._chainOutfile = undefined;
     // }
+    if (this._api) {
+      await this._api.disconnect();
+    }
+    delete this._api;
+
     if (this._chainProcess) {
       await new Promise<void>((resolve) => {
         this._chainProcess.on('close', (code) => {
@@ -177,6 +182,10 @@ class TestRunner {
         this._chainProcess = undefined;
       });
     }
+
+    // wait 5s for port to reopen
+    log.info('Waiting 5s for chain to exit...');
+    await new Promise<void>((resolve) => setTimeout(() => resolve(), 5000));
   }
 
   // With a valid chain running, construct a polkadot-js API and
@@ -197,22 +206,12 @@ class TestRunner {
     unsubscribe();
 
     // initialize the API itself
-    const registry = new TypeRegistry();
-    this._api = new ApiPromise({ provider, registry, ...dev });
-    await this._api.isReady;
+    this._api = await ApiPromise.create({ provider, ...spec });
 
     // fetch and print chain information
     const chainInfo = await this._api.rpc.state.getRuntimeVersion();
     log.info(`API connected to chain ${chainInfo.specName.toString()}:${+chainInfo.specVersion}!`);
     return +chainInfo.specVersion;
-  }
-
-  // Disconnect an active polkadot-js API from the chain.
-  private _stopApi() {
-    if (this._api) {
-      this._api.disconnect();
-    }
-    delete this._api;
   }
 
   // Performs an upgrade via a `sudo(setCode())` API call.
@@ -257,55 +256,49 @@ class TestRunner {
   }
 
   // with a valid chain and API connection, init tests
-  private async _runTests(): Promise<boolean> {
+  private async _runTests(preUpgrade: boolean): Promise<boolean> {
     if (!this._api) throw new Error('API not initialized!');
 
     // TODO: move this set-balance into a test case
-    if (this.options.upgrade.sudoSeed) {
+    if (this.options.upgrade.sudoSeed && preUpgrade) {
       const sudoKeyring = (new Keyring({ ss58Format: this.options.ss58Prefix, type: 'sr25519' }))
         .addFromUri(this.options.upgrade.sudoSeed);
       const newBalance = new BN('1000000000000000000000000');
       const setBalanceTx = this._api.tx.sudo.sudo(
         this._api.tx.balances.setBalance(sudoKeyring.address, newBalance, 0)
       );
-      const hash = await setBalanceTx.signAndSend(sudoKeyring);
-      log.info('Set sudo balance!');
+      await makeTx(this._api, setBalanceTx, sudoKeyring);
     }
 
     let rpcSubscription: UnsubscribePromise;
-    // subscribe to new blocks and run tests as they occur
-    // Promise resolves to "true" if an upgrade is pending,
-    //   otherwise "false" if testing is completed.
-    const testCompleteP: Promise<boolean> = new Promise((resolve) => {
-      rpcSubscription = this._api.rpc.chain.subscribeNewHeads(async (header) => {
-        const blockNumber = +header.number;
-        log.info(`Got block ${blockNumber}.`);
 
-        // perform upgrade after delay
-        if (this.options.upgrade && blockNumber === this.options.upgrade.block) {
-          resolve(true);
+    // run all tests, then perform upgrade if needed
+    let needsUpgrade = false;
+    if (preUpgrade) {
+      for (const t of this.tests) {
+        try {
+          await t.before(this._api);
+          log.info(`Test '${t.name}' action 'before' succeeded.`);
+        } catch (e) {
+          log.error(`Test '${t.name}' action 'before' failed: ${e.message}.`);
         }
+      }
 
-        const runnableTests = this.tests.filter((t) => !!t.actions[blockNumber]);
-        // run the selected tests
-        await Promise.all(runnableTests.map(async (t) => {
-          const { name, fn } = t.actions[blockNumber];
-          try {
-            await fn(this._api);
-            log.info(`Test '${t.name}' action '${name}' succeeded.`);
-          } catch (e) {
-            log.info(`Test '${t.name}' action '${name}' failed: ${e.message}.`);
-          }
-        }));
-        if (this.tests.every((test) => test.isComplete(blockNumber))) {
-          log.info('All tests complete!');
-          resolve(false);
+      // set flag to run upgrade
+      if (this.options.upgrade) {
+        needsUpgrade = true;
+      }
+    } else {
+      for (const t of this.tests) {
+        try {
+          await t.after(this._api);
+          log.info(`Test '${t.name}' action 'after' succeeded.`);
+        } catch (e) {
+          log.error(`Test '${t.name}' action 'after' failed: ${e.message}.`);
         }
-      });
-    });
-
-    // wait for the tests to complete
-    const needsUpgrade = await testCompleteP;
+      }
+      log.info('All tests complete!');
+    }
 
     // once all tests complete, kill the chain subscription
     if (rpcSubscription) (await rpcSubscription)();
@@ -321,12 +314,23 @@ class TestRunner {
     // 3. Construct API via websockets
     const startVersion = await this._startApi();
 
+    // [3.5.] If upgradeOnNewNode is set, restart chain immediately on new node
+    if (this.options.upgrade.binaryPath && this.options.upgrade.upgradeOnNewNode) {
+      await this._stopChain();
+      this.options.binaryPath = this.options.upgrade.binaryPath;
+      this._startChain(false);
+      const version = await this._startApi();
+      if (version !== startVersion) {
+        await this._stopChain();
+        throw new Error('Version should not change on node switch!');
+      }
+    }
+
     // 4. Run tests via API
-    const needsUpgrade = await this._runTests();
+    const needsUpgrade = await this._runTests(true);
 
     // end run if no upgrade needed
     if (!needsUpgrade) {
-      this._stopApi();
       await this._stopChain();
       return;
     }
@@ -335,9 +339,9 @@ class TestRunner {
     await this._doUpgrade();
 
     // [6.] Restart chain with upgraded binary (if needed)
-    this._stopApi();
     if (this.options.upgrade.binaryPath
-        && this.options.binaryPath !== this.options.upgrade.binaryPath) {
+        && this.options.binaryPath !== this.options.upgrade.binaryPath
+        && !this.options.upgrade.upgradeOnNewNode) {
       await this._stopChain();
       this.options.binaryPath = this.options.upgrade.binaryPath;
       this._startChain(false);
@@ -346,17 +350,41 @@ class TestRunner {
     // [7.] Reconstruct API
     const newVersion = await this._startApi();
     if (startVersion >= newVersion) {
-      this._stopApi();
       await this._stopChain();
       throw new Error('Upgrade failed! Version did not change.');
     }
 
     // [8.] Run additional tests post-upgrade
-    await this._runTests();
+    await this._runTests(false);
 
     // Cleanup and exit
-    this._stopApi();
     await this._stopChain();
+
+    // [9.] Run post-upgrade command if present
+    if (this.options.upgrade.postUpgradeCommand) {
+      log.info(`Running post-upgrade command:\n\t${this.options.upgrade.postUpgradeCommand.cmd}`
+        + `\n\t\t(env: ${JSON.stringify(this.options.upgrade.postUpgradeCommand.env)})`
+        + '\n\t\t...(may take some time)...');
+      await new Promise<void>((resolve, reject) => {
+        child_process.exec(
+          this.options.upgrade.postUpgradeCommand.cmd,
+          { env: this.options.upgrade.postUpgradeCommand.env },
+          (error, stdout, stderr) => {
+            if (error) {
+              log.error(`error: ${error.message}`);
+              reject(new Error('post-upgrade command failed'));
+            }
+            if (stderr) {
+              log.error(`stderr: ${stderr}`);
+            }
+            log.info(`stdout: ${stdout}`);
+            resolve();
+          }
+        );
+      });
+    }
+
+    process.exit(0);
   }
 }
 
