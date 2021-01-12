@@ -20,7 +20,7 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
-use sp_std::{prelude::*, marker::PhantomData};
+use sp_std::{prelude::*, convert::TryFrom, marker::PhantomData};
 
 pub use edgeware_primitives::{
 	AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Signature, Nonce,
