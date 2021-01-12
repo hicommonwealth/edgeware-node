@@ -21,63 +21,63 @@ static_assertions = "1.1.0"
 evm-runtime = { version = "0.20.0", default-features = false }
 
 # primitives
-sp-application-crypto = { version = "2.0.0", default-features = false }
-sp-authority-discovery = { version = "2.0.0", default-features = false }
-sp-consensus-aura = { version = "0.8.0", default-features = false }
-sp-block-builder = { version = "2.0.0", default-features = false}
-sp-inherents = { version = "2.0.0", default-features = false }
-sp-core = { version = "2.0.0", default-features = false }
-sp-io = { version = "2.0.0", default-features = false }
-sp-std = { version = "2.0.0", default-features = false }
-sp-api = { version = "2.0.0", default-features = false }
-sp-runtime = { version = "2.0.0", default-features = false }
-sp-staking = { version = "2.0.0", default-features = false }
-sp-keyring = { version = "2.0.0", optional = true }
-sp-session = { version = "2.0.0", default-features = false }
-sp-transaction-pool = { version = "2.0.0", default-features = false }
-sp-version = { version = "2.0.0", default-features = false }
-sp-offchain = { version = "2.0.0", default-features = false }
+sp-application-crypto = { version = "~2.0.0", default-features = false }
+sp-authority-discovery = { version = "~2.0.0", default-features = false }
+sp-consensus-aura = { version = "~0.8.0", default-features = false }
+sp-block-builder = { version = "~2.0.0", default-features = false}
+sp-inherents = { version = "~2.0.0", default-features = false }
+sp-core = { version = "~2.0.0", default-features = false }
+sp-io = { version = "~2.0.0", default-features = false }
+sp-std = { version = "~2.0.0", default-features = false }
+sp-api = { version = "~2.0.0", default-features = false }
+sp-runtime = { version = "~2.0.0", default-features = false }
+sp-staking = { version = "~2.0.0", default-features = false }
+sp-keyring = { version = "~2.0.0", optional = true }
+sp-session = { version = "~2.0.0", default-features = false }
+sp-transaction-pool = { version = "~2.0.0", default-features = false }
+sp-version = { version = "~2.0.0", default-features = false }
+sp-offchain = { version = "~2.0.0", default-features = false }
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
 
 # pallet dependencies
-pallet-authority-discovery = { version = "2.0.0", default-features = false }
-pallet-authorship = { version = "2.0.0", default-features = false }
-pallet-aura = { version = "2.0.0", default-features = false }
-pallet-balances = { version = "2.0.0", default-features = false }
-pallet-collective = { version = "2.0.0", default-features = false, features = ["runtime-benchmarks"] }
-pallet-contracts = { default-features = false, version = "2.0.0" }
-pallet-contracts-primitives = { default-features = false, version = "2.0.0" }
-pallet-contracts-rpc-runtime-api = { default-features = false, version = "0.8.0" }
-pallet-democracy = { version = "2.0.0", default-features = false }
-pallet-elections-phragmen = { version = "2.0.0", default-features = false }
-frame-executive = { version = "2.0.0", default-features = false }
-pallet-grandpa = { version = "2.0.0", default-features = false }
-pallet-identity = { version = "2.0.0", default-features = false }
-pallet-im-online = { version = "2.0.0", default-features = false }
-pallet-indices = { version = "2.0.0", default-features = false }
-pallet-multisig = { version = "2.0.0", default-features = false }
-pallet-offences = { version = "2.0.0", default-features = false }
-pallet-proxy = { version = "2.0.0", default-features = false }
-pallet-randomness-collective-flip = { version = "2.0.0", default-features = false }
-pallet-recovery = { version = "2.0.0", default-features = false }
-pallet-scheduler = { version = "2.0.0", default-features = false }
-pallet-session = { version = "2.0.0", default-features = false, features = ["historical"] }
-pallet-staking = { version = "2.0.0", default-features = false }
-pallet-staking-reward-curve = { version = "2.0.0" }
-pallet-sudo = { version = "2.0.0", default-features = false }
-frame-support = { version = "2.0.0", default-features = false }
-frame-system = { version = "2.0.0", default-features = false }
-frame-system-rpc-runtime-api = { version = "2.0.0", default-features = false }
-pallet-timestamp = { version = "2.0.0", default-features = false }
-pallet-treasury = { version = "2.0.0", default-features = false }
-pallet-tips = { version = "2.0.0", default-features = false }
-pallet-bounties = { version = "2.0.0", default-features = false }
-pallet-utility = { version = "2.0.0", default-features = false }
-pallet-transaction-payment = { version = "2.0.0", default-features = false }
-pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-features = false }
-pallet-vesting = { version = "2.0.0", default-features = false }
+pallet-authority-discovery = { version = "~2.0.0", default-features = false }
+pallet-authorship = { version = "~2.0.0", default-features = false }
+pallet-aura = { version = "~2.0.0", default-features = false }
+pallet-balances = { version = "~2.0.0", default-features = false }
+pallet-collective = { version = "~2.0.0", default-features = false, features = ["runtime-benchmarks"] }
+pallet-contracts = { default-features = false, version = "~2.0.0" }
+pallet-contracts-primitives = { default-features = false, version = "~2.0.0" }
+pallet-contracts-rpc-runtime-api = { default-features = false, version = "~0.8.0" }
+pallet-democracy = { version = "~2.0.0", default-features = false }
+pallet-elections-phragmen = { version = "~2.0.0", default-features = false }
+frame-executive = { version = "~2.0.0", default-features = false }
+pallet-grandpa = { version = "~2.0.0", default-features = false }
+pallet-identity = { version = "~2.0.0", default-features = false }
+pallet-im-online = { version = "~2.0.0", default-features = false }
+pallet-indices = { version = "~2.0.0", default-features = false }
+pallet-multisig = { version = "~2.0.0", default-features = false }
+pallet-offences = { version = "~2.0.0", default-features = false }
+pallet-proxy = { version = "~2.0.0", default-features = false }
+pallet-randomness-collective-flip = { version = "~2.0.0", default-features = false }
+pallet-recovery = { version = "~2.0.0", default-features = false }
+pallet-scheduler = { version = "~2.0.0", default-features = false }
+pallet-session = { version = "~2.0.0", default-features = false, features = ["historical"] }
+pallet-staking = { version = "~2.0.0", default-features = false }
+pallet-staking-reward-curve = { version = "~2.0.0" }
+pallet-sudo = { version = "~2.0.0", default-features = false }
+frame-support = { version = "~2.0.0", default-features = false }
+frame-system = { version = "~2.0.0", default-features = false }
+frame-system-rpc-runtime-api = { version = "~2.0.0", default-features = false }
+pallet-timestamp = { version = "~2.0.0", default-features = false }
+pallet-treasury = { version = "~2.0.0", default-features = false }
+pallet-tips = { version = "~2.0.0", default-features = false }
+pallet-bounties = { version = "~2.0.0", default-features = false }
+pallet-utility = { version = "~2.0.0", default-features = false }
+pallet-transaction-payment = { version = "~2.0.0", default-features = false }
+pallet-transaction-payment-rpc-runtime-api = { version = "~2.0.0", default-features = false }
+pallet-vesting = { version = "~2.0.0", default-features = false }
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge-treasury-reward", default-features = false }
 edge-chainbridge = { path = "../../modules/edge-chainbridge", default-features = false }
@@ -86,19 +86,19 @@ edge-assets = { path = "../../modules/edge-assets", default-features = false }
 
 fp-rpc = { version = "0.1.0", default-features = false }
 pallet-ethereum = { version = "0.1.0", default-features = false }
-pallet-evm = { version = "2.0.0", default-features = false }
-pallet-evm-precompile-simple = { version = "2.0.0", default-features = false }
+pallet-evm = { version = "~2.0.0", default-features = false }
+pallet-evm-precompile-simple = { version = "~2.0.0", default-features = false }
 
 # used for runtime benchmarking
-frame-benchmarking = { version = "2.0.0", default-features = false, optional = true }
-frame-system-benchmarking = { version = "2.0.0", default-features = false, optional = true }
+frame-benchmarking = { version = "~2.0.0", default-features = false, optional = true }
+frame-system-benchmarking = { version = "~2.0.0", default-features = false, optional = true }
 hex-literal = { version = "0.3.1", optional = true }
 
 [build-dependencies]
 substrate-wasm-builder = { package = "substrate-wasm-builder", version = "3.0.0" }
 
 [dev-dependencies]
-sp-io = { version = "2.0.0" }
+sp-io = { version = "~2.0.0" }
 
 [features]
 default = ["std"]
