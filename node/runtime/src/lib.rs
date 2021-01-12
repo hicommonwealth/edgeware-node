@@ -965,6 +965,24 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 	has_ext_code_hash: true,
 	estimate: false,
 };
+/// Current (safe) approximation of the gas/s consumption considering
+/// EVM execution over compiled WASM.
+pub const GAS_PER_SECOND: u64 = 4_000_000;
+
+/// Approximate ratio of the amount of Weight per Gas.
+/// u64 works for approximations because Weight is a very small unit compared to gas.
+pub const WEIGHT_PER_GAS: u64 = WEIGHT_PER_SECOND / GAS_PER_SECOND;
+
+pub struct EdgewareGasWeightMapping;
+
+impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
+	fn gas_to_weight(gas: usize) -> Weight {
+		Weight::try_from(gas.saturating_mul(WEIGHT_PER_GAS as usize)).unwrap_or(Weight::MAX)
+	}
+	fn weight_to_gas(weight: Weight) -> usize {
+		usize::try_from(weight.wrapping_div(WEIGHT_PER_GAS)).unwrap_or(usize::MAX)
+	}
+}
 
 impl pallet_evm::Config for Runtime {
 	type FeeCalculator = FixedGasPrice;
@@ -981,7 +999,7 @@ impl pallet_evm::Config for Runtime {
 		pallet_evm_precompile_simple::Identity,
 	);
 	type ChainId = EthChainId;
-	type GasWeightMapping = ();
+	type GasWeightMapping = EdgewareGasWeightMapping;
 
 	/// EVM config used in the module.
 	fn config() -> &'static EvmConfig {
