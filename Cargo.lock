@@ -4435,6 +4435,7 @@ dependencies = [
  "frame-system",
  "pallet-treasury",
  "parity-scale-codec",
+ "serde",
  "sp-runtime",
  "sp-std",
 ]
@@ -4871,6 +4872,7 @@ dependencies = [
  "frame-system",
  "pallet-treasury",
  "parity-scale-codec",
+ "serde",
  "sp-runtime",
  "sp-std",
 ]

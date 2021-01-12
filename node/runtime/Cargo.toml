@@ -164,6 +164,8 @@ std = [
 	"pallet-ethereum/std",
 	"evm-runtime/std",
 	"pallet-evm-precompile-simple/std",
+	"pallet-tips/std",
+	"pallet-bounties/std",
 ]
 
 runtime-benchmarks = [
