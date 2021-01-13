@@ -74,16 +74,16 @@ zeroize = { opt-level = 3 }
 evm = { git = "https://github.com/hicommonwealth/evm.git", branch = "jnaviask.primitive-types-0.8" }
 evm-runtime = { git = "https://github.com/hicommonwealth/evm.git", branch = "jnaviask.primitive-types-0.8" }
 evm-gasometer = { git = "https://github.com/hicommonwealth/evm.git", branch = "jnaviask.primitive-types-0.8" }
-ethereum = { git = "https://github.com/rust-blockchain/ethereum.git", branch = "vorot93/bump-deps" }
+ethereum = { git = "https://github.com/rust-blockchain/ethereum.git", branch = "master" }
 
-pallet-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-pallet-evm-precompile-simple = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-pallet-ethereum = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-fc-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-fc-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-fp-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-fp-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
-fc-rpc-core = { git = "https://github.com/hicommonwealth/frontier.git", rev = "657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7" }
+pallet-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+pallet-evm-precompile-simple = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+pallet-ethereum = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+fc-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+fc-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+fp-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+fp-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
+fc-rpc-core = { git = "https://github.com/hicommonwealth/frontier.git", rev = "e63e1b04fa1c2780312aad987fce2c7bc841551f" }
 
 # substrate deps
 fork-tree = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }

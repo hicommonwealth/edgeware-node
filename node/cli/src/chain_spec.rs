@@ -172,7 +172,7 @@ pub fn testnet_genesis(
 		},
 	);
 
-	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
 			get_account_id_from_seed::<sr25519::Public>("Bob"),
@@ -189,7 +189,27 @@ pub fn testnet_genesis(
 		]
 	});
 
+	initial_authorities.iter().for_each(|x| {
+		if !endowed_accounts.contains(&x.0) {
+			endowed_accounts.push(x.0.clone());
+		}
+		if !endowed_accounts.contains(&x.1) {
+			endowed_accounts.push(x.1.clone());
+		}
+	});
+
 	const STASH: Balance = 100000000 * DOLLARS;
+	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts
+		.iter()
+		.map(|k| (k.clone(), STASH))
+		.collect();
+
+	// add founders and balances to endowed if not already in list
+	founder_allocation.iter().chain(balances.iter()).for_each(|x| {
+		if !endowed_accounts.contains(&x.0) {
+			endowed_balances.push((x.0.clone(), x.1.clone()));
+		}
+	});
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
@@ -197,19 +217,7 @@ pub fn testnet_genesis(
 			changes_trie_config: Default::default(),
 		}),
 		pallet_balances: Some(BalancesConfig {
-			balances: endowed_accounts
-				.iter()
-				.cloned()
-				.map(|k| (k, STASH))
-				.chain(
-					founder_allocation
-						.iter()
-						.map(|x| (x.0.clone(), x.1.clone())),
-				)
-				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
-				.chain(initial_authorities.iter().map(|x| (x.1.clone(), STASH)))
-				.chain(balances.clone())
-				.collect(),
+			balances: endowed_balances,
 		}),
 		pallet_indices: Some(IndicesConfig { indices: vec![] }),
 		pallet_session: Some(SessionConfig {

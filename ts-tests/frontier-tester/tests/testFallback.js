@@ -23,7 +23,7 @@ describeWithEdgeware('Fallback test', async (context) => {
       from: account,
       to: c.address,
       value: valueSent.toString(),
-      gasLimit: new web3.utils.BN(web3.utils.toWei('1', 'gwei')),
+      gas: '200000',
       data: functionSig,
     });
     const balanceAfter = await web3.eth.getBalance(account);

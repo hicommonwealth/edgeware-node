@@ -913,16 +913,6 @@ impl pallet_contracts::Config for Runtime {
 	type DeletionWeightLimit = DeletionWeightLimit;
 }
 
-/// Fixed gas price of `1`.
-pub struct FixedGasPrice;
-
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
-
 parameter_types! {
 	pub const EthChainId: u64 = 2021;
 }
@@ -949,7 +939,7 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 	err_on_call_with_more_gas: false,
 	empty_considered_exists: false,
 	create_increase_nonce: true,
-	call_l64_after_gas: true,
+	call_l64_after_gas: false,
 	stack_limit: 1024,
 	memory_limit: usize::max_value(),
 	call_stack_limit: 1024,
@@ -985,7 +975,7 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 }
 
 impl pallet_evm::Config for Runtime {
-	type FeeCalculator = FixedGasPrice;
+	type FeeCalculator = ();
 	type CallOrigin = EnsureAddressTruncated;
 	type WithdrawOrigin = EnsureAddressTruncated;
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;

@@ -36,7 +36,7 @@ describeWithEdgeware("CreateContract test", async (context) => {
     assert.equal(nonce, startNonce + 1, 'contract nonce should increment');
   });
 
-  it("should spawn subcontract with value", async () => {
+  it("should spawn with value", async () => {
     const web3 = context.web3;
 
     let Create = contract({

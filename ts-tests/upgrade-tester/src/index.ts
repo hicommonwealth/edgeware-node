@@ -46,7 +46,7 @@ async function main() {
       binaryPath: UPGRADE_BINARY,
       sudoSeed: SUDO_SEED,
       upgradeOnNewNode: UPGRADE_ON_NEW_NODE,
-      postUpgradeCommand: null // POST_UPGRADE_COMMAND,
+      postUpgradeCommand: POST_UPGRADE_COMMAND,
     },
   });
 

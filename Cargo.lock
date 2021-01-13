@@ -1772,7 +1772,7 @@ dependencies = [
 [[package]]
 name = "ethereum"
 version = "0.5.1"
-source = "git+https://github.com/rust-blockchain/ethereum.git?branch=vorot93/bump-deps#fd138b35616319ae966279f826b29d419832bd88"
+source = "git+https://github.com/rust-blockchain/ethereum.git?branch=master#1327608448511fbb5b0e51f6ec1756fd33b91951"
 dependencies = [
  "ethereum-types",
  "hash-db",
@@ -1809,7 +1809,7 @@ checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
 [[package]]
 name = "evm"
 version = "0.20.0"
-source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#68ff72d69895d83b84304db387db8fce7d751aea"
+source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#14366a8e0c4ff0c7dd305e482debd6ed5c16378c"
 dependencies = [
  "ethereum",
  "evm-core",
@@ -1826,7 +1826,7 @@ dependencies = [
 [[package]]
 name = "evm-core"
 version = "0.20.0"
-source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#68ff72d69895d83b84304db387db8fce7d751aea"
+source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#14366a8e0c4ff0c7dd305e482debd6ed5c16378c"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -1836,7 +1836,7 @@ dependencies = [
 [[package]]
 name = "evm-gasometer"
 version = "0.20.0"
-source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#68ff72d69895d83b84304db387db8fce7d751aea"
+source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#14366a8e0c4ff0c7dd305e482debd6ed5c16378c"
 dependencies = [
  "evm-core",
  "evm-runtime",
@@ -1846,7 +1846,7 @@ dependencies = [
 [[package]]
 name = "evm-runtime"
 version = "0.20.0"
-source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#68ff72d69895d83b84304db387db8fce7d751aea"
+source = "git+https://github.com/hicommonwealth/evm.git?branch=jnaviask.primitive-types-0.8#14366a8e0c4ff0c7dd305e482debd6ed5c16378c"
 dependencies = [
  "evm-core",
  "primitive-types",
@@ -1908,7 +1908,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "derive_more",
  "fp-consensus",
@@ -1930,7 +1930,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -1966,7 +1966,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core",
@@ -2070,7 +2070,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -2081,7 +2081,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "0.8.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "evm",
  "impl-trait-for-tuples 0.1.3",
@@ -2094,7 +2094,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4561,7 +4561,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4588,7 +4588,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -4612,7 +4612,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7#657ad8ed6adc3c7151b9dbf9359d7d64f5e860f7"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=e63e1b04fa1c2780312aad987fce2c7bc841551f#e63e1b04fa1c2780312aad987fce2c7bc841551f"
 dependencies = [
  "evm",
  "fp-evm",
