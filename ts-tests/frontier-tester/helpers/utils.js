@@ -86,8 +86,8 @@ async function startEdgewareNode() {
     '--dev',
     '--no-telemetry',
     '--no-prometheus',
-    // '--tmp',
-    `--base-path=${basePath}`,
+    '--tmp',
+    // `--base-path=${basePath}`,
     '-lrpc=trace',
     // '-levm=trace',
   ];
