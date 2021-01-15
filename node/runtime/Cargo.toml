@@ -88,6 +88,8 @@ fp-rpc = { version = "0.1.0", default-features = false }
 pallet-ethereum = { version = "0.1.0", default-features = false }
 pallet-evm = { version = "2.0", default-features = false }
 pallet-evm-precompile-simple = { version = "2.0", default-features = false }
+pallet-evm-precompile-modexp = { version = "2.0", default-features = false }
+pallet-evm-precompile-ed25519 = { version = "2.0", default-features = false }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "2.0", default-features = false, optional = true }
@@ -164,6 +166,8 @@ std = [
 	"pallet-ethereum/std",
 	"evm-runtime/std",
 	"pallet-evm-precompile-simple/std",
+	"pallet-evm-precompile-modexp/std",
+	"pallet-evm-precompile-ed25519/std",
 	"pallet-tips/std",
 	"pallet-bounties/std",
 ]

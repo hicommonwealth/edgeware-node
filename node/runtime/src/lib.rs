@@ -987,6 +987,8 @@ impl pallet_evm::Config for Runtime {
 		pallet_evm_precompile_simple::Sha256,
 		pallet_evm_precompile_simple::Ripemd160,
 		pallet_evm_precompile_simple::Identity,
+		pallet_evm_precompile_modexp::Modexp,
+		pallet_evm_precompile_ed25519::Ed25519Verify,
 	);
 	type ChainId = EthChainId;
 	type GasWeightMapping = EdgewareGasWeightMapping;

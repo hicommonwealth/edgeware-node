@@ -78,10 +78,13 @@ ethereum = { git = "https://github.com/rust-blockchain/ethereum.git", branch = "
 
 pallet-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 pallet-evm-precompile-simple = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
+pallet-evm-precompile-modexp = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 pallet-ethereum = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 fc-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 fc-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 fp-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
+fp-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 fp-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 fc-rpc-core = { git = "https://github.com/hicommonwealth/frontier.git", rev = "7fa9c52cbc6a900881de60a81e68b69b13eb7610" }
 
