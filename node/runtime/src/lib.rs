@@ -974,18 +974,8 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 	}
 }
 
-// TODO: allow validators to configure this?
-/// Fixed gas price of `1`.
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
-
 impl pallet_evm::Config for Runtime {
-	type FeeCalculator = FixedGasPrice;
+	type FeeCalculator = (); // TODO: permit validators to set minimum gas prices
 	type CallOrigin = EnsureAddressTruncated;
 	type WithdrawOrigin = EnsureAddressTruncated;
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;

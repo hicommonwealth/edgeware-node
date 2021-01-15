@@ -11,7 +11,7 @@
     "add-liquidity": "mocha --timeout 1000000 --exit tests/addLiquidity.js",
     "init-eth-balance": "ts-mocha --timeout 100000 helpers/initDefaultAccountBalance.ts",
     "test": "ts-mocha --timeout 100000",
-    "test-ci": "ts-mocha --timeout 100000 ./tests/"
+    "test-ci": "ts-mocha --timeout 100000 ./tests/*.{ts,js}"
   },
   "author": "",
   "license": "ISC",
