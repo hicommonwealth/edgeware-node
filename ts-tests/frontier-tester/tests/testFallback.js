@@ -25,14 +25,13 @@ describeWithEdgeware('Fallback test', async (context) => {
       value: valueSent.toString(),
       gas: '200000',
       data: functionSig,
+      gasPrice: '1',
     });
     const balanceAfter = await web3.eth.getBalance(account);
     const balanceDiff = new web3.utils.BN(balanceBefore).sub(new web3.utils.BN(balanceAfter));
+    const gasUsed = new web3.utils.BN(receipt.gasUsed);
 
-    // ensure the value sent was (mostly) returned
-    assert.isTrue(balanceDiff.lt(valueSent));
-
-    // ensure some gas fees were spent
-    assert.isTrue(balanceDiff.gtn(0));
+    // ensure the value sent was (mostly) returned besides gas
+    assert.isTrue(balanceDiff.eq(gasUsed));
   });
 })
