@@ -98,7 +98,7 @@ parameter_types! {
 
 impl Config for Runtime {
 	type Event = Event;
-	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
+	type RenVMBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
 	type ControllerOrigin= EnsureRoot<AccountId>;
 	type ModuleId= RenVMModuleId;
 	type Assets = EdgeAssets;
@@ -119,7 +119,7 @@ impl edge_assets::Config for Runtime {
 	type Event = Event;
 	type Balance = Balance;
 	type AssetId = u32;
-	type ForceOrigin = EnsureRenVM<Runtime>;
+	type ForceOrigin = EnsureRoot<AccountId>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = ();

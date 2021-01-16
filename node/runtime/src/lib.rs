@@ -1061,14 +1061,14 @@ impl pallet_assets::Config for Runtime {
 }
 
 parameter_types! {
-	pub const RenvmBridgeUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 16;
+	pub const RenVMBridgeUnsignedPriority: TransactionPriority = TransactionPriority::max_value() / 16;
 
-	pub const RenVMModuleId: ModuleId = ModuleId(*b"RenToken");
+	pub const RenVMModuleId: ModuleId = ModuleId(*b"py/renvm");
 }
 
 impl edge_ren::Config for Runtime {
 	type Event = Event;
-	type RenvmBridgeUnsignedPriority = RenvmBridgeUnsignedPriority;
+	type RenVMBridgeUnsignedPriority = RenVMBridgeUnsignedPriority;
 	type ControllerOrigin= frame_system::EnsureOneOf<AccountId,
 		pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
 		frame_system::EnsureRoot<AccountId>,
@@ -1089,7 +1089,7 @@ impl edge_assets::Config for Runtime {
 	type Event = Event;
 	type Balance = Balance;
 	type AssetId = u32;
-	type ForceOrigin = EnsureOneOf< AccountId, EnsureRoot<AccountId>, edge_ren::EnsureRenVM<Runtime>>;
+	type ForceOrigin = EnsureRoot<AccountId>;
 	type AssetDepositBase = AssetDepositBase;
 	type AssetDepositPerZombie = AssetDepositPerZombie;
 	type WeightInfo = edge_assets::weights::SubstrateWeight<Runtime>;

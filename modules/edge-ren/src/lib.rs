@@ -15,7 +15,6 @@ use sp_runtime::{
 	DispatchResult,
 };
 use sp_std::vec::Vec;
-// use coinaddress as btc_address;
 use edge_assets::traits::{FungibleAsset, MintableAsset, BurnableAsset, ManageableAsset};
 
 #[cfg(test)]
@@ -45,7 +44,7 @@ pub trait Config: frame_system::Config {
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 
 	/// Priority level for  unsigned extrinsics of this pallet
-	type RenvmBridgeUnsignedPriority: Get<TransactionPriority>;
+	type RenVMBridgeUnsignedPriority: Get<TransactionPriority>;
 
 	/// The privileged origin for this pallet for token crud and spending
 	type ControllerOrigin: EnsureOrigin<Self::Origin>;
@@ -66,21 +65,21 @@ pub trait Config: frame_system::Config {
 #[derive(Encode,Decode, Clone, PartialEq, Eq, Debug, Default)]
 pub struct RenTokenInfo<TokenIdOf>
 	{
-	/// ren_token_id		What the Assets pallet uses to identify tokens ( unique for a given token/asset on this pallet for a given chain )
+	/// Assets identifier for this token
 	pub ren_token_id: TokenIdOf,
-	/// ren_token_name 		Name of the token; used to determine the validation process if any
+	/// Name of the token
 	pub ren_token_name: Vec<u8>,
-	/// ren_token_renvm_id	What RenVM uses to uniquely identify this token across different chains
+	/// RenVM identifier for this token
 	pub ren_token_renvm_id: [u8; 32],
-	/// ren_token_pub_key 	The PublicKey used to check the RenVM signature against
+	/// PublicKey used to check the RenVM signature against
 	pub ren_token_pub_key: [u8; 20],
-	/// ren_token_mint_enabled To enable/disable mint temporarily
+	/// To enable/disable mint temporarily
 	pub ren_token_mint_enabled: bool,
-	/// ren_token_burn_enabled To enable/disable burn temporarily
+	/// To enable/disable burn temporarily
 	pub ren_token_burn_enabled: bool,
-	/// ren_token_mint_fee	Parts-per-million fee on mint sent to the pallet account
+	/// Parts-per-million fee on mint sent to the pallet account
 	pub ren_token_mint_fee: u32,
-	/// ren_token_burn_fee	Parts-per-million fee on burn sent to the pallet account
+	/// Parts-per-million fee on burn sent to the pallet account
 	pub ren_token_burn_fee: u32,
 }
 
@@ -332,18 +331,6 @@ decl_module! {
 
 			ensure!(ren_token.ren_token_burn_enabled, Error::<T>::RenTokenBurnDisabled);
 
-			// match sp_std::str::from_utf8(ren_token.ren_token_name.as_slice()).map_err(|_| Error::<T>::UnexpectedError) {
-			// 	Ok("renBTC") 		=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
-			// 							.map_err(|_| Error::<T>::InvalidBurnToAddress)
-			// 							.and_then(|x| { if [0,5].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
-			// 	Ok("renTestBTC") 	=> btc_address::validate_btc_address(sp_std::str::from_utf8(to.as_slice()).unwrap_or_else(|_| ""))
-			// 							.map_err(|_| Error::<T>::InvalidBurnToAddress)
-			// 							.and_then(|x| { if [5,111].contains(&x) {Ok(())} else {Err(Error::<T>::InvalidBurnToAddress)}}),
-			// 	Err(x)				=> Err(x),
-			// 	_					=> Ok(()),
-			// }?;
-
-
 			NextBurnEventId::try_mutate(|id| -> DispatchResult {
 				let this_id = *id;
 				*id = id.checked_add(1).ok_or(Error::<T>::BurnIdOverflow)?;
@@ -411,8 +398,7 @@ impl<T: Config> Module<T> {
 		let identifier = ren_token.ren_token_renvm_id;
 
 		let signed_message_hash = keccak_256(&Self::signable_message(p_hash, amount, to, n_hash, &identifier));
-		let recoverd =
-			secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| Error::<T>::InvalidMintSignature)?;
+		let recoverd = secp256k1_ecdsa_recover(&sig, &signed_message_hash).map_err(|_| Error::<T>::InvalidMintSignature)?;
 		let addr = &keccak_256(&recoverd)[12..];
 
 		let pub_key = ren_token.ren_token_pub_key;
@@ -447,7 +433,7 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 			}
 
 			ValidTransaction::with_tag_prefix("edge-ren")
-				.priority(T::RenvmBridgeUnsignedPriority::get())
+				.priority(T::RenVMBridgeUnsignedPriority::get())
 				.and_provides(sig)
 				.longevity(64_u64)
 				.propagate(true)
@@ -456,24 +442,4 @@ impl<T: Config> frame_support::unsigned::ValidateUnsigned for Module<T> {
 			InvalidTransaction::Call.into()
 		}
 	}
-}
-
-
-/// Simple ensure origin for the RenVM account
-pub struct EnsureRenVM<T>(sp_std::marker::PhantomData<T>);
-impl<T: Config> EnsureOrigin<T::Origin> for EnsureRenVM<T> {
-	type Success = T::AccountId;
-	fn try_origin(o: T::Origin) -> Result<Self::Success, T::Origin> {
-		let renvm_id = Module::<T>::account_id();
-		o.into().and_then(|o| match o {
-			frame_system::RawOrigin::Signed(who) if who == renvm_id => Ok(renvm_id),
-			r => Err(T::Origin::from(r)),
-		})
-	}
-
-	#[cfg(feature = "runtime-benchmarks")]
-	fn successful_origin() -> T::Origin {
-		T::Origin::from(frame_system::RawOrigin::Signed(Module::<T>::account_id()))
-	}
-
 }

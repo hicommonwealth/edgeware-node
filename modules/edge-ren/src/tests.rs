@@ -31,7 +31,7 @@ fn mint_ren_token(
 #[test]
 fn token_mint_fails_on_bad_init_but_works_after() {
 	ExtBuilder::default().build().execute_with(|| {
-
+		
 		assert_ok!(mock::Call::EdgeAssets(edge_assets::Call::force_create(
 				0,
 				super::Module::<mock::Runtime>::account_id().into(),
@@ -661,127 +661,6 @@ fn token_burn_works() {
 
 		assert_eq!(RenVmBridge::burn_events(1), Some((0, 15, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000*80/100)));
 		assert_eq!(RenVmBridge::next_burn_event_id(), 2);
-
-		// assert_noop!(
-		// 	RenVmBridge::burn(
-		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-		// 		0,
-		// 		"mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(),
-		// 		2000
-		// 	),
-		// 	Error::<mock::Runtime>::InvalidBurnToAddress
-		// );
-		//
-		// assert_noop!(
-		// 	RenVmBridge::burn(
-		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-		// 		0,
-		// 		"LRELGDJyeCPRDXz4Dh1kWorMN9hTBB7CEz".as_bytes().to_vec(),
-		// 		2000
-		// 	),
-		// 	Error::<mock::Runtime>::InvalidBurnToAddress
-		// );
-
-		assert_ok!(
-			RenVmBridge::add_ren_token(
-				Origin::root(),
-				1,
-				"renTestBTC".as_bytes().to_vec(),
-				hex_literal::hex!["f6b5b360905f856404bd4cf39021b82209908faa44159e68ea207ab8a5e13197"],
-				hex_literal::hex!["4b939fc8ade87cb50b78987b1dda927460dc456a"],
-				true,
-				true,
-				0,
-				100_000,
-				u32::max_value(),
-				1u32.into()
-			)
-		);
-
-
-		assert_ok!(
-			mint_ren_token(
-				1,
-				hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into(),
-				hex!["425673f98610064b76dbd334783f45ea192f0e954db75ba2ae6b6058a8143d67"],
-				87266,
-				hex!["fe125f912d2de05e3e34b96a0ce8a8e35d9ed883e830b978871f3e1f5d393726"],
-				EcdsaSignature::from_slice(&hex!["acd463fa396c54995e444234e96d793d3977e75f445da219c10bc4947c22622f325f24dfc31e8e56ec21f04fc7669e91db861778a8367444bde6dfb5f95e15ed1b"]),
-			)
-		);
-
-		assert_eq!(
-			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-			87266
-		);
-
-
-		assert_ok!(
-			RenVmBridge::burn(
-				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-				1,
-				"mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(),
-				1000
-			)
-		);
-
-
-		assert_eq!(
-			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-			86266
-		);
-
-		assert_eq!(
-			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
-			1000*10/100
-		);
-
-		assert_eq!(RenVmBridge::burn_events(2), Some((1, 15, "mipcBbFg9gMiCh81Kj8tqqdgoZub1ZJRfn".as_bytes().to_vec(), 1000*90/100)));
-		assert_eq!(RenVmBridge::next_burn_event_id(), 3);
-
-		System::set_block_number(30);
-
-		assert_ok!(
-			RenVmBridge::burn(
-				Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-				1,
-				"3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(),
-				2000
-			)
-		);
-
-		assert_eq!(
-			EdgeAssets::balance(1, hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-			84266
-		);
-
-		assert_eq!(
-			EdgeAssets::balance(1, super::Module::<mock::Runtime>::account_id().into()),
-			1000*10/100 + 2000*10/100
-		);
-
-		assert_eq!(RenVmBridge::burn_events(3), Some((1, 30, "3EktnHQD7RiAE6uzMj2ZifT9YgRrkSgzQX".as_bytes().to_vec(), 2000*90/100)));
-		assert_eq!(RenVmBridge::next_burn_event_id(), 4);
-
-		// assert_noop!(
-		// 	RenVmBridge::burn(
-		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-		// 		1,
-		// 		"17VZNX1SN5NtKa8UQFxwQbFeFc3iqRYhem".as_bytes().to_vec(),
-		// 		2000
-		// 	),
-		// 	Error::<mock::Runtime>::InvalidBurnToAddress
-		// );
-		//
-		// assert_noop!(
-		// 	RenVmBridge::burn(
-		// 		Origin::signed(hex!["d43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d"].into()),
-		// 		1,
-		// 		"LRELGDJyeCPRDXz4Dh1kWorMN9hTBB7CEz".as_bytes().to_vec(),
-		// 		2000
-		// 	),
-		// 	Error::<mock::Runtime>::InvalidBurnToAddress
-		// );
 
 	});
 }

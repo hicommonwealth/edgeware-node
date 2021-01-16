@@ -11,16 +11,6 @@ use crate::Module as EdgeRen;
 
 const SEED: u32 = 0;
 
-
-fn ren_token_add_signatures<T: Config>(n: u32){
-	let ecdsa_key = ecdsa_generate(ECDSA, None);
-	for x in 1..=n{
-		let v: Vec<u8> = Encode::encode(&x);
-		let tmp_sig = ecdsa_sign(ECDSA, &ecdsa_key, v.as_slice()).unwrap();
-		Signatures::insert(&tmp_sig, ());
-	}
-}
-
 fn sign_paramters_with_ecdsa_pair<T: Config>(p_hash: &[u8; 32], amount: BalanceOf<T>, who: T::AccountId, n_hash: &[u8; 32], token: &[u8; 32])
 	-> ([u8;20], [u8;65])
 {
@@ -145,7 +135,6 @@ benchmarks! {
 	}
 
 	validate_and_mint{
-		let z in 1.. 10_000;
 		let to_acc: T::AccountId = account("to_acc", 0, SEED);
 		let (pubkey, sig) = sign_paramters_with_ecdsa_pair::<T>(
 			&hex!["67028f26328144de6ef80b8cd3b05e0cefb488762c340d1574c0542f752996cb"],
@@ -167,8 +156,6 @@ benchmarks! {
 			u32::max_value(),
 			1u32.into()
 		).is_ok());
-
-		ren_token_add_signatures::<T>(z);
 
 		let call = Call::<T>::mint(
 			Default::default(),
