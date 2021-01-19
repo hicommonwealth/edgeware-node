@@ -1,21 +1,26 @@
-const fs = require('fs');
-const path = require('path');
-const chalk = require('chalk');
-const { ApiPromise } = require('@polkadot/api');
-const { HttpProvider } = require('@polkadot/rpc-provider');
-const { xxhashAsHex } = require('@polkadot/util-crypto');
-const execFileSync = require('child_process').execFileSync;
-const execSync = require('child_process').execSync;
-const binaryPath = path.join(__dirname, 'data', 'binary');
-const wasmPath = path.join(__dirname, 'data', 'runtime.wasm');
-const schemaPath = path.join(__dirname, 'data', 'schema.json');
-const hexPath = path.join(__dirname, 'data', 'runtime.hex');
-const originalSpecPath = path.join(__dirname, 'data', 'genesis.json');
-const forkedSpecPath = path.join(__dirname, 'data', 'fork.json');
-const storagePath = path.join(__dirname, 'data', 'storage.json');
+/* eslint-disable prefer-template */
+import { spec } from '@edgeware/node-types';
+import { ApiPromise } from '@polkadot/api';
+import { HttpProvider } from '@polkadot/rpc-provider';
+import { xxhashAsHex } from '@polkadot/util-crypto';
+import fs from 'fs';
+import path from 'path';
+import chalk from 'chalk';
+import { execFileSync, execSync } from 'child_process';
+
+// input paths
+const binaryPath = '../../target/release/edgeware';
+const wasmPath = '../../../edgeware-node-3.1.0/edgeware_runtime.wasm';
+
+// output paths
+const outputDir = path.join(__dirname, 'forker-data');
+const hexPath = path.join(outputDir, 'runtime.hex');
+const originalSpecPath = path.join(outputDir, 'genesis.json');
+const forkedSpecPath = path.join(outputDir, 'fork.json');
+const storagePath = path.join(outputDir, 'storage.json');
 
 // Using http endpoint since substrate's Ws endpoint has a size limit.
-const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://localhost:9933')
+const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://beresheet5.edgewa.re:9933');
 
 /**
  * All module prefixes except those mentioned in the skippedModulesPrefix will be added to this by the script.
@@ -30,50 +35,47 @@ const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://local
  * For module hashing, do it via xxhashAsHex,
  * e.g. console.log(xxhashAsHex('System', 128)).
  */
-let prefixes = [
-  '0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9' /* System.Account */
+const prefixes = [
+  // '0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9' /* System.Account */
 ];
 const skippedModulesPrefix = ['System', 'Session', 'Aura', 'Grandpa', 'GrandpaFinality', 'FinalityTracker'];
 
 async function main() {
   if (!fs.existsSync(binaryPath)) {
-    console.log(chalk.red('Binary missing. Please copy the binary of your substrate node to the data folder and rename the binary to "binary"'));
+    console.log(chalk.red('Binary missing.'));
     process.exit(1);
   }
   execFileSync('chmod', ['+x', binaryPath]);
 
   if (!fs.existsSync(wasmPath)) {
-    console.log(chalk.red('WASM missing. Please copy the WASM blob of your substrate node to the data folder and rename it to "runtime.wasm"'));
+    console.log(chalk.red('WASM missing.'));
     process.exit(1);
   }
-  execSync('cat ' + wasmPath + ' | hexdump -ve \'/1 "%02x"\' > ' + hexPath);
 
-  let api;
-  console.log(chalk.green('We are intentionally using the HTTP endpoint. If you see any warnings about that, please ignore them.'));
-  if (!fs.existsSync(schemaPath)) {
-    console.log(chalk.yellow('Custom Schema missing, using default schema.'));
-    api = await ApiPromise.create({ provider });
-  } else {
-    const { types, rpc } = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-    api = await ApiPromise.create({
-      provider,
-      types,
-      rpc,
-    });
+  // create data folder if needed
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir);
   }
 
+  execSync('cat ' + wasmPath + ' | hexdump -ve \'/1 "%02x"\' > ' + hexPath);
+
+  console.log(chalk.green('We are intentionally using the HTTP endpoint. '
+    + 'If you see any warnings about that, please ignore them.'));
+  const api = await ApiPromise.create({ provider, ...spec });
+
   // Download state of original chain
-  console.log(chalk.green('Fetching current state of the live chain. Please wait, it can take a while depending on the size of your chain.'));
-  const pairs = await provider.send('state_getPairs', ["0x"]);
+  console.log(chalk.green('Fetching current state of the live chain. '
+    + 'Please wait, it can take a while depending on the size of your chain.'));
+  const pairs = await provider.send('state_getPairs', ['0x']);
   fs.writeFileSync(storagePath, JSON.stringify(pairs));
 
-  const metadata = await api.rpc.state.getMetadata();
+  const metadata: any = await api.rpc.state.getMetadata();
   // Populate the prefixes array
   const modules = JSON.parse(metadata.asLatest.modules);
-  modules.forEach((module) => {
-    if (module.storage) {
-      if (!skippedModulesPrefix.includes(module.storage.prefix)) {
-        prefixes.push(xxhashAsHex(module.storage.prefix, 128));
+  modules.forEach((m) => {
+    if (m.storage) {
+      if (!skippedModulesPrefix.includes(m.storage.prefix)) {
+        prefixes.push(xxhashAsHex(m.storage.prefix, 128));
       }
     }
   });
@@ -82,9 +84,9 @@ async function main() {
   execSync(binaryPath + ' build-spec --raw > ' + originalSpecPath);
   execSync(binaryPath + ' build-spec --dev --raw > ' + forkedSpecPath);
 
-  let storage = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
-  let originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
-  let forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
+  const storage = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
+  const originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
+  const forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
 
   // Modify chain name and id
   forkedSpec.name = originalSpec.name + '-fork';
@@ -94,7 +96,9 @@ async function main() {
   // Grab the items to be moved, then iterate through and insert into storage
   storage
     .filter((i) => prefixes.some((prefix) => i[0].startsWith(prefix)))
-    .forEach(([key, value]) => (forkedSpec.genesis.raw.top[key] = value));
+    .forEach(([key, value]) => {
+      forkedSpec.genesis.raw.top[key] = value;
+    });
 
   // Delete System.LastRuntimeUpgrade to ensure that the on_runtime_upgrade event is triggered
   delete forkedSpec.genesis.raw.top['0x26aa394eea5630e07c48ae0c9558cef7f9cce9c888469bb1a0dceaa129672ef8'];
@@ -107,7 +111,7 @@ async function main() {
 
   fs.writeFileSync(forkedSpecPath, JSON.stringify(forkedSpec, null, 4));
 
-  console.log('Forked genesis generated successfully. Find it at ./data/fork.json');
+  console.log(`Forked genesis generated successfully. Find it at ./${outputDir}/fork.json`);
   process.exit();
 }
 
