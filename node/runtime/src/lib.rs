@@ -966,11 +966,11 @@ pub const WEIGHT_PER_GAS: u64 = WEIGHT_PER_SECOND / GAS_PER_SECOND;
 pub struct EdgewareGasWeightMapping;
 
 impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
-	fn gas_to_weight(gas: usize) -> Weight {
-		Weight::try_from(gas.saturating_mul(WEIGHT_PER_GAS as usize)).unwrap_or(Weight::MAX)
+	fn gas_to_weight(gas: u64) -> Weight {
+		Weight::try_from(gas.saturating_mul(WEIGHT_PER_GAS)).unwrap_or(Weight::MAX)
 	}
-	fn weight_to_gas(weight: Weight) -> usize {
-		usize::try_from(weight.wrapping_div(WEIGHT_PER_GAS)).unwrap_or(usize::MAX)
+	fn weight_to_gas(weight: Weight) -> u64 {
+		weight.wrapping_div(WEIGHT_PER_GAS)
 	}
 }
 
@@ -1013,10 +1013,15 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for EthereumFindAuthor<F>
 	}
 }
 
+parameter_types! {
+	pub BlockGasLimit: U256 = U256::from(u32::max_value());
+}
+
 impl pallet_ethereum::Config for Runtime {
 	type Event = Event;
 	type FindAuthor = EthereumFindAuthor<Aura>;
 	type StateRoot = pallet_ethereum::IntermediateStateRoot;
+	type BlockGasLimit = BlockGasLimit;
 }
 
 impl treasury_reward::Config for Runtime {
