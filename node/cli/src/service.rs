@@ -140,6 +140,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 pub fn new_full_base(
 	config: Configuration,
 	enable_dev_signer: bool,
+	minimum_gas_price: u128,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_aura::AuraBlockImport<
 			Block,
@@ -210,6 +211,7 @@ pub fn new_full_base(
 				pending_transactions: pending.clone(),
 				is_authority,
 				enable_dev_signer,
+				minimum_gas_price,
 				deny_unsafe,
 				grandpa: edgeware_rpc::GrandpaDeps {
 					shared_voter_state: shared_voter_state.clone(),
@@ -400,9 +402,9 @@ pub struct NewFullBase {
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(config: Configuration, enable_dev_signer: bool)
+pub fn new_full(config: Configuration, enable_dev_signer: bool, minimum_gas_price: u128)
 -> Result<TaskManager, ServiceError> {
-	new_full_base(config, enable_dev_signer, |_, _| ()).map(|NewFullBase { task_manager, .. }| {
+	new_full_base(config, enable_dev_signer, minimum_gas_price, |_, _| ()).map(|NewFullBase { task_manager, .. }| {
 		task_manager
 	})
 }

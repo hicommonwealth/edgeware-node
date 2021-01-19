@@ -82,7 +82,7 @@ pub fn run() -> Result<()> {
 			runner.run_node_until_exit(|config| async move {
 				match config.role {
 					Role::Light => service::new_light(config),
-					_ => service::new_full(config, cli.run.enable_dev_signer),
+					_ => service::new_full(config, cli.run.enable_dev_signer, cli.run.minimum_gas_price),
 				}
 			})
 		}

@@ -1,25 +1,17 @@
 ## Edgeware Frontier Tester
 
-Unit tests for Edgeware Frontier. 
+Unit tests for Edgeware Frontier. You must have the node built to run these tests. The location of the binary is defined in the environment variable `BINARY_PATH`, whose default is set in [utils.js](contracts/utils.js) as `../../target/release/edgeware`.
 
-You'll need to run a frontier-compatible Edgeware node with dev signing enabled.
-You can use [jake.frontier-up-2](https://github.com/hicommonwealth/edgeware-node/tree/jake.frontier-up-2).
-Start the Edgeware node with the following command.
+To run a single test, use:
 
 ```
-./target/release/edgeware --dev --enable-dev-signer
+yarn test tests/<testName.js/ts>
 ```
 
 To run all included frontier tests, use the following:
 
 ```
-yarn test web3tests
-```
-
-To run a specific test:
-
-```
-yarn test web3tests/[testName]
+yarn test-ci
 ```
 
 The following functionality is tested:
@@ -31,9 +23,11 @@ The following functionality is tested:
 - Event emission and subscription
 - Fallback function
 - Hashing (on chain and with web3 provider): keccak256, sha3, ripemd
+- Identity, modexp, and ed25519 precompiles.
 - Contract Interfaces
 - Edgeware Lockdrop
 - Modifiers
 - Transferring balance into EVM pallet
 - Timestamps
 - Contract creation with non-zero contract balance
+- Basic substrate-native functionality including democracy proposals, treasury proposals, and identity registration.
