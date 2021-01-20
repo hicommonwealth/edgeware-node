@@ -81,7 +81,7 @@ const convertToSubstrateAddress = (evmAddress, prefix = 7) => {
 
 async function startEdgewareNode() {
   const basePath = process.env.BASE_PATH || './db';
-  const chain = process.env.CHAIN_PATH || 'development';
+  const chain = process.env.CHAIN_PATH || 'dev';
   const cmd = BINARY_PATH;
   const args = [
     // '--dev',
