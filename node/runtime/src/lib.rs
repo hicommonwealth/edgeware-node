@@ -955,6 +955,7 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 	has_ext_code_hash: true,
 	estimate: false,
 };
+
 /// Current (safe) approximation of the gas/s consumption considering
 /// EVM execution over compiled WASM.
 pub const GAS_PER_SECOND: u64 = 8_000_000;
@@ -974,8 +975,18 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 	}
 }
 
+/// Fixed gas price of `1`.
+pub struct FixedGasPrice;
+
+impl FeeCalculator for FixedGasPrice {
+	fn min_gas_price() -> U256 {
+		// Gas price is always one token per gas.
+		1.into()
+	}
+}
+
 impl pallet_evm::Config for Runtime {
-	type FeeCalculator = (); // TODO: permit validators to set minimum gas prices
+	type FeeCalculator = FeeCalculator; // TODO: permit validators to set minimum gas prices
 	type CallOrigin = EnsureAddressTruncated;
 	type WithdrawOrigin = EnsureAddressTruncated;
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
