@@ -17,7 +17,7 @@ const UPGRADE_CODE = '../../edgeware_runtime.wasm';
 const SUDO_SEED = '//Alice';
 const UPGRADE_ON_NEW_NODE = false;
 const POST_UPGRADE_COMMAND = {
-  env: { BASE_PATH: `${__dirname}/../db` },
+  env: { BASE_PATH: CHAIN_BASE_PATH, CHAIN_PATH: CHAINSPEC, },
   cmd: `cd ${__dirname}/../../frontier-tester && yarn init-eth-balance && yarn test-ci`,
 };
 

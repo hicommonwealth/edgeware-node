@@ -15,12 +15,14 @@ export default class extends StateTest {
 
   public async before(api: ApiPromise) {
     // create a democracy proposal
+    const nProposals = await api.query.democracy.publicPropCount();
     const call = api.tx.system.fillBlock(1);
     await makeTx(api, api.tx.democracy.propose(call.hash, api.consts.democracy.minimumDeposit), this.accounts.alice);
 
     const proposals = await api.query.democracy.publicProps();
-    assert.lengthOf(proposals, 1, 'proposal should be in publicProps array');
-    this._proposal = proposals[0];
+    assert.isAbove(proposals.length, 0, 'publicProps array should have proposals');
+    this._proposal = proposals.find(([ idx ]) => +idx === +nProposals);
+    assert.exists(this._proposal, 'proposal must exist');
 
     // submit the preimage
     await makeTx(api, api.tx.democracy.notePreimage(call.toHex()), this.accounts.alice);
@@ -42,14 +44,17 @@ export default class extends StateTest {
     }
 
     // check the proposal
+    const nProposals = await api.query.democracy.publicPropCount();
     const proposals = await api.query.democracy.publicProps();
-    assert.lengthOf(proposals, 1, 'proposal should still exist');
+    assert.lengthOf(proposals, 1, 'proposals should still exist');
+    const proposal = proposals.find(([ idx ]) => +idx === (+nProposals - 1));
+    assert.exists(proposal, 'proposal must exist');
     assert.deepEqual(
-      proposals[0].toHuman(),
+      proposal.toHuman(),
       this._proposal.toHuman(),
       'democracy proposal should be identical',
     );
-    const proposalId = proposals[0][0];
+    const proposalId = proposal[0];
     const deposits = await api.query.democracy.depositOf(proposalId);
     assert.isTrue(deposits.isSome);
     const [ voters, balance ] = deposits.unwrap();
@@ -68,7 +73,7 @@ export default class extends StateTest {
     );
 
     // attempt to second the proposal and verify it works
-    await makeTx(api, api.tx.democracy.second(proposals[0][0], 5), this.accounts.bob);
+    await makeTx(api, api.tx.democracy.second(proposalId, 5), this.accounts.bob);
     const updatedDeposits = await api.query.democracy.depositOf(proposalId);
     assert.isTrue(updatedDeposits.isSome, 'should find deposits for proposal');
     const [ updatedVoters, updatedBalance ] = updatedDeposits.unwrap();

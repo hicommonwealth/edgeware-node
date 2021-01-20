@@ -138,7 +138,8 @@ class TestRunner {
       '--wasm-execution', 'Compiled',
       '--alice', // TODO: abstract this into accounts somehow
       '--force-authoring',
-      '-l', 'ws::handler=info'
+      '--no-telemetry',
+      '--no-prometheus',
     ];
     log.info(`Executing ${this.options.binaryPath} with args ${JSON.stringify(args)}`);
     this._chainProcess = child_process.spawn(

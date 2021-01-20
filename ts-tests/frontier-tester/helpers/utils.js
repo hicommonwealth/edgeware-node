@@ -81,14 +81,19 @@ const convertToSubstrateAddress = (evmAddress, prefix = 7) => {
 
 async function startEdgewareNode() {
   const basePath = process.env.BASE_PATH || './db';
+  const chain = process.env.CHAIN_PATH || 'development';
   const cmd = BINARY_PATH;
   const args = [
-    '--dev',
+    // '--dev',
+    `--chain=${chain}`,
+    '--pruning=archive',
     '--no-telemetry',
     '--no-prometheus',
     // '--tmp',
     `--base-path=${basePath}`,
-    '-lrpc=trace',
+    '--force-authoring',
+    '--alice',
+    // '-lrpc=trace',
     // '-levm=trace',
   ];
   // console.log(`Running node with args: ${JSON.stringify(args)}`);
