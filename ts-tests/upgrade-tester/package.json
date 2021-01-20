@@ -12,7 +12,8 @@
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "democracy-upgrade": "ts-node src/scripts/democracyUpgrade.ts"
+    "democracy-upgrade": "ts-node src/scripts/democracyUpgrade.ts",
+    "generate-chainspec": "ts-node src/scripts/forker.ts"
   },
   "dependencies": {
     "@edgeware/node-types": "^3.1.0-beta.14",

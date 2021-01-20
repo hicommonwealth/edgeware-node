@@ -71,7 +71,7 @@ const convertToEvmAddress = (substrateAddress) => {
   return '0x' + Buffer.from(addressBytes.subarray(0, 20)).toString('hex');
 }
 
-const convertToSubstrateAddress = (evmAddress, prefix = 42) => {
+const convertToSubstrateAddress = (evmAddress, prefix = 7) => {
   const addressBytes = Buffer.from(evmAddress.slice(2), 'hex');
   const prefixBytes = Buffer.from('evm:');
   const convertBytes = Uint8Array.from(Buffer.concat([ prefixBytes, addressBytes ]));

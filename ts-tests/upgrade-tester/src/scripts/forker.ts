@@ -109,6 +109,10 @@ async function main() {
   // To prevent the validator set from changing mid-test, set Staking.ForceEra to ForceNone ('0x02')
   forkedSpec.genesis.raw.top['0x5f3e4907f716ac89b6347d15ececedcaf7dad0317324aecae8744b87fc95f2f3'] = '0x02';
 
+  // To make testing easier, set Sudo.Key to //Alice
+  const sudoKeyHash = xxhashAsHex('Sudo', 128) + xxhashAsHex('Key', 128).slice(2);
+  forkedSpec.genesis.raw.top[sudoKeyHash] = '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
+
   fs.writeFileSync(forkedSpecPath, JSON.stringify(forkedSpec, null, 4));
 
   console.log(`Forked genesis generated successfully. Find it at ./${outputDir}/fork.json`);

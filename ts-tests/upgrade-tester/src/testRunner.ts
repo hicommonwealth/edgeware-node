@@ -137,6 +137,7 @@ class TestRunner {
       '--base-path', this.options.chainBasePath,
       '--wasm-execution', 'Compiled',
       '--alice', // TODO: abstract this into accounts somehow
+      '--force-authoring',
       '-l', 'ws::handler=info'
     ];
     log.info(`Executing ${this.options.binaryPath} with args ${JSON.stringify(args)}`);
@@ -195,7 +196,7 @@ class TestRunner {
 
     // initialize provider separately from the API: the API throws an error
     // if the chain is not available immediately
-    const provider = new WsProvider(this.options.wsUrl);
+    const provider = new WsProvider(this.options.wsUrl, 5000); // 5s reconnect time
 
     // this promise waits for the provider to connect to the chain, and then
     // removes the listener for 'connected' events.
