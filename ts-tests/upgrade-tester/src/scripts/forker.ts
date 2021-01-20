@@ -115,7 +115,7 @@ async function main() {
 
   fs.writeFileSync(forkedSpecPath, JSON.stringify(forkedSpec, null, 4));
 
-  console.log(`Forked genesis generated successfully. Find it at ./${outputDir}/fork.json`);
+  console.log(`Forked genesis generated successfully. Find it at ${outputDir}/fork.json`);
   process.exit();
 }
 

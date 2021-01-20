@@ -46,7 +46,7 @@ export default class extends StateTest {
     // check the proposal
     const nProposals = await api.query.democracy.publicPropCount();
     const proposals = await api.query.democracy.publicProps();
-    assert.lengthOf(proposals, 1, 'proposals should still exist');
+    assert.isAbove(proposals.length, 0, 'proposals should still exist');
     const proposal = proposals.find(([ idx ]) => +idx === (+nProposals - 1));
     assert.exists(proposal, 'proposal must exist');
     assert.deepEqual(
