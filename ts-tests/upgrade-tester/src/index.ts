@@ -31,6 +31,7 @@ async function main() {
     new ((await import('./tests/democracy')).default)(),
     new ((await import('./tests/council')).default)(),
     new ((await import('./tests/treasury')).default)(),
+    new ((await import('./tests/storage')).default)(),
   );
 
   // construct tester
