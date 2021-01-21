@@ -93,10 +93,10 @@ pallet-grandpa = { version = "2.0" }
 pallet-evm = { version = "2.0" }
 
 # node-specific dependencies
-edgeware-runtime = { version = "3.1.0", path = "../runtime" }
-edgeware-rpc = { version = "3.1.0", path = "../rpc" }
-edgeware-primitives = { version = "3.1.0", path = "../primitives" }
-edgeware-executor = { version = "3.1.0", path = "../executor" }
+edgeware-runtime = { version = "3.2.0", path = "../runtime" }
+edgeware-rpc = { version = "3.2.0", path = "../rpc" }
+edgeware-primitives = { version = "3.2.0", path = "../primitives" }
+edgeware-executor = { version = "3.2.0", path = "../executor" }
 
 # CLI-specific dependencies
 sc-cli = { version = "0.8", optional = true }
