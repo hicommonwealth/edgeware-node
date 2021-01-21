@@ -16,7 +16,7 @@
 
 use crate::{chain_spec, service, Cli, Subcommand};
 use edgeware_executor::Executor;
-use edgeware_runtime::{Block, RuntimeApi};
+use edgeware_runtime::Block;
 use sc_cli::{Result, SubstrateCli, RuntimeVersion, Role, ChainSpec};
 use sc_service::PartialComponents;
 use crate::service::{new_partial};
@@ -96,7 +96,7 @@ pub fn run() -> Result<()> {
 				You can enable it with `--features runtime-benchmarks`.".into())
 			}
 		}
-		Some(Subcommand::Key(cmd)) => cmd.run(),
+		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
 		Some(Subcommand::Sign(cmd)) => cmd.run(),
 		Some(Subcommand::Verify(cmd)) => cmd.run(),
 		Some(Subcommand::Vanity(cmd)) => cmd.run(),

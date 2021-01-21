@@ -26,9 +26,9 @@ use sp_runtime::traits::{Zero};
 
 use frame_support::{decl_event, decl_module, decl_storage};
 use frame_system::{ensure_root};
-pub type BalanceOf<T> = <<T as pallet_staking::Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
+pub type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
-pub trait Config: pallet_staking::Config + pallet_treasury::Config + pallet_balances::Config {
+pub trait Config: pallet_treasury::Config + pallet_balances::Config {
 	/// The overarching event type.
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
 	/// The account balance
@@ -42,7 +42,7 @@ decl_module! {
 		fn on_finalize(_n: T::BlockNumber) {
 			if <frame_system::Module<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
-				<T as pallet_staking::Config>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
+				<T as Config>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
 				Self::deposit_event(RawEvent::TreasuryMinting(
 					<pallet_balances::Module<T>>::free_balance(<pallet_treasury::Module<T>>::account_id()),
 					<frame_system::Module<T>>::block_number(),

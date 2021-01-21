@@ -155,7 +155,8 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
       from: senderAddress,
       to: evmAddress,
       value: value.toString(),
-      gas: web3.utils.toWei('1', 'ether'),
+      gas: '1000000',
+      gasPrice: '1',
     });
     // const gasUsed = web3.utils.toBN(web3.utils.toWei(`${receipt.gasUsed}`, 'gwei'));
     const gasUsed = web3.utils.toBN(`${receipt.gasUsed}`);

@@ -71,7 +71,7 @@ const convertToEvmAddress = (substrateAddress) => {
   return '0x' + Buffer.from(addressBytes.subarray(0, 20)).toString('hex');
 }
 
-const convertToSubstrateAddress = (evmAddress, prefix = 42) => {
+const convertToSubstrateAddress = (evmAddress, prefix = 7) => {
   const addressBytes = Buffer.from(evmAddress.slice(2), 'hex');
   const prefixBytes = Buffer.from('evm:');
   const convertBytes = Uint8Array.from(Buffer.concat([ prefixBytes, addressBytes ]));
@@ -81,13 +81,19 @@ const convertToSubstrateAddress = (evmAddress, prefix = 42) => {
 
 async function startEdgewareNode() {
   const basePath = process.env.BASE_PATH || './db';
+  const chain = process.env.CHAIN_PATH || 'dev';
   const cmd = BINARY_PATH;
   const args = [
-    '--dev',
+    // '--dev',
+    `--chain=${chain}`,
+    '--pruning=archive',
     '--no-telemetry',
     '--no-prometheus',
     // '--tmp',
     `--base-path=${basePath}`,
+    '--force-authoring',
+    '--alice',
+    '--validator',
     '-lrpc=trace',
     // '-levm=trace',
   ];
