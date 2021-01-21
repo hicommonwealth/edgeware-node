@@ -44,7 +44,7 @@ sp-version = { version = "2.0", default-features = false }
 sp-offchain = { version = "2.0", default-features = false }
 
 # edgeware primitives
-edgeware-primitives = { version = "3.1.0", path = "../primitives", default-features = false }
+edgeware-primitives = { version = "3.2.0", path = "../primitives", default-features = false }
 
 # pallet dependencies
 pallet-authority-discovery = { version = "2.0", default-features = false }
