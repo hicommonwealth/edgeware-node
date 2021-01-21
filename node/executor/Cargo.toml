@@ -4,6 +4,10 @@ version = "3.2.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 edition = "2018"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 trie-root = "0.16.0"
@@ -15,9 +19,9 @@ sp-core = { version = "2.0"}
 sp-trie = { version = "2.0"}
 frame-benchmarking = { version = "2.0"}
 
-edgeware-primitives = { path = "../primitives" }
-edgeware-runtime = { path = "../runtime" }
-edgeware-runtime-interface = { path = "../runtime-interface" }
+edgeware-primitives = { version = "3.1.0", path = "../primitives" }
+edgeware-runtime = { version = "3.1.0", path = "../runtime" }
+edgeware-runtime-interface = { version = "3.1.0", path = "../runtime-interface" }
 
 [dev-dependencies]
 sp-runtime = { version = "2.0"}
@@ -33,7 +37,7 @@ pallet-indices = { version = "2.0"}
 wabt = "0.10.0"
 criterion = "0.3.0"
 
-edgeware-testing = { path = "../testing" }
+edgeware-testing = { version = "3.1.0", path = "../testing" }
 
 [features]
 wasmtime = [

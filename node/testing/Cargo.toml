@@ -4,6 +4,7 @@ version = "3.2.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Test utilities for Edgeware."
 edition = "2018"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -50,3 +51,4 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../modules/edge
 [dev-dependencies]
 criterion = "0.3.0"
 sc-cli = { version = "0.8" }
+

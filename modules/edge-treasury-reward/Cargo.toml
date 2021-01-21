@@ -3,6 +3,11 @@ name = "edge-treasury-reward"
 version = "1.0.0"
 authors = ["drewstone <drewstone329@gmail.com>"]
 edition = "2018"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
+description = "Edgeware treasury reward module"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, optional = true }
