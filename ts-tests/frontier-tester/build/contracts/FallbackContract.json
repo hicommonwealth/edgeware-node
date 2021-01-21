@@ -13,25 +13,25 @@
       "type": "fallback"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"fallback\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/frontier-tester/contracts/FallbackContract.sol\":\"FallbackContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/frontier-tester/contracts/FallbackContract.sol\":{\"keccak256\":\"0xe44a02bb324057b287a0b0e2f62363c46a37855d024ca92f1c790c176d2aa376\",\"urls\":[\"bzz-raw://ffd9e1fe7134be3c6980ea9b4ec2f09b6f89e58ff9d34014d94474803623bf96\",\"dweb:/ipfs/QmRd9xqBzf5dMofuxVLNJ4japqcak4CxJwQCBaT7cojaWj\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b5060818061001e6000396000f3fe60806040523373ffffffffffffffffffffffffffffffffffffffff166108fc349081150290604051600060405180830381858888f193505050501580156049573d6000803e3d6000fd5b5000fea265627a7a72315820a3070c1bb81ab9e1d477b29b3b3eb55524dce1494eca6116b6beaa77adf59d1764736f6c63430005100032",
-  "deployedBytecode": "0x60806040523373ffffffffffffffffffffffffffffffffffffffff166108fc349081150290604051600060405180830381858888f193505050501580156049573d6000803e3d6000fd5b5000fea265627a7a72315820a3070c1bb81ab9e1d477b29b3b3eb55524dce1494eca6116b6beaa77adf59d1764736f6c63430005100032",
-  "sourceMap": "25:126:4:-;;;55:24;8:9:-1;5:2;;;30:1;27;20:12;5:2;55:24:4;25:126;;;;;;",
-  "deployedSourceMap": "25:126:4:-;;;115:10;:19;;:30;135:9;115:30;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;115:30:4;25:126",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"payable\":true,\"stateMutability\":\"payable\",\"type\":\"fallback\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/FallbackContract.sol\":\"FallbackContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/FallbackContract.sol\":{\"keccak256\":\"0xe44a02bb324057b287a0b0e2f62363c46a37855d024ca92f1c790c176d2aa376\",\"urls\":[\"bzz-raw://ffd9e1fe7134be3c6980ea9b4ec2f09b6f89e58ff9d34014d94474803623bf96\",\"dweb:/ipfs/QmRd9xqBzf5dMofuxVLNJ4japqcak4CxJwQCBaT7cojaWj\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b5060818061001e6000396000f3fe60806040523373ffffffffffffffffffffffffffffffffffffffff166108fc349081150290604051600060405180830381858888f193505050501580156049573d6000803e3d6000fd5b5000fea265627a7a72315820c80b5cd5e99723aef83178431d16ad6735a08f87bb0ccc4d386ba38554338cab64736f6c63430005100032",
+  "deployedBytecode": "0x60806040523373ffffffffffffffffffffffffffffffffffffffff166108fc349081150290604051600060405180830381858888f193505050501580156049573d6000803e3d6000fd5b5000fea265627a7a72315820c80b5cd5e99723aef83178431d16ad6735a08f87bb0ccc4d386ba38554338cab64736f6c63430005100032",
+  "sourceMap": "25:126:5:-;;;55:24;8:9:-1;5:2;;;30:1;27;20:12;5:2;55:24:5;25:126;;;;;;",
+  "deployedSourceMap": "25:126:5:-;;;115:10;:19;;:30;135:9;115:30;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;115:30:5;25:126",
   "source": "pragma solidity ^0.5.0;\n\ncontract FallbackContract {\n  constructor() public { }\n\n\tfunction () external payable {\n\t\tmsg.sender.transfer(msg.value);\n\t}\n}",
-  "sourcePath": "/media/ext/cw/frontier-tester/contracts/FallbackContract.sol",
+  "sourcePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/FallbackContract.sol",
   "ast": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/FallbackContract.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/FallbackContract.sol",
     "exportedSymbols": {
       "FallbackContract": [
-        217
+        234
       ]
     },
-    "id": 218,
+    "id": 235,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 199,
+        "id": 216,
         "literals": [
           "solidity",
           "^",
@@ -39,7 +39,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:4"
+        "src": "0:23:5"
       },
       {
         "baseContracts": [],
@@ -47,50 +47,50 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 217,
+        "id": 234,
         "linearizedBaseContracts": [
-          217
+          234
         ],
         "name": "FallbackContract",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 202,
+              "id": 219,
               "nodeType": "Block",
-              "src": "76:3:4",
+              "src": "76:3:5",
               "statements": []
             },
             "documentation": null,
-            "id": 203,
+            "id": 220,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 200,
+              "id": 217,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "66:2:4"
+              "src": "66:2:5"
             },
             "returnParameters": {
-              "id": 201,
+              "id": 218,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "76:0:4"
+              "src": "76:0:5"
             },
-            "scope": 217,
-            "src": "55:24:4",
+            "scope": 234,
+            "src": "55:24:5",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 215,
+              "id": 232,
               "nodeType": "Block",
-              "src": "111:38:4",
+              "src": "111:38:5",
               "statements": [
                 {
                   "expression": {
@@ -100,18 +100,18 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 211,
+                          "id": 228,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1826,
-                          "src": "135:3:4",
+                          "referencedDeclaration": 1907,
+                          "src": "135:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
                             "typeString": "msg"
                           }
                         },
-                        "id": 212,
+                        "id": 229,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -119,7 +119,7 @@
                         "memberName": "value",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": null,
-                        "src": "135:9:4",
+                        "src": "135:9:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -137,18 +137,18 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 206,
+                          "id": 223,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1826,
-                          "src": "115:3:4",
+                          "referencedDeclaration": 1907,
+                          "src": "115:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
                             "typeString": "msg"
                           }
                         },
-                        "id": 209,
+                        "id": 226,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -156,13 +156,13 @@
                         "memberName": "sender",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": null,
-                        "src": "115:10:4",
+                        "src": "115:10:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address_payable",
                           "typeString": "address payable"
                         }
                       },
-                      "id": 210,
+                      "id": 227,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -170,13 +170,13 @@
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "115:19:4",
+                      "src": "115:19:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_transfer_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 213,
+                    "id": 230,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -184,62 +184,62 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "115:30:4",
+                    "src": "115:30:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 214,
+                  "id": 231,
                   "nodeType": "ExpressionStatement",
-                  "src": "115:30:4"
+                  "src": "115:30:5"
                 }
               ]
             },
             "documentation": null,
-            "id": 216,
+            "id": 233,
             "implemented": true,
             "kind": "fallback",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 204,
+              "id": 221,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "91:2:4"
+              "src": "91:2:5"
             },
             "returnParameters": {
-              "id": 205,
+              "id": 222,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "111:0:4"
+              "src": "111:0:5"
             },
-            "scope": 217,
-            "src": "82:67:4",
+            "scope": 234,
+            "src": "82:67:5",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 218,
-        "src": "25:126:4"
+        "scope": 235,
+        "src": "25:126:5"
       }
     ],
-    "src": "0:151:4"
+    "src": "0:151:5"
   },
   "legacyAST": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/FallbackContract.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/FallbackContract.sol",
     "exportedSymbols": {
       "FallbackContract": [
-        217
+        234
       ]
     },
-    "id": 218,
+    "id": 235,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 199,
+        "id": 216,
         "literals": [
           "solidity",
           "^",
@@ -247,7 +247,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:4"
+        "src": "0:23:5"
       },
       {
         "baseContracts": [],
@@ -255,50 +255,50 @@
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 217,
+        "id": 234,
         "linearizedBaseContracts": [
-          217
+          234
         ],
         "name": "FallbackContract",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "body": {
-              "id": 202,
+              "id": 219,
               "nodeType": "Block",
-              "src": "76:3:4",
+              "src": "76:3:5",
               "statements": []
             },
             "documentation": null,
-            "id": 203,
+            "id": 220,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 200,
+              "id": 217,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "66:2:4"
+              "src": "66:2:5"
             },
             "returnParameters": {
-              "id": 201,
+              "id": 218,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "76:0:4"
+              "src": "76:0:5"
             },
-            "scope": 217,
-            "src": "55:24:4",
+            "scope": 234,
+            "src": "55:24:5",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "public"
           },
           {
             "body": {
-              "id": 215,
+              "id": 232,
               "nodeType": "Block",
-              "src": "111:38:4",
+              "src": "111:38:5",
               "statements": [
                 {
                   "expression": {
@@ -308,18 +308,18 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 211,
+                          "id": 228,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1826,
-                          "src": "135:3:4",
+                          "referencedDeclaration": 1907,
+                          "src": "135:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
                             "typeString": "msg"
                           }
                         },
-                        "id": 212,
+                        "id": 229,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -327,7 +327,7 @@
                         "memberName": "value",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": null,
-                        "src": "135:9:4",
+                        "src": "135:9:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -345,18 +345,18 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 206,
+                          "id": 223,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1826,
-                          "src": "115:3:4",
+                          "referencedDeclaration": 1907,
+                          "src": "115:3:5",
                           "typeDescriptions": {
                             "typeIdentifier": "t_magic_message",
                             "typeString": "msg"
                           }
                         },
-                        "id": 209,
+                        "id": 226,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -364,13 +364,13 @@
                         "memberName": "sender",
                         "nodeType": "MemberAccess",
                         "referencedDeclaration": null,
-                        "src": "115:10:4",
+                        "src": "115:10:5",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address_payable",
                           "typeString": "address payable"
                         }
                       },
-                      "id": 210,
+                      "id": 227,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -378,13 +378,13 @@
                       "memberName": "transfer",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": null,
-                      "src": "115:19:4",
+                      "src": "115:19:5",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_transfer_nonpayable$_t_uint256_$returns$__$",
                         "typeString": "function (uint256)"
                       }
                     },
-                    "id": 213,
+                    "id": 230,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -392,57 +392,57 @@
                     "lValueRequested": false,
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "115:30:4",
+                    "src": "115:30:5",
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 214,
+                  "id": 231,
                   "nodeType": "ExpressionStatement",
-                  "src": "115:30:4"
+                  "src": "115:30:5"
                 }
               ]
             },
             "documentation": null,
-            "id": 216,
+            "id": 233,
             "implemented": true,
             "kind": "fallback",
             "modifiers": [],
             "name": "",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 204,
+              "id": 221,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "91:2:4"
+              "src": "91:2:5"
             },
             "returnParameters": {
-              "id": 205,
+              "id": 222,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "111:0:4"
+              "src": "111:0:5"
             },
-            "scope": 217,
-            "src": "82:67:4",
+            "scope": 234,
+            "src": "82:67:5",
             "stateMutability": "payable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 218,
-        "src": "25:126:4"
+        "scope": 235,
+        "src": "25:126:5"
       }
     ],
-    "src": "0:151:4"
+    "src": "0:151:5"
   },
   "compiler": {
     "name": "solc",
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.2.0",
-  "updatedAt": "2020-09-21T15:06:59.558Z",
+  "schemaVersion": "3.2.3",
+  "updatedAt": "2021-01-21T20:27:19.346Z",
   "devdoc": {
     "methods": {}
   },

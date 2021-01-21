@@ -38,15 +38,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"salt\",\"type\":\"uint256\"}],\"name\":\"deploy\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"viewAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/frontier-tester/contracts/Create2Factory.sol\":\"Create2Factory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/frontier-tester/contracts/Create2Factory.sol\":{\"keccak256\":\"0x5555f80aa6a911bb021eaff69164db1eb07172a141cdfa90ac38a670d1170c03\",\"urls\":[\"bzz-raw://a732e2395dfcb3d91c3e5a5c6c2d8c3569141b260fbfdcf96dd9d89386ccb538\",\"dweb:/ipfs/QmZc8KKw3YZ8ao2QKQCXskPyTFZWQoPaed59xM18dRQdC5\"]},\"/media/ext/cw/frontier-tester/contracts/ValueContract.sol\":{\"keccak256\":\"0x6c2d0a8ced74c07a819f247b41866ad541633f1b0aec9abb5acbc9489ae3d23f\",\"urls\":[\"bzz-raw://169224639be9221c3b3f4351400a7c3c3dc04768bcc9bbdc8d8656c9d86294c1\",\"dweb:/ipfs/QmRN2BVFteVsmeTkrnbWQ2aVLqHfkCWBi6a9M4q4n2ESuy\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50610262806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c8063059fe9721461003b578063a5e3875114610085575b600080fd5b6100436100b3565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100b16004803603602081101561009b57600080fd5b81019080803590602001909291905050506100dc565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60006060604051806020016100f090610162565b6020820181038252601f19601f820116604052509050828151602083016000f59150813b61011d57600080fd5b816000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505050565b60bf8061016f8339019056fe60806040523460008190555060a6806100196000396000f3fe60806040526004361060265760003560e01c80632096525514602b57806327c845dc146053575b600080fd5b348015603657600080fd5b50603d605b565b6040518082815260200191505060405180910390f35b60596064565b005b60008054905090565b346000540160008190555056fea265627a7a72315820114865ff0b2817bd7ef621fd2e8fff81b4c862f3a2f48240b810d60abc4d797e64736f6c63430005100032a265627a7a7231582098d199061cbbfbb6122fc8b4327adfe9a57cc1e9b624707a9a44b354d66786a164736f6c63430005100032",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063059fe9721461003b578063a5e3875114610085575b600080fd5b6100436100b3565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100b16004803603602081101561009b57600080fd5b81019080803590602001909291905050506100dc565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60006060604051806020016100f090610162565b6020820181038252601f19601f820116604052509050828151602083016000f59150813b61011d57600080fd5b816000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505050565b60bf8061016f8339019056fe60806040523460008190555060a6806100196000396000f3fe60806040526004361060265760003560e01c80632096525514602b57806327c845dc146053575b600080fd5b348015603657600080fd5b50603d605b565b6040518082815260200191505060405180910390f35b60596064565b005b60008054905090565b346000540160008190555056fea265627a7a72315820114865ff0b2817bd7ef621fd2e8fff81b4c862f3a2f48240b810d60abc4d797e64736f6c63430005100032a265627a7a7231582098d199061cbbfbb6122fc8b4327adfe9a57cc1e9b624707a9a44b354d66786a164736f6c63430005100032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"salt\",\"type\":\"uint256\"}],\"name\":\"deploy\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"viewAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/Create2Factory.sol\":\"Create2Factory\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/Create2Factory.sol\":{\"keccak256\":\"0x5555f80aa6a911bb021eaff69164db1eb07172a141cdfa90ac38a670d1170c03\",\"urls\":[\"bzz-raw://a732e2395dfcb3d91c3e5a5c6c2d8c3569141b260fbfdcf96dd9d89386ccb538\",\"dweb:/ipfs/QmZc8KKw3YZ8ao2QKQCXskPyTFZWQoPaed59xM18dRQdC5\"]},\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ValueContract.sol\":{\"keccak256\":\"0x6c2d0a8ced74c07a819f247b41866ad541633f1b0aec9abb5acbc9489ae3d23f\",\"urls\":[\"bzz-raw://169224639be9221c3b3f4351400a7c3c3dc04768bcc9bbdc8d8656c9d86294c1\",\"dweb:/ipfs/QmRN2BVFteVsmeTkrnbWQ2aVLqHfkCWBi6a9M4q4n2ESuy\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50610262806100206000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c8063059fe9721461003b578063a5e3875114610085575b600080fd5b6100436100b3565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100b16004803603602081101561009b57600080fd5b81019080803590602001909291905050506100dc565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60006060604051806020016100f090610162565b6020820181038252601f19601f820116604052509050828151602083016000f59150813b61011d57600080fd5b816000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505050565b60bf8061016f8339019056fe60806040523460008190555060a6806100196000396000f3fe60806040526004361060265760003560e01c80632096525514602b57806327c845dc146053575b600080fd5b348015603657600080fd5b50603d605b565b6040518082815260200191505060405180910390f35b60596064565b005b60008054905090565b346000540160008190555056fea265627a7a72315820b1262422fa01b8988f7cece06d1a34d7b8eb3f3f06db4b9e07f7ce975c91ffc664736f6c63430005100032a265627a7a723158202b238a64557611b5e02a0361d03384c4184ba8d09246c305b31a5f07f225e74464736f6c63430005100032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c8063059fe9721461003b578063a5e3875114610085575b600080fd5b6100436100b3565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b6100b16004803603602081101561009b57600080fd5b81019080803590602001909291905050506100dc565b005b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b60006060604051806020016100f090610162565b6020820181038252601f19601f820116604052509050828151602083016000f59150813b61011d57600080fd5b816000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505050565b60bf8061016f8339019056fe60806040523460008190555060a6806100196000396000f3fe60806040526004361060265760003560e01c80632096525514602b57806327c845dc146053575b600080fd5b348015603657600080fd5b50603d605b565b6040518082815260200191505060405180910390f35b60596064565b005b60008054905090565b346000540160008190555056fea265627a7a72315820b1262422fa01b8988f7cece06d1a34d7b8eb3f3f06db4b9e07f7ce975c91ffc664736f6c63430005100032a265627a7a723158202b238a64557611b5e02a0361d03384c4184ba8d09246c305b31a5f07f225e74464736f6c63430005100032",
   "sourceMap": "56:466:1:-;;;101:24;8:9:-1;5:2;;;30:1;27;20:12;5:2;101:24:1;56:466;;;;;;",
   "deployedSourceMap": "56:466:1:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;56:466:1;;;;;;;;;;;;;;;;;;;;;;;;448:72;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;129:315;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;129:315:1;;;;;;;;;;;;;;;;;:::i;:::-;;448:72;489:7;511:4;;;;;;;;;;;504:11;;448:72;:::o;129:315::-;172:17;195:21;219:32;;;;;;;;:::i;:::-;41:4:-1;34:5;30:16;25:3;21:26;14:5;7:41;87:2;83:7;78:2;73:3;69:12;65:26;61:2;54:38;219:32:1;195:56;;336:4;325:8;319:15;312:4;302:8;298:19;295:1;287:54;274:67;;370:9;358:22;348:2;;402:1;399;392:12;348:2;430:9;423:4;;:16;;;;;;;;;;;;;;;;;;129:315;;;:::o;56:466::-;;;;;;;;:::o",
   "source": "pragma solidity ^0.5.0;\n\nimport './ValueContract.sol';\n\ncontract Create2Factory {\n  address addr;\n\n  constructor() public { }\n\n  function deploy(uint256 salt) public {\n    address addrLocal;\n    bytes memory bytecode = type(ValueContract).creationCode;\n    assembly {\n      addrLocal := create2(0, add(bytecode, 0x20), mload(bytecode), salt)\n      if iszero(extcodesize(addrLocal)) {\n        revert(0, 0)\n      }\n    }\n    addr = addrLocal;\n  }\n\n  function viewAddr() public view returns (address) {\n    return addr;\n  }\n}\n",
-  "sourcePath": "/media/ext/cw/frontier-tester/contracts/Create2Factory.sol",
+  "sourcePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/Create2Factory.sol",
   "ast": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/Create2Factory.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/Create2Factory.sol",
     "exportedSymbols": {
       "Create2Factory": [
         52
@@ -67,12 +67,12 @@
         "src": "0:23:1"
       },
       {
-        "absolutePath": "/media/ext/cw/frontier-tester/contracts/ValueContract.sol",
+        "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ValueContract.sol",
         "file": "./ValueContract.sol",
         "id": 16,
         "nodeType": "ImportDirective",
         "scope": 53,
-        "sourceUnit": 1073,
+        "sourceUnit": 1147,
         "src": "25:29:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -80,7 +80,7 @@
       {
         "baseContracts": [],
         "contractDependencies": [
-          1072
+          1146
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -239,10 +239,10 @@
                           "name": "ValueContract",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1072,
+                          "referencedDeclaration": 1146,
                           "src": "224:13:1",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1072_$",
+                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1146_$",
                             "typeString": "type(contract ValueContract)"
                           }
                         }
@@ -250,7 +250,7 @@
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1072_$",
+                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1146_$",
                             "typeString": "type(contract ValueContract)"
                           }
                         ],
@@ -258,7 +258,7 @@
                         "name": "type",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1846,
+                        "referencedDeclaration": 1920,
                         "src": "219:4:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_metatype_pure$_t_address_$returns$__$",
@@ -275,7 +275,7 @@
                       "nodeType": "FunctionCall",
                       "src": "219:19:1",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_magic_meta_type_t_contract$_ValueContract_$1072",
+                        "typeIdentifier": "t_magic_meta_type_t_contract$_ValueContract_$1146",
                         "typeString": "type(contract ValueContract)"
                       }
                     },
@@ -298,15 +298,6 @@
                 },
                 {
                   "externalReferences": [
-                    {
-                      "salt": {
-                        "declaration": 24,
-                        "isOffset": false,
-                        "isSlot": false,
-                        "src": "336:4:1",
-                        "valueSize": 1
-                      }
-                    },
                     {
                       "addrLocal": {
                         "declaration": 28,
@@ -340,6 +331,15 @@
                         "isOffset": false,
                         "isSlot": false,
                         "src": "370:9:1",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "salt": {
+                        "declaration": 24,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "336:4:1",
                         "valueSize": 1
                       }
                     }
@@ -537,7 +537,7 @@
     "src": "0:523:1"
   },
   "legacyAST": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/Create2Factory.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/Create2Factory.sol",
     "exportedSymbols": {
       "Create2Factory": [
         52
@@ -558,12 +558,12 @@
         "src": "0:23:1"
       },
       {
-        "absolutePath": "/media/ext/cw/frontier-tester/contracts/ValueContract.sol",
+        "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ValueContract.sol",
         "file": "./ValueContract.sol",
         "id": 16,
         "nodeType": "ImportDirective",
         "scope": 53,
-        "sourceUnit": 1073,
+        "sourceUnit": 1147,
         "src": "25:29:1",
         "symbolAliases": [],
         "unitAlias": ""
@@ -571,7 +571,7 @@
       {
         "baseContracts": [],
         "contractDependencies": [
-          1072
+          1146
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -730,10 +730,10 @@
                           "name": "ValueContract",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 1072,
+                          "referencedDeclaration": 1146,
                           "src": "224:13:1",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1072_$",
+                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1146_$",
                             "typeString": "type(contract ValueContract)"
                           }
                         }
@@ -741,7 +741,7 @@
                       "expression": {
                         "argumentTypes": [
                           {
-                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1072_$",
+                            "typeIdentifier": "t_type$_t_contract$_ValueContract_$1146_$",
                             "typeString": "type(contract ValueContract)"
                           }
                         ],
@@ -749,7 +749,7 @@
                         "name": "type",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 1846,
+                        "referencedDeclaration": 1920,
                         "src": "219:4:1",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_metatype_pure$_t_address_$returns$__$",
@@ -766,7 +766,7 @@
                       "nodeType": "FunctionCall",
                       "src": "219:19:1",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_magic_meta_type_t_contract$_ValueContract_$1072",
+                        "typeIdentifier": "t_magic_meta_type_t_contract$_ValueContract_$1146",
                         "typeString": "type(contract ValueContract)"
                       }
                     },
@@ -789,15 +789,6 @@
                 },
                 {
                   "externalReferences": [
-                    {
-                      "salt": {
-                        "declaration": 24,
-                        "isOffset": false,
-                        "isSlot": false,
-                        "src": "336:4:1",
-                        "valueSize": 1
-                      }
-                    },
                     {
                       "addrLocal": {
                         "declaration": 28,
@@ -831,6 +822,15 @@
                         "isOffset": false,
                         "isSlot": false,
                         "src": "370:9:1",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "salt": {
+                        "declaration": 24,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "336:4:1",
                         "valueSize": 1
                       }
                     }
@@ -1039,8 +1039,8 @@
       "transactionHash": "0xb58d264186f818ce01a5dbf33d91c592c16fce4d1fa337a749a82d623128cf21"
     }
   },
-  "schemaVersion": "3.2.0",
-  "updatedAt": "2020-09-22T13:58:53.713Z",
+  "schemaVersion": "3.2.3",
+  "updatedAt": "2021-01-21T20:27:19.340Z",
   "devdoc": {
     "methods": {}
   },

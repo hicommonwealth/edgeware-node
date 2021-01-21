@@ -17,25 +17,25 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"doSomething\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/frontier-tester/contracts/IContract.sol\":\"IContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/frontier-tester/contracts/IContract.sol\":{\"keccak256\":\"0x6a1b8b12fd0e805c4f99eb49a072f03cdb8cd34167687874ec53c78486cb7d79\",\"urls\":[\"bzz-raw://4c691e18c13c3c44f8854ec02dd3380604377666f7091565f47318fd7fdbd316\",\"dweb:/ipfs/QmNMCk7Syj148Y1fWwoFLHatUUtYyA8ar2Bm1F4bp8FtV7\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"doSomething\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol\":\"IContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol\":{\"keccak256\":\"0x6a1b8b12fd0e805c4f99eb49a072f03cdb8cd34167687874ec53c78486cb7d79\",\"urls\":[\"bzz-raw://4c691e18c13c3c44f8854ec02dd3380604377666f7091565f47318fd7fdbd316\",\"dweb:/ipfs/QmNMCk7Syj148Y1fWwoFLHatUUtYyA8ar2Bm1F4bp8FtV7\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.5.0;\n\ninterface IContract {\n\tfunction doSomething() external view returns (bool);\n}\n",
-  "sourcePath": "/media/ext/cw/frontier-tester/contracts/IContract.sol",
+  "sourcePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol",
   "ast": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/IContract.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol",
     "exportedSymbols": {
       "IContract": [
-        145
+        281
       ]
     },
-    "id": 146,
+    "id": 282,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 139,
+        "id": 275,
         "literals": [
           "solidity",
           "^",
@@ -43,7 +43,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:3"
+        "src": "0:23:7"
       },
       {
         "baseContracts": [],
@@ -51,9 +51,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 145,
+        "id": 281,
         "linearizedBaseContracts": [
-          145
+          281
         ],
         "name": "IContract",
         "nodeType": "ContractDefinition",
@@ -61,29 +61,29 @@
           {
             "body": null,
             "documentation": null,
-            "id": 144,
+            "id": 280,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "doSomething",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 140,
+              "id": 276,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "68:2:3"
+              "src": "68:2:7"
             },
             "returnParameters": {
-              "id": 143,
+              "id": 279,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 142,
+                  "id": 278,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 144,
-                  "src": "94:4:3",
+                  "scope": 280,
+                  "src": "94:4:7",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -91,10 +91,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 141,
+                    "id": 277,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "94:4:3",
+                    "src": "94:4:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -104,33 +104,33 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "93:6:3"
+              "src": "93:6:7"
             },
-            "scope": 145,
-            "src": "48:52:3",
+            "scope": 281,
+            "src": "48:52:7",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 146,
-        "src": "25:77:3"
+        "scope": 282,
+        "src": "25:77:7"
       }
     ],
-    "src": "0:103:3"
+    "src": "0:103:7"
   },
   "legacyAST": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/IContract.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol",
     "exportedSymbols": {
       "IContract": [
-        145
+        281
       ]
     },
-    "id": 146,
+    "id": 282,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 139,
+        "id": 275,
         "literals": [
           "solidity",
           "^",
@@ -138,7 +138,7 @@
           ".0"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:3"
+        "src": "0:23:7"
       },
       {
         "baseContracts": [],
@@ -146,9 +146,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 145,
+        "id": 281,
         "linearizedBaseContracts": [
-          145
+          281
         ],
         "name": "IContract",
         "nodeType": "ContractDefinition",
@@ -156,29 +156,29 @@
           {
             "body": null,
             "documentation": null,
-            "id": 144,
+            "id": 280,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "doSomething",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 140,
+              "id": 276,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "68:2:3"
+              "src": "68:2:7"
             },
             "returnParameters": {
-              "id": 143,
+              "id": 279,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 142,
+                  "id": 278,
                   "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 144,
-                  "src": "94:4:3",
+                  "scope": 280,
+                  "src": "94:4:7",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -186,10 +186,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 141,
+                    "id": 277,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "94:4:3",
+                    "src": "94:4:7",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -199,28 +199,28 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "93:6:3"
+              "src": "93:6:7"
             },
-            "scope": 145,
-            "src": "48:52:3",
+            "scope": 281,
+            "src": "48:52:7",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 146,
-        "src": "25:77:3"
+        "scope": 282,
+        "src": "25:77:7"
       }
     ],
-    "src": "0:103:3"
+    "src": "0:103:7"
   },
   "compiler": {
     "name": "solc",
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.2.0",
-  "updatedAt": "2020-09-14T16:55:40.242Z",
+  "schemaVersion": "3.2.3",
+  "updatedAt": "2021-01-21T20:27:19.348Z",
   "devdoc": {
     "methods": {}
   },

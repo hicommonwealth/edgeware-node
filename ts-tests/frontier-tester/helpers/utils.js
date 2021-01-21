@@ -93,7 +93,8 @@ async function startEdgewareNode() {
     `--base-path=${basePath}`,
     '--force-authoring',
     '--alice',
-    // '-lrpc=trace',
+    '--validator',
+    '-lrpc=trace',
     // '-levm=trace',
   ];
   // console.log(`Running node with args: ${JSON.stringify(args)}`);

@@ -17,15 +17,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"doSomething\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/frontier-tester/contracts/ContractImpl.sol\":\"ContractImpl\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/frontier-tester/contracts/ContractImpl.sol\":{\"keccak256\":\"0xf353fb1d637bd5326532864e324a728e1a9d6d71196d05212d0bed584fa27d8d\",\"urls\":[\"bzz-raw://e1e019c08ed74a772aa6f6d979b1ca54aa8ab33189cd1ac3e17693cc2030ff9f\",\"dweb:/ipfs/QmZwUACoDMKxjYySvRDvZkVTriSVPBLaUfJ9nHnnydnFiu\"]},\"/media/ext/cw/frontier-tester/contracts/IContract.sol\":{\"keccak256\":\"0x6a1b8b12fd0e805c4f99eb49a072f03cdb8cd34167687874ec53c78486cb7d79\",\"urls\":[\"bzz-raw://4c691e18c13c3c44f8854ec02dd3380604377666f7091565f47318fd7fdbd316\",\"dweb:/ipfs/QmNMCk7Syj148Y1fWwoFLHatUUtYyA8ar2Bm1F4bp8FtV7\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b50608b8061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80638269267914602d575b600080fd5b6033604d565b604051808215151515815260200191505060405180910390f35b6000600190509056fea265627a7a723158206b6376b586f7126024c0cd3f8e0f1fa8b1247209e40c4a8f1b86ec912fb9b8b964736f6c63430005100032",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c80638269267914602d575b600080fd5b6033604d565b604051808215151515815260200191505060405180910390f35b6000600190509056fea265627a7a723158206b6376b586f7126024c0cd3f8e0f1fa8b1247209e40c4a8f1b86ec912fb9b8b964736f6c63430005100032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[],\"name\":\"doSomething\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ContractImpl.sol\":\"ContractImpl\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ContractImpl.sol\":{\"keccak256\":\"0xf353fb1d637bd5326532864e324a728e1a9d6d71196d05212d0bed584fa27d8d\",\"urls\":[\"bzz-raw://e1e019c08ed74a772aa6f6d979b1ca54aa8ab33189cd1ac3e17693cc2030ff9f\",\"dweb:/ipfs/QmZwUACoDMKxjYySvRDvZkVTriSVPBLaUfJ9nHnnydnFiu\"]},\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol\":{\"keccak256\":\"0x6a1b8b12fd0e805c4f99eb49a072f03cdb8cd34167687874ec53c78486cb7d79\",\"urls\":[\"bzz-raw://4c691e18c13c3c44f8854ec02dd3380604377666f7091565f47318fd7fdbd316\",\"dweb:/ipfs/QmNMCk7Syj148Y1fWwoFLHatUUtYyA8ar2Bm1F4bp8FtV7\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50608b8061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80638269267914602d575b600080fd5b6033604d565b604051808215151515815260200191505060405180910390f35b6000600190509056fea265627a7a72315820291904e75cd8bd4ae7327fd1e43966281a23d40d5a16675f8c27b08150b9a11e64736f6c63430005100032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c80638269267914602d575b600080fd5b6033604d565b604051808215151515815260200191505060405180910390f35b6000600190509056fea265627a7a72315820291904e75cd8bd4ae7327fd1e43966281a23d40d5a16675f8c27b08150b9a11e64736f6c63430005100032",
   "sourceMap": "52:111:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;52:111:0;;;;;;;",
   "deployedSourceMap": "52:111:0:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;52:111:0;;;;;;;;;;;;;;;;;;;90:71;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;136:4;153;146:11;;90:71;:::o",
   "source": "pragma solidity ^0.5.0;\n\nimport './IContract.sol';\n\ncontract ContractImpl is IContract {\n\tfunction doSomething() external view returns (bool) {\n\t\treturn true;\n\t}\n}\n",
-  "sourcePath": "/media/ext/cw/frontier-tester/contracts/ContractImpl.sol",
+  "sourcePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ContractImpl.sol",
   "ast": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/ContractImpl.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ContractImpl.sol",
     "exportedSymbols": {
       "ContractImpl": [
         13
@@ -46,12 +46,12 @@
         "src": "0:23:0"
       },
       {
-        "absolutePath": "/media/ext/cw/frontier-tester/contracts/IContract.sol",
+        "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol",
         "file": "./IContract.sol",
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 14,
-        "sourceUnit": 146,
+        "sourceUnit": 282,
         "src": "25:25:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -65,10 +65,10 @@
               "id": 3,
               "name": "IContract",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 145,
+              "referencedDeclaration": 281,
               "src": "77:9:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IContract_$145",
+                "typeIdentifier": "t_contract$_IContract_$281",
                 "typeString": "contract IContract"
               }
             },
@@ -78,7 +78,7 @@
           }
         ],
         "contractDependencies": [
-          145
+          281
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -86,7 +86,7 @@
         "id": 13,
         "linearizedBaseContracts": [
           13,
-          145
+          281
         ],
         "name": "ContractImpl",
         "nodeType": "ContractDefinition",
@@ -172,7 +172,7 @@
             "scope": 13,
             "src": "90:71:0",
             "stateMutability": "view",
-            "superFunction": 144,
+            "superFunction": 280,
             "visibility": "external"
           }
         ],
@@ -183,7 +183,7 @@
     "src": "0:164:0"
   },
   "legacyAST": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/ContractImpl.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ContractImpl.sol",
     "exportedSymbols": {
       "ContractImpl": [
         13
@@ -204,12 +204,12 @@
         "src": "0:23:0"
       },
       {
-        "absolutePath": "/media/ext/cw/frontier-tester/contracts/IContract.sol",
+        "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/IContract.sol",
         "file": "./IContract.sol",
         "id": 2,
         "nodeType": "ImportDirective",
         "scope": 14,
-        "sourceUnit": 146,
+        "sourceUnit": 282,
         "src": "25:25:0",
         "symbolAliases": [],
         "unitAlias": ""
@@ -223,10 +223,10 @@
               "id": 3,
               "name": "IContract",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 145,
+              "referencedDeclaration": 281,
               "src": "77:9:0",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IContract_$145",
+                "typeIdentifier": "t_contract$_IContract_$281",
                 "typeString": "contract IContract"
               }
             },
@@ -236,7 +236,7 @@
           }
         ],
         "contractDependencies": [
-          145
+          281
         ],
         "contractKind": "contract",
         "documentation": null,
@@ -244,7 +244,7 @@
         "id": 13,
         "linearizedBaseContracts": [
           13,
-          145
+          281
         ],
         "name": "ContractImpl",
         "nodeType": "ContractDefinition",
@@ -330,7 +330,7 @@
             "scope": 13,
             "src": "90:71:0",
             "stateMutability": "view",
-            "superFunction": 144,
+            "superFunction": 280,
             "visibility": "external"
           }
         ],
@@ -352,9 +352,8 @@
       "transactionHash": "0x9b81a634cec7813cc375921fffb8154b4567da0ea3f193c91647eb1bfe673205"
     }
   },
-  "schemaVersion": "3.2.0",
-  "updatedAt": "2020-09-16T14:33:25.023Z",
-  "networkType": "ethereum",
+  "schemaVersion": "3.2.3",
+  "updatedAt": "2021-01-21T20:27:19.335Z",
   "devdoc": {
     "methods": {}
   },

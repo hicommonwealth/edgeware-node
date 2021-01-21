@@ -24,15 +24,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"c\",\"type\":\"address\"}],\"name\":\"e\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[],\"name\":\"emitEvent\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/frontier-tester/contracts/EventContract.sol\":\"EventContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/frontier-tester/contracts/EventContract.sol\":{\"keccak256\":\"0x753fc5ef18abaaccf05ed92c2f03b656244e8153d53151700e7f3eb0533508f7\",\"urls\":[\"bzz-raw://e1452a31715af781ad64c211b936da479bae04975f3e2b1209992301d53c81c7\",\"dweb:/ipfs/QmNzVM9di6tvGubEdUgpo7GWXFVHjmrcEURiPsqYbwTBum\"]}},\"version\":1}",
-  "bytecode": "0x6080604052348015600f57600080fd5b5060cf8061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80637b0cb83914602d575b600080fd5b60336035565b005b7f23919512b2162ddc59b67a65e3b03c419d4105366f7d4a632f5d3c3bee9b1cff30604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a156fea265627a7a723158206c80ec35a08beca8f8b2e7c14bf5f83ca92f4183b4acb0b78b52429bceef3a0a64736f6c63430005100032",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c80637b0cb83914602d575b600080fd5b60336035565b005b7f23919512b2162ddc59b67a65e3b03c419d4105366f7d4a632f5d3c3bee9b1cff30604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a156fea265627a7a723158206c80ec35a08beca8f8b2e7c14bf5f83ca92f4183b4acb0b78b52429bceef3a0a64736f6c63430005100032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"c\",\"type\":\"address\"}],\"name\":\"e\",\"type\":\"event\"},{\"constant\":false,\"inputs\":[],\"name\":\"emitEvent\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/EventContract.sol\":\"EventContract\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/EventContract.sol\":{\"keccak256\":\"0x753fc5ef18abaaccf05ed92c2f03b656244e8153d53151700e7f3eb0533508f7\",\"urls\":[\"bzz-raw://e1452a31715af781ad64c211b936da479bae04975f3e2b1209992301d53c81c7\",\"dweb:/ipfs/QmNzVM9di6tvGubEdUgpo7GWXFVHjmrcEURiPsqYbwTBum\"]}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b5060cf8061001e6000396000f3fe6080604052348015600f57600080fd5b506004361060285760003560e01c80637b0cb83914602d575b600080fd5b60336035565b005b7f23919512b2162ddc59b67a65e3b03c419d4105366f7d4a632f5d3c3bee9b1cff30604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a156fea265627a7a72315820119a2895e24ba9402ff12474e3d33d27d746c278db2d2cec6621709c21cef48264736f6c63430005100032",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b506004361060285760003560e01c80637b0cb83914602d575b600080fd5b60336035565b005b7f23919512b2162ddc59b67a65e3b03c419d4105366f7d4a632f5d3c3bee9b1cff30604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390a156fea265627a7a72315820119a2895e24ba9402ff12474e3d33d27d746c278db2d2cec6621709c21cef48264736f6c63430005100032",
   "sourceMap": "25:112:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:112:4;;;;;;;",
   "deployedSourceMap": "25:112:4:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:112:4;;;;;;;;;;;;;;;;;;;75:60;;;:::i;:::-;;;114:16;124:4;114:16;;;;;;;;;;;;;;;;;;;;;;75:60::o",
   "source": "pragma solidity ^0.5.0;\n\ncontract EventContract {\n  event e(address c);\n\n  function emitEvent() public {\n    emit e(address(this));\n  }\n}\n",
-  "sourcePath": "/media/ext/cw/frontier-tester/contracts/EventContract.sol",
+  "sourcePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/EventContract.sol",
   "ast": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/EventContract.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/EventContract.sol",
     "exportedSymbols": {
       "EventContract": [
         214
@@ -127,7 +127,7 @@
                             "name": "this",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1903,
+                            "referencedDeclaration": 1935,
                             "src": "124:4:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_contract$_EventContract_$214",
@@ -241,7 +241,7 @@
     "src": "0:138:4"
   },
   "legacyAST": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/EventContract.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/EventContract.sol",
     "exportedSymbols": {
       "EventContract": [
         214
@@ -336,7 +336,7 @@
                             "name": "this",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1903,
+                            "referencedDeclaration": 1935,
                             "src": "124:4:4",
                             "typeDescriptions": {
                               "typeIdentifier": "t_contract$_EventContract_$214",
@@ -454,8 +454,8 @@
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.2.0",
-  "updatedAt": "2020-09-30T15:48:22.916Z",
+  "schemaVersion": "3.2.3",
+  "updatedAt": "2021-01-21T20:27:19.346Z",
   "devdoc": {
     "methods": {}
   },

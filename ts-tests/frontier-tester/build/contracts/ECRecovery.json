@@ -28,15 +28,15 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"hash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"sig\",\"type\":\"bytes\"}],\"name\":\"recover\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{\"recover(bytes32,bytes)\":{\"details\":\"Recover signer address from a message by using his signature\",\"params\":{\"hash\":\"bytes32 message, the hash is the signed message. What is recovered is the signer address.\",\"sig\":\"bytes signature, the signature is generated using web3.eth.sign()\"}}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/frontier-tester/contracts/ECRecovery.sol\":\"ECRecovery\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/frontier-tester/contracts/ECRecovery.sol\":{\"keccak256\":\"0xc2b089de238b7af770bfec4ff93949bf2424f5f242b0f8da810107beae1c6ad8\",\"urls\":[\"bzz-raw://b5926300b600563720ea491eb608440f48d74edad3b63408b476a10043444869\",\"dweb:/ipfs/QmUNrLYFHWowhwpsRvSQkkh2Y1Fy6JoRkVkH5PWHioha7F\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b5061024c806100206000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c806319045a2514610030575b600080fd5b6100f36004803603604081101561004657600080fd5b81019080803590602001909291908035906020019064010000000081111561006d57600080fd5b82018360208201111561007f57600080fd5b803590602001918460018302840111640100000000831117156100a157600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f820116905080830192505050505050509192919290505050610135565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b60008060008060418551146101505760009350505050610211565b6020850151925060408501519150606085015160001a9050601b8160ff16101561017b57601b810190505b601b8160ff16141580156101935750601c8160ff1614155b156101a45760009350505050610211565b60018682858560405160008152602001604052604051808581526020018460ff1660ff1681526020018381526020018281526020019450505050506020604051602081039080840390855afa158015610201573d6000803e3d6000fd5b5050506020604051035193505050505b9291505056fea265627a7a7231582098d80832beb5ce333408b218b0c49a8f3f2f3d24688910a1af1df3ed912336e664736f6c63430005100032",
-  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c806319045a2514610030575b600080fd5b6100f36004803603604081101561004657600080fd5b81019080803590602001909291908035906020019064010000000081111561006d57600080fd5b82018360208201111561007f57600080fd5b803590602001918460018302840111640100000000831117156100a157600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f820116905080830192505050505050509192919290505050610135565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b60008060008060418551146101505760009350505050610211565b6020850151925060408501519150606085015160001a9050601b8160ff16101561017b57601b810190505b601b8160ff16141580156101935750601c8160ff1614155b156101a45760009350505050610211565b60018682858560405160008152602001604052604051808581526020018460ff1660ff1681526020018381526020018281526020019450505050506020604051602081039080840390855afa158015610201573d6000803e3d6000fd5b5050506020604051035193505050505b9291505056fea265627a7a7231582098d80832beb5ce333408b218b0c49a8f3f2f3d24688910a1af1df3ed912336e664736f6c63430005100032",
+  "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.9c3226ce\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"hash\",\"type\":\"bytes32\"},{\"internalType\":\"bytes\",\"name\":\"sig\",\"type\":\"bytes\"}],\"name\":\"recover\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"pure\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{\"recover(bytes32,bytes)\":{\"details\":\"Recover signer address from a message by using his signature\",\"params\":{\"hash\":\"bytes32 message, the hash is the signed message. What is recovered is the signer address.\",\"sig\":\"bytes signature, the signature is generated using web3.eth.sign()\"}}}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ECRecovery.sol\":\"ECRecovery\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ECRecovery.sol\":{\"keccak256\":\"0xc2b089de238b7af770bfec4ff93949bf2424f5f242b0f8da810107beae1c6ad8\",\"urls\":[\"bzz-raw://b5926300b600563720ea491eb608440f48d74edad3b63408b476a10043444869\",\"dweb:/ipfs/QmUNrLYFHWowhwpsRvSQkkh2Y1Fy6JoRkVkH5PWHioha7F\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061024c806100206000396000f3fe608060405234801561001057600080fd5b506004361061002b5760003560e01c806319045a2514610030575b600080fd5b6100f36004803603604081101561004657600080fd5b81019080803590602001909291908035906020019064010000000081111561006d57600080fd5b82018360208201111561007f57600080fd5b803590602001918460018302840111640100000000831117156100a157600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f820116905080830192505050505050509192919290505050610135565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b60008060008060418551146101505760009350505050610211565b6020850151925060408501519150606085015160001a9050601b8160ff16101561017b57601b810190505b601b8160ff16141580156101935750601c8160ff1614155b156101a45760009350505050610211565b60018682858560405160008152602001604052604051808581526020018460ff1660ff1681526020018381526020018281526020019450505050506020604051602081039080840390855afa158015610201573d6000803e3d6000fd5b5050506020604051035193505050505b9291505056fea265627a7a72315820bfd47aa39024c1407f91f006e2bb38e2a5135aae1453776cf99e3e43f9054b1b64736f6c63430005100032",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061002b5760003560e01c806319045a2514610030575b600080fd5b6100f36004803603604081101561004657600080fd5b81019080803590602001909291908035906020019064010000000081111561006d57600080fd5b82018360208201111561007f57600080fd5b803590602001918460018302840111640100000000831117156100a157600080fd5b91908080601f016020809104026020016040519081016040528093929190818152602001838380828437600081840152601f19601f820116905080830192505050505050509192919290505050610135565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b60008060008060418551146101505760009350505050610211565b6020850151925060408501519150606085015160001a9050601b8160ff16101561017b57601b810190505b601b8160ff16141580156101935750601c8160ff1614155b156101a45760009350505050610211565b60018682858560405160008152602001604052604051808581526020018460ff1660ff1681526020018381526020018281526020019450505050506020604051602081039080840390855afa158015610201573d6000803e3d6000fd5b5050506020604051035193505050505b9291505056fea265627a7a72315820bfd47aa39024c1407f91f006e2bb38e2a5135aae1453776cf99e3e43f9054b1b64736f6c63430005100032",
   "sourceMap": "25:999:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:999:3;;;;;;;",
   "deployedSourceMap": "25:999:3:-;;;;8:9:-1;5:2;;;30:1;27;20:12;5:2;25:999:3;;;;;;;;;;;;;;;;;;;322:700;;;;;;13:2:-1;8:3;5:11;2:2;;;29:1;26;19:12;2:2;322:700:3;;;;;;;;;;;;;;;;;;;21:11:-1;8;5:28;2:2;;;46:1;43;36:12;2:2;322:700:3;;35:9:-1;28:4;12:14;8:25;5:40;2:2;;;58:1;55;48:12;2:2;322:700:3;;;;;;100:9:-1;95:1;81:12;77:20;67:8;63:35;60:50;39:11;25:12;22:29;11:107;8:2;;;131:1;128;121:12;8:2;322:700:3;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;30:3:-1;22:6;14;1:33;99:1;93:3;85:6;81:16;74:27;137:4;133:9;126:4;121:3;117:14;113:30;106:37;;169:3;161:6;157:16;147:26;;322:700:3;;;;;;;;;;;;;;;:::i;:::-;;;;;;;;;;;;;;;;;;;;;;;;392:7;407:9;422;437:7;502:2;488:3;:10;:16;484:56;;530:1;514:19;;;;;;;484:56;635:2;630:3;626:12;620:19;615:24;;666:2;661:3;657:12;651:19;646:24;;705:2;700:3;696:12;690:19;687:1;682:28;677:33;;817:2;813:1;:6;;;809:34;;;834:2;829:7;;;;809:34;917:2;912:1;:7;;;;:18;;;;;928:2;923:1;:7;;;;912:18;908:110;;;956:1;940:19;;;;;;;908:110;987:24;997:4;1003:1;1006;1009;987:24;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;8:9:-1;5:2;;;45:16;42:1;39;24:38;77:16;74:1;67:27;5:2;987:24:3;;;;;;;;980:31;;;;;322:700;;;;;:::o",
   "source": "pragma solidity ^0.5.0;\n\ncontract ECRecovery {\n\n  /**\n   * @dev Recover signer address from a message by using his signature\n   * @param hash bytes32 message, the hash is the signed message. What is recovered is the signer address.\n   * @param sig bytes signature, the signature is generated using web3.eth.sign()\n   */\n  function recover(bytes32 hash, bytes memory sig) public pure returns (address) {\n    bytes32 r;\n    bytes32 s;\n    uint8 v;\n\n    //Check the signature length\n    if (sig.length != 65) {\n      return (address(0));\n    }\n\n    // Divide the signature in r, s and v variables\n    assembly {\n      r := mload(add(sig, 32))\n      s := mload(add(sig, 64))\n      v := byte(0, mload(add(sig, 96)))\n    }\n\n    // Version of signature should be 27 or 28, but 0 and 1 are also possible versions\n    if (v < 27) {\n      v += 27;\n    }\n\n    // If the version is correct return the signer address\n    if (v != 27 && v != 28) {\n      return (address(0));\n    } else {\n      return ecrecover(hash, v, r, s);\n    }\n  }\n}",
-  "sourcePath": "/media/ext/cw/frontier-tester/contracts/ECRecovery.sol",
+  "sourcePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ECRecovery.sol",
   "ast": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/ECRecovery.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ECRecovery.sol",
     "exportedSymbols": {
       "ECRecovery": [
         197
@@ -347,15 +347,6 @@
                 {
                   "externalReferences": [
                     {
-                      "sig": {
-                        "declaration": 138,
-                        "isOffset": false,
-                        "isSlot": false,
-                        "src": "700:3:3",
-                        "valueSize": 1
-                      }
-                    },
-                    {
                       "r": {
                         "declaration": 144,
                         "isOffset": false,
@@ -397,6 +388,15 @@
                         "isOffset": false,
                         "isSlot": false,
                         "src": "677:1:3",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "sig": {
+                        "declaration": 138,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "700:3:3",
                         "valueSize": 1
                       }
                     }
@@ -725,7 +725,7 @@
                             "name": "ecrecover",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1798,
+                            "referencedDeclaration": 1899,
                             "src": "987:9:3",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_ecrecover_pure$_t_bytes32_$_t_uint8_$_t_bytes32_$_t_bytes32_$returns$_t_address_$",
@@ -959,7 +959,7 @@
     "src": "0:1024:3"
   },
   "legacyAST": {
-    "absolutePath": "/media/ext/cw/frontier-tester/contracts/ECRecovery.sol",
+    "absolutePath": "/media/ext/cw/edgeware-node-develop/ts-tests/frontier-tester/contracts/ECRecovery.sol",
     "exportedSymbols": {
       "ECRecovery": [
         197
@@ -1270,15 +1270,6 @@
                 {
                   "externalReferences": [
                     {
-                      "sig": {
-                        "declaration": 138,
-                        "isOffset": false,
-                        "isSlot": false,
-                        "src": "700:3:3",
-                        "valueSize": 1
-                      }
-                    },
-                    {
                       "r": {
                         "declaration": 144,
                         "isOffset": false,
@@ -1320,6 +1311,15 @@
                         "isOffset": false,
                         "isSlot": false,
                         "src": "677:1:3",
+                        "valueSize": 1
+                      }
+                    },
+                    {
+                      "sig": {
+                        "declaration": 138,
+                        "isOffset": false,
+                        "isSlot": false,
+                        "src": "700:3:3",
                         "valueSize": 1
                       }
                     }
@@ -1648,7 +1648,7 @@
                             "name": "ecrecover",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 1798,
+                            "referencedDeclaration": 1899,
                             "src": "987:9:3",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_ecrecover_pure$_t_bytes32_$_t_uint8_$_t_bytes32_$_t_bytes32_$returns$_t_address_$",
@@ -1886,8 +1886,8 @@
     "version": "0.5.16+commit.9c3226ce.Emscripten.clang"
   },
   "networks": {},
-  "schemaVersion": "3.2.0",
-  "updatedAt": "2020-09-21T14:50:13.786Z",
+  "schemaVersion": "3.2.3",
+  "updatedAt": "2021-01-21T20:27:19.345Z",
   "devdoc": {
     "methods": {
       "recover(bytes32,bytes)": {
