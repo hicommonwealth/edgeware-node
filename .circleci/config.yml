@@ -24,6 +24,11 @@ jobs:
       # full build
       - run: source ~/.cargo/env && cd ~/edgeware && cargo build --release
 
+      # save the built binary
+      - store_artifacts:
+          path: ~/edgeware/target/release/edgeware
+          destination: edgeware-node
+
       # save edgeware build
       - save_cache:
           key: edgeware-{{ checksum "Cargo.lock" }}
