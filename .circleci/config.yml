@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:lts
+      - image: ubuntu:18.04
         environment:
           DEBUG_BUILD: true
           DEBIAN_FRONTEND: noninteractive
@@ -12,6 +12,8 @@ jobs:
     steps:
       - checkout
       - run: sudo apt-get update
+      - run: sudo apt-get install nodejs npm
+      - run: npm install --global yarn
       - run: ~/edgeware/scripts/init.sh
 
       # get cached edgeware build
