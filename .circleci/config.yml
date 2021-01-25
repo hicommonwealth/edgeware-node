@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - run: apt-get update
-      - run: apt-get install sudo git nodejs npm
+      - run: apt-get install -y sudo git nodejs npm
       - checkout
       - run: npm install --global yarn
       - run: ~/edgeware/scripts/init.sh
