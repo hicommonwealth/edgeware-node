@@ -10,7 +10,7 @@ function timeout(ms) {
 }
 
 function blockTimeifyDate(n) {
-  return Math.floor(n / 1000);
+  return Math.floor(n / BLOCK_TIME_MS) * (BLOCK_TIME_MS / 1000);
 }
 
 describeWithEdgeware("TimeContract test", async (context) => {
