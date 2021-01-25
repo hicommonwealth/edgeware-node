@@ -10,9 +10,9 @@ jobs:
     working_directory: ~/edgeware
 
     steps:
+      - run: apt-get update
+      - run: apt-get install sudo git nodejs npm
       - checkout
-      - run: sudo apt-get update
-      - run: sudo apt-get install nodejs npm
       - run: npm install --global yarn
       - run: ~/edgeware/scripts/init.sh
 
