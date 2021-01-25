@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: cimg/node:15.4.0
+      - image: ubuntu:18.04
         environment:
           DEBUG_BUILD: true
           DEBIAN_FRONTEND: noninteractive
@@ -10,8 +10,15 @@ jobs:
     working_directory: ~/edgeware
 
     steps:
+      # basic image config to install sudo, node, yarn
+      - run: apt-get update
+      - run: apt-get install -y sudo git curl
+      - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+      - run: sudo apt-get install -y nodejs
+      - run: npm install --global yarn
+
+      # begin using repo-specific scripts
       - checkout
-      - run: sudo apt-get update
       - run: ~/edgeware/scripts/init.sh
 
       # get cached edgeware build
@@ -23,6 +30,11 @@ jobs:
 
       # full build
       - run: source ~/.cargo/env && cd ~/edgeware && cargo build --release
+
+      # save the built binary
+      - store_artifacts:
+          path: ~/edgeware/target/release/edgeware
+          destination: edgeware-node
 
       # save edgeware build
       - save_cache:
