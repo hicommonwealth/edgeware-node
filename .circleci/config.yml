@@ -14,10 +14,10 @@ jobs:
       - run: apt-get update
       - run: apt-get install -y sudo git curl
       - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-      - run: apt-get update
-      - run: sudo apt-get install -y nodejs npm
+      - run: sudo apt-get install -y nodejs
       - run: npm install --global yarn
       - run: echo $(node -v)
+      - run: echo $(npm -v)
 
       # begin using repo-specific scripts
       - checkout
