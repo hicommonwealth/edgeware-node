@@ -17,7 +17,7 @@ jobs:
       - run: apt-get update
       - run: sudo apt-get install -y nodejs npm
       - run: npm install --global yarn
-      - run: echo "Node: $(node -v)"
+      - run: echo $(node -v)
 
       # begin using repo-specific scripts
       - checkout
