@@ -10,10 +10,17 @@ jobs:
     working_directory: ~/edgeware
 
     steps:
+      # basic image config to install sudo, node, yarn
       - run: apt-get update
-      - run: apt-get install -y sudo git nodejs npm
-      - checkout
+      - run: apt-get install -y sudo git curl
+      - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+      - run: apt-get update
+      - run: sudo apt-get install -y nodejs npm
       - run: npm install --global yarn
+      - run: echo "Node: $(node -v)"
+
+      # begin using repo-specific scripts
+      - checkout
       - run: ~/edgeware/scripts/init.sh
 
       # get cached edgeware build
