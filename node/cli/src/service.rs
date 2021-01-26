@@ -138,7 +138,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 
 /// Creates a full service from the configuration.
 pub fn new_full_base(
-	config: Configuration,
+	mut config: Configuration,
 	enable_dev_signer: bool,
 	with_startup_data: impl FnOnce(
 		&sc_consensus_aura::AuraBlockImport<
@@ -225,6 +225,8 @@ pub fn new_full_base(
 
 		(rpc_extensions_builder, rpc_setup)
 	};
+
+	config.network.extra_sets.push(sc_finality_grandpa::grandpa_peers_set_config());
 
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
