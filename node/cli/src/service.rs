@@ -160,6 +160,8 @@ pub fn new_full_base(
 		other: (block_import, grandpa_link, pending_transactions),
 	} = new_partial(&config)?;
 
+	config.network.extra_sets.push(sc_finality_grandpa::grandpa_peers_set_config());
+
 	let (network, network_status_sinks, system_rpc_tx, network_starter) =
 		sc_service::build_network(sc_service::BuildNetworkParams {
 			config: &config,
@@ -225,8 +227,6 @@ pub fn new_full_base(
 
 		(rpc_extensions_builder, rpc_setup)
 	};
-
-	config.network.extra_sets.push(sc_finality_grandpa::grandpa_peers_set_config());
 
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
