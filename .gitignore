@@ -16,3 +16,8 @@ edgeware*.wasm
 # Misc
 .vscode
 mainnet-state.json
+db
+node_modules
+forker-data
+beresheet-state.json
+build

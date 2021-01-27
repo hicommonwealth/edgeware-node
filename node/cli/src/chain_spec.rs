@@ -21,8 +21,8 @@ use edgeware_runtime::Block;
 use edgeware_runtime::{
 	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
 	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-	SessionKeys, SignalingConfig, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap,
+	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
+	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig,
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -31,7 +31,7 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public};
+use sp_core::{sr25519, Pair, Public, U256, H160,};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
 	traits::{IdentifyAccount, One, Verify},
@@ -47,6 +47,8 @@ use serde_json::Result;
 use std::fs::File;
 use std::io::Read;
 use std::path::Path;
+use std::collections::BTreeMap;
+use std::str::FromStr;
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -158,7 +160,19 @@ pub fn testnet_genesis(
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	founder_allocation: Vec<(AccountId, Balance)>,
 ) -> GenesisConfig {
-	let endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
+	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
+	let mut evm_accounts = BTreeMap::new();
+	evm_accounts.insert(
+		alice_evm_account_id,
+		pallet_evm::GenesisAccount {
+			nonce: 0.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		},
+	);
+
+	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),
 			get_account_id_from_seed::<sr25519::Public>("Bob"),
@@ -175,7 +189,27 @@ pub fn testnet_genesis(
 		]
 	});
 
+	initial_authorities.iter().for_each(|x| {
+		if !endowed_accounts.contains(&x.0) {
+			endowed_accounts.push(x.0.clone());
+		}
+		if !endowed_accounts.contains(&x.1) {
+			endowed_accounts.push(x.1.clone());
+		}
+	});
+
 	const STASH: Balance = 100000000 * DOLLARS;
+	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts
+		.iter()
+		.map(|k| (k.clone(), STASH))
+		.collect();
+
+	// add founders and balances to endowed if not already in list
+	founder_allocation.iter().chain(balances.iter()).for_each(|x| {
+		if !endowed_accounts.contains(&x.0) {
+			endowed_balances.push((x.0.clone(), x.1.clone()));
+		}
+	});
 
 	GenesisConfig {
 		frame_system: Some(SystemConfig {
@@ -183,19 +217,7 @@ pub fn testnet_genesis(
 			changes_trie_config: Default::default(),
 		}),
 		pallet_balances: Some(BalancesConfig {
-			balances: endowed_accounts
-				.iter()
-				.cloned()
-				.map(|k| (k, STASH))
-				.chain(
-					founder_allocation
-						.iter()
-						.map(|x| (x.0.clone(), x.1.clone())),
-				)
-				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
-				.chain(initial_authorities.iter().map(|x| (x.1.clone(), STASH)))
-				.chain(balances.clone())
-				.collect(),
+			balances: endowed_balances,
 		}),
 		pallet_indices: Some(IndicesConfig { indices: vec![] }),
 		pallet_session: Some(SessionConfig {
@@ -238,11 +260,9 @@ pub fn testnet_genesis(
 		pallet_elections_phragmen: Some(Default::default()),
 		pallet_sudo: Some(SudoConfig { key: _root_key }),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
+		pallet_evm: Some(EVMConfig { accounts: evm_accounts }),
 		pallet_contracts: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
-		}),
+		pallet_ethereum: Some(Default::default()),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
@@ -316,6 +336,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	)
 }
 
+/// Development config with 6 node validator set
 fn multi_development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![
@@ -335,6 +356,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 	)
 }
 
+/// Development config with single node validator set
 pub fn development_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		vec![get_authority_keys_from_seed("Alice")],
@@ -499,11 +521,9 @@ pub fn mainnet_genesis(
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		}),
 		pallet_vesting: Some(VestingConfig { vesting: vesting }),
+		pallet_evm: Some(Default::default()),
 		pallet_contracts: Some(Default::default()),
-		signaling: Some(SignalingConfig {
-			voting_length: 7 * DAYS,
-			proposal_creation_bond: 1 * DOLLARS,
-		}),
+		pallet_ethereum: Some(Default::default()),
 		treasury_reward: Some(TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),

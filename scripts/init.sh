@@ -9,7 +9,7 @@ if [[ "$OSTYPE" == "linux-gnu" ]]; then
         SUDO_PREFIX='sudo'
     fi
     $SUDO_PREFIX apt update
-    $SUDO_PREFIX apt install -y build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev
+    $SUDO_PREFIX apt install -y curl build-essential cmake pkg-config libssl-dev openssl git clang libclang-dev
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     echo "Found macbook"
     brew install cmake pkg-config openssl git llvm
@@ -26,9 +26,3 @@ fi
 rustup update stable
 rustup update nightly
 rustup target add wasm32-unknown-unknown --toolchain nightly
-
-if [[ $(wasm-gc) ]]; then
-    echo "Found wasm-gc"
-else
-    cargo install --git https://github.com/alexcrichton/wasm-gc
-fi

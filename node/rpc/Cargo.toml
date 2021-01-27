@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-rpc"
-version = "3.1.0"
+version = "3.2.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
@@ -11,24 +11,29 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 jsonrpc-core = "15.0.0"
-edgeware-primitives = { version = "3.1.0", path = "../primitives" }
-edgeware-runtime = { version = "3.1.0", path = "../runtime" }
-pallet-contracts-rpc = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-pallet-transaction-payment-rpc = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-client-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-consensus-babe = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-consensus-babe-rpc = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-consensus-epochs = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-finality-grandpa-rpc = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-keystore = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-rpc-api = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sc-rpc = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-api = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-block-builder = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-blockchain = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-consensus = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-consensus-babe = { version = "0.8.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-runtime = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-sp-transaction-pool = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
-substrate-frame-rpc-system = { version = "2.0.0", git = "https://github.com/hicommonwealth/substrate.git", branch = "master" }
+jsonrpc-pubsub = "15.0.0"
+edgeware-primitives = { path = "../primitives" }
+edgeware-runtime = { path = "../runtime" }
+pallet-contracts-rpc = { version = "0.8" }
+pallet-transaction-payment-rpc = { version = "2.0" }
+sc-client-api = { version = "2.0" }
+sc-consensus-aura = { version = "0.8" }
+sc-consensus-epochs = { version = "0.8" }
+sc-finality-grandpa = { version = "0.8" }
+sc-finality-grandpa-rpc = { version = "0.8" }
+sc-keystore = { version = "2.0" }
+sc-network = { version = "0.8" }
+sc-rpc-api = { version = "0.8" }
+sc-rpc = { version = "2.0" }
+sp-api = { version = "2.0" }
+sp-block-builder = { version = "2.0" }
+sp-blockchain = { version = "2.0" }
+sp-consensus = { version = "0.8" }
+sp-consensus-aura = { version = "0.8" }
+sp-runtime = { version = "2.0" }
+sp-transaction-pool = { version = "2.0" }
+substrate-frame-rpc-system = { version = "2.0" }
+pallet-ethereum = { version = "0.1" }
+fc-rpc = { version = "0.1", features = ["rpc_binary_search_estimate"] }
+fp-rpc = { version = "0.1" }
+fc-rpc-core = { version = "0.1" }
