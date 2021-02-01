@@ -31,12 +31,16 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
+use sp_consensus_babe::{AuthorityId as BabeId};
 use sp_core::{sr25519, Pair, Public, U256, H160,};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
 	traits::{IdentifyAccount, One, Verify},
 	Perbill,
 };
+
+use hex_literal::hex;
+use sp_core::crypto::UncheckedInto;
 
 pub use edgeware_primitives::{AccountId, Balance, BlockNumber, Signature};
 pub use edgeware_runtime::constants::time::*;
@@ -105,12 +109,14 @@ pub fn edgeware_beresheet_official() -> ChainSpec {
 fn session_keys(
 	grandpa: GrandpaId,
 	aura: AuraId,
+	babe: BabeId,
 	im_online: ImOnlineId,
 	authority_discovery: AuthorityDiscoveryId,
 ) -> SessionKeys {
 	SessionKeys {
 		grandpa,
 		aura,
+		babe,
 		im_online,
 		authority_discovery,
 	}
@@ -227,7 +233,7 @@ pub fn testnet_genesis(
 					(
 						x.0.clone(),
 						x.0.clone(),
-						session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone()),
+						session_keys(x.2.clone(), x.3.clone(), hex!["9becad03e6dcac03cee07edebca5475314861492cdfc96a2144a67bbe9699332"].unchecked_into(), x.4.clone(), x.5.clone()),
 					)
 				})
 				.collect::<Vec<_>>(),
@@ -251,6 +257,7 @@ pub fn testnet_genesis(
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
+		pallet_babe: Some(Default::default()),
 		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
 		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
 		pallet_grandpa: Some(GrandpaConfig {
@@ -479,7 +486,7 @@ pub fn mainnet_genesis(
 					(
 						x.0.clone(),
 						x.0.clone(),
-						session_keys(x.4.clone(), x.3.clone(), x.5.clone(), x.6.clone()),
+						session_keys(x.4.clone(), x.3.clone(), hex!["9becad03e6dcac03cee07edebca5475314861492cdfc96a2144a67bbe9699332"].unchecked_into(), x.5.clone(), x.6.clone()),
 					)
 				})
 				.collect::<Vec<_>>(),
@@ -510,6 +517,7 @@ pub fn mainnet_genesis(
 		pallet_aura: Some(AuraConfig {
 			authorities: vec![],
 		}),
+		pallet_babe: Some(Default::default()),
 		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
 		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
 		pallet_grandpa: Some(GrandpaConfig {

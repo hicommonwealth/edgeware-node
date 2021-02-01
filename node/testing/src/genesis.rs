@@ -94,6 +94,7 @@ pub fn config(support_changes_trie: bool, code: Option<&[u8]>) -> GenesisConfig 
 			..Default::default()
 		}),
 		pallet_aura: Some(Default::default()),
+		pallet_babe: Some(Default::default()),
 		pallet_grandpa: Some(GrandpaConfig {
 			authorities: vec![],
 		}),

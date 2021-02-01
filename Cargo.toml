@@ -98,6 +98,7 @@ frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.
 pallet-aura = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
 pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
 pallet-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
+pallet-babe = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
 pallet-balances = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
 pallet-bounties = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
 pallet-collective = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }

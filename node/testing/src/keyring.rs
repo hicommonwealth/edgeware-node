@@ -62,6 +62,7 @@ pub fn to_session_keys(
 	SessionKeys {
 		grandpa: ed25519_keyring.to_owned().public().into(),
 		aura: ed25519_keyring.to_owned().public().into(),
+		babe: sr25519_keyring.to_owned().public().into(),
 		im_online: ed25519_keyring.to_owned().public().into(),
 		authority_discovery: sr25519_keyring.to_owned().public().into(),
 	}
