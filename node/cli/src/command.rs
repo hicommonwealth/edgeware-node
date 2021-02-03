@@ -83,7 +83,7 @@ pub fn run() -> Result<()> {
 				match config.role {
 					Role::Light => service::new_light(config),
 					_ => service::new_full(config, cli.run.enable_dev_signer),
-				}
+				}.map_err(sc_cli::Error::Service)
 			})
 		}
 		Some(Subcommand::Benchmark(cmd)) => {

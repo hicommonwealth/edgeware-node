@@ -30,7 +30,7 @@
 #![warn(missing_docs)]
 
 use std::{sync::Arc};
-use fc_rpc_core::types::PendingTransactions;
+use fc_rpc_core::types::{FilterPool, PendingTransactions};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use jsonrpc_pubsub::manager::SubscriptionManager;
 use sc_finality_grandpa::{
@@ -95,6 +95,8 @@ pub struct FullDeps<C, P, SC, B> {
 	pub network: Arc<NetworkService<Block, Hash>>,
 	/// Ethereum pending transactions.
 	pub pending_transactions: PendingTransactions,
+	/// EthFilterApi pool.
+	pub filter_pool: Option<FilterPool>,
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
@@ -127,7 +129,7 @@ pub fn create_full<C, P, SC, B>(
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 	use fc_rpc::{
 		EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi,
-		EthDevSigner, EthSigner, HexEncodedIdProvider,
+		EthDevSigner, EthSigner, HexEncodedIdProvider, EthFilterApi, EthFilterApiServer,
 	};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -139,6 +141,7 @@ pub fn create_full<C, P, SC, B>(
 		is_authority,
 		network,
 		pending_transactions,
+		filter_pool,
 		deny_unsafe,
 		grandpa,
 	} = deps;
@@ -178,6 +181,17 @@ pub fn create_full<C, P, SC, B>(
 			is_authority,
 		))
 	);
+
+	if let Some(filter_pool) = filter_pool {
+		io.extend_with(
+			EthFilterApiServer::to_delegate(EthFilterApi::new(
+				client.clone(),
+				filter_pool.clone(),
+				500 as usize, // max stored filters
+			))
+		);
+	}
+
 	io.extend_with(
 		NetApiServer::to_delegate(NetApi::new(
 			client.clone(),

@@ -19,8 +19,8 @@
 //! Service implementation. Specialized wrapper over substrate service.
 
 use sc_service::ChainSpec;
-use std::{sync::{Arc, Mutex}, collections::HashMap};
-use fc_rpc_core::types::PendingTransactions;
+use std::{sync::{Arc, Mutex}, collections::{BTreeMap, HashMap}};
+use fc_rpc_core::types::{FilterPool, PendingTransactions};
 use sc_client_api::{ExecutorProvider, RemoteBackend, BlockchainEvents};
 use sc_consensus_aura;
 use sc_finality_grandpa::{self, FinalityProofProvider as GrandpaFinalityProofProvider};
@@ -32,6 +32,7 @@ use sc_service::{
 	RpcHandlers, TaskManager,
 };
 use sp_inherents::InherentDataProviders;
+use sc_telemetry::{TelemetryConnectionNotifier, TelemetrySpan};
 use sc_network::{Event, NetworkService};
 use sp_runtime::traits::Block as BlockT;
 use futures::prelude::*;
@@ -80,9 +81,11 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 		>,
 		sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 		PendingTransactions,
+		Option<TelemetrySpan>,
+		Option<FilterPool>,
 	)
 >, ServiceError> {
-	let (client, backend, keystore_container, task_manager) =
+	let (client, backend, keystore_container, task_manager, telemetry_span) =
 		sc_service::new_full_parts::<Block, RuntimeApi, Executor>(&config)?;
 	let client = Arc::new(client);
 
@@ -97,6 +100,9 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 
 	let pending_transactions: PendingTransactions
 		= Some(Arc::new(Mutex::new(HashMap::new())));
+
+	let filter_pool: Option<FilterPool>
+		= Some(Arc::new(Mutex::new(BTreeMap::new())));
 
 	let (grandpa_block_import, grandpa_link) = sc_finality_grandpa::block_import(
 		client.clone(),
@@ -132,7 +138,7 @@ pub fn new_partial(config: &Configuration) -> Result<sc_service::PartialComponen
 	Ok(sc_service::PartialComponents {
 		client, backend, task_manager, import_queue, keystore_container, select_chain, transaction_pool,
 		inherent_data_providers,
-		other: (aura_block_import.clone(), grandpa_link, pending_transactions,)
+		other: (aura_block_import.clone(), grandpa_link, pending_transactions, telemetry_span, filter_pool,)
 	})
 }
 
@@ -157,7 +163,7 @@ pub fn new_full_base(
 	let sc_service::PartialComponents {
 		client, backend, mut task_manager, import_queue, keystore_container,
 		select_chain, transaction_pool, inherent_data_providers,
-		other: (block_import, grandpa_link, pending_transactions),
+		other: (block_import, grandpa_link, pending_transactions, telemetry_span, filter_pool),
 	} = new_partial(&config)?;
 
 	config.network.extra_sets.push(sc_finality_grandpa::grandpa_peers_set_config());
@@ -184,14 +190,16 @@ pub fn new_full_base(
 	let name = config.network.node_name.clone();
 	let enable_grandpa = !config.disable_grandpa;
 	let prometheus_registry = config.prometheus_registry().cloned();
-	let telemetry_connection_sinks = sc_service::TelemetryConnectionSinks::default();
 
 	let (rpc_extensions_builder, rpc_setup) = {
 		let justification_stream = grandpa_link.justification_stream();
 		let shared_authority_set = grandpa_link.shared_authority_set().clone();
 		let shared_voter_state = sc_finality_grandpa::SharedVoterState::empty();
-		let finality_proof_provider =
-			GrandpaFinalityProofProvider::new_for_service(backend.clone(), client.clone());
+		let finality_proof_provider = GrandpaFinalityProofProvider::new_for_service(
+			backend.clone(),
+			client.clone(),
+			Some(shared_authority_set.clone()),
+		);
 
 		let rpc_setup = (shared_voter_state.clone(), finality_proof_provider.clone());
 		let client = client.clone();
@@ -199,6 +207,7 @@ pub fn new_full_base(
 		let select_chain = select_chain.clone();
 		let network = network.clone();
 		let pending = pending_transactions.clone();
+		let filter_pool = filter_pool.clone();
 		let is_authority = config.role.clone().is_authority();
 		let _keystore = keystore_container.sync_keystore();
 		let subscription_executor = sc_rpc::SubscriptionTaskExecutor::new(task_manager.spawn_handle());
@@ -210,6 +219,7 @@ pub fn new_full_base(
 				select_chain: select_chain.clone(),
 				network: network.clone(),
 				pending_transactions: pending.clone(),
+				filter_pool: filter_pool.clone(),
 				is_authority,
 				enable_dev_signer,
 				deny_unsafe,
@@ -228,7 +238,7 @@ pub fn new_full_base(
 		(rpc_extensions_builder, rpc_setup)
 	};
 
-	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
+	let (_rpc_handlers, telemetry_connection_notifier) = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
 		backend: backend.clone(),
 		client: client.clone(),
@@ -239,10 +249,32 @@ pub fn new_full_base(
 		task_manager: &mut task_manager,
 		on_demand: None,
 		remote_blockchain: None,
-		telemetry_connection_sinks: telemetry_connection_sinks.clone(),
 		network_status_sinks: network_status_sinks.clone(),
 		system_rpc_tx,
+		telemetry_span,
 	})?;
+
+	// Spawn Frontier EthFilterApi maintenance task.
+	if filter_pool.is_some() {
+		use futures::StreamExt;
+		// Each filter is allowed to stay in the pool for 100 blocks.
+		const FILTER_RETAIN_THRESHOLD: u64 = 100;
+		task_manager.spawn_essential_handle().spawn(
+			"frontier-filter-pool",
+			client.import_notification_stream().for_each(move |notification| {
+				if let Ok(locked) = &mut filter_pool.clone().unwrap().lock() {
+					let imported_number: u64 = notification.header.number as u64;
+					for (k, v) in locked.clone().iter() {
+						let lifespan_limit = v.at_block + FILTER_RETAIN_THRESHOLD;
+						if lifespan_limit <= imported_number {
+							locked.remove(&k);
+						}
+					}
+				}
+				futures::future::ready(())
+			})
+		);
+	}
 
 	// Spawn Frontier pending transactions maintenance task (as essential, otherwise we leak).
 	if pending_transactions.is_some() {
@@ -371,7 +403,7 @@ pub fn new_full_base(
 			config,
 			link: grandpa_link,
 			network: network.clone(),
-			telemetry_on_connect: Some(telemetry_connection_sinks.on_connect_stream()),
+			telemetry_on_connect: telemetry_connection_notifier.map(|x| x.on_connect_stream()),
 			voting_rule: sc_finality_grandpa::VotingRulesBuilder::default().build(),
 			prometheus_registry,
 			shared_voter_state,
@@ -410,11 +442,11 @@ pub fn new_full(config: Configuration, enable_dev_signer: bool)
 }
 
 pub fn new_light_base(config: Configuration) -> Result<(
-	TaskManager, RpcHandlers, Arc<LightClient>,
+	TaskManager, RpcHandlers, Option<TelemetryConnectionNotifier>, Arc<LightClient>,
 	Arc<NetworkService<Block, <Block as BlockT>::Hash>>,
 	Arc<sc_transaction_pool::LightPool<Block, LightClient, sc_network::config::OnDemand<Block>>>
 ), ServiceError> {
-	let (client, backend, keystore_container, mut task_manager, on_demand) =
+	let (client, backend, keystore_container, mut task_manager, on_demand, telemetry_span) =
 		sc_service::new_light_parts::<Block, RuntimeApi, Executor>(&config)?;
 
 	let select_chain = sc_consensus::LongestChain::new(backend.clone());
@@ -476,7 +508,7 @@ pub fn new_light_base(config: Configuration) -> Result<(
 
 	let rpc_extensions = edgeware_rpc::create_light(light_deps);
 
-	let rpc_handlers =
+	let (rpc_handlers, telemetry_connection_notifier) =
 		sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 			on_demand: Some(on_demand),
 			remote_blockchain: Some(backend.remote_blockchain()),
@@ -486,16 +518,17 @@ pub fn new_light_base(config: Configuration) -> Result<(
 			keystore: keystore_container.sync_keystore(),
 			config, backend, network_status_sinks, system_rpc_tx,
 			network: network.clone(),
-			telemetry_connection_sinks: sc_service::TelemetryConnectionSinks::default(),
 			task_manager: &mut task_manager,
+			telemetry_span,
 		})?;
 
-	Ok((task_manager, rpc_handlers, client, network, transaction_pool))
+
+	Ok((task_manager, rpc_handlers, telemetry_connection_notifier, client, network, transaction_pool))
 }
 
 /// Builds a new service for a light client.
 pub fn new_light(config: Configuration) -> Result<TaskManager, ServiceError> {
-	new_light_base(config).map(|(task_manager, _, _, _, _)| {
+	new_light_base(config).map(|(task_manager, _, _, _, _, _)| {
 		task_manager
 	})
 }

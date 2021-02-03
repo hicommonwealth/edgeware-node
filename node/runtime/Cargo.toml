@@ -56,7 +56,7 @@ pallet-contracts = { default-features = false, version = "2.0" }
 pallet-contracts-primitives = { default-features = false, version = "2.0" }
 pallet-contracts-rpc-runtime-api = { default-features = false, version = "0.8" }
 pallet-democracy = { version = "2.0", default-features = false }
-pallet-elections-phragmen = { version = "2.0", default-features = false }
+pallet-elections-phragmen = { version = "3.0", default-features = false }
 frame-executive = { version = "2.0", default-features = false }
 pallet-grandpa = { version = "2.0", default-features = false }
 pallet-identity = { version = "2.0", default-features = false }
