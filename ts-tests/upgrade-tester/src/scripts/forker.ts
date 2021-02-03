@@ -10,7 +10,11 @@ import { execFileSync, execSync } from 'child_process';
 
 // input paths
 const binaryPath = '../../target/release/edgeware';
-const wasmPath = '../../../edgeware-node-3.1.0/edgeware_runtime.wasm';
+const wasmPath = '../../../edgeware-node-3.2.0/edgeware_runtime.wasm';
+const rpcEndpoint = 'http://beresheet2.edgewa.re:9933';
+// const rpcEndpoint = 'http://mainnet2.edgewa.re:9933';
+const chainSpecName = 'beresheet';
+// const chainSpecName = 'edgeware';
 
 // output paths
 const outputDir = path.join(__dirname, 'forker-data');
@@ -20,7 +24,7 @@ const forkedSpecPath = path.join(outputDir, 'fork.json');
 const storagePath = path.join(outputDir, 'storage.json');
 
 // Using http endpoint since substrate's Ws endpoint has a size limit.
-const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://beresheet2.edgewa.re:9933');
+const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || rpcEndpoint);
 
 /**
  * All module prefixes except those mentioned in the skippedModulesPrefix will be added to this by the script.
@@ -81,7 +85,7 @@ async function main() {
   });
 
   // Generate chain spec for original and forked chains
-  execSync(`${binaryPath} build-spec --raw --chain=beresheet > ${originalSpecPath}`);
+  execSync(`${binaryPath} build-spec --raw --chain=${chainSpecName} > ${originalSpecPath}`);
   execSync(`${binaryPath} build-spec --dev --raw > ${forkedSpecPath}`);
 
   const storage = JSON.parse(fs.readFileSync(storagePath, 'utf8'));

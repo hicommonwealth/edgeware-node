@@ -137,6 +137,7 @@ class TestRunner {
       '--base-path', this.options.chainBasePath,
       '--wasm-execution', 'Compiled',
       '--alice', // TODO: abstract this into accounts somehow
+      '--validator',
       '--force-authoring',
       '--no-telemetry',
       '--no-prometheus',

@@ -5,14 +5,16 @@ import StateTest from './stateTest';
 import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
-const CHAINSPEC = `${__dirname}/scripts/forker-data/fork.json`;
-// const BINARY_PATH = '../../../edgeware-node-3.1.0/target/release/edgeware';
-const BINARY_PATH = '../../target/release/edgeware';
+// const CHAINSPEC = `${__dirname}/scripts/forker-data/fork.json`;
+const CHAINSPEC = 'dev';
+const BINARY_PATH = '../../../edgeware-node-3.2.0/target/release/edgeware';
+// const BINARY_PATH = '../../target/release/edgeware';
 const CHAIN_BASE_PATH = `${__dirname}/../db`;
 const ACCOUNTS = [ '//Alice' ];
 const SS58_PREFIX = 7; // edgeware ss58
 
-const UPGRADE_BINARY = '../../target/release/edgeware';
+// const UPGRADE_BINARY = '../../target/release/edgeware';
+const UPGRADE_BINARY = null;
 const UPGRADE_CODE = '../../edgeware_runtime.wasm';
 const SUDO_SEED = '//Alice';
 const UPGRADE_ON_NEW_NODE = false;

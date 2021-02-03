@@ -1,7 +1,5 @@
 import { ApiPromise } from '@polkadot/api';
-import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
-import { ITuple } from '@polkadot/types/types';
+import { Voter } from '@polkadot/types/interfaces';
 import { assert } from 'chai';
 import StateTest from '../stateTest';
 import { makeTx } from '../util';
@@ -9,7 +7,7 @@ import { makeTx } from '../util';
 export default class extends StateTest {
   private _candidates: string[];
   private _council: string[];
-  private _charlieVotes: ITuple<[BalanceOf, Vec<AccountId>]>;
+  private _charlieVotes: Voter;
 
   constructor() {
     super('council test');
@@ -41,8 +39,9 @@ export default class extends StateTest {
 
     // confirm vote unchanged
     const charlieVotes = await api.query.elections.voting(this.accounts.charlie.address);
-    assert.equal(+charlieVotes[0], +this._charlieVotes[0]);
-    assert.sameMembers(charlieVotes[1].map((c) => c.toString()), this._charlieVotes[1].map((c) => c.toString()));
+    assert.equal(charlieVotes.stake.toString(), this._charlieVotes.stake.toString());
+    assert.equal(charlieVotes.deposit.toString(), this._charlieVotes.deposit.toString());
+    assert.sameMembers(charlieVotes.votes.map((c) => c.toString()), this._charlieVotes.votes.map((c) => c.toString()));
 
     // confirm council unchanged
     const council = (await api.query.council.members()).map((c) => c.toString());
