@@ -23,7 +23,7 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
-evm-runtime = { version = "0.21.0", default-features = false }
+evm-runtime = { version = "0.22.0", default-features = false }
 
 # primitives
 sp-application-crypto = { version = "2.0", default-features = false }
@@ -91,7 +91,7 @@ edge-assets = { path = "../../modules/edge-assets", default-features = false }
 
 fp-rpc = { version = "0.1", default-features = false }
 pallet-ethereum = { version = "0.1", default-features = false }
-pallet-evm = { version = "2.0", default-features = false }
+pallet-evm = { version = "= 2.0.0", default-features = false }
 pallet-evm-precompile-simple = { version = "2.0", default-features = false }
 pallet-evm-precompile-modexp = { version = "2.0", default-features = false }
 pallet-evm-precompile-ed25519 = { version = "2.0", default-features = false }

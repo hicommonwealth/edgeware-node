@@ -1407,8 +1407,8 @@ dependencies = [
  "futures 0.3.12",
  "hex 0.3.2",
  "hex-literal",
- "jsonrpc-core",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "log",
  "nix",
  "pallet-authority-discovery",
@@ -1521,8 +1521,8 @@ dependencies = [
  "fc-rpc",
  "fc-rpc-core",
  "fp-rpc",
- "jsonrpc-core",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "pallet-contracts-rpc",
  "pallet-ethereum",
  "pallet-transaction-payment-rpc",
@@ -1552,7 +1552,7 @@ dependencies = [
  "edgeware-primitives",
  "futures 0.1.30",
  "hyper 0.12.35",
- "jsonrpc-core-client",
+ "jsonrpc-core-client 15.1.0",
  "log",
  "sc-rpc",
  "sp-tracing",
@@ -1822,9 +1822,9 @@ checksum = "f7531096570974c3a9dcf9e4b8e1cede1ec26cf5046219fb3b9d897503b9be59"
 
 [[package]]
 name = "evm"
-version = "0.21.0"
+version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b38d664e59bf9ae0114a275cdf785d4112c32b3df0e522f16585a77599e7c614"
+checksum = "fd540113f54cb8f20c74a594e3dc4422d69cb3df7c425ed7ed33c0383f780df0"
 dependencies = [
  "ethereum",
  "evm-core",
@@ -1840,9 +1840,9 @@ dependencies = [
 
 [[package]]
 name = "evm-core"
-version = "0.21.0"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c11690b7226e83602067b6ba9568055e642971158b2c3af210c80d37ce2b8629"
+checksum = "aa225f553e9380c498f5beb4ba6e5d455b147a133d371b550f0326b92c95cc17"
 dependencies = [
  "parity-scale-codec",
  "primitive-types",
@@ -1851,9 +1851,9 @@ dependencies = [
 
 [[package]]
 name = "evm-gasometer"
-version = "0.21.0"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f566265c4b49fab36e74db39f8c5499a7d4bbfb54c83896ef56f3f517b945eca"
+checksum = "08bdd70b8a66727a77b991eb8374374f38b076fd9d539244751c59ebac9c3082"
 dependencies = [
  "evm-core",
  "evm-runtime",
@@ -1862,9 +1862,9 @@ dependencies = [
 
 [[package]]
 name = "evm-runtime"
-version = "0.21.0"
+version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d22e83135ff4870046706c7bd8dd70bb321df98b42218812e99444332222250"
+checksum = "25ab3a3ea8ab273ef0f9237e13f5fa271b6deb19d604766b88325d8d807afcaf"
 dependencies = [
  "evm-core",
  "primitive-types",
@@ -1926,10 +1926,11 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "derive_more",
  "fp-consensus",
+ "fp-rpc",
  "futures 0.3.12",
  "log",
  "parity-scale-codec",
@@ -1948,7 +1949,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -1956,10 +1957,10 @@ dependencies = [
  "fc-rpc-core",
  "fp-rpc",
  "futures 0.3.12",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "jsonrpc-pubsub 15.1.0",
  "libsecp256k1",
  "log",
  "pallet-ethereum",
@@ -1984,13 +1985,13 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "ethereum-types",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "jsonrpc-pubsub 15.1.0",
  "rustc-hex",
  "serde",
  "serde_json",
@@ -2088,7 +2089,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -2099,7 +2100,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "0.8.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "evm",
  "impl-trait-for-tuples 0.1.3",
@@ -2112,7 +2113,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -3136,6 +3137,22 @@ dependencies = [
 
 [[package]]
 name = "jsonrpc-client-transports"
+version = "14.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2773fa94a2a1fd51efb89a8f45b8861023dbb415d18d3c9235ae9388d780f9ec"
+dependencies = [
+ "failure",
+ "futures 0.1.30",
+ "jsonrpc-core 14.2.0",
+ "jsonrpc-pubsub 14.2.0",
+ "log",
+ "serde",
+ "serde_json",
+ "url 1.7.2",
+]
+
+[[package]]
+name = "jsonrpc-client-transports"
 version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "489b9c612e60c766f751ab40fcb43cbb55a1e10bb44a9b4307ed510ca598cbd7"
@@ -3143,12 +3160,25 @@ dependencies = [
  "failure",
  "futures 0.1.30",
  "hyper 0.12.35",
- "jsonrpc-core",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "log",
  "serde",
  "serde_json",
  "url 1.7.2",
+]
+
+[[package]]
+name = "jsonrpc-core"
+version = "14.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0747307121ffb9703afd93afbd0fb4f854c38fb873f2c8b90e0e902f27c7b62"
+dependencies = [
+ "futures 0.1.30",
+ "log",
+ "serde",
+ "serde_derive",
+ "serde_json",
 ]
 
 [[package]]
@@ -3166,11 +3196,32 @@ dependencies = [
 
 [[package]]
 name = "jsonrpc-core-client"
+version = "14.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34221123bc79b66279a3fde2d3363553835b43092d629b34f2e760c44dc94713"
+dependencies = [
+ "jsonrpc-client-transports 14.2.1",
+]
+
+[[package]]
+name = "jsonrpc-core-client"
 version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6f764902d7b891344a0acb65625f32f6f7c6db006952143bd650209fbe7d94db"
 dependencies = [
- "jsonrpc-client-transports",
+ "jsonrpc-client-transports 15.1.0",
+]
+
+[[package]]
+name = "jsonrpc-derive"
+version = "14.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0e77e8812f02155b85a677a96e1d16b60181950c0636199bc4528524fba98dc"
+dependencies = [
+ "proc-macro-crate",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -3192,7 +3243,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fb5c4513b7b542f42da107942b7b759f27120b5cc894729f88254b28dff44b7"
 dependencies = [
  "hyper 0.12.35",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-server-utils",
  "log",
  "net2",
@@ -3206,7 +3257,7 @@ version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf50e53e4eea8f421a7316c5f63e395f7bc7c4e786a6dc54d76fab6ff7aa7ce7"
 dependencies = [
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-server-utils",
  "log",
  "parity-tokio-ipc",
@@ -3216,11 +3267,24 @@ dependencies = [
 
 [[package]]
 name = "jsonrpc-pubsub"
+version = "14.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2d44f5602a11d657946aac09357956d2841299ed422035edf140c552cb057986"
+dependencies = [
+ "jsonrpc-core 14.2.0",
+ "log",
+ "parking_lot 0.10.2",
+ "rand 0.7.3",
+ "serde",
+]
+
+[[package]]
+name = "jsonrpc-pubsub"
 version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "639558e0604013be9787ae52f798506ae42bf4220fe587bdc5625871cc8b9c77"
 dependencies = [
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "log",
  "parking_lot 0.10.2",
  "rand 0.7.3",
@@ -3235,7 +3299,7 @@ checksum = "72f1f3990650c033bd8f6bd46deac76d990f9bbfb5f8dc8c4767bf0a00392176"
 dependencies = [
  "bytes 0.4.12",
  "globset",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "lazy_static",
  "log",
  "tokio 0.1.22",
@@ -3249,7 +3313,7 @@ version = "15.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6596fe75209b73a2a75ebe1dce4e60e03b88a2b25e8807b667597f6315150d22"
 dependencies = [
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-server-utils",
  "log",
  "parity-ws",
@@ -4578,9 +4642,9 @@ name = "pallet-contracts-rpc"
 version = "0.8.1"
 source = "git+https://github.com/paritytech/substrate.git?rev=b2a50198d3fa71959c77d22edb5fdb8c1e74006c#b2a50198d3fa71959c77d22edb5fdb8c1e74006c"
 dependencies = [
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 15.1.0",
+ "jsonrpc-derive 15.1.0",
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "parity-scale-codec",
@@ -4636,7 +4700,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4662,8 +4726,8 @@ dependencies = [
 
 [[package]]
 name = "pallet-evm"
-version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+version = "2.0.0"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -4686,8 +4750,8 @@ dependencies = [
 
 [[package]]
 name = "pallet-evm-precompile-ed25519"
-version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+version = "2.0.0"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "ed25519-dalek",
  "evm",
@@ -4698,8 +4762,8 @@ dependencies = [
 
 [[package]]
 name = "pallet-evm-precompile-modexp"
-version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+version = "2.0.0"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "evm",
  "fp-evm",
@@ -4710,8 +4774,8 @@ dependencies = [
 
 [[package]]
 name = "pallet-evm-precompile-simple"
-version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+version = "2.0.0"
+source = "git+https://github.com/hicommonwealth/frontier.git?rev=1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b#1b8502c2e4512dcdd1d7a2ace1e3fca7308a1b3b"
 dependencies = [
  "evm",
  "fp-evm",
@@ -4998,9 +5062,9 @@ name = "pallet-transaction-payment-rpc"
 version = "2.0.1"
 source = "git+https://github.com/paritytech/substrate.git?rev=b2a50198d3fa71959c77d22edb5fdb8c1e74006c#b2a50198d3fa71959c77d22edb5fdb8c1e74006c"
 dependencies = [
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 15.1.0",
+ "jsonrpc-derive 15.1.0",
  "pallet-transaction-payment-rpc-runtime-api",
  "parity-scale-codec",
  "serde",
@@ -6728,10 +6792,10 @@ dependencies = [
  "derive_more",
  "finality-grandpa",
  "futures 0.3.12",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 15.1.0",
+ "jsonrpc-derive 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "log",
  "parity-scale-codec",
  "sc-client-api",
@@ -6926,8 +6990,8 @@ source = "git+https://github.com/paritytech/substrate.git?rev=b2a50198d3fa71959c
 dependencies = [
  "futures 0.3.12",
  "hash-db",
- "jsonrpc-core",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "log",
  "parity-scale-codec",
  "parking_lot 0.11.1",
@@ -6960,10 +7024,10 @@ source = "git+https://github.com/paritytech/substrate.git?rev=b2a50198d3fa71959c
 dependencies = [
  "derive_more",
  "futures 0.3.12",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 15.1.0",
+ "jsonrpc-derive 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "log",
  "parity-scale-codec",
  "parking_lot 0.11.1",
@@ -6983,10 +7047,10 @@ version = "2.0.1"
 source = "git+https://github.com/paritytech/substrate.git?rev=b2a50198d3fa71959c77d22edb5fdb8c1e74006c#b2a50198d3fa71959c77d22edb5fdb8c1e74006c"
 dependencies = [
  "futures 0.1.30",
- "jsonrpc-core",
+ "jsonrpc-core 15.1.0",
  "jsonrpc-http-server",
  "jsonrpc-ipc-server",
- "jsonrpc-pubsub",
+ "jsonrpc-pubsub 15.1.0",
  "jsonrpc-ws-server",
  "log",
  "serde",
@@ -7006,8 +7070,8 @@ dependencies = [
  "futures 0.3.12",
  "futures-timer 3.0.2",
  "hash-db",
- "jsonrpc-core",
- "jsonrpc-pubsub",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-pubsub 15.1.0",
  "lazy_static",
  "log",
  "parity-scale-codec",
@@ -8420,9 +8484,9 @@ source = "git+https://github.com/paritytech/substrate.git?rev=b2a50198d3fa71959c
 dependencies = [
  "frame-system-rpc-runtime-api",
  "futures 0.3.12",
- "jsonrpc-core",
- "jsonrpc-core-client",
- "jsonrpc-derive",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 15.1.0",
+ "jsonrpc-derive 15.1.0",
  "log",
  "parity-scale-codec",
  "sc-client-api",
