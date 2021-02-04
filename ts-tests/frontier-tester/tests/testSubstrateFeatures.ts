@@ -142,7 +142,7 @@ describeWithEdgeware('Substrate Feature Tests', async (context) => {
     const submitCandidacyTx = api.tx.elections.submitCandidacy(candidates.length);
     await submitTxWithFee(submitCandidacyTx, bob);
     const newCandidates = await api.query.elections.candidates();
-    assert.isTrue(newCandidates.map((c) => c.toString()).includes(bob.address));
+    assert.isTrue(newCandidates.map(([ c, _deposit ]) => c.toString()).includes(bob.address));
   });
 
   it('should register an identity', async () => {

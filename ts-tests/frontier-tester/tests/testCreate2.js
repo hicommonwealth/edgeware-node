@@ -16,8 +16,8 @@ describeWithEdgeware('Create2Factory test', async (context) => {
     let c = await Create2.new({ from: account });
 
     // load bytecode and deploy
-    await c.deploy(5, { from: account, gasPrice: 1000000000 });
-    const addr = await c.viewAddr.call({ from: account, gasPrice: 1000000000 });
+    await c.deploy(5, { from: account, gasPrice: 1 });
+    const addr = await c.viewAddr.call({ from: account, gasPrice: 1 });
 
     let Value = contract({
       abi: ValueContract.abi,
@@ -27,7 +27,7 @@ describeWithEdgeware('Create2Factory test', async (context) => {
 
     // load new contract and check methods
     const valueContract = await Value.at(addr);
-    const value = await valueContract.getValue.call({ from: account, gasPrice: 1000000000 });
+    const value = await valueContract.getValue.call({ from: account, gasPrice: 1 });
     assert.equal(value, '0');
   });
 });
