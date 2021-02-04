@@ -9,7 +9,7 @@ import BN from 'bn.js';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 const { describeWithEdgeware } = require('../helpers/utils.js');
 
-describeWithEdgeware('Upgrade Tests', async (context) => {
+describeWithEdgeware('Substrate Feature Tests', async (context) => {
   let api: ApiPromise;
   let pairs: TestKeyringMap;
   const FEE_ACCURACY = 10000;
@@ -21,7 +21,7 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
       provider,
       ...spec,
     });
-    pairs = createTestPairs();
+    pairs = createTestPairs({ ss58Format: 7 });
   });
 
   after(async () => {

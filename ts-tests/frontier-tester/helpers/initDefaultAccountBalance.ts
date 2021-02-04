@@ -14,7 +14,7 @@ let sendSubstrateBalance = async (web3: Web3): Promise<void> => {
   });
 
   // configure funded substrate account, target account, and balance to send
-  const keyring = createTestPairs().dave;
+  const keyring = createTestPairs({ ss58Format: 7 }).dave;
   const balance = await api.query.system.account(keyring.address);
   if (balance.data.free.eqn(0)) {
     throw new Error(`Fetched no balance for address ${keyring.address}`);

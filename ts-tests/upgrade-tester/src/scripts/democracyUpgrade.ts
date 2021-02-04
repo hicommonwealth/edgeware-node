@@ -99,7 +99,7 @@ async function passUpgrade(api: ApiPromise, pairs: TestKeyringMap, refIdx: numbe
 
 async function main() {
   const api = await ApiPromise.create({ ...spec });
-  const pairs = createTestPairs();
+  const pairs = createTestPairs({ ss58Format: 7 });
   await submitUpgrade(api, pairs, `${__dirname}/../../../../edgeware_runtime.wasm`);
   const refIdx = await waitForReferendum(api);
   await passUpgrade(api, pairs, refIdx);
