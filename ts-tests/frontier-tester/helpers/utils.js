@@ -95,7 +95,7 @@ async function startEdgewareNode() {
     '--alice',
     '--validator',
     '-lrpc=trace',
-    // '-levm=trace',
+    '-levm=debug',
   ];
   // console.log(`Running node with args: ${JSON.stringify(args)}`);
   const binary = child_process.spawn(cmd, args);

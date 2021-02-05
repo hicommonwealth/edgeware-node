@@ -48,10 +48,20 @@ describeWithEdgeware("CreateContract test", async (context) => {
     let c = await Create.new({ from: account });
     let startNonce = await web3.eth.getTransactionCount(c.address);
     console.log(`CreateContract address: ${c.address}, nonce: ${startNonce}`);
+
     // create with value
-    const value = web3.utils.toWei('10', 'ether');
-    await c.spawnWithValue({ value, from: account });
+    const value = web3.utils.toWei('1', 'ether');
+    const gas = await c.spawnWithValue.estimateGas();
+    console.log(`Gas estimate: ${gas}.`);
+
+    await c.spawnWithValue({ value, from: account, gas });
+    let intermediateNonce1 = await web3.eth.getTransactionCount(c.address);
+    assert.equal(intermediateNonce1, startNonce + 1);
+
     address = await c.deployed.call({ from: account });
+    let intermediateNonce2 = await web3.eth.getTransactionCount(c.address);
+    assert.equal(intermediateNonce1, intermediateNonce2);
+
     var Sub = contract({
       abi: SubContract.abi,
       unlinked_binary: SubContract.bytecode,
