@@ -10,7 +10,7 @@ services:
     volumes:
       - ./data_edg_mainnet:/data/chains
     ports:
-      - "0.0.0.0:9933:9933"
-      - "0.0.0.0:9944:9944"
-      - "0.0.0.0:30333:30333"
-    command: ['--chain', 'edgeware', '--name', 'substrate_playground', '--ws-external', '--rpc-cors', 'all' ]
+      - "127.0.0.1:9933:9933"
+      - "127.0.0.1:9944:9944"
+      - "127.0.0.1:30333:30333"
+    command: ['--chain', 'edgeware', '--name', 'substrate_playground', '--ws-external', '--rpc-external', '--rpc-cors', 'all' ]
