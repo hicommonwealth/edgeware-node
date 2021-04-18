@@ -1051,10 +1051,10 @@ impl pallet_evm::Config for Runtime {
 	type OnChargeTransaction = ();
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 
-	// /// EVM config used in the module.
-	// fn config() -> &'static EvmConfig {
-	// 	&EVM_CONFIG
-	// }
+	/// EVM config used in the module.
+	fn config() -> &'static EvmConfig {
+		&EVM_CONFIG
+	}
 }
 
 pub struct EthereumFindAuthor<F>(PhantomData<F>);
