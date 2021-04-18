@@ -21,6 +21,9 @@ pub mod currency {
 	use edgeware_primitives::Balance;
 
 	pub type AssetId = u32;
+	pub type Amount = i128;
+	// Currency id
+	pub type CurrencyId = u64;
 
 	pub const MILLICENTS: Balance = 10_000_000_000_000;
 	pub const CENTS: Balance = 1_000 * MILLICENTS; // assume this is worth about a cent.

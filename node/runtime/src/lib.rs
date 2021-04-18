@@ -100,6 +100,11 @@ use constants::{currency::*, time::*};
 use sp_runtime::generic::Era;
 use pallet_contracts::weights::WeightInfo;
 
+use merkle::weights::Weights as MerkleWeights;
+use merkle::utils::keys::ScalarData;
+use mixer::weights::Weights as MixerWeights;
+use webb_currencies::BasicCurrencyAdapter;
+
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -121,8 +126,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 45,
-	impl_version: 45,
+	spec_version: 46,
+	impl_version: 46,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -1076,6 +1081,80 @@ impl treasury_reward::Config for Runtime {
 	type Currency = Balances;
 }
 
+parameter_types! {
+	pub const MaxTreeDepth: u8 = 32;
+	pub const CacheBlockLength: BlockNumber = 100;
+}
+
+impl merkle::Config for Runtime {
+	type CacheBlockLength = CacheBlockLength;
+	type Event = Event;
+	type MaxTreeDepth = MaxTreeDepth;
+	type TreeId = u32;
+	type WeightInfo = MerkleWeights<Self>;
+}
+
+parameter_types! {
+	pub const TokensPalletId: PalletId = PalletId(*b"py/token");
+	pub const NativeCurrencyId: CurrencyId = 0;
+	pub const CurrencyDeposit: u64 = 1;
+	pub const ApprovalDeposit: u64 = 1;
+	pub const StringLimit: u32 = 50;
+	pub const MetadataDepositBase: u64 = 1;
+	pub const MetadataDepositPerByte: u64 = 1;
+}
+
+
+impl webb_tokens::Config for Runtime {
+	type PalletId = TokensPalletId;
+	type Amount = Amount;
+	type Balance = Balance;
+	type CurrencyId = CurrencyId;
+	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
+	type Event = Event;
+	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
+	type CurrencyDeposit = CurrencyDeposit;
+	type MetadataDepositBase = MetadataDepositBase;
+	type MetadataDepositPerByte = MetadataDepositPerByte;
+	type ApprovalDeposit = ApprovalDeposit;
+	type StringLimit = StringLimit;
+	type DustAccount = ();
+	type WeightInfo = ();
+	type Extra = ();
+}
+
+impl webb_currencies::Config for Runtime {
+	type Event = Event;
+	type GetNativeCurrencyId = NativeCurrencyId;
+	type MultiCurrency = Tokens;
+	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
+	type WeightInfo = ();
+}
+
+parameter_types! {
+	pub const MixerPalletId: PalletId = PalletId(*b"py/mixer");
+	pub const MinimumDepositLength: BlockNumber = 10 * 60 * 24 * 28;
+	pub const DefaultAdminKey: AccountId = AccountId::new([0; 32]);
+	pub MixerSizes: Vec<Balance> = [
+		DOLLARS * 1_000,
+		DOLLARS * 10_000,
+		DOLLARS * 100_000,
+		DOLLARS * 1_000_000
+	].to_vec();
+}
+
+impl mixer::Config for Runtime {
+	type Currency = Currencies;
+	type DefaultAdmin = DefaultAdminKey;
+	type DepositLength = MinimumDepositLength;
+	type Event = Event;
+	type MixerSizes = MixerSizes;
+	type PalletId = MixerPalletId;
+	type NativeCurrencyId = NativeCurrencyId;
+	type Tree = Merkle;
+	type WeightInfo = MixerWeights<Self>;
+}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -1125,6 +1204,11 @@ construct_runtime!(
 
 		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 37,
 		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
+
+		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 40,
+		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 41,
+		Mixer: mixer::{Pallet, Call, Storage, Event<T>} = 42,
+		Merkle: merkle::{Pallet, Call, Storage, Event<T>} = 43,
 	}
 );
 
@@ -1472,6 +1556,17 @@ impl_runtime_apis! {
 				Self::current_receipts(),
 				Self::current_transaction_statuses(),
 			)
+		}
+	}
+
+	impl merkle::MerkleApi<Block> for Runtime {
+		fn get_leaf(tree_id: u32, index: u32) -> Option<ScalarData> {
+			let v = Merkle::leaves(tree_id, index);
+			if v == ScalarData::default() {
+				None
+			} else {
+				Some(v)
+			}
 		}
 	}
 

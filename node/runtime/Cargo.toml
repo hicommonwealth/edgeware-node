@@ -96,6 +96,12 @@ pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier",
 pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
 pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
 
+merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "drew-re-add-fronier" }
+mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "drew-re-add-fronier" }
+merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "drew-re-add-fronier", optional = true }
+webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "drew-re-add-fronier" }
+webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "drew-re-add-fronier" }
+webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "drew-re-add-fronier" }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "3.0", default-features = false, optional = true }
@@ -175,6 +181,11 @@ std = [
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",
+    "merkle/std",
+    "merkle-rpc",
+    "mixer/std",
+    "webb-currencies/std",
+    "webb-tokens/std",
 ]
 
 runtime-benchmarks = [

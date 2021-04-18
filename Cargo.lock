@@ -447,6 +447,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "904dfeac50f3cdaba28fc6f57fdcddb75f49ed61346676a78c4ffe55877802fd"
 
 [[package]]
+name = "bencher"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dfdb4953a096c551ce9ace855a604d702e6e62d77fac690575ae347571717f5"
+
+[[package]]
 name = "bincode"
 version = "1.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -645,6 +651,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bdce191bf3fa4995ce948c8c83b4640a1745457a149e73c6db75b4ffe36aad5f"
 dependencies = [
  "semver 0.6.0",
+]
+
+[[package]]
+name = "bulletproofs-gadgets"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f730544daa13f48320a9be1bf804dd3544193f20a4194901317fd3ec354861fb"
+dependencies = [
+ "bencher",
+ "curve25519-dalek 3.1.0",
+ "merlin",
+ "parity-scale-codec 1.3.7",
+ "rand_core 0.5.1",
+ "sp-std 2.0.1",
+ "webb-bulletproofs",
 ]
 
 [[package]]
@@ -849,6 +870,15 @@ dependencies = [
  "textwrap",
  "unicode-width",
  "vec_map",
+]
+
+[[package]]
+name = "clear_on_drop"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9cc5db465b294c3fa986d5bbb0f3017cd850bff6dd6c52f9ccff8b4d21b7b08"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -1272,6 +1302,7 @@ dependencies = [
  "byteorder",
  "digest 0.9.0",
  "rand_core 0.5.1",
+ "serde",
  "subtle 2.4.0",
  "zeroize",
 ]
@@ -1465,7 +1496,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -1679,6 +1710,9 @@ dependencies = [
  "pallet-identity",
  "pallet-im-online",
  "pallet-indices",
+ "pallet-merkle",
+ "pallet-merkle-rpc",
+ "pallet-mixer",
  "pallet-multisig",
  "pallet-offences",
  "pallet-proxy",
@@ -1714,11 +1748,14 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-transaction-pool",
  "sp-version",
  "static_assertions",
  "substrate-wasm-builder",
+ "webb-currencies",
+ "webb-tokens",
+ "webb-traits",
 ]
 
 [[package]]
@@ -2212,7 +2249,7 @@ dependencies = [
  "sha3 0.8.2",
  "sp-core",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -2225,7 +2262,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-core",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -2241,7 +2278,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -2256,7 +2293,7 @@ dependencies = [
  "sp-api",
  "sp-core",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -2274,7 +2311,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-runtime-interface",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-storage",
 ]
 
@@ -2311,7 +2348,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-arithmetic",
  "sp-npos-elections",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -2325,7 +2362,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-tracing",
 ]
 
@@ -2337,7 +2374,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-core",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -2362,7 +2399,7 @@ dependencies = [
  "sp-runtime",
  "sp-staking",
  "sp-state-machine",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-tracing",
 ]
 
@@ -2413,7 +2450,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-version",
 ]
 
@@ -2429,7 +2466,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-core",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -3588,6 +3625,9 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+dependencies = [
+ "spin",
+]
 
 [[package]]
 name = "lazycell"
@@ -4756,7 +4796,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-consensus-aura",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4771,7 +4811,7 @@ dependencies = [
  "sp-application-crypto",
  "sp-authority-discovery",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4786,7 +4826,7 @@ dependencies = [
  "sp-authorship",
  "sp-inherents",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4800,7 +4840,7 @@ dependencies = [
  "log",
  "parity-scale-codec 2.1.1",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4813,7 +4853,7 @@ dependencies = [
  "pallet-treasury",
  "parity-scale-codec 2.1.1",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4829,7 +4869,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4850,7 +4890,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-sandbox",
- "sp-std",
+ "sp-std 3.0.0",
  "wasmi-validation",
 ]
 
@@ -4864,7 +4904,7 @@ dependencies = [
  "serde",
  "sp-core",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4905,7 +4945,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-api",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4920,7 +4960,7 @@ dependencies = [
  "serde",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4937,7 +4977,7 @@ dependencies = [
  "sp-io",
  "sp-npos-elections",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "static_assertions",
 ]
 
@@ -4952,7 +4992,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-npos-elections",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -4980,7 +5020,7 @@ dependencies = [
  "sha3 0.8.2",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5005,7 +5045,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5062,7 +5102,7 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5077,7 +5117,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5095,7 +5135,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5110,7 +5150,72 @@ dependencies = [
  "sp-io",
  "sp-keyring",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
+]
+
+[[package]]
+name = "pallet-merkle"
+version = "3.0.0"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "bulletproofs-gadgets",
+ "curve25519-dalek 3.1.0",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "lazy_static",
+ "merlin",
+ "pallet-balances",
+ "parity-scale-codec 2.1.1",
+ "rand_core 0.5.1",
+ "serde",
+ "sha2 0.9.3",
+ "sp-api",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "webb-bulletproofs",
+]
+
+[[package]]
+name = "pallet-merkle-rpc"
+version = "3.0.0"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 15.1.0",
+ "jsonrpc-derive 15.1.0",
+ "pallet-merkle",
+ "parity-scale-codec 2.1.1",
+ "sc-rpc",
+ "sp-api",
+ "sp-blockchain",
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
+name = "pallet-mixer"
+version = "3.0.0"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "bencher",
+ "bulletproofs-gadgets",
+ "curve25519-dalek 3.1.0",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "merlin",
+ "pallet-balances",
+ "pallet-merkle",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "webb-bulletproofs",
+ "webb-currencies",
+ "webb-tokens",
+ "webb-traits",
 ]
 
 [[package]]
@@ -5124,7 +5229,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5140,7 +5245,7 @@ dependencies = [
  "serde",
  "sp-runtime",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5154,7 +5259,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5167,7 +5272,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "safe-mix",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5181,7 +5286,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5196,7 +5301,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5214,7 +5319,7 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-trie",
 ]
 
@@ -5236,7 +5341,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
  "static_assertions",
 ]
 
@@ -5261,7 +5366,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5277,7 +5382,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-inherents",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-timestamp",
 ]
 
@@ -5292,7 +5397,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5308,7 +5413,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5351,7 +5456,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5365,7 +5470,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -5378,7 +5483,7 @@ dependencies = [
  "frame-system",
  "parity-scale-codec 2.1.1",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -6814,7 +6919,7 @@ dependencies = [
  "sp-keystore",
  "sp-runtime",
  "sp-state-machine",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-storage",
  "sp-transaction-pool",
  "sp-trie",
@@ -7989,7 +8094,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=22f09c602704aeee2b
 dependencies = [
  "log",
  "sp-core",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-wasm-interface",
  "thiserror",
 ]
@@ -8006,7 +8111,7 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "sp-state-machine",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-version",
  "thiserror",
 ]
@@ -8032,7 +8137,7 @@ dependencies = [
  "serde",
  "sp-core",
  "sp-io",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8045,7 +8150,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-debug-derive",
- "sp-std",
+ "sp-std 3.0.0",
  "static_assertions",
 ]
 
@@ -8058,7 +8163,7 @@ dependencies = [
  "sp-api",
  "sp-application-crypto",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8069,7 +8174,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-inherents",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8081,7 +8186,7 @@ dependencies = [
  "sp-api",
  "sp-inherents",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8129,7 +8234,7 @@ dependencies = [
  "sp-inherents",
  "sp-runtime",
  "sp-state-machine",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-trie",
  "sp-utils",
  "sp-version",
@@ -8150,7 +8255,7 @@ dependencies = [
  "sp-consensus-slots",
  "sp-inherents",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-timestamp",
 ]
 
@@ -8171,7 +8276,7 @@ dependencies = [
  "sp-inherents",
  "sp-keystore",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-timestamp",
 ]
 
@@ -8194,7 +8299,7 @@ dependencies = [
  "schnorrkel",
  "sp-core",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8230,7 +8335,7 @@ dependencies = [
  "sp-debug-derive",
  "sp-externalities",
  "sp-runtime-interface",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-storage",
  "substrate-bip39",
  "thiserror",
@@ -8267,7 +8372,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=22f09c602704aeee2b
 dependencies = [
  "environmental",
  "parity-scale-codec 2.1.1",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-storage",
 ]
 
@@ -8285,7 +8390,7 @@ dependencies = [
  "sp-core",
  "sp-keystore",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8296,7 +8401,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "parking_lot 0.11.1",
  "sp-core",
- "sp-std",
+ "sp-std 3.0.0",
  "thiserror",
 ]
 
@@ -8316,7 +8421,7 @@ dependencies = [
  "sp-keystore",
  "sp-runtime-interface",
  "sp-state-machine",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-tracing",
  "sp-trie",
  "sp-wasm-interface",
@@ -8371,7 +8476,7 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-npos-elections-compact",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8430,7 +8535,7 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-io",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8443,7 +8548,7 @@ dependencies = [
  "primitive-types 0.9.0",
  "sp-externalities",
  "sp-runtime-interface-proc-macro",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-storage",
  "sp-tracing",
  "sp-wasm-interface",
@@ -8470,7 +8575,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-core",
  "sp-io",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-wasm-interface",
  "wasmi",
 ]
@@ -8494,7 +8599,7 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "sp-staking",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8504,7 +8609,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=22f09c602704aeee2b
 dependencies = [
  "parity-scale-codec 2.1.1",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8522,12 +8627,18 @@ dependencies = [
  "sp-core",
  "sp-externalities",
  "sp-panic-handler",
- "sp-std",
+ "sp-std 3.0.0",
  "sp-trie",
  "thiserror",
  "trie-db",
  "trie-root",
 ]
+
+[[package]]
+name = "sp-std"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2585fb8f5f4fde53c2f9ccebac4517da4dc435373a8fcaf5db7f54b798da66c2"
 
 [[package]]
 name = "sp-std"
@@ -8544,7 +8655,7 @@ dependencies = [
  "ref-cast",
  "serde",
  "sp-debug-derive",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8557,7 +8668,7 @@ dependencies = [
  "sp-externalities",
  "sp-io",
  "sp-runtime-interface",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8569,7 +8680,7 @@ dependencies = [
  "sp-api",
  "sp-inherents",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
  "wasm-timer",
 ]
 
@@ -8580,7 +8691,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=22f09c602704aeee2b
 dependencies = [
  "log",
  "parity-scale-codec 2.1.1",
- "sp-std",
+ "sp-std 3.0.0",
  "tracing",
  "tracing-core",
  "tracing-subscriber",
@@ -8611,7 +8722,7 @@ dependencies = [
  "memory-db",
  "parity-scale-codec 2.1.1",
  "sp-core",
- "sp-std",
+ "sp-std 3.0.0",
  "trie-db",
  "trie-root",
 ]
@@ -8637,7 +8748,7 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-runtime",
- "sp-std",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -8647,7 +8758,7 @@ source = "git+https://github.com/paritytech/substrate.git?rev=22f09c602704aeee2b
 dependencies = [
  "impl-trait-for-tuples 0.2.1",
  "parity-scale-codec 2.1.1",
- "sp-std",
+ "sp-std 3.0.0",
  "wasmi",
 ]
 
@@ -10119,6 +10230,93 @@ checksum = "a905d57e488fec8861446d3393670fb50d27a262344013181c2cdf9fff5481be"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "webb-bulletproofs"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d3dcc103f95a2509aea2ca010f7f06b137bc4693cf57f39947937ae00d487266"
+dependencies = [
+ "byteorder",
+ "clear_on_drop",
+ "curve25519-dalek 3.1.0",
+ "digest 0.9.0",
+ "merlin",
+ "rand 0.7.3",
+ "rand_core 0.5.1",
+ "serde",
+ "serde_derive",
+ "sha3 0.9.1",
+ "sp-std 2.0.1",
+ "subtle 2.4.0",
+ "thiserror",
+]
+
+[[package]]
+name = "webb-currencies"
+version = "0.4.1-dev"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "funty",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "webb-traits",
+ "webb-utilities",
+]
+
+[[package]]
+name = "webb-tokens"
+version = "3.0.0"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "bencher",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "pallet-treasury",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "webb-traits",
+]
+
+[[package]]
+name = "webb-traits"
+version = "0.4.1-dev"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "frame-support",
+ "funty",
+ "impl-trait-for-tuples 0.2.1",
+ "num-traits",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "webb-utilities",
+]
+
+[[package]]
+name = "webb-utilities"
+version = "0.4.1-dev"
+source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+dependencies = [
+ "frame-support",
+ "funty",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
