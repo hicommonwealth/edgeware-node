@@ -40,13 +40,13 @@ decl_module! {
 		fn deposit_event() = default;
 		/// Mint money for the treasury!
 		fn on_finalize(_n: T::BlockNumber) {
-			if <frame_system::Module<T>>::block_number() % Self::minting_interval() == Zero::zero() {
+			if <frame_system::Pallet<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
-				<T as Config>::Currency::deposit_creating(&<pallet_treasury::Module<T>>::account_id(), reward);
+				<T as Config>::Currency::deposit_creating(&<pallet_treasury::Pallet<T>>::account_id(), reward);
 				Self::deposit_event(RawEvent::TreasuryMinting(
-					<pallet_balances::Module<T>>::free_balance(<pallet_treasury::Module<T>>::account_id()),
-					<frame_system::Module<T>>::block_number(),
-					<pallet_treasury::Module<T>>::account_id())
+					<pallet_balances::Pallet<T>>::free_balance(<pallet_treasury::Pallet<T>>::account_id()),
+					<frame_system::Pallet<T>>::block_number(),
+					<pallet_treasury::Pallet<T>>::account_id())
 				);
 			}
 		}

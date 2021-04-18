@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-rpc"
-version = "3.2.0"
+version = "3.3.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
@@ -14,26 +14,27 @@ jsonrpc-core = "15.0.0"
 jsonrpc-pubsub = "15.0.0"
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
-pallet-contracts-rpc = { version = "0.8" }
-pallet-transaction-payment-rpc = { version = "2.0" }
-sc-client-api = { version = "2.0" }
-sc-consensus-aura = { version = "0.8" }
-sc-consensus-epochs = { version = "0.8" }
-sc-finality-grandpa = { version = "0.8" }
-sc-finality-grandpa-rpc = { version = "0.8" }
-sc-keystore = { version = "2.0" }
-sc-network = { version = "0.8" }
-sc-rpc-api = { version = "0.8" }
-sc-rpc = { version = "2.0" }
-sp-api = { version = "2.0" }
-sp-block-builder = { version = "2.0" }
-sp-blockchain = { version = "2.0" }
-sp-consensus = { version = "0.8" }
-sp-consensus-aura = { version = "0.8" }
-sp-runtime = { version = "2.0" }
-sp-transaction-pool = { version = "2.0" }
-substrate-frame-rpc-system = { version = "2.0" }
-pallet-ethereum = { version = "0.1" }
-fc-rpc = { version = "0.1", features = ["rpc_binary_search_estimate"] }
-fp-rpc = { version = "0.1" }
-fc-rpc-core = { version = "0.1" }
+pallet-contracts-rpc = { version = "3.0" }
+pallet-transaction-payment-rpc = { version = "3.0" }
+sc-client-api = { version = "3.0" }
+sc-consensus-aura = { version = "0.9" }
+sc-consensus-epochs = { version = "0.9" }
+sc-finality-grandpa = { version = "0.9" }
+sc-finality-grandpa-rpc = { version = "0.9" }
+sc-keystore = { version = "3.0" }
+sc-network = { version = "0.9" }
+sc-rpc-api = { version = "0.9" }
+sc-rpc = { version = "3.0" }
+sp-api = { version = "3.0" }
+sp-block-builder = { version = "3.0" }
+sp-blockchain = { version = "3.0" }
+sp-consensus = { version = "0.9" }
+sp-consensus-aura = { version = "0.9" }
+sp-runtime = { version = "3.0" }
+sp-transaction-pool = { version = "3.0" }
+substrate-frame-rpc-system = { version = "3.0" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon" }
+fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-anon" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-anon" }
+fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-anon" }
+fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-anon" }

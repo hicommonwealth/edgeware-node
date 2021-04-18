@@ -1,0 +1,47 @@
+[package]
+name = "edge-treasury-reward"
+version = "1.0.0"
+authors = ["drewstone <drewstone329@gmail.com>"]
+edition = "2018"
+license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
+description = "Edgeware treasury reward module"
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[dependencies]
+serde = { version = "1.0", default-features = false, optional = true }
+safe-mix = { version = "1.0", default-features = false }
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
+sp-std = { version = "3.0", default-features = false }
+sp-runtime = { version = "3.0", default-features = false }
+frame-support = { version = "3.0", default-features = false }
+frame-system = { version = "3.0", default-features = false }
+pallet-authorship = { version = "3.0", default-features = false }
+pallet-staking = { version = "3.0", default-features = false }
+pallet-balances = { version = "3.0", default-features = false }
+pallet-treasury = { version = "3.0", default-features = false }
+
+[dev-dependencies]
+sp-io = { version = "3.0", default-features = false }
+sp-staking = { version = "3.0", default-features = false }
+sp-core = { version = "3.0", default-features = false }
+pallet-staking-reward-curve = { version = "3.0", default-features = false }
+pallet-session = { version = "3.0", default-features = false }
+pallet-timestamp = { version = "3.0", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"serde",
+	"safe-mix/std",
+	"codec/std",
+	"sp-std/std",
+	"sp-runtime/std",
+	"pallet-authorship/std",
+	"pallet-balances/std",
+	"frame-support/std",
+	"frame-system/std",
+	"pallet-staking/std",
+	"pallet-treasury/std",
+]

@@ -30,7 +30,9 @@
 #![warn(missing_docs)]
 
 use std::{sync::Arc};
-use fc_rpc_core::types::PendingTransactions;
+use std::collections::BTreeMap;
+use fc_rpc_core::types::{PendingTransactions, FilterPool};
+use fc_rpc::{StorageOverride, SchemaV1Override, OverrideHandle, RuntimeApiStorageOverride};
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use jsonrpc_pubsub::manager::SubscriptionManager;
 use sc_finality_grandpa::{
@@ -48,6 +50,7 @@ use sc_client_api::{
 	backend::{StorageProvider, AuxStore},
 	client::BlockchainEvents,
 };
+use pallet_ethereum::EthereumStorageSchema;
 use sc_rpc::SubscriptionTaskExecutor;
 
 /// Public io handler for exporting into other modules
@@ -93,12 +96,16 @@ pub struct FullDeps<C, P, SC, B> {
 	pub enable_dev_signer: bool,
 	/// Network service
 	pub network: Arc<NetworkService<Block, Hash>>,
-	/// Ethereum pending transactions.
-	pub pending_transactions: PendingTransactions,
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// GRANDPA specific dependencies.
 	pub grandpa: GrandpaDeps<B>,
+	/// Ethereum pending transactions.
+	pub pending_transactions: PendingTransactions,
+	/// EthFilterApi pool.
+	pub filter_pool: Option<FilterPool>,
+	/// Backend.
+	pub backend: Arc<fc_db::Backend<Block>>,
 }
 
 
@@ -112,7 +119,7 @@ pub fn create_full<C, P, SC, B>(
 	C: Send + Sync + 'static,
 	C: BlockchainEvents<Block>,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
-	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber>,
+	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
@@ -126,8 +133,9 @@ pub fn create_full<C, P, SC, B>(
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 	use fc_rpc::{
-		EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi,
-		EthDevSigner, EthSigner, HexEncodedIdProvider,
+		EthApi, EthApiServer, EthFilterApi, EthFilterApiServer, NetApi, NetApiServer,
+		EthPubSubApi, EthPubSubApiServer, Web3Api, Web3ApiServer, EthDevSigner, EthSigner,
+		HexEncodedIdProvider,
 	};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -138,9 +146,11 @@ pub fn create_full<C, P, SC, B>(
 		enable_dev_signer,
 		is_authority,
 		network,
-		pending_transactions,
 		deny_unsafe,
 		grandpa,
+		pending_transactions,
+		filter_pool,
+		backend,
 	} = deps;
 	let GrandpaDeps {
 		shared_voter_state,
@@ -167,6 +177,17 @@ pub fn create_full<C, P, SC, B>(
 	if enable_dev_signer {
 		signers.push(Box::new(EthDevSigner::new()) as Box<dyn EthSigner>);
 	}
+	let mut overrides_map = BTreeMap::new();
+	overrides_map.insert(
+		EthereumStorageSchema::V1,
+		Box::new(SchemaV1Override::new(client.clone())) as Box<dyn StorageOverride<_> + Send + Sync>
+	);
+
+	let overrides = Arc::new(OverrideHandle {
+		schemas: overrides_map,
+		fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
+	});
+
 	io.extend_with(
 		EthApiServer::to_delegate(EthApi::new(
 			client.clone(),
@@ -175,13 +196,33 @@ pub fn create_full<C, P, SC, B>(
 			network.clone(),
 			pending_transactions.clone(),
 			signers,
+			overrides.clone(),
+			backend,
 			is_authority,
 		))
 	);
+
+	if let Some(filter_pool) = filter_pool {
+		io.extend_with(
+			EthFilterApiServer::to_delegate(EthFilterApi::new(
+				client.clone(),
+				filter_pool.clone(),
+				500 as usize, // max stored filters
+				overrides.clone(),
+			))
+		);
+	}
+
 	io.extend_with(
 		NetApiServer::to_delegate(NetApi::new(
 			client.clone(),
 			network.clone(),
+		))
+	);
+
+	io.extend_with(
+		Web3ApiServer::to_delegate(Web3Api::new(
+			client.clone(),
 		))
 	);
 	io.extend_with(
@@ -193,8 +234,10 @@ pub fn create_full<C, P, SC, B>(
 				HexEncodedIdProvider::default(),
 				Arc::new(subscription_task_executor)
 			),
+			overrides
 		))
 	);
+
 	io.extend_with(
 		sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
 			GrandpaRpcHandler::new(
