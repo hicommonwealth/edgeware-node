@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api';
-import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
+import { BalanceOf, AccountId, Voter } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
 import { assert } from 'chai';
@@ -9,7 +9,7 @@ import { makeTx } from '../util';
 export default class extends StateTest {
   private _candidates: string[];
   private _council: string[];
-  private _charlieVotes: ITuple<[BalanceOf, Vec<AccountId>]>;
+  private _charlieVotes: Voter;
 
   constructor() {
     super('council test');

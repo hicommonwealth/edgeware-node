@@ -30,10 +30,10 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@edgeware/node-types@^3.4.0-tel-aviv.1":
-  version "3.4.0-tel-aviv.1"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.4.0-tel-aviv.1.tgz#407f58f72625443511813a766149f36af0754e96"
-  integrity sha512-LmDJfVG93y4iQJUQlIqa61/rkiHfdPDtpaJQS6ATUmrTa+7x8z2AQubB5Zo2XkZjYRFubtnNONN3mVtEyT97xw==
+"@edgeware/node-types@^3.4.0-tel-aviv.3":
+  version "3.4.0-tel-aviv.3"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.4.0-tel-aviv.3.tgz#586b2227940ac671394b7a0a0f0e18f16e526281"
+  integrity sha512-PbJDrqtZoqCQ5rbwQbZN3QCLLJ6nZqobZs83fes+apUzpN3NCXP00zsF6zfVYy0kqzBl6BIxlDMVdJJAZG4fVQ==
 
 "@polkadot/api-derive@4.6.3-6":
   version "4.6.3-6"
