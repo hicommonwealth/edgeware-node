@@ -5115,7 +5115,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "bulletproofs-gadgets",
  "curve25519-dalek 3.1.0",
@@ -5139,7 +5139,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle-rpc"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -5156,7 +5156,7 @@ dependencies = [
 [[package]]
 name = "pallet-mixer"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "bencher",
  "bulletproofs-gadgets",
@@ -5164,6 +5164,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "log",
  "merlin",
  "pallet-balances",
  "pallet-merkle",
@@ -10196,7 +10197,7 @@ dependencies = [
 [[package]]
 name = "webb-currencies"
 version = "0.4.1-dev"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -10213,7 +10214,7 @@ dependencies = [
 [[package]]
 name = "webb-tokens"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "bencher",
  "frame-benchmarking",
@@ -10231,7 +10232,7 @@ dependencies = [
 [[package]]
 name = "webb-traits"
 version = "0.4.1-dev"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "frame-support",
  "funty",
@@ -10248,7 +10249,7 @@ dependencies = [
 [[package]]
 name = "webb-utilities"
 version = "0.4.1-dev"
-source = "git+https://github.com/webb-tools/anon?branch=drew-re-add-fronier#d1b08e20c37043a7e20a1caf4e748ce3261438a0"
+source = "git+https://github.com/webb-tools/anon?branch=develop#01db87380cc59d08dafef48dd487402f9fd881d4"
 dependencies = [
  "frame-support",
  "funty",
