@@ -16,7 +16,7 @@
     "generate-chainspec": "ts-node src/scripts/forker.ts"
   },
   "dependencies": {
-    "@edgeware/node-types": "^3.4.0-tel-aviv.0",
+    "@edgeware/node-types": "^3.4.0-tel-aviv.1",
     "@polkadot/api": "3.2.4-3",
     "@polkadot/keyring": "^5.2.2",
     "@polkadot/util": "^5.2.2",
