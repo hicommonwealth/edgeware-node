@@ -10445,8 +10445,3 @@ dependencies = [
  "cc",
  "libc",
 ]
-
-[[patch.unused]]
-name = "substrate-test-client"
-version = "2.0.1"
-source = "git+https://github.com/paritytech/substrate.git?rev=22f09c602704aeee2b59b14f427f73f6cb8b5e2f#22f09c602704aeee2b59b14f427f73f6cb8b5e2f"

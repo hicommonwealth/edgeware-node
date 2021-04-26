@@ -6,8 +6,8 @@ import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const CHAINSPEC = `${__dirname}/scripts/forker-data/fork.json`;
-// const BINARY_PATH = '../../../edgeware-node-3.1.0/target/release/edgeware';
-const BINARY_PATH = '../../target/release/edgeware';
+const BINARY_PATH = '../../../../edgeware-node/target/release/edgeware';
+// const BINARY_PATH = '../../target/release/edgeware';
 const CHAIN_BASE_PATH = `${__dirname}/../db`;
 const ACCOUNTS = [ '//Alice' ];
 const SS58_PREFIX = 7; // edgeware ss58
