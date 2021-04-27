@@ -1926,7 +1926,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "derive_more",
  "fp-consensus",
@@ -1948,7 +1948,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -1984,7 +1984,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core",
@@ -2088,7 +2088,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "parity-scale-codec",
  "sp-core",
@@ -2099,7 +2099,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "0.8.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "evm",
  "impl-trait-for-tuples 0.1.3",
@@ -2112,7 +2112,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4636,7 +4636,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "0.1.0"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4663,7 +4663,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -4687,7 +4687,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-ed25519"
 version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "ed25519-dalek",
  "evm",
@@ -4699,7 +4699,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "evm",
  "fp-evm",
@@ -4711,7 +4711,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.1"
-source = "git+https://github.com/hicommonwealth/frontier.git?rev=d3179acb5a111d58af6c48a12588ecd38750a9bb#d3179acb5a111d58af6c48a12588ecd38750a9bb"
+source = "git+https://github.com/VLT-Protocol/frontier.git?rev=6a284edd6bf34e96d1a4721fad215a0adb2cd5d3#6a284edd6bf34e96d1a4721fad215a0adb2cd5d3"
 dependencies = [
  "evm",
  "fp-evm",
