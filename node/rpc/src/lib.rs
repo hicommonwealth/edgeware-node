@@ -127,7 +127,7 @@ pub fn create_full<C, P, SC, B>(
 	use pallet_contracts_rpc::{Contracts, ContractsApi};
 	use fc_rpc::{
 		EthApi, EthApiServer, NetApi, NetApiServer, EthPubSubApiServer, EthPubSubApi,
-		EthDevSigner, EthSigner, HexEncodedIdProvider,
+		EthDevSigner, EthSigner, HexEncodedIdProvider, Web3Api, Web3ApiServer
 	};
 
 	let mut io = jsonrpc_core::IoHandler::default();
@@ -182,6 +182,11 @@ pub fn create_full<C, P, SC, B>(
 		NetApiServer::to_delegate(NetApi::new(
 			client.clone(),
 			network.clone(),
+		))
+	);
+	io.extend_with(
+		Web3ApiServer::to_delegate(Web3Api::new(
+			client.clone(),
 		))
 	);
 	io.extend_with(
