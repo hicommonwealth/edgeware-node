@@ -59,7 +59,8 @@ pallet-contracts-primitives = { default-features = false, version = "3.0" }
 pallet-contracts-rpc-runtime-api = { default-features = false, version = "3.0" }
 pallet-democracy = { version = "3.0", default-features = false }
 pallet-election-provider-multi-phase = { version = "3.0", default-features = false }
-pallet-elections-phragmen = { version = "3.0", default-features = false }
+pallet-elections-phragmen = { version = "4.0", default-features = false }
+
 frame-executive = { version = "3.0", default-features = false }
 pallet-grandpa = { version = "3.0", default-features = false }
 pallet-identity = { version = "3.0", default-features = false }
@@ -89,12 +90,12 @@ pallet-vesting = { version = "3.0", default-features = false }
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge-treasury-reward", default-features = false }
 
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-anon" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "drew-anon", default-features = false }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
+pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
 
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }
 mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }

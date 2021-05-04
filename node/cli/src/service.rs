@@ -38,12 +38,12 @@ use sc_service::{
 	config::{Configuration}, error::{Error as ServiceError},
 	RpcHandlers, TaskManager, BasePath,
 };
-use sp_inherents::InherentDataProviders;
 use sc_network::{Event, NetworkService};
 use sp_runtime::traits::Block as BlockT;
 use futures::prelude::*;
 use edgeware_executor::Executor;
 use sc_telemetry::{TelemetryWorker};
+use sp_consensus::SlotData;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -163,31 +163,40 @@ pub fn new_partial(
 		frontier_backend.clone(),
 	);
 
-	let inherent_data_providers = sp_inherents::InherentDataProviders::new();
-
 	let aura_block_import = sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
 		frontier_block_import, client.clone(),
 	);
 
-	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _>(
+	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
+	let raw_slot_duration = slot_duration.slot_duration();
+
+	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			slot_duration: sc_consensus_aura::slot_duration(&*client)?,
 			block_import: aura_block_import.clone(),
 			justification_import: Some(Box::new(grandpa_block_import.clone())),
 			client: client.clone(),
-			inherent_data_providers: inherent_data_providers.clone(),
+			create_inherent_data_providers: move |_, ()| async move {
+				let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
+
+				let slot =
+					sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+						*timestamp,
+						raw_slot_duration,
+					);
+
+				Ok((timestamp, slot))
+			},
 			spawner: &task_manager.spawn_essential_handle(),
-			registry: config.prometheus_registry(),
 			can_author_with: sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone()),
+			registry: config.prometheus_registry(),
 			check_for_equivocation: Default::default(),
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
-		}
+		},
 	)?;
 
 
 	Ok(sc_service::PartialComponents {
 		client, backend, task_manager, import_queue, keystore_container, select_chain, transaction_pool,
-		inherent_data_providers,
 		other: (
 			aura_block_import.clone(),
 			grandpa_link,
@@ -221,8 +230,8 @@ pub fn new_full_base(
 
 	let sc_service::PartialComponents {
 		client, backend, mut task_manager, import_queue, keystore_container,
-		select_chain, transaction_pool, inherent_data_providers,
-		other: (block_import, grandpa_link, pending_transactions, filter_pool, frontier_backend, mut telemetry),
+		select_chain, transaction_pool,
+		other: (aura_block_import, grandpa_link, pending_transactions, filter_pool, frontier_backend, mut telemetry),
 	} = new_partial(&config, cli)?;
 
 	config.network.extra_sets.push(sc_finality_grandpa::grandpa_peers_set_config());
@@ -267,6 +276,7 @@ pub fn new_full_base(
 		let pending = pending_transactions.clone();
 		let filter_pool = filter_pool.clone();
 		let frontier_backend = frontier_backend.clone();
+		let max_past_logs = cli.run.max_past_logs;
 
 		let is_authority = config.role.clone().is_authority();
 		let _keystore = keystore_container.sync_keystore();
@@ -293,6 +303,7 @@ pub fn new_full_base(
 				pending_transactions: pending.clone(),
 				filter_pool: filter_pool.clone(),
 				backend: frontier_backend.clone(),
+				max_past_logs,
 			};
 
 			edgeware_rpc::create_full(deps, subscription_executor.clone())
@@ -357,12 +368,12 @@ pub fn new_full_base(
 
 	let (shared_voter_state, _finality_proof_provider) = rpc_setup;
 
-	(with_startup_data)(&block_import, &grandpa_link);
+	(with_startup_data)(&aura_block_import, &grandpa_link);
 
 	let backoff_authoring_blocks: Option<()> = None;
 
 	if let sc_service::config::Role::Authority { .. } = &role {
-		let proposer = sc_basic_authorship::ProposerFactory::new(
+		let proposer_factory = sc_basic_authorship::ProposerFactory::new(
 			task_manager.spawn_handle(),
 			client.clone(),
 			transaction_pool.clone(),
@@ -370,24 +381,36 @@ pub fn new_full_base(
 			telemetry.as_ref().map(|x| x.handle()),
 		);
 
-		let can_author_with =
-			sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
-		let aura = sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _>(
+		let can_author_with = sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
+		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
+		let raw_slot_duration = slot_duration.slot_duration();
+
+		let aura = sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _, _>(
 			StartAuraParams {
-				slot_duration: sc_consensus_aura::slot_duration(&*client)?,
+				slot_duration,
 				client: client.clone(),
 				select_chain,
-				block_import,
-				proposer_factory: proposer,
-				sync_oracle: network.clone(),
-				inherent_data_providers: inherent_data_providers.clone(),
+				block_import: aura_block_import,
+				proposer_factory,
+				create_inherent_data_providers: move |_, ()| async move {
+					let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
+
+					let slot =
+						sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+							*timestamp,
+							raw_slot_duration,
+						);
+
+					Ok((timestamp, slot))
+				},
 				force_authoring,
 				backoff_authoring_blocks,
 				keystore: keystore_container.sync_keystore(),
 				can_author_with,
+				sync_oracle: network.clone(),
 				block_proposal_slot_portion: SlotProportion::new(2f32 / 3f32),
 				telemetry: telemetry.as_ref().map(|x| x.handle()),
-			}
+			},
 		)?;
 
 		// the AURA authoring task is considered essential, i.e. if it
@@ -462,14 +485,13 @@ pub fn new_full_base(
 
 	network_starter.start_network();
 	Ok(NewFullBase {
-		task_manager, inherent_data_providers, client, network, network_status_sinks,
+		task_manager, client, network, network_status_sinks,
 		transaction_pool,
 	})
 }
 
 pub struct NewFullBase {
 	pub task_manager: TaskManager,
-	pub inherent_data_providers: InherentDataProviders,
 	pub client: Arc<FullClient>,
 	pub network: Arc<NetworkService<Block, <Block as BlockT>::Hash>>,
 	pub network_status_sinks: sc_service::NetworkStatusSinks<Block>,
@@ -532,19 +554,30 @@ pub fn new_light_base(config: Configuration) -> Result<(
 		client.clone(),
 	);
 
-	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _>(
+	let slot_duration = sc_consensus_aura::slot_duration(&*client)?.slot_duration();
+
+	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			slot_duration: sc_consensus_aura::slot_duration(&*client)?,
 			block_import: aura_block_import.clone(),
 			justification_import: Some(Box::new(grandpa_block_import.clone())),
 			client: client.clone(),
-			inherent_data_providers: InherentDataProviders::new(),
+			create_inherent_data_providers: move |_, ()| async move {
+				let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
+
+				let slot =
+					sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+						*timestamp,
+						slot_duration,
+					);
+
+				Ok((timestamp, slot))
+			},
 			spawner: &task_manager.spawn_essential_handle(),
-			registry: config.prometheus_registry(),
 			can_author_with: sp_consensus::NeverCanAuthor,
+			registry: config.prometheus_registry(),
 			check_for_equivocation: Default::default(),
 			telemetry: telemetry.as_ref().map(|x| x.handle()),
-		}
+		},
 	)?;
 
 	let (network, network_status_sinks, system_rpc_tx, network_starter) =

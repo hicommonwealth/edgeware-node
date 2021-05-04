@@ -26,6 +26,10 @@ pub struct RunCmd {
 
 	#[structopt(long = "enable-dev-signer")]
 	pub enable_dev_signer: bool,
+
+	/// Maximum number of logs in a query.
+	#[structopt(long, default_value = "10000")]
+	pub max_past_logs: u32,
 }
 
 /// An overarching CLI command definition.
