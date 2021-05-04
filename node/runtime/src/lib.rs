@@ -31,7 +31,7 @@ use frame_support::{
 		Weight, IdentityFee,
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND}, DispatchClass,
 	},
-	traits::{Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, OnUnbalanced, Randomness, LockIdentifier, U128CurrencyToVote},
+	traits::{Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, OnUnbalanced, LockIdentifier, U128CurrencyToVote},
 };
 
 use frame_system::{EnsureRoot, EnsureOneOf};
@@ -1269,23 +1269,18 @@ pub type Extrinsic = <Block as BlockT>::Extrinsic;
 /// Custom runtime upgrade to execute the balances migration before the account migration.
 mod custom_migration {
 	use super::*;
-	use frame_support::{traits::{OnRuntimeUpgrade, Get}, weights::Weight};
+	use frame_support::{traits::{OnRuntimeUpgrade}, weights::Weight};
+	use sp_runtime::print;
 
 	pub struct Upgrade;
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
+			print("Running double ref count migration");
 			let mut weight = 0;
-			weight += migrate_to_dual_ref_count::<Runtime>();
+			weight += frame_system::migrations::migrate_to_dual_ref_count::<Runtime>();
+			print("Finished double ref count migration");
 			weight
 		}
-	}
-
-	/// Migrate from unique `u32` reference counting to triple `u32` reference counting.
-	fn migrate_to_dual_ref_count<T: frame_system::Config>() -> frame_support::weights::Weight {
-		frame_system::Account::<T>::translate::<(T::Index, frame_system::RefCount, T::AccountData), _>(|_key, (nonce, consumers, data)|
-			Some(frame_system::AccountInfo { nonce, consumers, providers: 1, sufficients: 0, data })
-		);
-		T::BlockWeights::get().max_block
 	}
 }
 
