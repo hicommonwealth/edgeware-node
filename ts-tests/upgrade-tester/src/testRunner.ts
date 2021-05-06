@@ -338,7 +338,7 @@ class TestRunner {
     }
 
     // [5.] Upgrade chain via API
-    await this._doUpgrade();
+    await this._doUpgrade(false);
 
     // [6.] Restart chain with upgraded binary (if needed)
     if (this.options.upgrade.binaryPath
