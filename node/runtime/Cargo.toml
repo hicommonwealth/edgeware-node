@@ -97,12 +97,12 @@ pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier",
 pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
 pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
 
-merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }
-mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }
-merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "develop", optional = true }
-webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }
-webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }
-webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "develop" }
+merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
+mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
+merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "master", optional = true }
+webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
+webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
+webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "3.0", default-features = false, optional = true }

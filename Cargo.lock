@@ -5118,7 +5118,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "bulletproofs-gadgets",
  "curve25519-dalek 3.1.0",
@@ -5142,7 +5142,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle-rpc"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -5159,7 +5159,7 @@ dependencies = [
 [[package]]
 name = "pallet-mixer"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "bencher",
  "bulletproofs-gadgets",
@@ -10192,7 +10192,7 @@ dependencies = [
 [[package]]
 name = "webb-currencies"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -10209,7 +10209,7 @@ dependencies = [
 [[package]]
 name = "webb-tokens"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "bencher",
  "frame-benchmarking",
@@ -10227,7 +10227,7 @@ dependencies = [
 [[package]]
 name = "webb-traits"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "frame-support",
  "funty",
@@ -10244,7 +10244,7 @@ dependencies = [
 [[package]]
 name = "webb-utilities"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=develop#c08623523757dd80796c0c6052b7d6fb45bbb2c7"
+source = "git+https://github.com/webb-tools/anon?branch=master#015869382e183b50060e51804e4b915ff46683d7"
 dependencies = [
  "frame-support",
  "funty",

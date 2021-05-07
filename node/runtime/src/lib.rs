@@ -1275,36 +1275,6 @@ mod custom_migration {
 	use frame_support::{traits::{OnRuntimeUpgrade}, weights::Weight};
 	use sp_runtime::print;
 
-	// pub struct GrandpaStoragePrefixMigration;
-	// impl frame_support::traits::OnRuntimeUpgrade for GrandpaStoragePrefixMigration {
-	// 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
-	// 		use frame_support::traits::PalletInfo;
-	// 		if let Some(name) = <Runtime as frame_system::Config>::PalletInfo::name::<Grandpa>() {
-	// 			pallet_grandpa::migrations::v4::migrate::<Runtime, Grandpa, _>(name)
-	// 		} else {
-	// 			log::warn!("Grandpa storage prefix migration skipped: unable to fetch name");
-	// 			0
-	// 		}
-	// 	}
-
-	// 	#[cfg(feature = "try-runtime")]
-	// 	fn pre_upgrade() -> Result<(), &'static str> {
-	// 		use frame_support::traits::PalletInfo;
-	// 		if let Some(name) = <Runtime as frame_system::Config>::PalletInfo::name::<Grandpa>() {
-	// 			pallet_grandpa::migrations::v4::pre_migration::<Grandpa, _>(name);
-	// 		} else {
-	// 			log::warn!("Grandpa storage prefix migration pre-upgrade skipped: unable to fetch name");
-	// 		}
-	// 		Ok(())
-	// 	}
-
-	// 	#[cfg(feature = "try-runtime")]
-	// 	fn post_upgrade() -> Result<(), &'static str> {
-	// 		pallet_grandpa::migrations::v4::post_migration::<Grandpa>();
-	// 		Ok(())
-	// 	}
-	// }
-
 	pub struct Upgrade;
 	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
 		type AccountId = AccountId;
@@ -1317,10 +1287,32 @@ mod custom_migration {
 			print("Running double ref count migration");
 			let mut weight = 0;
 			weight += frame_system::migrations::migrate_to_dual_ref_count::<Runtime>();
-			weight += pallet_elections_phragmen::migrations::v3::apply::<Self>(
-				10 * DOLLARS, // old VotingBond
-				1_000 * DOLLARS, // old CandidacyBond
-			);
+
+			// old VotingBond
+			let old_voter_bond: Balance = 10 * DOLLARS;
+			// old CandidacyBond
+			let old_candidacy_bond: Balance = 1_000 * DOLLARS;
+
+			pallet_elections_phragmen
+				::migrations::v3
+				::migrate_voters_to_recorded_deposit
+				::<Self>(old_voter_bond);
+
+			pallet_elections_phragmen
+				::migrations::v3
+				::migrate_candidates_to_recorded_deposit
+				::<Self>(old_candidacy_bond);
+
+			pallet_elections_phragmen
+				::migrations::v3
+				::migrate_runners_up_to_recorded_deposit
+				::<Self>(old_candidacy_bond);
+
+			pallet_elections_phragmen
+				::migrations::v3
+				::migrate_members_to_recorded_deposit
+				::<Self>(old_candidacy_bond);
+
 			// TODO FOR AUDIT: Double check the we want this name for the pallet
 			weight += pallet_elections_phragmen::migrations::v4::migrate::<Runtime, Elections, _>(
 				"Elections",

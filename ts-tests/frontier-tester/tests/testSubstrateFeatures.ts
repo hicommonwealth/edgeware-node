@@ -21,7 +21,7 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
       provider,
       ...spec,
     });
-    pairs = createTestPairs();
+    pairs = createTestPairs({ ss58Format: 7 });
   });
 
   after(async () => {
