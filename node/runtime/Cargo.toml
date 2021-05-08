@@ -23,7 +23,7 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
-evm-runtime = { version = "0.25.0", default-features = false }
+evm-runtime = { version = "0.26.0", default-features = false }
 log = { version = "0.4.14", default-features = false }
 
 # primitives
@@ -108,7 +108,7 @@ webb-currencies = { default-features = false, git = "https://github.com/webb-too
 webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 
-evm = { version = "0.25.0", default-features = false, features = ["with-codec"] }
+evm = { version = "0.26.0", default-features = false, features = ["with-codec"] }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "3.0", default-features = false, optional = true }
