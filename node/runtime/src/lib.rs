@@ -94,6 +94,9 @@ pub use pallet_staking::StakerStatus;
 pub mod impls;
 use impls::{Author};
 
+pub mod precompiles;
+pub use precompiles::{EdgewarePrecompiles};
+
 /// Constant values used within the runtime.
 pub mod constants;
 use constants::{currency::*, time::*};
@@ -1030,6 +1033,7 @@ impl FeeCalculator for FixedGasPrice {
 		1.into()
 	}
 }
+
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(u32::max_value());
 }
@@ -1043,13 +1047,7 @@ impl pallet_evm::Config for Runtime {
 	type Currency = Balances;
 	type Event = Event;
 	type GasWeightMapping = EdgewareGasWeightMapping;
-	type Precompiles = (
-		pallet_evm_precompile_simple::ECRecover,
-		pallet_evm_precompile_simple::Sha256,
-		pallet_evm_precompile_simple::Ripemd160,
-		pallet_evm_precompile_simple::Identity,
-		pallet_evm_precompile_simple::ECRecoverPublicKey,
-	);
+	type Precompiles = EdgewarePrecompiles<Self>;
 	type BlockGasLimit = BlockGasLimit;
 	type OnChargeTransaction = ();
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
@@ -1073,6 +1071,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for EthereumFindAuthor<F> {
 		None
 	}
 }
+
 impl pallet_ethereum::Config for Runtime {
 	type Event = Event;
 	type FindAuthor = EthereumFindAuthor<Aura>;
@@ -1106,7 +1105,6 @@ parameter_types! {
 	pub const MetadataDepositBase: u64 = 1;
 	pub const MetadataDepositPerByte: u64 = 1;
 }
-
 
 impl webb_tokens::Config for Runtime {
 	type PalletId = TokensPalletId;

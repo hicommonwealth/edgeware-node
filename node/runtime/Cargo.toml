@@ -94,8 +94,12 @@ fp-rpc = { default-features = false, git = "https://github.com/webb-tools/fronti
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
@@ -103,6 +107,8 @@ merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-too
 webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
+
+evm = { version = "0.25.0", default-features = false, features = ["with-codec"] }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "3.0", default-features = false, optional = true }
@@ -176,9 +182,14 @@ std = [
 	"fp-rpc/std",
 	"pallet-ethereum/std",
 	"evm-runtime/std",
+	"evm/std",
 	"pallet-evm-precompile-simple/std",
 	"pallet-evm-precompile-modexp/std",
 	"pallet-evm-precompile-ed25519/std",
+	"pallet-evm-precompile-bn128/std",
+	"pallet-evm-precompile-dispatch/std",
+	"pallet-evm-precompile-sha3fips/std",
+	"pallet-evm-precompile-blake2/std",
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",

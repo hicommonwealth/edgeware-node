@@ -1670,6 +1670,7 @@ version = "3.3.0"
 dependencies = [
  "edge-treasury-reward",
  "edgeware-primitives",
+ "evm",
  "evm-runtime",
  "fp-rpc",
  "frame-benchmarking",
@@ -1695,8 +1696,12 @@ dependencies = [
  "pallet-elections-phragmen",
  "pallet-ethereum",
  "pallet-evm",
+ "pallet-evm-precompile-blake2",
+ "pallet-evm-precompile-bn128",
+ "pallet-evm-precompile-dispatch",
  "pallet-evm-precompile-ed25519",
  "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
  "pallet-grandpa",
  "pallet-identity",
@@ -2008,7 +2013,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2033,7 +2038,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "1.0.0"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "kvdb",
  "kvdb-rocksdb",
@@ -2047,7 +2052,7 @@ dependencies = [
 [[package]]
 name = "fc-mapping-sync"
 version = "1.1.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "fc-consensus",
  "fc-db",
@@ -2065,7 +2070,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2106,7 +2111,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core 15.1.0",
@@ -2210,7 +2215,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "1.0.0"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ethereum",
  "parity-scale-codec 2.1.1",
@@ -2224,7 +2229,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "evm",
  "impl-trait-for-tuples 0.1.3",
@@ -2237,7 +2242,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2253,7 +2258,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4959,7 +4964,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -4987,7 +4992,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "3.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -5010,9 +5015,46 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-evm-precompile-blake2"
+version = "1.1.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
+dependencies = [
+ "evm",
+ "fp-evm",
+ "sp-core",
+ "sp-io",
+]
+
+[[package]]
+name = "pallet-evm-precompile-bn128"
+version = "2.0.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
+dependencies = [
+ "evm",
+ "fp-evm",
+ "sp-core",
+ "sp-io",
+ "substrate-bn",
+]
+
+[[package]]
+name = "pallet-evm-precompile-dispatch"
+version = "1.0.1-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
+dependencies = [
+ "evm",
+ "fp-evm",
+ "frame-support",
+ "pallet-evm",
+ "parity-scale-codec 2.1.1",
+ "sp-core",
+ "sp-io",
+]
+
+[[package]]
 name = "pallet-evm-precompile-ed25519"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "ed25519-dalek",
  "evm",
@@ -5024,7 +5066,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-modexp"
 version = "1.1.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5034,9 +5076,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-evm-precompile-sha3fips"
+version = "1.0.1-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
+dependencies = [
+ "evm",
+ "fp-evm",
+ "sp-core",
+ "sp-io",
+ "tiny-keccak",
+]
+
+[[package]]
 name = "pallet-evm-precompile-simple"
 version = "1.0.1-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#f7684878e558e78e06a09128955d0fab0b02f2ed"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-4#845b68ba52279f04e8d94020c0868c96b0164275"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5117,7 +5171,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "bulletproofs-gadgets",
  "curve25519-dalek 3.1.0",
@@ -5141,7 +5195,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle-rpc"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -5158,7 +5212,7 @@ dependencies = [
 [[package]]
 name = "pallet-mixer"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "bencher",
  "bulletproofs-gadgets",
@@ -8806,6 +8860,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "substrate-bn"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "lazy_static",
+ "rand 0.8.3",
+ "rustc-hex",
+]
+
+[[package]]
 name = "substrate-browser-utils"
 version = "0.9.0"
 source = "git+https://github.com/paritytech/substrate.git?branch=master#a8ada8a654a1e50d855345d07f5f8f8cbce0a818"
@@ -10191,7 +10258,7 @@ dependencies = [
 [[package]]
 name = "webb-currencies"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -10208,7 +10275,7 @@ dependencies = [
 [[package]]
 name = "webb-tokens"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "bencher",
  "frame-benchmarking",
@@ -10226,7 +10293,7 @@ dependencies = [
 [[package]]
 name = "webb-traits"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "frame-support",
  "funty",
@@ -10243,7 +10310,7 @@ dependencies = [
 [[package]]
 name = "webb-utilities"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=master#3d62d89a6ec3d10573e879761a7f30e65cb7b5ac"
+source = "git+https://github.com/webb-tools/anon?branch=master#d29dcda57e31b0e0d0a7cbb13df7f8dbf163b14e"
 dependencies = [
  "frame-support",
  "funty",
