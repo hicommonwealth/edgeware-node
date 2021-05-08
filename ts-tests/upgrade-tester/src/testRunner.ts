@@ -140,6 +140,7 @@ class TestRunner {
       '--force-authoring',
       '--no-telemetry',
       '--no-prometheus',
+      '-linfo',
     ];
     log.info(`Executing ${this.options.binaryPath} with args ${JSON.stringify(args)}`);
     this._chainProcess = child_process.spawn(

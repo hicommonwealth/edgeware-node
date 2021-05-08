@@ -222,6 +222,8 @@ pub fn create_full<C, P, SC, B>(
 		NetApiServer::to_delegate(NetApi::new(
 			client.clone(),
 			network.clone(),
+			// Whether to format the `peer_count` response as Hex (default) or not.
+			true,
 		))
 	);
 

@@ -33,8 +33,8 @@ sp-consensus-aura = { version = "0.9" }
 sp-runtime = { version = "3.0" }
 sp-transaction-pool = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
-fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
-fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
-fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }

@@ -90,12 +90,12 @@ pallet-vesting = { version = "3.0", default-features = false }
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge-treasury-reward", default-features = false }
 
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "drew-frontier-to-master", default-features = false }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
 mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }

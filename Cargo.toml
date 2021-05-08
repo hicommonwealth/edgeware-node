@@ -68,17 +68,17 @@ zeroize = { opt-level = 3 }
 
 [patch.crates-io]
 # frontier deps
-fc-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-fc-rpc-core = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-fp-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-fp-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
-pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier.git", branch = "drew-frontier-to-master" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+fc-rpc-core = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+fp-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+fp-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 
 # substrate deps
 fork-tree = { git = "https://github.com/paritytech/substrate.git", branch = "master" }

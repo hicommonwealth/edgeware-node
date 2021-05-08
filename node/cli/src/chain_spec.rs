@@ -260,7 +260,8 @@ pub fn testnet_genesis(
 		pallet_elections_phragmen: Default::default(),
 		pallet_sudo: SudoConfig { key: _root_key },
 		pallet_vesting: VestingConfig { vesting: vesting },
-		pallet_evm: EVMConfig { accounts: evm_accounts, marker: core::marker::PhantomData },
+		pallet_ethereum: Default::default(),
+		pallet_evm: EVMConfig { accounts: evm_accounts },
 		pallet_contracts: Default::default(),
 		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
@@ -520,6 +521,7 @@ pub fn mainnet_genesis(
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		},
 		pallet_vesting: VestingConfig { vesting: vesting },
+		pallet_ethereum: Default::default(),
 		pallet_evm: Default::default(),
 		pallet_contracts: Default::default(),
 		treasury_reward: TreasuryRewardConfig {

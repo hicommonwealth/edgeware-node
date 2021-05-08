@@ -1200,8 +1200,8 @@ construct_runtime!(
 		// REMOVED: Assets: edge_assets::{Pallet, Call, Storage, Event<T>} = 29,
 
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
-		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 33,
-		EVM: pallet_evm::{Pallet, Config<T>, Call, Storage, Event<T>} = 34,
+		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,
+		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
 
