@@ -43,7 +43,7 @@ describeWithEdgeware('Precompiles test', async (context) => {
       + '88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee'
       + '6c92140653922643b059e25a8ea5007baecc4a84dd3baa0b2c3aa62d44aea0393d70d860f6a6d5266cdd62160a971917f257603de3d8d0218681753caadae204';
     const callResult = await web3.eth.call({
-      to: '0000000000000000000000000000000000000006',
+      to: '0000000000000000000000000000000000001028',
       from: account,
       data: message,
     });
@@ -57,7 +57,7 @@ describeWithEdgeware('Precompiles test', async (context) => {
       + '88dc3417d5058ec4b4503e0c12ea1a0a89be200fe98922423d4334014fa6b0ee'
       + '003d4e3fca386deff58df1d86f8bb490d3204e14d14ef5e51af03e34b72f7abea34ec295d6a0c055388e521c91f60b25e5199ec5d4c2c1af433ac040a75d8f0a';
     const callResult = await web3.eth.call({
-      to: '0000000000000000000000000000000000000006',
+      to: '0000000000000000000000000000000000001028',
       from: account,
       data: message,
     });

@@ -18,68 +18,113 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(test)]
-mod tests;
+pub mod mock;
+
+#[cfg(test)]
+pub mod tests;
+
+use sp_std::prelude::*;
 
 use frame_support::traits::Currency;
-use sp_std::prelude::*;
-use sp_runtime::traits::{Zero};
-
-use frame_support::{decl_event, decl_module, decl_storage};
-use frame_system::{ensure_root};
 pub type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 
-pub trait Config: pallet_treasury::Config + pallet_balances::Config {
-	/// The overarching event type.
-	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
-	/// The account balance
-	type Currency: Currency<Self::AccountId>;
-}
+pub use pallet::*;
 
-decl_module! {
-	pub struct Module<T: Config> for enum Call where origin: T::Origin {
-		fn deposit_event() = default;
-		/// Mint money for the treasury!
+#[frame_support::pallet]
+pub mod pallet {
+	use super::*;
+	use sp_runtime::traits::Zero;
+	use frame_support::pallet_prelude::*;
+	use frame_system::pallet_prelude::*;
+
+	/// The pallet's configuration trait.
+	#[pallet::config]
+	pub trait Config: frame_system::Config + pallet_balances::Config + pallet_treasury::Config {
+		/// The overarching event type.
+		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+
+		/// The account balance
+		type Currency: Currency<Self::AccountId>;
+	}
+
+	#[pallet::event]
+	#[pallet::generate_deposit(pub(crate) fn deposit_event)]
+	#[pallet::metadata(T::Balance = "Balance", T::BlockNumber = "BlockNumber", T::AccountId = "AccountId")]
+	pub enum Event<T: Config> {
+		/// Treasury minting event
+		TreasuryMinting(T::Balance, T::BlockNumber, T::AccountId),
+	}
+
+	/// The next tree identifier up for grabs
+	#[pallet::storage]
+	#[pallet::getter(fn minting_interval)]
+	pub type MintingInterval<T: Config> = StorageValue<_, T::BlockNumber, ValueQuery>;
+
+	/// The next tree identifier up for grabs
+	#[pallet::storage]
+	#[pallet::getter(fn current_payout)]
+	pub type CurrentPayout<T: Config> = StorageValue<_, BalanceOf<T>, ValueQuery>;
+
+	#[pallet::pallet]
+	pub struct Pallet<T>(PhantomData<T>);
+
+	#[pallet::genesis_config]
+	pub struct GenesisConfig<T: Config> {
+		// tokens to create + min_balance for that token
+		pub minting_interval: T::BlockNumber,
+		// endowed accounts for a token + their balances
+		pub current_payout: BalanceOf<T>,
+	}
+
+	#[cfg(feature = "std")]
+	impl<T: Config> Default for GenesisConfig<T> {
+		fn default() -> Self {
+			GenesisConfig {
+				minting_interval: Zero::zero(),
+				current_payout: Zero::zero(),
+			}
+		}
+	}
+
+	#[pallet::genesis_build]
+	impl<T: Config> GenesisBuild<T> for GenesisConfig<T> {
+		fn build(&self) {
+			MintingInterval::<T>::put(self.minting_interval);
+			CurrentPayout::<T>::put(self.current_payout);
+		}
+	}
+
+	#[pallet::hooks]
+	impl<T: Config> Hooks<T::BlockNumber> for Pallet<T> {
 		fn on_finalize(_n: T::BlockNumber) {
 			if <frame_system::Pallet<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
 				<T as Config>::Currency::deposit_creating(&<pallet_treasury::Pallet<T>>::account_id(), reward);
-				Self::deposit_event(RawEvent::TreasuryMinting(
+				Self::deposit_event(Event::TreasuryMinting(
 					<pallet_balances::Pallet<T>>::free_balance(<pallet_treasury::Pallet<T>>::account_id()),
 					<frame_system::Pallet<T>>::block_number(),
 					<pallet_treasury::Pallet<T>>::account_id())
 				);
 			}
 		}
+	}
 
+	#[pallet::call]
+	impl<T: Config> Pallet<T> {
 		/// Sets the fixed treasury payout per minting interval.
-		#[weight = 5_000_000]
-		fn set_current_payout(origin, payout: BalanceOf<T>) {
+		#[pallet::weight(5_000_000)]
+		pub(super) fn set_current_payout(origin: OriginFor<T>, payout: BalanceOf<T>) -> DispatchResultWithPostInfo {
 			ensure_root(origin)?;
 			<CurrentPayout<T>>::put(payout);
+			Ok(().into())
 		}
 
 		/// Sets the treasury minting interval.
-		#[weight = 5_000_000]
-		fn set_minting_interval(origin, interval: T::BlockNumber) {
+		#[pallet::weight(5_000_000)]
+		pub(super) fn set_minting_interval(origin: OriginFor<T>, interval: T::BlockNumber) -> DispatchResultWithPostInfo {
 			ensure_root(origin)?;
 			<MintingInterval<T>>::put(interval);
+			Ok(().into())
 		}
-	}
-}
-
-decl_event!(
-	pub enum Event<T> where <T as frame_system::Config>::BlockNumber,
-							<T as frame_system::Config>::AccountId,
-							Balance = <T as pallet_balances::Config>::Balance {
-		TreasuryMinting(Balance, BlockNumber, AccountId),
-	}
-);
-
-decl_storage! {
-	trait Store for Module<T: Config> as TreasuryReward {
-		/// Interval in number of blocks to reward treasury
-		pub MintingInterval get(fn minting_interval) config(): T::BlockNumber;
-		/// Current payout of module
-		pub CurrentPayout get(fn current_payout) config(): BalanceOf<T>;
 	}
 }

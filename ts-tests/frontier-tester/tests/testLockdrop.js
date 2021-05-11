@@ -54,6 +54,7 @@ describeWithEdgeware("Lockdrop test", async (context) => {
     let lockdrop = await LD.new(time, { from: account });
 
     let startNonce = await web3.eth.getTransactionCount(lockdrop.address);
+    console.log('Start nonce', startNonce);
     assert.equal(startNonce, '1', 'start nonce of deployed contract should be 1');
 
     let senderBalance = new web3.utils.BN(await web3.eth.getBalance(account));
@@ -65,12 +66,17 @@ describeWithEdgeware("Lockdrop test", async (context) => {
 
     const value = web3.utils.toWei('10', 'ether');
 
-    await lockdrop.lock(THREE_MONTHS, account, true, {
+    let before_nonce = await web3.eth.getTransactionCount(lockdrop.address);
+    console.log('Before lock nonce', before_nonce);
+    const res = await lockdrop.lock(THREE_MONTHS, account, true, {
       from: account,
       value: value,
       gas: 1500000,
       gasPrice: 1000,
     });
+    console.log(res);
+    let after_nonce = await web3.eth.getTransactionCount(lockdrop.address);
+    console.log('After lock nonce', after_nonce);
 
     let balLock1 = await web3.eth.getBalance(bcontractAddr1);
     let balLock2 = await web3.eth.getBalance(bcontractAddr2);
@@ -86,8 +92,9 @@ describeWithEdgeware("Lockdrop test", async (context) => {
     let sentBalance = senderBalance.sub(senderBalanceAfter);
     assert.isTrue(sentBalance.gt(new web3.utils.BN(value)), 'sent balance should be greater than lock value');
 
-    const nonce = (await web3.eth.getTransactionCount(lockdrop.address));
-    const contractAddr = getContractAddress(lockdrop.address, nonce - 1);
+    const nonce = await web3.eth.getTransactionCount(lockdrop.address);
+    console.log('Second nonce', nonce);
+    const contractAddr = getContractAddress(lockdrop.address, (nonce > 0) ? nonce - 1 : nonce);
     assert.equal(nonce, '2', 'contract nonce of Lockdrop contract should be 2 after lock')
 
     const bal0 = await web3.eth.getBalance(contractAddr);
@@ -103,7 +110,7 @@ describeWithEdgeware("Lockdrop test", async (context) => {
       gasPrice: 1000000000,
     });
 
-    const new_nonce = (await web3.eth.getTransactionCount(lockdrop.address));
+    const new_nonce = await web3.eth.getTransactionCount(lockdrop.address);
     const new_contractAddr = getContractAddress(lockdrop.address, new_nonce - 1);
     const bal2 = await web3.eth.getBalance(new_contractAddr);
 

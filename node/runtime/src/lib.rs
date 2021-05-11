@@ -1311,10 +1311,10 @@ mod custom_migration {
 				::migrate_members_to_recorded_deposit
 				::<Self>(old_candidacy_bond);
 
-			// TODO FOR AUDIT: Double check the we want this name for the pallet
-			weight += pallet_elections_phragmen::migrations::v4::migrate::<Runtime, Elections, _>(
-				"Elections",
-			);
+			// // TODO FOR AUDIT: Double check the we want this name for the pallet
+			// weight += pallet_elections_phragmen::migrations::v4::migrate::<Runtime, Elections, _>(
+			// 	"Elections",
+			// );
 			print("Finished double ref count migration");
 			weight
 		}
