@@ -1298,6 +1298,7 @@ mod custom_migration {
 		fn on_runtime_upgrade() -> Weight {
 			print("Running double ref count migration");
 			let mut weight = 0;
+			// custom migration for edgeware.
 			weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
 
 			// old VotingBond
