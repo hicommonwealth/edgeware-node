@@ -101,12 +101,12 @@ pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier
 pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 
-merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
-mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
-merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "master", optional = true }
-webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
-webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
-webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "master" }
+merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4", optional = true }
+webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 
 evm = { version = "0.26.0", default-features = false, features = ["with-codec"] }
 
