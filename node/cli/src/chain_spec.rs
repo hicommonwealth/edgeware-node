@@ -16,13 +16,10 @@
 
 //! Substrate chain configurations.
 
-use edgeware_runtime::constants::currency::*;
-use edgeware_runtime::Block;
 use edgeware_runtime::{
-	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
-	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig,
+	constants::currency::*, wasm_binary_unwrap, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, Block,
+	CouncilConfig, DemocracyConfig, EVMConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
+	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig, TreasuryRewardConfig, VestingConfig,
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -31,7 +28,7 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public, U256, H160,};
+use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
 	traits::{IdentifyAccount, One, Verify},
@@ -39,16 +36,11 @@ use sp_runtime::{
 };
 
 pub use edgeware_primitives::{AccountId, Balance, BlockNumber, Signature};
-pub use edgeware_runtime::constants::time::*;
-pub use edgeware_runtime::GenesisConfig;
+pub use edgeware_runtime::{constants::time::*, GenesisConfig};
 
 use hex::FromHex;
 use serde_json::Result;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-use std::collections::BTreeMap;
-use std::str::FromStr;
+use std::{collections::BTreeMap, fs::File, io::Read, path::Path, str::FromStr};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -132,7 +124,9 @@ where
 }
 
 /// Helper function to generate stash, controller and session key from seed
-pub fn get_authority_keys_from_seed(seed: &str) -> (
+pub fn get_authority_keys_from_seed(
+	seed: &str,
+) -> (
 	AccountId,
 	AccountId,
 	GrandpaId,
@@ -152,7 +146,14 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (
 
 /// Helper function to create GenesisConfig for testing
 pub fn testnet_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)>,
+	initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		GrandpaId,
+		AuraId,
+		ImOnlineId,
+		AuthorityDiscoveryId,
+	)>,
 	_root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	_enable_println: bool,
@@ -162,15 +163,12 @@ pub fn testnet_genesis(
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
-	evm_accounts.insert(
-		alice_evm_account_id,
-		pallet_evm::GenesisAccount {
-			nonce: 0.into(),
-			balance: U256::from(123456_123_000_000_000_000_000u128),
-			storage: BTreeMap::new(),
-			code: vec![],
-		},
-	);
+	evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
+		nonce: 0.into(),
+		balance: U256::from(123456_123_000_000_000_000_000u128),
+		storage: BTreeMap::new(),
+		code: vec![],
+	});
 
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
@@ -199,10 +197,7 @@ pub fn testnet_genesis(
 	});
 
 	const STASH: Balance = 100000000 * DOLLARS;
-	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts
-		.iter()
-		.map(|k| (k.clone(), STASH))
-		.collect();
+	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
 
 	// add founders and balances to endowed if not already in list
 	founder_allocation.iter().chain(balances.iter()).for_each(|x| {
@@ -248,18 +243,14 @@ pub fn testnet_genesis(
 			members: crate::testnet_fixtures::get_testnet_election_members(),
 			phantom: Default::default(),
 		},
-		pallet_aura: AuraConfig {
-			authorities: vec![],
-		},
+		pallet_aura: AuraConfig { authorities: vec![] },
 		pallet_im_online: ImOnlineConfig { keys: vec![] },
 		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-		pallet_grandpa: GrandpaConfig {
-			authorities: vec![],
-		},
+		pallet_grandpa: GrandpaConfig { authorities: vec![] },
 		pallet_treasury: Default::default(),
 		pallet_elections_phragmen: Default::default(),
 		pallet_sudo: SudoConfig { key: _root_key },
-		pallet_vesting: VestingConfig { vesting: vesting },
+		pallet_vesting: VestingConfig { vesting },
 		pallet_ethereum: Default::default(),
 		pallet_evm: EVMConfig { accounts: evm_accounts },
 		pallet_contracts: Default::default(),
@@ -489,14 +480,7 @@ pub fn mainnet_genesis(
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities
 				.iter()
-				.map(|x| {
-					(
-						x.0.clone(),
-						x.1.clone(),
-						x.2.clone(),
-						StakerStatus::Validator,
-					)
-				})
+				.map(|x| (x.0.clone(), x.1.clone(), x.2.clone(), StakerStatus::Validator))
 				.collect(),
 			invulnerables: vec![],
 			slash_reward_fraction: Perbill::from_percent(10),
@@ -507,20 +491,16 @@ pub fn mainnet_genesis(
 			members: crate::mainnet_fixtures::get_mainnet_election_members(),
 			phantom: Default::default(),
 		},
-		pallet_aura: AuraConfig {
-			authorities: vec![],
-		},
+		pallet_aura: AuraConfig { authorities: vec![] },
 		pallet_im_online: ImOnlineConfig { keys: vec![] },
 		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-		pallet_grandpa: GrandpaConfig {
-			authorities: vec![],
-		},
+		pallet_grandpa: GrandpaConfig { authorities: vec![] },
 		pallet_treasury: Default::default(),
 		pallet_elections_phragmen: Default::default(),
 		pallet_sudo: SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		},
-		pallet_vesting: VestingConfig { vesting: vesting },
+		pallet_vesting: VestingConfig { vesting },
 		pallet_ethereum: Default::default(),
 		pallet_evm: Default::default(),
 		pallet_contracts: Default::default(),

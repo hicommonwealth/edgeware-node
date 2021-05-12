@@ -1,10 +1,8 @@
 use super::*;
 use crate as treasury_reward;
-use sp_runtime::traits::One;
-use frame_support::{construct_runtime, parameter_types, weights::Weight, PalletId};
+use frame_support::{construct_runtime, parameter_types, traits::GenesisBuild, weights::Weight, PalletId};
 use frame_system::mocking::{MockBlock, MockUncheckedExtrinsic};
-use sp_runtime::{Permill};
-use frame_support::traits::GenesisBuild;
+use sp_runtime::{traits::One, Permill};
 
 use sp_core::H256;
 use sp_runtime::{
@@ -116,8 +114,8 @@ impl pallet_treasury::Config for Test {
 }
 
 impl Config for Test {
-	type Event = Event;
 	type Currency = Balances;
+	type Event = Event;
 }
 
 pub type TreasuryCurrencyAdapter = <Test as pallet_treasury::Config>::Currency;
@@ -144,7 +142,9 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 	treasury_reward::GenesisConfig::<Test> {
 		current_payout: 9500000,
 		minting_interval: One::one(),
-	}.assimilate_storage(&mut t).unwrap();
+	}
+	.assimilate_storage(&mut t)
+	.unwrap();
 
 	t.into()
 }

@@ -14,12 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{chain_spec, service, Cli, Subcommand};
+use crate::{chain_spec, service, service::new_partial, Cli, Subcommand};
 use edgeware_executor::Executor;
 use edgeware_runtime::Block;
-use sc_cli::{Result, SubstrateCli, RuntimeVersion, Role, ChainSpec};
+use sc_cli::{ChainSpec, Result, Role, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
-use crate::service::{new_partial};
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
@@ -62,11 +61,10 @@ impl SubstrateCli for Cli {
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
 			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
 			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
-			path => Box::new(chain_spec::ChainSpec::from_json_file(
-				std::path::PathBuf::from(path),
-			)?),
+			path => Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		})
 	}
+
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
 		&edgeware_runtime::VERSION
 	}
@@ -84,7 +82,8 @@ pub fn run() -> Result<()> {
 				runner.sync_run(|config| cmd.run::<Block, Executor>(config))
 			} else {
 				Err("Benchmarking wasn't enabled when building the node. \
-				You can enable it with `--features runtime-benchmarks`.".into())
+				You can enable it with `--features runtime-benchmarks`."
+					.into())
 			}
 		}
 		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
@@ -94,60 +93,71 @@ pub fn run() -> Result<()> {
 		Some(Subcommand::BuildSpec(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
-		},
+		}
 		Some(Subcommand::CheckBlock(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, import_queue, ..}
-					= new_partial(&config, &cli)?;
+				let PartialComponents {
+					client,
+					task_manager,
+					import_queue,
+					..
+				} = new_partial(&config, &cli)?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
-		},
+		}
 		Some(Subcommand::ExportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, ..}
-					= new_partial(&config, &cli)?;
+				let PartialComponents {
+					client, task_manager, ..
+				} = new_partial(&config, &cli)?;
 				Ok((cmd.run(client, config.database), task_manager))
 			})
-		},
+		}
 		Some(Subcommand::ExportState(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, ..}
-					= new_partial(&config, &cli)?;
+				let PartialComponents {
+					client, task_manager, ..
+				} = new_partial(&config, &cli)?;
 				Ok((cmd.run(client, config.chain_spec), task_manager))
 			})
-		},
+		}
 		Some(Subcommand::ImportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, import_queue, ..}
-					= new_partial(&config, &cli)?;
+				let PartialComponents {
+					client,
+					task_manager,
+					import_queue,
+					..
+				} = new_partial(&config, &cli)?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
-		},
+		}
 		Some(Subcommand::PurgeChain(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.sync_run(|config| cmd.run(config.database))
-		},
+		}
 		Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, backend, ..}
-					= new_partial(&config, &cli)?;
+				let PartialComponents {
+					client,
+					task_manager,
+					backend,
+					..
+				} = new_partial(&config, &cli)?;
 				Ok((cmd.run(client, backend), task_manager))
 			})
-		},
+		}
 		None => {
 			let runner = cli.create_runner(&cli.run.base)?;
 			runner.run_node_until_exit(|config| async move {
 				match config.role {
 					Role::Light => service::new_light(config),
-					_ => service::new_full(
-						config,
-						&cli
-					),
+					_ => service::new_full(config, &cli),
 				}
 				.map_err(sc_cli::Error::Service)
 			})

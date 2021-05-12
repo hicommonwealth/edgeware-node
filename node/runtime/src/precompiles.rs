@@ -5,25 +5,22 @@ use pallet_evm::{Precompile, PrecompileSet};
 use pallet_evm_precompile_blake2::Blake2F;
 use pallet_evm_precompile_bn128::{Bn128Add, Bn128Mul, Bn128Pairing};
 use pallet_evm_precompile_dispatch::Dispatch;
-use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_ed25519::Ed25519Verify;
+use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_sha3fips::{Sha3FIPS256, Sha3FIPS512};
-use pallet_evm_precompile_simple::{ECRecover, Identity, Ripemd160, Sha256, ECRecoverPublicKey};
+use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
 use sp_core::H160;
 
-use sp_std::fmt::Debug;
-use sp_std::{marker::PhantomData, vec::Vec};
-
-
+use sp_std::{fmt::Debug, marker::PhantomData, vec::Vec};
 
 #[derive(Debug, Clone, Copy)]
 pub struct EdgewarePrecompiles<R>(PhantomData<R>);
 
-impl<R: frame_system::Config> EdgewarePrecompiles<R>
-{
-	/// Return all addresses that contain precompiles. This can be used to populate dummy code
-	/// under the precompile, and potentially in the future to prevent using accounts that have
-	/// precompiles at their addresses explicitly using something like SignedExtra.
+impl<R: frame_system::Config> EdgewarePrecompiles<R> {
+	/// Return all addresses that contain precompiles. This can be used to
+	/// populate dummy code under the precompile, and potentially in the future
+	/// to prevent using accounts that have precompiles at their addresses
+	/// explicitly using something like SignedExtra.
 	#[allow(dead_code)]
 	fn used_addresses() -> impl Iterator<Item = H160> {
 		sp_std::vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 1024, 1025, 1026, 1027, 1028]
@@ -34,7 +31,8 @@ impl<R: frame_system::Config> EdgewarePrecompiles<R>
 
 /// The following distribution has been decided for the precompiles
 /// 0-1023: Ethereum Mainnet Precompiles
-/// 1024-2047 Precompiles that are not in Ethereum Mainnet but are neither Moonbeam specific
+/// 1024-2047 Precompiles that are not in Ethereum Mainnet but are neither
+/// Moonbeam specific
 impl<R: frame_system::Config + pallet_evm::Config> PrecompileSet for EdgewarePrecompiles<R>
 where
 	R::Call: Dispatchable<PostInfo = PostDispatchInfo> + GetDispatchInfo + Decode,

@@ -15,13 +15,10 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 use crate::chain_spec::ChainSpec;
+use browser_utils::{browser_configuration, init_console_log, set_console_error_panic_hook, Client};
 use log::info;
-use wasm_bindgen::prelude::*;
-use browser_utils::{
-	Client,
-	browser_configuration, set_console_error_panic_hook, init_console_log,
-};
 use std::str::FromStr;
+use wasm_bindgen::prelude::*;
 
 /// Starts the client.
 #[wasm_bindgen]
@@ -35,8 +32,9 @@ async fn start_inner(chain_spec: Option<String>, log_level: String) -> Result<Cl
 	set_console_error_panic_hook();
 	init_console_log(log::Level::from_str(&log_level)?)?;
 	let chain_spec = match chain_spec {
-		Some(chain_spec) => ChainSpec::from_json_bytes(chain_spec.as_bytes().to_vec())
-			.map_err(|e| format!("{:?}", e))?,
+		Some(chain_spec) => {
+			ChainSpec::from_json_bytes(chain_spec.as_bytes().to_vec()).map_err(|e| format!("{:?}", e))?
+		}
 		None => crate::chain_spec::development_config(),
 	};
 
@@ -50,10 +48,9 @@ async fn start_inner(chain_spec: Option<String>, log_level: String) -> Result<Cl
 	info!("👤 Role: {:?}", config.role);
 
 	// Create the service. This is the most heavy initialization step.
-	let (task_manager, rpc_handlers) =
-		crate::service::new_light_base(config)
-			.map(|(components, rpc_handlers, _, _, _)| (components, rpc_handlers))
-			.map_err(|e| format!("{:?}", e))?;
+	let (task_manager, rpc_handlers) = crate::service::new_light_base(config)
+		.map(|(components, rpc_handlers, ..)| (components, rpc_handlers))
+		.map_err(|e| format!("{:?}", e))?;
 
 	Ok(browser_utils::start_client(task_manager, rpc_handlers))
 }

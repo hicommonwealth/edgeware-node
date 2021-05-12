@@ -17,24 +17,27 @@
 //! Low-level types used throughout the Substrate code.
 
 #![warn(missing_docs)]
-
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use sp_runtime::{
-	generic, traits::{Verify, BlakeTwo256, IdentifyAccount}, OpaqueExtrinsic, MultiSignature
+	generic,
+	traits::{BlakeTwo256, IdentifyAccount, Verify},
+	MultiSignature, OpaqueExtrinsic,
 };
 
 /// An index to a block.
 pub type BlockNumber = u32;
 
-/// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
+/// Alias to 512-bit hash when used in the context of a transaction signature on
+/// the chain.
 pub type Signature = MultiSignature;
 
-/// Some way of identifying an account on the chain. We intentionally make it equivalent
-/// to the public key of our transaction signing scheme.
+/// Some way of identifying an account on the chain. We intentionally make it
+/// equivalent to the public key of our transaction signing scheme.
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
 
-/// The type for looking up accounts. We don't expect more than 4 billion of them.
+/// The type for looking up accounts. We don't expect more than 4 billion of
+/// them.
 pub type AccountIndex = u32;
 
 /// Balance of an account.
@@ -86,13 +89,13 @@ pub mod report {
 	/// Identity of the equivocation/misbehavior reporter.
 	pub type ReporterId = app::Public;
 
-	/// An `AppCrypto` type to allow submitting signed transactions using the reporting
-	/// application key as signer.
+	/// An `AppCrypto` type to allow submitting signed transactions using the
+	/// reporting application key as signer.
 	pub struct ReporterAppCrypto;
 
 	impl AppCrypto<<Signature as Verify>::Signer, Signature> for ReporterAppCrypto {
-		type RuntimeAppPublic = ReporterId;
-		type GenericSignature = sp_core::ed25519::Signature;
 		type GenericPublic = sp_core::ed25519::Public;
+		type GenericSignature = sp_core::ed25519::Signature;
+		type RuntimeAppPublic = ReporterId;
 	}
 }

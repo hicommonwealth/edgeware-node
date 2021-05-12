@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-#![recursion_limit="128"]
+#![recursion_limit = "128"]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[cfg(test)]
@@ -33,9 +33,9 @@ pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
 	use super::*;
-	use sp_runtime::traits::Zero;
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
+	use sp_runtime::traits::Zero;
 
 	/// The pallet's configuration trait.
 	#[pallet::config]
@@ -103,8 +103,8 @@ pub mod pallet {
 				Self::deposit_event(Event::TreasuryMinting(
 					<pallet_balances::Pallet<T>>::free_balance(<pallet_treasury::Pallet<T>>::account_id()),
 					<frame_system::Pallet<T>>::block_number(),
-					<pallet_treasury::Pallet<T>>::account_id())
-				);
+					<pallet_treasury::Pallet<T>>::account_id(),
+				));
 			}
 		}
 	}
@@ -121,7 +121,10 @@ pub mod pallet {
 
 		/// Sets the treasury minting interval.
 		#[pallet::weight(5_000_000)]
-		pub(super) fn set_minting_interval(origin: OriginFor<T>, interval: T::BlockNumber) -> DispatchResultWithPostInfo {
+		pub(super) fn set_minting_interval(
+			origin: OriginFor<T>,
+			interval: T::BlockNumber,
+		) -> DispatchResultWithPostInfo {
 			ensure_root(origin)?;
 			<MintingInterval<T>>::put(interval);
 			Ok(().into())

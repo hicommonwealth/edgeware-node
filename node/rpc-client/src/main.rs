@@ -18,20 +18,14 @@
 
 //! Example edgeware RPC client code.
 //!
-//! This module shows how you can write a Rust RPC client that connects to a running
-//! edgeware node and use statically typed RPC wrappers.
+//! This module shows how you can write a Rust RPC client that connects to a
+//! running edgeware node and use statically typed RPC wrappers.
 
+use edgeware_primitives::Hash;
 use futures::Future;
 use hyper::rt;
-use edgeware_primitives::Hash;
-use sc_rpc::author::{
-	AuthorClient,
-	hash::ExtrinsicOrHash,
-};
-use jsonrpc_core_client::{
-	transports::http,
-	RpcError,
-};
+use jsonrpc_core_client::{transports::http, RpcError};
+use sc_rpc::author::{hash::ExtrinsicOrHash, AuthorClient};
 
 fn main() {
 	sp_tracing::try_init_simple();
@@ -40,9 +34,7 @@ fn main() {
 		let uri = "http://localhost:9933";
 
 		http::connect(uri)
-			.and_then(|client: AuthorClient<Hash, Hash>| {
-				remove_all_extrinsics(client)
-			})
+			.and_then(|client: AuthorClient<Hash, Hash>| remove_all_extrinsics(client))
 			.map_err(|e| {
 				println!("Error: {:?}", e);
 			})
@@ -55,17 +47,21 @@ fn main() {
 /// 1. Calls the `pending_extrinsics` method to get all extrinsics in the pool.
 /// 2. Then calls `remove_extrinsic` passing the obtained raw extrinsics.
 ///
-/// As the result of running the code the entire content of the transaction pool is going
-/// to be removed and the extrinsics are going to be temporarily banned.
-fn remove_all_extrinsics(client: AuthorClient<Hash, Hash>) -> impl Future<Item=(), Error=RpcError> {
-	client.pending_extrinsics()
+/// As the result of running the code the entire content of the transaction pool
+/// is going to be removed and the extrinsics are going to be temporarily
+/// banned.
+fn remove_all_extrinsics(client: AuthorClient<Hash, Hash>) -> impl Future<Item = (), Error = RpcError> {
+	client
+		.pending_extrinsics()
 		.and_then(move |pending| {
 			client.remove_extrinsic(
-				pending.into_iter().map(|tx| ExtrinsicOrHash::Extrinsic(tx.into())).collect()
+				pending
+					.into_iter()
+					.map(|tx| ExtrinsicOrHash::Extrinsic(tx.into()))
+					.collect(),
 			)
 		})
 		.map(|removed| {
 			println!("Removed extrinsics: {:?}", removed);
 		})
 }
-
