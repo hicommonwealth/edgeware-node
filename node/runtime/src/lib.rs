@@ -287,7 +287,7 @@ impl InstanceFilter<Call> for ProxyType {
 			),
 			ProxyType::Governance => matches!(
 				c,
-				Call::Democracy(..) | Call::Council(..) | Call::Elections(..) | Call::Treasury(..)
+				Call::Democracy(..) | Call::Council(..) | Call::PhragmenElection(..) | Call::Treasury(..)
 			),
 			ProxyType::Staking => matches!(c, Call::Staking(..)),
 		}
@@ -740,7 +740,7 @@ impl pallet_tips::Config for Runtime {
 	type TipCountdown = TipCountdown;
 	type TipFindersFee = TipFindersFee;
 	type TipReportDepositBase = TipReportDepositBase;
-	type Tippers = Elections;
+	type Tippers = PhragmenElection;
 	type WeightInfo = pallet_tips::weights::SubstrateWeight<Runtime>;
 }
 
@@ -1180,7 +1180,7 @@ construct_runtime!(
 		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 9,
 		Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 10,
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 11,
-		Elections: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
+		PhragmenElection: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
 		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
 
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
@@ -1291,38 +1291,27 @@ mod custom_migration {
 	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
 		type AccountId = AccountId;
 		type Balance = Balance;
-		type Module = Elections;
+		type Module = PhragmenElection;
 	}
 
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
-			print("Running double ref count migration");
 			let mut weight = 0;
 			// custom migration for edgeware.
 			weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
-
 			// old VotingBond
 			let old_voter_bond: Balance = 10 * DOLLARS;
 			// old CandidacyBond
 			let old_candidacy_bond: Balance = 1_000 * DOLLARS;
-
+			// elections migrations.
 			pallet_elections_phragmen::migrations::v3::migrate_voters_to_recorded_deposit::<Self>(old_voter_bond);
-
 			pallet_elections_phragmen::migrations::v3::migrate_candidates_to_recorded_deposit::<Self>(
 				old_candidacy_bond,
 			);
-
 			pallet_elections_phragmen::migrations::v3::migrate_runners_up_to_recorded_deposit::<Self>(
 				old_candidacy_bond,
 			);
-
 			pallet_elections_phragmen::migrations::v3::migrate_members_to_recorded_deposit::<Self>(old_candidacy_bond);
-
-			// // TODO FOR AUDIT: Double check the we want this name for the pallet
-			// weight += pallet_elections_phragmen::migrations::v4::migrate::<Runtime,
-			// Elections, _>( 	"Elections",
-			// );
-			print("Finished double ref count migration");
 			weight
 		}
 	}
