@@ -901,6 +901,30 @@ impl pallet_recovery::Config for Runtime {
 }
 
 parameter_types! {
+	pub const AssetDeposit: Balance = 100 * DOLLARS;
+	pub const ApprovalDeposit: Balance = 1 * DOLLARS;
+	pub const StringLimit: u32 = 50;
+	pub const MetadataDepositBase: Balance = 10 * DOLLARS;
+	pub const MetadataDepositPerByte: Balance = 1 * DOLLARS;
+}
+
+impl pallet_assets::Config for Runtime {
+	type Event = Event;
+	type Balance = u64;
+	type AssetId = u32;
+	type Currency = Balances;
+	type ForceOrigin = EnsureRoot<AccountId>;
+	type AssetDeposit = AssetDeposit;
+	type MetadataDepositBase = MetadataDepositBase;
+	type MetadataDepositPerByte = MetadataDepositPerByte;
+	type ApprovalDeposit = ApprovalDeposit;
+	type StringLimit = StringLimit;
+	type Freezer = ();
+	type Extra = ();
+	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
+}
+
+parameter_types! {
 	pub const MinVestedTransfer: Balance = 100 * DOLLARS;
 }
 
@@ -1103,11 +1127,7 @@ impl merkle::Config for Runtime {
 parameter_types! {
 	pub const TokensPalletId: PalletId = PalletId(*b"py/token");
 	pub const NativeCurrencyId: CurrencyId = 0;
-	pub const CurrencyDeposit: u64 = 1;
-	pub const ApprovalDeposit: u64 = 1;
-	pub const StringLimit: u32 = 50;
-	pub const MetadataDepositBase: u64 = 1;
-	pub const MetadataDepositPerByte: u64 = 1;
+	pub const CurrencyDeposit: Balance = 100 * DOLLARS;
 }
 
 impl webb_tokens::Config for Runtime {
@@ -1199,7 +1219,7 @@ construct_runtime!(
 		Scheduler: pallet_scheduler::{Pallet, Call, Storage, Event<T>} = 26,
 		Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>} = 27,
 		Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>} = 28,
-		// REMOVED: Assets: edge_assets::{Pallet, Call, Storage, Event<T>} = 29,
+		Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 29,
 
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,

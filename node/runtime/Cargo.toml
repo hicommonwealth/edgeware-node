@@ -49,6 +49,7 @@ sp-npos-elections = { version = "3.0", default-features = false }
 edgeware-primitives = { version = "3.3.0", path = "../primitives", default-features = false }
 
 # pallet dependencies
+pallet-assets = { version = "3.0", default-features = false }
 pallet-authority-discovery = { version = "3.0", default-features = false }
 pallet-authorship = { version = "3.0", default-features = false }
 pallet-aura = { version = "3.0", default-features = false }
@@ -125,6 +126,7 @@ sp-io = { version = "3.0" }
 default = ["std"]
 std = [
 	"sp-authority-discovery/std",
+	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
 	"sp-consensus-aura/std",

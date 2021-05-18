@@ -92,6 +92,7 @@ frame-support-procedural-tools = { git = "https://github.com/webb-tools/substrat
 frame-support-procedural-tools-derive = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 frame-system = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 frame-system-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-assets = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 pallet-aura = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 pallet-authority-discovery = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 pallet-authorship = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
