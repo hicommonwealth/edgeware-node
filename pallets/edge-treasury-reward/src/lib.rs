@@ -23,8 +23,6 @@ pub mod mock;
 #[cfg(test)]
 pub mod tests;
 
-use sp_std::prelude::*;
-
 use frame_support::traits::Currency;
 pub type BalanceOf<T> = <<T as Config>::Currency as Currency<<T as frame_system::Config>::AccountId>>::Balance;
 

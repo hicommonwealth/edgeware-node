@@ -131,10 +131,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 46,
-	impl_version: 46,
+	spec_version: 47,
+	impl_version: 47,
 	apis: RUNTIME_API_VERSIONS,
-	transaction_version: 1,
+	transaction_version: 2,
 };
 
 /// Native version.
@@ -1180,6 +1180,27 @@ impl mixer::Config for Runtime {
 	type WeightInfo = MixerWeights<Self>;
 }
 
+parameter_types! {
+	pub const NftPalletId: PalletId = PalletId(*b"edge/NFT");
+	pub CreateClassDeposit: Balance = 500 * MILLICENTS;
+	pub CreateTokenDeposit: Balance = 100 * MILLICENTS;
+}
+
+impl nft::Config for Runtime {
+	type Event = Event;
+	type CreateClassDeposit = CreateClassDeposit;
+	type CreateTokenDeposit = CreateTokenDeposit;
+	type PalletId = NftPalletId;
+	type WeightInfo = ();
+}
+
+impl orml_nft::Config for Runtime {
+	type ClassId = u32;
+	type TokenId = u64;
+	type ClassData = nft::ClassData<Balance>;
+	type TokenData = nft::TokenData<Balance>;
+}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -1234,6 +1255,10 @@ construct_runtime!(
 		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 41,
 		Mixer: mixer::{Pallet, Call, Storage, Event<T>} = 42,
 		Merkle: merkle::{Pallet, Call, Storage, Event<T>} = 43,
+
+		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 44,
+		NFT: nft::{Pallet, Call, Event<T>} = 45,
+
 	}
 );
 

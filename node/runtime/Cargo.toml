@@ -90,6 +90,8 @@ pallet-transaction-payment-rpc-runtime-api = { version = "3.0", default-features
 pallet-vesting = { version = "3.0", default-features = false }
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge-treasury-reward", default-features = false }
+orml-nft = { path = "../../pallets/orml-nft", default-features = false }
+nft = { package = "module-nft", path = "../../pallets/nft", default-features = false }
 
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
@@ -200,6 +202,8 @@ std = [
     "mixer/std",
     "webb-currencies/std",
     "webb-tokens/std",
+    "orml-nft/std",
+    "nft/std",
 ]
 
 runtime-benchmarks = [

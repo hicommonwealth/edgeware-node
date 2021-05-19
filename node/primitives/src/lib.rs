@@ -69,6 +69,15 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
 
+/// NFT balance for nft module
+pub type NFTBalance = u128;
+/// Asset id type for assets module
+pub type AssetId = u32;
+/// Token amount type for tokens module
+pub type Amount = i128;
+/// Currency id for tokens module
+pub type CurrencyId = u64;
+
 /// App-specific crypto used for reporting equivocation/misbehavior in AURA and
 /// GRANDPA. Any rewards for misbehavior reporting will be paid out to this
 /// account.

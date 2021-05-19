@@ -1694,6 +1694,8 @@ dependencies = [
  "hex-literal",
  "integer-sqrt",
  "log",
+ "module-nft",
+ "orml-nft",
  "pallet-assets",
  "pallet-aura",
  "pallet-authority-discovery",
@@ -1804,6 +1806,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "83c8d82922337cd23a15f88b70d8e4ef5f11da38dd7cdb55e84dd5de99695da0"
 dependencies = [
  "enumflags2_derive",
+ "serde",
 ]
 
 [[package]]
@@ -4431,6 +4434,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "module-nft"
+version = "1.0.0"
+dependencies = [
+ "edgeware-primitives",
+ "enumflags2",
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "orml-nft",
+ "pallet-balances",
+ "pallet-proxy",
+ "pallet-utility",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "webb-currencies",
+ "webb-tokens",
+ "webb-traits",
+]
+
+[[package]]
 name = "more-asserts"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4756,6 +4783,20 @@ name = "openssl-probe"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28988d872ab76095a6e6ac88d99b54fd267702734fd7ffe610ca27f533ddb95a"
+
+[[package]]
+name = "orml-nft"
+version = "0.4.1-dev"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+]
 
 [[package]]
 name = "output_vt100"

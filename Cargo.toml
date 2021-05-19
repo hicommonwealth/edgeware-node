@@ -1,6 +1,8 @@
 [workspace]
 members = [
 	"pallets/edge-treasury-reward",
+	"pallets/orml-nft",
+	"pallets/nft",
 	"node/cli",
 	"node/executor",
 	"node/primitives",
