@@ -693,7 +693,7 @@ parameter_types! {
 	pub const BountyDepositBase: Balance = 10 * DOLLARS;
 	pub const BountyDepositPayoutDelay: BlockNumber = 7 * DAYS;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
-	pub const BountyUpdatePeriod: BlockNumber = 3 * DAYS;
+	pub const BountyUpdatePeriod: BlockNumber = 30 * DAYS;
 	pub const MaximumReasonLength: u32 = 16384;
 	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
 	pub const BountyValueMinimum: Balance = 100 * DOLLARS;
