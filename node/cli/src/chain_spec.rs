@@ -258,7 +258,6 @@ pub fn testnet_genesis(
 			minting_interval: One::one(),
 		},
 		orml_nft: Default::default(),
-		pallet_dynamic_fee: Default::default(),
 	}
 }
 
@@ -509,7 +508,6 @@ pub fn mainnet_genesis(
 			minting_interval: One::one(),
 		},
 		orml_nft: Default::default(),
-		pallet_dynamic_fee: Default::default(),
 	}
 }
 

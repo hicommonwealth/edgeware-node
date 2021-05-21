@@ -1244,7 +1244,7 @@ construct_runtime!(
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,
 		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
 		// TODO: Find if reusing old index is bad
-		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Config, Event<T>, Inherent} = 35,
+		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 35,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
 
