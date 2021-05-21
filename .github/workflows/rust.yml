@@ -1,0 +1,60 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    working_directory: ~/edgeware
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Init
+      run: |
+        scripts/init.sh
+        cargo --version
+        rustc --version
+        cargo +$WASM_BUILD_TOOLCHAIN --version
+        rustc +$WASM_BUILD_TOOLCHAIN --version
+      env:
+        WASM_BUILD_TOOLCHAIN: nightly-2021-03-15
+    # get cached edgeware build
+    - restore_cache:
+        key: edgeware-{{ checksum "Cargo.lock" }}
+    - name: Build
+      run: cargo build --release --verbose --all
+    - name: Run tests
+      run: cargo test --release --verbose --all
+    - name: Use Node.js 10
+      uses: actions/setup-node@v1
+      with:
+        node-version: 10
+    - name: Install functional tests typescript
+      run: cd ts-tests && npm install
+    - name: Run functional tests
+      run: cd ts-tests && npm run build && npm run test
+    
+    # save the built binary
+    - store_artifacts:
+        path: ~/edgeware/target/release/edgeware
+        destination: edgeware-node
+
+    # save edgeware build
+    - save_cache:
+        key: edgeware-{{ checksum "Cargo.lock" }}
+        paths:
+          - target
+
+    # ts test cases with node_modules caching
+    - restore_cache:
+        key: edgeware-tests-{{ checksum "ts-tests/frontier-tester/yarn.lock" }}
+    - run: cd ~/edgeware/ts-tests/frontier-tester && yarn
+    - save_cache:
+        key: edgeware-tests-{{ checksum "ts-tests/frontier-tester/yarn.lock" }}
+        paths:
+          - ts-tests/frontier-tester/node_modules
+
+    - run: cd ~/edgeware/ts-tests/frontier-tester && yarn test-ci
