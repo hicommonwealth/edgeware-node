@@ -170,6 +170,8 @@ pub fn new_partial(
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 	let raw_slot_duration = slot_duration.slot_duration();
 
+	let target_gas_price = U256::from(cli.run.target_gas_price);
+
 	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
 			block_import: aura_block_import.clone(),
@@ -183,7 +185,9 @@ pub fn new_partial(
 					raw_slot_duration,
 				);
 
-				Ok((timestamp, slot))
+				let fee = pallet_dynamic_fee::InherentDataProvider(target_gas_price);
+
+				Ok((timestamp, slot, fee))
 			},
 			spawner: &task_manager.spawn_essential_handle(),
 			can_author_with: sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone()),
@@ -227,6 +231,7 @@ pub fn new_full_base(
 	),
 ) -> Result<NewFullBase, ServiceError> {
 	let enable_dev_signer = cli.run.enable_dev_signer;
+	let target_gas_price = U256::from(cli.run.target_gas_price);
 
 	let sc_service::PartialComponents {
 		client,
@@ -401,7 +406,9 @@ pub fn new_full_base(
 							raw_slot_duration,
 						);
 
-						Ok((timestamp, slot))
+						let fee = pallet_dynamic_fee::InherentDataProvider(target_gas_price);
+
+						Ok((timestamp, slot, fee))
 					},
 					force_authoring,
 					backoff_authoring_blocks,
