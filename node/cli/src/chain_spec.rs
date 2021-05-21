@@ -253,12 +253,12 @@ pub fn testnet_genesis(
 		pallet_vesting: VestingConfig { vesting },
 		pallet_ethereum: Default::default(),
 		pallet_evm: EVMConfig { accounts: evm_accounts },
-		pallet_contracts: Default::default(),
 		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		},
 		orml_nft: Default::default(),
+		pallet_dynamic_fee: Default::default(),
 	}
 }
 
@@ -504,12 +504,12 @@ pub fn mainnet_genesis(
 		pallet_vesting: VestingConfig { vesting },
 		pallet_ethereum: Default::default(),
 		pallet_evm: Default::default(),
-		pallet_contracts: Default::default(),
 		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		},
 		orml_nft: Default::default(),
+		pallet_dynamic_fee: Default::default(),
 	}
 }
 

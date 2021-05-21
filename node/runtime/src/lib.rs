@@ -76,7 +76,7 @@ pub use pallet_session::historical as pallet_session_historical;
 
 use evm_runtime::Config as EvmConfig;
 use fp_rpc::TransactionStatus;
-use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner};
+use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, HashedAddressMapping, Runner};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -952,7 +952,6 @@ parameter_types! {
 	pub RentFraction: Perbill = Perbill::from_rational(1u32, 30 * DAYS);
 	pub const SurchargeReward: Balance = 150 * MILLICENTS;
 	pub const SignedClaimHandicap: u32 = 2;
-	pub const MaxDepth: u32 = 32;
 	pub const MaxValueSize: u32 = 16 * 1024;
 	// The lazy deletion runs inside on_initialize.
 	pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
@@ -963,30 +962,29 @@ parameter_types! {
 			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(1) -
 			<Runtime as pallet_contracts::Config>::WeightInfo::on_initialize_per_queue_item(0)
 		)) / 5) as u32;
-	pub MaxCodeSize: u32 = 128 * 1024;
+	pub Schedule: pallet_contracts::Schedule<Runtime> = Default::default();
 }
 
 impl pallet_contracts::Config for Runtime {
-	type ChainExtension = ();
+	type Time = Timestamp;
+	type Randomness = RandomnessCollectiveFlip;
 	type Currency = Balances;
-	type DeletionQueueDepth = DeletionQueueDepth;
-	type DeletionWeightLimit = DeletionWeightLimit;
+	type Event = Event;
+	type RentPayment = ();
+	type SignedClaimHandicap = SignedClaimHandicap;
+	type TombstoneDeposit = TombstoneDeposit;
 	type DepositPerContract = DepositPerContract;
 	type DepositPerStorageByte = DepositPerStorageByte;
 	type DepositPerStorageItem = DepositPerStorageItem;
-	type Event = Event;
-	type MaxCodeSize = MaxCodeSize;
-	type MaxDepth = MaxDepth;
-	type MaxValueSize = MaxValueSize;
-	type Randomness = RandomnessCollectiveFlip;
 	type RentFraction = RentFraction;
-	type RentPayment = ();
-	type SignedClaimHandicap = SignedClaimHandicap;
 	type SurchargeReward = SurchargeReward;
-	type Time = Timestamp;
-	type TombstoneDeposit = TombstoneDeposit;
-	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+	type CallStack = [pallet_contracts::Frame<Self>; 31];
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
+	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+	type ChainExtension = ();
+	type DeletionQueueDepth = DeletionQueueDepth;
+	type DeletionWeightLimit = DeletionWeightLimit;
+	type Schedule = Schedule;
 }
 
 parameter_types! {
@@ -1053,15 +1051,6 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 	}
 }
 
-/// Fixed gas price of `1`.
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		// Gas price is always one token per gas.
-		1.into()
-	}
-}
-
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(u32::max_value());
 }
@@ -1073,7 +1062,7 @@ impl pallet_evm::Config for Runtime {
 	type ChainId = EthChainId;
 	type Currency = Balances;
 	type Event = Event;
-	type FeeCalculator = FixedGasPrice;
+	type FeeCalculator = pallet_dynamic_fee::Pallet<Self>;
 	type GasWeightMapping = EdgewareGasWeightMapping;
 	type OnChargeTransaction = ();
 	type Precompiles = EdgewarePrecompiles<Self>;
@@ -1235,7 +1224,7 @@ construct_runtime!(
 
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>} = 15,
-		Contracts: pallet_contracts::{Pallet, Call, Config<T>, Storage, Event<T>} = 16,
+		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 17,
 		ImOnline: pallet_im_online::{Pallet, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 18,
 		AuthorityDiscovery: pallet_authority_discovery::{Pallet, Call, Config} = 19,
@@ -1341,7 +1330,6 @@ pub type Extrinsic = <Block as BlockT>::Extrinsic;
 mod custom_migration {
 	use super::*;
 	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
-	use sp_runtime::print;
 
 	pub struct Upgrade;
 	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
@@ -1493,7 +1481,7 @@ impl_runtime_apis! {
 			gas_limit: u64,
 			input_data: Vec<u8>,
 		) -> pallet_contracts_primitives::ContractExecResult {
-			Contracts::bare_call(origin, dest, value, gas_limit, input_data)
+			Contracts::bare_call(origin, dest, value, gas_limit, input_data, true)
 		}
 
 		fn instantiate(
@@ -1505,7 +1493,7 @@ impl_runtime_apis! {
 			salt: Vec<u8>,
 		) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
 		{
-			Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
+			Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true, true)
 		}
 
 		fn get_storage(

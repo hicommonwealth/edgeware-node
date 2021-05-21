@@ -1532,6 +1532,7 @@ dependencies = [
  "pallet-authority-discovery",
  "pallet-balances",
  "pallet-contracts",
+ "pallet-dynamic-fee",
  "pallet-evm",
  "pallet-grandpa",
  "pallet-im-online",
@@ -1707,6 +1708,7 @@ dependencies = [
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
+ "pallet-dynamic-fee",
  "pallet-election-provider-multi-phase",
  "pallet-elections-phragmen",
  "pallet-ethereum",
@@ -5005,6 +5007,23 @@ dependencies = [
  "parity-scale-codec 2.1.1",
  "serde",
  "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+]
+
+[[package]]
+name = "pallet-dynamic-fee"
+version = "1.0.1-dev"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#6992b0f4e1b796e842f330ac4157a52be2968eff"
+dependencies = [
+ "async-trait",
+ "frame-support",
+ "frame-system",
+ "pallet-evm",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "sp-core",
+ "sp-inherents",
  "sp-runtime",
  "sp-std 3.0.0",
 ]

@@ -42,6 +42,7 @@ use std::{
 	sync::{Arc, Mutex},
 	time::Duration,
 };
+use sp_core::U256;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -89,7 +90,7 @@ pub fn open_frontier_backend(config: &Configuration) -> Result<Arc<fc_db::Backen
 
 pub fn new_partial(
 	config: &Configuration,
-	_cli: &Cli,
+	cli: &Cli,
 ) -> Result<
 	sc_service::PartialComponents<
 		FullClient,

@@ -93,6 +93,7 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge
 orml-nft = { path = "../../pallets/orml-nft", default-features = false }
 nft = { package = "module-nft", path = "../../pallets/nft", default-features = false }
 
+pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
