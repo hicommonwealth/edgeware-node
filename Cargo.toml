@@ -76,6 +76,7 @@ fc-rpc-core = { git = "https://github.com/webb-tools/frontier.git", branch = "er
 fp-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 fp-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 fp-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
+pallet-dynamic-fee = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 pallet-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
