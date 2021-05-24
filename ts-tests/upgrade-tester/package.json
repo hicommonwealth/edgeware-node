@@ -16,11 +16,11 @@
     "generate-chainspec": "ts-node src/scripts/forker.ts"
   },
   "dependencies": {
-    "@edgeware/node-types": "^3.4.0-tel-aviv.3",
-    "@polkadot/api": "4.6.3-6",
-    "@polkadot/keyring": "^6.2.1",
-    "@polkadot/util": "^6.2.1",
-    "@polkadot/util-crypto": "^6.2.1",
+    "@edgeware/node-types": "^3.4.0-erup-4.3",
+    "@polkadot/api": "4.11.2",
+    "@polkadot/keyring": "^6.5.1",
+    "@polkadot/util": "^6.5.1",
+    "@polkadot/util-crypto": "^6.5.1",
     "@types/chai": "^4.2.11",
     "@types/rimraf": "^3.0.0",
     "@types/underscore": "^1.10.24",
