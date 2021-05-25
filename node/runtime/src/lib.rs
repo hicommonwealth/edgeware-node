@@ -351,10 +351,16 @@ impl pallet_indices::Config for Runtime {
 	type WeightInfo = pallet_indices::weights::SubstrateWeight<Runtime>;
 }
 
+#[cfg(feature = "no-reaping")]
 parameter_types! {
-	#[cfg(feature = "no-reaping")]
 	pub const ExistentialDeposit: Balance = 0;
-	#[cfg(not(feature = "no-reaping"))]
+	// For weight estimation, we assume that the most locks on an individual account will be 50.
+	// This number may need to be adjusted in the future if this assumption no longer holds true.
+	pub const MaxLocks: u32 = 50;
+}
+
+#[cfg(not(feature = "no-reaping"))]
+parameter_types! {
 	pub const ExistentialDeposit: Balance = 1 * MILLICENTS;
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
