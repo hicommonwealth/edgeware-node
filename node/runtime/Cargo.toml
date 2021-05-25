@@ -127,6 +127,7 @@ sp-io = { version = "3.0" }
 
 [features]
 default = ["std"]
+no-reaping = []
 std = [
 	"sp-authority-discovery/std",
 	"pallet-assets/std",
