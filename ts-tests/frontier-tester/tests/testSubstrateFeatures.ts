@@ -136,12 +136,12 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
     assert.equal(proposal.unwrap().bond.toString(), bond.toString());
   });
 
-  it('should apply for council', async () => {
+  it.only('should apply for council', async () => {
     const bob = pairs.bob;
-    const candidates = await api.query.elections.candidates();
-    const submitCandidacyTx = api.tx.elections.submitCandidacy(candidates.length);
+    const candidates = await api.query.phragmenElections.candidates();
+    const submitCandidacyTx = api.tx.phragmenElections.submitCandidacy(candidates.length);
     await submitTxWithFee(submitCandidacyTx, bob);
-    const newCandidates = await api.query.elections.candidates();
+    const newCandidates = await api.query.phragmenElections.candidates();
     assert.isTrue(newCandidates.map((c) => c.toString()).includes(bob.address));
   });
 
