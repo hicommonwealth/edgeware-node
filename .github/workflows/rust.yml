@@ -25,4 +25,4 @@ jobs:
       run: cargo build --release --features no-reaping
     - name: Run tests
       run: scripts/test.sh
-    - run: cd ~/edgeware/ts-tests/frontier-tester && yarn && yarn test-ci
+    - run: cd ts-tests/frontier-tester && yarn && yarn test-ci
