@@ -21,8 +21,17 @@ jobs:
         rustc +$WASM_BUILD_TOOLCHAIN --version
       env:
         WASM_BUILD_TOOLCHAIN: nightly-2021-03-15
+    - name: Cache Cargo
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.cargo/bin
+          target
+        key: cargo-cache
     - name: Build (with no-reaping)
       run: cargo build --release --features no-reaping
     - name: Run tests
       run: scripts/test.sh
-    - run: cd ts-tests/frontier-tester && yarn && yarn test-ci
+    - run: cd ts-tests/frontier-tester && yarn && yarn compile && yarn test-ci
