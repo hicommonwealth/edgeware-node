@@ -1511,6 +1511,11 @@ dependencies = [
  "edgeware-executor",
  "edgeware-primitives",
  "edgeware-rpc",
+ "edgeware-rpc-debug",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
+ "edgeware-rpc-trace",
+ "edgeware-rpc-txpool",
  "edgeware-runtime",
  "fc-consensus",
  "fc-db",
@@ -1618,6 +1623,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edgeware-extensions-evm"
+version = "0.1.0"
+dependencies = [
+ "edgeware-rpc-primitives-debug",
+ "ethereum-types",
+ "evm",
+ "evm-core",
+ "fp-evm",
+ "pallet-evm",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 2.0.1",
+]
+
+[[package]]
 name = "edgeware-primitives"
 version = "3.3.0"
 dependencies = [
@@ -1678,11 +1699,164 @@ dependencies = [
 ]
 
 [[package]]
+name = "edgeware-rpc-core-debug"
+version = "0.1.0"
+dependencies = [
+ "edgeware-rpc-primitives-debug",
+ "ethereum-types",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "serde",
+ "serde_json",
+ "sp-core",
+]
+
+[[package]]
+name = "edgeware-rpc-core-trace"
+version = "0.6.0"
+dependencies = [
+ "edgeware-rpc-primitives-debug",
+ "ethereum-types",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "edgeware-rpc-core-txpool"
+version = "0.6.0"
+dependencies = [
+ "ethereum",
+ "ethereum-types",
+ "fc-rpc-core",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "edgeware-rpc-debug"
+version = "0.1.0"
+dependencies = [
+ "edgeware-rpc-core-debug",
+ "edgeware-rpc-primitives-debug",
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-db",
+ "fc-rpc",
+ "fp-rpc",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "sc-client-api",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-utils",
+ "tokio 0.2.25",
+]
+
+[[package]]
+name = "edgeware-rpc-primitives-debug"
+version = "0.1.0"
+dependencies = [
+ "ethereum",
+ "ethereum-types",
+ "hex 0.4.3",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "serde_json",
+ "sp-api",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 2.0.1",
+]
+
+[[package]]
+name = "edgeware-rpc-primitives-txpool"
+version = "0.1.0"
+dependencies = [
+ "ethereum",
+ "parity-scale-codec 2.1.1",
+ "sp-api",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 2.0.1",
+]
+
+[[package]]
+name = "edgeware-rpc-trace"
+version = "0.6.0"
+dependencies = [
+ "edgeware-rpc-core-trace",
+ "edgeware-rpc-primitives-debug",
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-rpc",
+ "fc-rpc-core",
+ "fp-rpc",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "sc-client-api",
+ "sc-network",
+ "sc-transaction-graph",
+ "serde",
+ "sha3 0.8.2",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 2.0.1",
+ "sp-transaction-pool",
+ "sp-utils",
+ "tokio 0.2.25",
+ "tracing",
+]
+
+[[package]]
+name = "edgeware-rpc-txpool"
+version = "0.6.0"
+dependencies = [
+ "edgeware-rpc-core-txpool",
+ "edgeware-rpc-primitives-txpool",
+ "ethereum",
+ "ethereum-types",
+ "fc-rpc",
+ "frame-system",
+ "jsonrpc-core 15.1.0",
+ "sc-transaction-graph",
+ "serde",
+ "sha3 0.8.2",
+ "sp-api",
+ "sp-blockchain",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "sp-transaction-pool",
+]
+
+[[package]]
 name = "edgeware-runtime"
 version = "3.3.0"
 dependencies = [
  "edge-treasury-reward",
+ "edgeware-extensions-evm",
  "edgeware-primitives",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
  "evm",
  "evm-runtime",
  "fp-rpc",
@@ -1748,6 +1922,7 @@ dependencies = [
  "rustc-hex",
  "safe-mix",
  "serde",
+ "sha3 0.9.1",
  "sp-api",
  "sp-application-crypto",
  "sp-authority-discovery",
@@ -2926,6 +3101,9 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "hex-literal"

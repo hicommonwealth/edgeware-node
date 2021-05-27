@@ -1,0 +1,34 @@
+[package]
+name = "edgeware-extensions-evm"
+version = '0.1.0'
+authors = ['PureStake']
+edition = '2018'
+homepage = 'https://edgewa.re'
+license = 'GPL-3.0-only'
+repository = 'https://github.com/hicommonwealth/edgeware-node/'
+
+[dependencies]
+fp-evm = { git = "https://github.com/webb-tools/frontier", default-features = false, branch = "erup-4" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier", default-features = false, branch = "erup-4" }
+evm = { version = "0.26.0", default-features = false, features = ["with-codec"] }
+evm-core = { version = "0.26.0", default-features = false, features = ["with-codec"] }
+sp-core = { default-features = false }
+sp-std = { default-features = false }
+sp-io = { default-features = false }
+sp-runtime = { default-features = false }
+edgeware-rpc-primitives-debug = { path = "../../debug", default-features = false }
+ethereum-types = { version = "0.11.0", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"evm/std",
+	"evm/with-serde",
+	"pallet-evm/std",
+	"sp-core/std",
+	"sp-std/std",
+	"sp-runtime/std",
+	"ethereum-types/std",
+	"fp-evm/std",
+	"edgeware-rpc-primitives-debug/std",
+]

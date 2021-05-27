@@ -3,11 +3,11 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { createTestPairs, TestKeyringMap } from '@polkadot/keyring/testingPairs';
 import { u8aToString } from '@polkadot/util';
 import { assert } from 'chai';
-import { spec } from '@edgeware/node-types';
 import { TypeRegistry } from '@polkadot/types';
 import BN from 'bn.js';
 import { SubmittableExtrinsic } from '@polkadot/api/types';
 const { describeWithEdgeware } = require('../helpers/utils.js');
+import { optionsWithEdgeware } from '@webb-tools/api';
 
 describeWithEdgeware('Upgrade Tests', async (context) => {
   let api: ApiPromise;
@@ -17,10 +17,9 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
   before(async () => {
     const polkadotUrl = 'ws://localhost:9944';
     const provider = new WsProvider(polkadotUrl);
-    api = await ApiPromise.create({
+    api = await ApiPromise.create(optionsWithEdgeware({
       provider,
-      ...spec,
-    });
+    }));
     pairs = createTestPairs({ ss58Format: 7 });
   });
 
@@ -138,10 +137,11 @@ describeWithEdgeware('Upgrade Tests', async (context) => {
 
   it.only('should apply for council', async () => {
     const bob = pairs.bob;
-    const candidates = await api.query.phragmenElections.candidates();
-    const submitCandidacyTx = api.tx.phragmenElections.submitCandidacy(candidates.length);
+    console.log(api.query)
+    const candidates = await api.query.elections.candidates();
+    const submitCandidacyTx = api.tx.elections.submitCandidacy(candidates.length);
     await submitTxWithFee(submitCandidacyTx, bob);
-    const newCandidates = await api.query.phragmenElections.candidates();
+    const newCandidates = await api.query.elections.candidates();
     assert.isTrue(newCandidates.map((c) => c.toString()).includes(bob.address));
   });
 

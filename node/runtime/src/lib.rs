@@ -41,6 +41,12 @@ use frame_system::{
 	EnsureOneOf, EnsureRoot,
 };
 
+use sha3::{Digest, Keccak256};
+use pallet_ethereum::Call::transact;
+use pallet_ethereum::{Transaction as EthereumTransaction, TransactionAction};
+use edgeware_extensions_evm::runner::stack::TraceRunner as TraceRunnerT;
+use edgeware_rpc_primitives_txpool::TxPoolResponse;
+
 pub use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 pub use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 pub use pallet_transaction_payment::{CurrencyAdapter, Multiplier, TargetedFeeAdjustment};
@@ -1669,6 +1675,282 @@ impl_runtime_apis! {
 				None
 			} else {
 				Some(v)
+			}
+		}
+	}
+
+	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
+		fn trace_transaction(
+			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+			transaction: &EthereumTransaction,
+			trace_type: edgeware_rpc_primitives_debug::single::TraceType,
+		) -> Result<
+			edgeware_rpc_primitives_debug::single::TransactionTrace,
+			sp_runtime::DispatchError
+		> {
+			// Get the caller;
+			let mut sig = [0u8; 65];
+			let mut msg = [0u8; 32];
+			sig[0..32].copy_from_slice(&transaction.signature.r()[..]);
+			sig[32..64].copy_from_slice(&transaction.signature.s()[..]);
+			sig[64] = transaction.signature.standard_v();
+			msg.copy_from_slice(
+				&pallet_ethereum::TransactionMessage::from(transaction.clone()).hash()[..]
+			);
+
+			let from = match sp_io::crypto::secp256k1_ecdsa_recover(&sig, &msg) {
+				Ok(pk) => H160::from(
+					H256::from_slice(Keccak256::digest(&pk).as_slice())
+				),
+				_ => H160::default()
+			};
+
+			// Apply the a subset of extrinsics: all the substrate-specific or ethereum transactions
+			// that preceded the requested transaction.
+			for ext in extrinsics.into_iter() {
+				let _ = match &ext.function {
+					Call::Ethereum(transact(t)) => {
+						if t == transaction {
+							break;
+						}
+						Executive::apply_extrinsic(ext)
+					},
+					_ => Executive::apply_extrinsic(ext)
+				};
+			}
+
+			let mut c = <Runtime as pallet_evm::Config>::config().clone();
+			c.estimate = true;
+			let config = Some(c);
+
+			// Use the runner extension to interface with our evm's trace executor and return the
+			// TraceExecutorResult.
+			match transaction.action {
+				TransactionAction::Call(to) => {
+					if let Ok(res) = <Runtime as pallet_evm::Config>::Runner::trace_call(
+						from,
+						to,
+						transaction.input.clone(),
+						transaction.value,
+						transaction.gas_limit.low_u64(),
+						config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+						trace_type,
+					) {
+						return Ok(res);
+					} else {
+						return Err(sp_runtime::DispatchError::Other("Evm error"));
+					}
+				},
+				TransactionAction::Create => {
+					if let Ok(res) = <Runtime as pallet_evm::Config>::Runner::trace_create(
+						from,
+						transaction.input.clone(),
+						transaction.value,
+						transaction.gas_limit.low_u64(),
+						config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+						trace_type,
+					) {
+						return Ok(res);
+					} else {
+						return Err(sp_runtime::DispatchError::Other("Evm error"));
+					}
+				}
+			}
+		}
+
+		fn trace_block(
+			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+		) -> Result<
+			Vec<
+				edgeware_rpc_primitives_debug::block::TransactionTrace>,
+				sp_runtime::DispatchError
+			> {
+			use edgeware_rpc_primitives_debug::{single, block, CallResult, CreateResult, CreateType};
+
+			let mut config = <Runtime as pallet_evm::Config>::config().clone();
+			config.estimate = true;
+
+			let mut traces = vec![];
+			let mut eth_tx_index = 0;
+
+			// Apply all extrinsics. Ethereum extrinsics are traced.
+			for ext in extrinsics.into_iter() {
+				match &ext.function {
+					Call::Ethereum(transact(transaction)) => {
+						// Get the caller;
+						let mut sig = [0u8; 65];
+						let mut msg = [0u8; 32];
+						sig[0..32].copy_from_slice(&transaction.signature.r()[..]);
+						sig[32..64].copy_from_slice(&transaction.signature.s()[..]);
+						sig[64] = transaction.signature.standard_v();
+						msg.copy_from_slice(
+							&pallet_ethereum::TransactionMessage::from(transaction.clone())
+								.hash()[..]
+						);
+
+						let from = match sp_io::crypto::secp256k1_ecdsa_recover(&sig, &msg) {
+							Ok(pk) => H160::from(
+								H256::from_slice(Keccak256::digest(&pk).as_slice())
+							),
+							_ => H160::default()
+						};
+
+						// Use the runner extension to interface with our evm's trace executor and
+						// return the TraceExecutorResult.
+						let tx_traces = match transaction.action {
+							TransactionAction::Call(to) => {
+								<Runtime as pallet_evm::Config>::Runner::trace_call(
+									from,
+									to,
+									transaction.input.clone(),
+									transaction.value,
+									transaction.gas_limit.low_u64(),
+									&config,
+									single::TraceType::CallList,
+								).map_err(|_| sp_runtime::DispatchError::Other("Evm error"))?
+
+							},
+							TransactionAction::Create => {
+								<Runtime as pallet_evm::Config>::Runner::trace_create(
+									from,
+									transaction.input.clone(),
+									transaction.value,
+									transaction.gas_limit.low_u64(),
+									&config,
+									single::TraceType::CallList,
+								).map_err(|_| sp_runtime::DispatchError::Other("Evm error"))?
+							}
+						};
+
+						let tx_traces = match tx_traces {
+							single::TransactionTrace::CallList(t) => t,
+							_ => return Err(sp_runtime::DispatchError::Other("Runtime API error")),
+						};
+
+						// Convert traces from "single" format to "block" format.
+						let mut tx_traces: Vec<_> = tx_traces.into_iter().map(|trace|
+							match trace.inner {
+								single::CallInner::Call {
+									input, to, res, call_type
+								} => block::TransactionTrace {
+									action: block::TransactionTraceAction::Call {
+										call_type,
+										from: trace.from,
+										gas: trace.gas,
+										input,
+										to,
+										value: trace.value,
+									},
+									// Can't be known here, must be inserted upstream.
+									block_hash: H256::default(),
+									// Can't be known here, must be inserted upstream.
+									block_number: 0,
+									output: match res {
+										CallResult::Output(output) => {
+											block::TransactionTraceOutput::Result(
+												block::TransactionTraceResult::Call {
+													gas_used: trace.gas_used,
+													output
+												})
+										},
+										CallResult::Error(error) =>
+											block::TransactionTraceOutput::Error(error),
+									},
+									subtraces: trace.subtraces,
+									trace_address: trace.trace_address,
+									// Can't be known here, must be inserted upstream.
+									transaction_hash: H256::default(),
+									transaction_position: eth_tx_index,
+								},
+								single::CallInner::Create { init, res } => block::TransactionTrace {
+									action: block::TransactionTraceAction::Create {
+										creation_method: CreateType::Create,
+										from: trace.from,
+										gas: trace.gas,
+										init,
+										value: trace.value,
+									},
+									// Can't be known here, must be inserted upstream.
+									block_hash: H256::default(),
+									// Can't be known here, must be inserted upstream.
+									block_number: 0,
+									output: match res {
+										CreateResult::Success {
+											created_contract_address_hash,
+											created_contract_code
+										} => {
+											block::TransactionTraceOutput::Result(
+												block::TransactionTraceResult::Create {
+													gas_used: trace.gas_used,
+													code: created_contract_code,
+													address: created_contract_address_hash,
+												}
+											)
+										},
+										CreateResult::Error {
+											error
+										} => block::TransactionTraceOutput::Error(error),
+									},
+									subtraces: trace.subtraces,
+									trace_address: trace.trace_address,
+									// Can't be known here, must be inserted upstream.
+									transaction_hash: H256::default(),
+									transaction_position: eth_tx_index,
+
+								},
+								single::CallInner::SelfDestruct {
+									balance,
+									refund_address
+								} => block::TransactionTrace {
+									action: block::TransactionTraceAction::Suicide {
+										address: from,
+										balance,
+										refund_address,
+									},
+									// Can't be known here, must be inserted upstream.
+									block_hash: H256::default(),
+									// Can't be known here, must be inserted upstream.
+									block_number: 0,
+									output: block::TransactionTraceOutput::Result(
+												block::TransactionTraceResult::Suicide
+											),
+									subtraces: trace.subtraces,
+									trace_address: trace.trace_address,
+									// Can't be known here, must be inserted upstream.
+									transaction_hash: H256::default(),
+									transaction_position: eth_tx_index,
+
+								},
+							}
+						).collect();
+
+						traces.append(&mut tx_traces);
+
+						eth_tx_index += 1;
+					},
+					_ => {let _ = Executive::apply_extrinsic(ext); }
+				};
+			}
+
+			Ok(traces)
+		}
+	}
+
+
+	impl edgeware_rpc_primitives_txpool::TxPoolRuntimeApi<Block> for Runtime {
+		fn extrinsic_filter(
+			xts_ready: Vec<<Block as BlockT>::Extrinsic>,
+			xts_future: Vec<<Block as BlockT>::Extrinsic>
+		) -> TxPoolResponse {
+			TxPoolResponse {
+				ready: xts_ready.into_iter().filter_map(|xt| match xt.function {
+					Call::Ethereum(transact(t)) => Some(t),
+					_ => None
+				}).collect(),
+				future: xts_future.into_iter().filter_map(|xt| match xt.function {
+					Call::Ethereum(transact(t)) => Some(t),
+					_ => None
+				}).collect(),
 			}
 		}
 	}
