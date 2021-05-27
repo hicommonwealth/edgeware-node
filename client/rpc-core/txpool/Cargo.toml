@@ -3,7 +3,7 @@ name = "edgeware-rpc-core-txpool"
 version = '0.6.0'
 authors = ['PureStake']
 edition = '2018'
-homepage = 'https://moonbeam.network'
+homepage = 'https://edgewa.re'
 license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 

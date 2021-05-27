@@ -47,7 +47,7 @@ sp-npos-elections = { version = "3.0", default-features = false }
 
 # edgeware primitives
 edgeware-primitives = { version = "3.3.0", path = "../primitives", default-features = false }
-edgeware-extensions-evm = { path = "../extensions/evm", default-features = false }
+edgeware-evm-tracer = { path = "../evm_tracer", default-features = false }
 edgeware-rpc-primitives-debug = { path = "../debug", default-features = false }
 edgeware-rpc-primitives-txpool = { path = "../txpool", default-features = false }
 
@@ -212,7 +212,7 @@ std = [
     "webb-tokens/std",
     "orml-nft/std",
     "nft/std",
-    "edgeware-extensions-evm/std",
+    "edgeware-evm-tracer/std",
 	"edgeware-rpc-primitives-debug/std",
 	"edgeware-rpc-primitives-txpool/std",
 ]

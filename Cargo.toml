@@ -11,7 +11,7 @@ members = [
 	"pallets/nft",
 	"node/cli",
 	"node/executor",
-	"node/extensions/evm",
+	"node/evm_tracer",
 	"node/primitives",
 	"node/rpc",
 	"node/rpc-client",
