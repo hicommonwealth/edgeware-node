@@ -1644,6 +1644,8 @@ dependencies = [
  "jsonrpc-pubsub 15.1.0",
  "pallet-contracts-rpc",
  "pallet-ethereum",
+ "pallet-merkle",
+ "pallet-merkle-rpc",
  "pallet-transaction-payment-rpc",
  "sc-client-api",
  "sc-consensus-aura",

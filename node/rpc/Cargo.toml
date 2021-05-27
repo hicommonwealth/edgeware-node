@@ -38,3 +38,5 @@ fc-rpc = { default-features = false, git = "https://github.com/webb-tools/fronti
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4" }
