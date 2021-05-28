@@ -16,6 +16,7 @@
 
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
+use cli_opt::EthApi;
 
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
@@ -34,6 +35,30 @@ pub struct RunCmd {
 	/// The dynamic-fee pallet target gas price set by block author
 	#[structopt(long, default_value = "1")]
 	pub target_gas_price: u64,
+
+	/// Enable EVM tracing module on a non-authority node.
+	#[structopt(
+		long,
+		conflicts_with = "collator",
+		conflicts_with = "validator",
+		require_delimiter = true
+	)]
+	pub ethapi: Vec<EthApi>,
+
+	/// Number of concurrent tracing tasks. Meant to be shared by both "debug" and "trace" modules.
+	#[structopt(long, default_value = "10")]
+	pub ethapi_max_permits: u32,
+
+	/// Maximum number of trace entries a single request of `trace_filter` is allowed to return.
+	/// A request asking for more or an unbounded one going over this limit will both return an
+	/// error.
+	#[structopt(long, default_value = "500")]
+	pub ethapi_trace_max_count: u32,
+
+	/// Duration (in seconds) after which the cache of `trace_filter` for a given block will be
+	/// discarded.
+	#[structopt(long, default_value = "300")]
+	pub ethapi_trace_cache_duration: u64,
 }
 
 /// An overarching CLI command definition.
