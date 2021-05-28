@@ -1508,6 +1508,7 @@ name = "edgeware-cli"
 version = "3.3.0"
 dependencies = [
  "assert_cmd",
+ "edgeware-cli-opt",
  "edgeware-executor",
  "edgeware-primitives",
  "edgeware-rpc",
@@ -1594,6 +1595,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "edgeware-cli-opt"
+version = "0.1.0"
+
+[[package]]
 name = "edgeware-evm-tracer"
 version = "0.1.0"
 dependencies = [
@@ -1656,7 +1661,13 @@ dependencies = [
 name = "edgeware-rpc"
 version = "3.3.0"
 dependencies = [
+ "edgeware-cli-opt",
  "edgeware-primitives",
+ "edgeware-rpc-debug",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
+ "edgeware-rpc-trace",
+ "edgeware-rpc-txpool",
  "edgeware-runtime",
  "fc-db",
  "fc-rpc",

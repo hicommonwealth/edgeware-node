@@ -40,3 +40,9 @@ fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/f
 fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+edgeware-cli-opt = { path = "../cli-opt" }
+edgeware-rpc-txpool = { path = "../../client/rpc/txpool" }
+edgeware-rpc-primitives-txpool = { path = "../txpool" }
+edgeware-rpc-debug = { path = "../../client/rpc/debug" }
+edgeware-rpc-primitives-debug = { path = "../debug" }
+edgeware-rpc-trace = { path = "../../client/rpc/trace" }

@@ -1,0 +1,9 @@
+ [package]
+name = 'edgeware-cli-opt'
+homepage = 'https://edgewa.re'
+license = 'GPL-3.0-only'
+version = '0.1.0'
+authors = ["PureStake"]
+edition = '2018'
+
+[dependencies]

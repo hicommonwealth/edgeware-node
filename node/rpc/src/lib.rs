@@ -29,6 +29,7 @@
 
 #![warn(missing_docs)]
 
+use edgeware_cli::EthApi as EthApiCmd;
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use fc_rpc::{OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override, StorageOverride};
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
@@ -50,6 +51,10 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 use std::{collections::BTreeMap, sync::Arc};
+
+use edgeware_rpc_debug::{Debug, DebugRequester, DebugServer};
+use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, Trace, TraceServer};
+use edgeware_rpc_txpool::{TxPool, TxPoolServer};
 
 /// Public io handler for exporting into other modules
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
@@ -106,6 +111,14 @@ pub struct FullDeps<C, P, SC, B> {
 	pub backend: Arc<fc_db::Backend<Block>>,
 	/// Maximum number of logs in a query.
 	pub max_past_logs: u32,
+	/// The list of optional RPC extensions.
+	pub ethapi_cmd: Vec<EthApiCmd>,
+	/// Debug server requester.
+	pub debug_requester: Option<DebugRequester>,
+	/// Trace filter cache server requester.
+	pub trace_filter_requester: Option<TraceFilterCacheRequester>,
+	/// Trace filter max count.
+	pub trace_filter_max_count: u32,
 }
 
 /// Instantiate all Full RPC extensions.
@@ -152,6 +165,9 @@ where
 		filter_pool,
 		backend,
 		max_past_logs,
+		debug_requester,
+		trace_filter_requester,
+		trace_filter_max_count,
 	} = deps;
 	let GrandpaDeps {
 		shared_voter_state,
@@ -241,6 +257,25 @@ where
 			finality_provider,
 		),
 	));
+
+	if ethapi_cmd.contains(&EthApiCmd::Txpool) {
+		io.extend_with(TxPoolServer::to_delegate(TxPool::new(
+			Arc::clone(&client),
+			graph,
+		)));
+	}
+
+	if let Some(trace_filter_requester) = trace_filter_requester {
+		io.extend_with(TraceServer::to_delegate(Trace::new(
+			client,
+			trace_filter_requester,
+			trace_filter_max_count,
+		)));
+	}
+
+	if let Some(debug_requester) = debug_requester {
+		io.extend_with(DebugServer::to_delegate(Debug::new(debug_requester)));
+	}
 
 	io
 }

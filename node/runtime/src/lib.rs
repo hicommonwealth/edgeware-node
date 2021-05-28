@@ -41,9 +41,8 @@ use frame_system::{
 	EnsureOneOf, EnsureRoot,
 };
 
-use sha3::{Digest, Keccak256};
 use pallet_ethereum::Call::transact;
-use pallet_ethereum::{Transaction as EthereumTransaction, TransactionAction};
+use pallet_ethereum::{Transaction as EthereumTransaction};
 use edgeware_rpc_primitives_txpool::TxPoolResponse;
 
 pub use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
