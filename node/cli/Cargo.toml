@@ -99,7 +99,6 @@ edgeware-rpc = { version = "3.3.0", path = "../rpc" }
 edgeware-primitives = { version = "3.3.0", path = "../primitives" }
 edgeware-executor = { version = "3.3.0", path = "../executor" }
 
-cli-opt = { package = "edgeware-cli-opt", path = "../cli-opt", default-features = false }
 edgeware-rpc-txpool = { path = "../../client/rpc/txpool" }
 edgeware-rpc-primitives-txpool = { path = "../txpool" }
 edgeware-rpc-debug = { path = "../../client/rpc/debug" }

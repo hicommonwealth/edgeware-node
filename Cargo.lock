@@ -1508,7 +1508,6 @@ name = "edgeware-cli"
 version = "3.3.0"
 dependencies = [
  "assert_cmd",
- "edgeware-cli-opt",
  "edgeware-executor",
  "edgeware-primitives",
  "edgeware-rpc",

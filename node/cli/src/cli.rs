@@ -15,8 +15,28 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
+use std::str::FromStr;
 use structopt::StructOpt;
-use cli_opt::EthApi;
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum EthApi {
+	Txpool,
+	Debug,
+	Trace,
+}
+
+impl FromStr for EthApi {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"txpool" => Self::Txpool,
+			"debug" => Self::Debug,
+			"trace" => Self::Trace,
+			_ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
+		})
+	}
+}
 
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
@@ -45,18 +65,19 @@ pub struct RunCmd {
 	)]
 	pub ethapi: Vec<EthApi>,
 
-	/// Number of concurrent tracing tasks. Meant to be shared by both "debug" and "trace" modules.
+	/// Number of concurrent tracing tasks. Meant to be shared by both "debug"
+	/// and "trace" modules.
 	#[structopt(long, default_value = "10")]
 	pub ethapi_max_permits: u32,
 
-	/// Maximum number of trace entries a single request of `trace_filter` is allowed to return.
-	/// A request asking for more or an unbounded one going over this limit will both return an
-	/// error.
+	/// Maximum number of trace entries a single request of `trace_filter` is
+	/// allowed to return. A request asking for more or an unbounded one going
+	/// over this limit will both return an error.
 	#[structopt(long, default_value = "500")]
 	pub ethapi_trace_max_count: u32,
 
-	/// Duration (in seconds) after which the cache of `trace_filter` for a given block will be
-	/// discarded.
+	/// Duration (in seconds) after which the cache of `trace_filter` for a
+	/// given block will be discarded.
 	#[structopt(long, default_value = "300")]
 	pub ethapi_trace_cache_duration: u64,
 }
