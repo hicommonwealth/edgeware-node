@@ -19,6 +19,7 @@
 //! Service implementation. Specialized wrapper over substrate service.
 
 use crate::Cli;
+use edgeware_opts::EthApi as EthApiCmd;
 use edgeware_executor::Executor;
 use edgeware_primitives::Block;
 use edgeware_runtime::RuntimeApi;
@@ -323,6 +324,7 @@ pub fn new_full_base(
 			let deps = edgeware_rpc::FullDeps {
 				client: client.clone(),
 				pool: pool.clone(),
+				graph: pool.pool().clone(),
 				select_chain: select_chain.clone(),
 				network: network.clone(),
 				is_authority,

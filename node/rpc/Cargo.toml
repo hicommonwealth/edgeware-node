@@ -32,6 +32,8 @@ sp-consensus = { version = "0.9" }
 sp-consensus-aura = { version = "0.9" }
 sp-runtime = { version = "3.0" }
 sp-transaction-pool = { version = "3.0" }
+sc-transaction-pool = { version = "3.0" }
+sc-transaction-graph = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
@@ -40,6 +42,7 @@ fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/f
 fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+edgeware-opts = { path = "../opts" }
 edgeware-rpc-txpool = { path = "../../client/rpc/txpool" }
 edgeware-rpc-primitives-txpool = { path = "../txpool" }
 edgeware-rpc-debug = { path = "../../client/rpc/debug" }

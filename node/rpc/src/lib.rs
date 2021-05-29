@@ -29,7 +29,7 @@
 
 #![warn(missing_docs)]
 
-use edgeware_cli::EthApi as EthApiCmd;
+use edgeware_opts::EthApi as EthApiCmd;
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use fc_rpc::{OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override, StorageOverride};
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
@@ -50,6 +50,7 @@ use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
+use sc_transaction_graph::{ChainApi, Pool};
 use std::{collections::BTreeMap, sync::Arc};
 
 use edgeware_rpc_debug::{Debug, DebugRequester, DebugServer};
@@ -86,11 +87,13 @@ pub struct GrandpaDeps<B> {
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B> {
+pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
 	pub pool: Arc<P>,
+	/// Graph pool instance.
+	pub graph: Arc<Pool<A>>,
 	/// The SelectChain Strategy
 	pub select_chain: SC,
 	/// The Node authority flag
@@ -122,8 +125,8 @@ pub struct FullDeps<C, P, SC, B> {
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B>(
-	deps: FullDeps<C, P, SC, B>,
+pub fn create_full<C, P, SC, B, A>(
+	deps: FullDeps<C, P, SC, B, A>,
 	subscription_task_executor: SubscriptionTaskExecutor,
 ) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
 where
@@ -142,6 +145,7 @@ where
 	SC: SelectChain<Block> + 'static,
 	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
 	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+	A: ChainApi<Block = Block> + 'static,
 {
 	use fc_rpc::{
 		EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi, EthPubSubApiServer,
@@ -155,6 +159,7 @@ where
 	let FullDeps {
 		client,
 		pool,
+		graph,
 		select_chain: _,
 		enable_dev_signer,
 		is_authority,
@@ -168,6 +173,7 @@ where
 		debug_requester,
 		trace_filter_requester,
 		trace_filter_max_count,
+		ethapi_cmd,
 	} = deps;
 	let GrandpaDeps {
 		shared_voter_state,

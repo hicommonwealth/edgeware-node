@@ -15,11 +15,9 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 fn main() {
-	#[cfg(feature = "cli")]
 	cli::main();
 }
 
-#[cfg(feature = "cli")]
 mod cli {
 	include!("src/cli.rs");
 

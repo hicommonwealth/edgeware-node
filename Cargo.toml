@@ -13,6 +13,7 @@ members = [
 	"node/executor",
 	"node/evm_tracer",
 	"node/primitives",
+	"node/opts",
 	"node/rpc",
 	"node/rpc-client",
 	"node/runtime",
