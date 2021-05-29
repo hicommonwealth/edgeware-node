@@ -16,7 +16,33 @@
 
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
-use edgeware_opts::EthApi;
+
+use std::str::FromStr;
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum EthApi {
+	Txpool,
+	Debug,
+	Trace,
+}
+
+impl FromStr for EthApi {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"txpool" => Self::Txpool,
+			"debug" => Self::Debug,
+			"trace" => Self::Trace,
+			_ => {
+				return Err(format!(
+					"`{}` is not recognized as a supported Ethereum Api",
+					s
+				))
+			}
+		})
+	}
+}
 
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
