@@ -96,26 +96,26 @@ treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge
 orml-nft = { path = "../../pallets/orml-nft", default-features = false }
 nft = { package = "module-nft", path = "../../pallets/nft", default-features = false }
 
-pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
+pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up", default-features = false }
 
 sha3 = { version = "0.9", default-features = false }
 
-merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4", optional = true }
-webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4-up" }
+mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4-up" }
+merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4-up", optional = true }
+webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4-up" }
+webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4-up" }
+webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4-up" }
 
 evm = { version = "0.26.0", default-features = false, features = ["with-codec"] }
 
