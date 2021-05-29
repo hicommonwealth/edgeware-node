@@ -1533,6 +1533,7 @@ dependencies = [
  "hex-literal",
  "jsonrpc-core 15.1.0",
  "jsonrpc-pubsub 15.1.0",
+ "libp2p-wasm-ext",
  "log",
  "nix",
  "pallet-authority-discovery",
@@ -1561,6 +1562,7 @@ dependencies = [
  "sc-consensus-aura",
  "sc-consensus-epochs",
  "sc-finality-grandpa",
+ "sc-finality-grandpa-warp-sync",
  "sc-keystore",
  "sc-network",
  "sc-offchain",
@@ -1661,6 +1663,7 @@ dependencies = [
 name = "edgeware-rpc"
 version = "3.3.0"
 dependencies = [
+ "edgeware-executor",
  "edgeware-opts",
  "edgeware-primitives",
  "edgeware-rpc-debug",
@@ -1680,6 +1683,7 @@ dependencies = [
  "pallet-merkle",
  "pallet-merkle-rpc",
  "pallet-transaction-payment-rpc",
+ "pallet-transaction-payment-rpc-runtime-api",
  "sc-client-api",
  "sc-consensus-aura",
  "sc-consensus-epochs",
@@ -1689,6 +1693,7 @@ dependencies = [
  "sc-network",
  "sc-rpc",
  "sc-rpc-api",
+ "sc-service",
  "sc-transaction-graph",
  "sc-transaction-pool",
  "sp-api",
@@ -1696,7 +1701,10 @@ dependencies = [
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-aura",
+ "sp-offchain",
  "sp-runtime",
+ "sp-session",
+ "sp-storage",
  "sp-transaction-pool",
  "substrate-frame-rpc-system",
 ]
@@ -7581,6 +7589,27 @@ dependencies = [
  "serde_json",
  "sp-blockchain",
  "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
+name = "sc-finality-grandpa-warp-sync"
+version = "0.9.0"
+source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#0e5c23844faa7a99f0a9e24731827205db7094fb"
+dependencies = [
+ "derive_more",
+ "futures 0.3.15",
+ "log",
+ "num-traits",
+ "parity-scale-codec 2.1.1",
+ "parking_lot 0.11.1",
+ "prost",
+ "sc-client-api",
+ "sc-finality-grandpa",
+ "sc-network",
+ "sc-service",
+ "sp-blockchain",
+ "sp-finality-grandpa",
  "sp-runtime",
 ]
 

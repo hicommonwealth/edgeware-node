@@ -94,6 +94,7 @@ pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier.g
 pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 
 # substrate deps
+sc-finality-grandpa-warp-sync = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 fork-tree = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 frame-benchmarking = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 frame-benchmarking-cli = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
