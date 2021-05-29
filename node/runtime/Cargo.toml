@@ -23,7 +23,7 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
-evm-runtime = { version = "0.26.0", default-features = false }
+evm-runtime = { version = "0.27.0", default-features = false }
 log = { version = "0.4.14", default-features = false }
 
 # primitives
@@ -104,6 +104,7 @@ pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", 
 pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
@@ -112,7 +113,7 @@ webb-currencies = { default-features = false, git = "https://github.com/webb-too
 webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 
-evm = { version = "0.26.0", default-features = false, features = ["with-codec"] }
+evm = { version = "0.27.0", default-features = false, features = ["with-codec"] }
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "3.0", default-features = false, optional = true }
@@ -196,6 +197,7 @@ std = [
 	"pallet-evm-precompile-dispatch/std",
 	"pallet-evm-precompile-sha3fips/std",
 	"pallet-evm-precompile-blake2/std",
+	"pallet-evm-precompile-curve25519/std",
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",

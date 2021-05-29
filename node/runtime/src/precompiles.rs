@@ -9,6 +9,8 @@ use pallet_evm_precompile_ed25519::Ed25519Verify;
 use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_sha3fips::{Sha3FIPS256};
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
+use pallet_evm_precompile_curve25519::{Curve25519Add, Curve25519ScalarMul};
+use evm::executor::PrecompileOutput;
 use sp_core::H160;
 
 use sp_std::{fmt::Debug, marker::PhantomData, vec::Vec};
@@ -23,7 +25,7 @@ impl<R: frame_system::Config> EdgewarePrecompiles<R> {
 	/// explicitly using something like SignedExtra.
 	#[allow(dead_code)]
 	fn used_addresses() -> impl Iterator<Item = H160> {
-		sp_std::vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 1024, 1025, 1026, 1027, 1028]
+		sp_std::vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 1024, 1025, 1026, 1027, 1028, 1029]
 			.into_iter()
 			.map(|x| hash(x).into())
 	}
@@ -43,7 +45,7 @@ where
 		input: &[u8],
 		target_gas: Option<u64>,
 		context: &Context,
-	) -> Option<Result<(ExitSucceed, Vec<u8>, u64), ExitError>> {
+	) -> Option<core::result::Result<PrecompileOutput, ExitError>> {
 		match address {
 			// Ethereum precompiles
 			a if a == hash(1) => Some(ECRecover::execute(input, target_gas, context)),
@@ -60,6 +62,8 @@ where
 			a if a == hash(1025) => Some(Dispatch::<R>::execute(input, target_gas, context)),
 			a if a == hash(1026) => Some(ECRecoverPublicKey::execute(input, target_gas, context)),
 			a if a == hash(1027) => Some(Ed25519Verify::execute(input, target_gas, context)),
+			a if a == hash(1028) => Some(Curve25519Add::execute(input, target_gas, context)),
+			a if a == hash(1029) => Some(Curve25519ScalarMul::execute(input, target_gas, context)),
 			_ => None,
 		}
 	}
