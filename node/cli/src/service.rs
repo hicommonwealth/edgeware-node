@@ -24,7 +24,6 @@ use edgeware_opts::{EthApi as EthApiCmd, RpcParams};
 use edgeware_primitives::Block;
 use edgeware_rpc_debug::DebugHandler;
 use edgeware_runtime::RuntimeApi;
-use fc_consensus::FrontierBlockImport;
 use fc_mapping_sync::MappingSyncWorker;
 use fc_rpc::EthTask;
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
@@ -40,6 +39,7 @@ use sp_core::U256;
 use sp_runtime::traits::Block as BlockT;
 use std::{
 	collections::{BTreeMap, HashMap},
+	str::FromStr,
 	sync::{Arc, Mutex},
 	time::Duration,
 };
@@ -48,7 +48,6 @@ use tokio::sync::Semaphore;
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
-type FullGrandpaBlockImport = sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
 
 /// Can be called for a `Configuration` to check if it is a configuration for
@@ -155,9 +154,6 @@ pub fn new_partial(
 		telemetry.as_ref().map(|x| x.handle()),
 	)?;
 
-	let frontier_block_import =
-		FrontierBlockImport::new(grandpa_block_import.clone(), client.clone(), frontier_backend.clone());
-
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 	let raw_slot_duration = slot_duration.slot_duration();
 
@@ -215,6 +211,13 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,
 		max_past_logs: cli.run.max_past_logs,
 	};
+	let ethapi: Vec<_> = cli
+		.run
+		.ethapi
+		.iter()
+		.map(|v| EthApiCmd::from_str(&v.to_string()))
+		.flatten()
+		.collect();
 
 	let enable_dev_signer = cli.run.enable_dev_signer;
 	let target_gas_price = U256::from(cli.run.target_gas_price);
@@ -280,7 +283,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 
 		let permit_pool = Arc::new(Semaphore::new(rpc_params.ethapi_max_permits as usize));
 
-		let (trace_filter_task, trace_filter_requester) = if cli.run.ethapi.contains(&EthApiCmd::Trace) {
+		let (trace_filter_task, trace_filter_requester) = if ethapi.contains(&EthApiCmd::Trace) {
 			let (trace_filter_task, trace_filter_requester) = edgeware_rpc_trace::CacheTask::create(
 				Arc::clone(&client),
 				Arc::clone(&backend),
@@ -292,7 +295,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 			(None, None)
 		};
 
-		let (debug_task, debug_requester) = if cli.run.ethapi.contains(&EthApiCmd::Debug) {
+		let (debug_task, debug_requester) = if ethapi.contains(&EthApiCmd::Debug) {
 			let (debug_task, debug_requester) = DebugHandler::task(
 				Arc::clone(&client),
 				Arc::clone(&backend),
@@ -337,7 +340,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 				filter_pool: filter_pool.clone(),
 				backend: frontier_backend.clone(),
 				max_past_logs,
-				ethapi_cmd: cli.run.ethapi.clone(),
+				ethapi_cmd: ethapi.clone(),
 				debug_requester: debug_requester.clone(),
 				trace_filter_requester: trace_filter_requester.clone(),
 				trace_filter_max_count: rpc_params.ethapi_trace_max_count,

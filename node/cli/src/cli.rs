@@ -14,13 +14,49 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::opts::EthApi as EthApiCmd;
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
+
+use std::{fmt, str::FromStr};
+
+/// Ethereum API Features
+#[derive(Debug, PartialEq, Clone)]
+pub enum EthApi {
+	/// Transactions Pool
+	Txpool,
+	/// Debugging
+	Debug,
+	/// Tracing.
+	Trace,
+}
+
+impl FromStr for EthApi {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"txpool" => Self::Txpool,
+			"debug" => Self::Debug,
+			"trace" => Self::Trace,
+			_ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
+		})
+	}
+}
+
+impl fmt::Display for EthApi {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		match self {
+			EthApi::Txpool => write!(f, "txpool"),
+			EthApi::Debug => write!(f, "debug"),
+			EthApi::Trace => write!(f, "trace"),
+		}
+	}
+}
 
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
 pub struct RunCmd {
+	#[allow(missing_docs)]
 	#[structopt(flatten)]
 	pub base: sc_cli::RunCmd,
 
@@ -42,7 +78,7 @@ pub struct RunCmd {
 		conflicts_with = "validator",
 		require_delimiter = true
 	)]
-	pub ethapi: Vec<EthApiCmd>,
+	pub ethapi: Vec<EthApi>,
 
 	/// Number of concurrent tracing tasks. Meant to be shared by both "debug"
 	/// and "trace" modules.
