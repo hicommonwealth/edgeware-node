@@ -1597,6 +1597,7 @@ dependencies = [
  "substrate-build-script-utils",
  "substrate-frame-cli",
  "tempfile",
+ "tokio 0.2.25",
  "tracing",
  "wasm-bindgen",
  "wasm-bindgen-futures",

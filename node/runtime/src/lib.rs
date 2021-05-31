@@ -27,8 +27,8 @@ pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Has
 use frame_support::{
 	construct_runtime, parameter_types,
 	traits::{
-		Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier, OnUnbalanced,
-		U128CurrencyToVote, MaxEncodedLen
+		Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier, MaxEncodedLen, OnUnbalanced,
+		U128CurrencyToVote,
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -44,9 +44,8 @@ use frame_system::{
 	EnsureOneOf, EnsureRoot,
 };
 
-use pallet_ethereum::Call::transact;
-use pallet_ethereum::{Transaction as EthereumTransaction};
 use edgeware_rpc_primitives_txpool::TxPoolResponse;
+use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction};
 
 pub use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 pub use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
@@ -269,12 +268,19 @@ parameter_types! {
 }
 
 /// The type used to represent the kinds of proxying allowed.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, MaxEncodedLen)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+#[repr(u8)]
 pub enum ProxyType {
 	Any = 0,
 	NonTransfer = 1,
 	Governance = 2,
 	Staking = 3,
+}
+
+impl MaxEncodedLen for ProxyType {
+	fn max_encoded_len() -> usize {
+		1 // one byte
+	}
 }
 
 impl Default for ProxyType {
@@ -528,6 +534,7 @@ impl pallet_election_provider_multi_phase::Config for Runtime {
 	type DataProvider = Staking;
 	type Event = Event;
 	type Fallback = Fallback;
+	type ForceOrigin = EnsureRootOrHalfCouncil;
 	type MinerMaxIterations = MinerMaxIterations;
 	type MinerMaxLength = MinerMaxLength;
 	type MinerMaxWeight = MinerMaxWeight;
@@ -537,7 +544,6 @@ impl pallet_election_provider_multi_phase::Config for Runtime {
 	type SignedPhase = SignedPhase;
 	type SolutionImprovementThreshold = SolutionImprovementThreshold;
 	type UnsignedPhase = UnsignedPhase;
-	type ForceOrigin = EnsureRootOrHalfCouncil;
 	type WeightInfo = pallet_election_provider_multi_phase::weights::SubstrateWeight<Runtime>;
 }
 
@@ -926,18 +932,18 @@ parameter_types! {
 }
 
 impl pallet_assets::Config for Runtime {
-	type Event = Event;
-	type Balance = u64;
-	type AssetId = u32;
-	type Currency = Balances;
-	type ForceOrigin = EnsureRoot<AccountId>;
+	type ApprovalDeposit = ApprovalDeposit;
 	type AssetDeposit = AssetDeposit;
+	type AssetId = u32;
+	type Balance = u64;
+	type Currency = Balances;
+	type Event = Event;
+	type Extra = ();
+	type ForceOrigin = EnsureRoot<AccountId>;
+	type Freezer = ();
 	type MetadataDepositBase = MetadataDepositBase;
 	type MetadataDepositPerByte = MetadataDepositPerByte;
-	type ApprovalDeposit = ApprovalDeposit;
 	type StringLimit = StringLimit;
-	type Freezer = ();
-	type Extra = ();
 	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
 }
 
@@ -983,25 +989,25 @@ parameter_types! {
 }
 
 impl pallet_contracts::Config for Runtime {
-	type Time = Timestamp;
-	type Randomness = RandomnessCollectiveFlip;
+	type CallStack = [pallet_contracts::Frame<Self>; 31];
+	type ChainExtension = ();
 	type Currency = Balances;
-	type Event = Event;
-	type RentPayment = ();
-	type SignedClaimHandicap = SignedClaimHandicap;
-	type TombstoneDeposit = TombstoneDeposit;
+	type DeletionQueueDepth = DeletionQueueDepth;
+	type DeletionWeightLimit = DeletionWeightLimit;
 	type DepositPerContract = DepositPerContract;
 	type DepositPerStorageByte = DepositPerStorageByte;
 	type DepositPerStorageItem = DepositPerStorageItem;
+	type Event = Event;
+	type Randomness = RandomnessCollectiveFlip;
 	type RentFraction = RentFraction;
-	type SurchargeReward = SurchargeReward;
-	type CallStack = [pallet_contracts::Frame<Self>; 31];
-	type WeightPrice = pallet_transaction_payment::Module<Self>;
-	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-	type ChainExtension = ();
-	type DeletionQueueDepth = DeletionQueueDepth;
-	type DeletionWeightLimit = DeletionWeightLimit;
+	type RentPayment = ();
 	type Schedule = Schedule;
+	type SignedClaimHandicap = SignedClaimHandicap;
+	type SurchargeReward = SurchargeReward;
+	type Time = Timestamp;
+	type TombstoneDeposit = TombstoneDeposit;
+	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+	type WeightPrice = pallet_transaction_payment::Module<Self>;
 }
 
 parameter_types! {
@@ -1202,18 +1208,18 @@ parameter_types! {
 }
 
 impl nft::Config for Runtime {
-	type Event = Event;
 	type CreateClassDeposit = CreateClassDeposit;
 	type CreateTokenDeposit = CreateTokenDeposit;
+	type Event = Event;
 	type PalletId = NftPalletId;
 	type WeightInfo = ();
 }
 
 impl orml_nft::Config for Runtime {
-	type ClassId = u32;
-	type TokenId = u64;
 	type ClassData = nft::ClassData<Balance>;
+	type ClassId = u32;
 	type TokenData = nft::TokenData<Balance>;
+	type TokenId = u64;
 }
 
 construct_runtime!(

@@ -19,9 +19,10 @@
 //! Service implementation. Specialized wrapper over substrate service.
 
 use crate::Cli;
-use edgeware_opts::EthApi as EthApiCmd;
 use edgeware_executor::Executor;
+use edgeware_opts::{EthApi as EthApiCmd, RpcParams};
 use edgeware_primitives::Block;
+use edgeware_rpc_debug::DebugHandler;
 use edgeware_runtime::RuntimeApi;
 use fc_consensus::FrontierBlockImport;
 use fc_mapping_sync::MappingSyncWorker;
@@ -30,20 +31,19 @@ use fc_rpc_core::types::{FilterPool, PendingTransactions};
 use futures::prelude::*;
 use sc_cli::SubstrateCli;
 use sc_client_api::{BlockchainEvents, ExecutorProvider, RemoteBackend};
-use sc_consensus_aura::{
-	self, {ImportQueueParams, SlotProportion, StartAuraParams},
-};
+use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_network::{Event, NetworkService};
 use sc_service::{config::Configuration, error::Error as ServiceError, BasePath, ChainSpec, RpcHandlers, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_consensus::SlotData;
+use sp_core::U256;
 use sp_runtime::traits::Block as BlockT;
 use std::{
 	collections::{BTreeMap, HashMap},
 	sync::{Arc, Mutex},
 	time::Duration,
 };
-use sp_core::U256;
+use tokio::sync::Semaphore;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -100,12 +100,7 @@ pub fn new_partial(
 		sp_consensus::DefaultImportQueue<Block, FullClient>,
 		sc_transaction_pool::FullPool<Block, FullClient>,
 		(
-			sc_consensus_aura::AuraBlockImport<
-				Block,
-				FullClient,
-				FrontierBlockImport<Block, FullGrandpaBlockImport, FullClient>,
-				sp_consensus_aura::ed25519::AuthorityPair,
-			>,
+			sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>,
 			sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 			PendingTransactions,
 			Option<FilterPool>,
@@ -163,12 +158,6 @@ pub fn new_partial(
 	let frontier_block_import =
 		FrontierBlockImport::new(grandpa_block_import.clone(), client.clone(), frontier_backend.clone());
 
-	let aura_block_import =
-		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
-			frontier_block_import,
-			client.clone(),
-		);
-
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 	let raw_slot_duration = slot_duration.slot_duration();
 
@@ -176,7 +165,7 @@ pub fn new_partial(
 
 	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			block_import: aura_block_import.clone(),
+			block_import: grandpa_block_import.clone(),
 			justification_import: Some(Box::new(grandpa_block_import.clone())),
 			client: client.clone(),
 			create_inherent_data_providers: move |_, ()| async move {
@@ -208,7 +197,7 @@ pub fn new_partial(
 		select_chain,
 		transaction_pool,
 		other: (
-			aura_block_import.clone(),
+			grandpa_block_import,
 			grandpa_link,
 			pending_transactions,
 			filter_pool,
@@ -219,11 +208,7 @@ pub fn new_partial(
 }
 
 /// Creates a full service from the configuration.
-pub fn new_full_base(
-	mut config: Configuration,
-	cli: &Cli,
-	ethapi: Vec<EthApiCmd>,
-) -> Result<NewFullBase, ServiceError> {
+pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase, ServiceError> {
 	let rpc_params = RpcParams {
 		ethapi_max_permits: cli.run.ethapi_max_permits,
 		ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
@@ -250,16 +235,15 @@ pub fn new_full_base(
 		.extra_sets
 		.push(sc_finality_grandpa::grandpa_peers_set_config());
 
-	let (network, network_status_sinks, system_rpc_tx, network_starter) =
-		sc_service::build_network(sc_service::BuildNetworkParams {
-			config: &config,
-			client: client.clone(),
-			transaction_pool: transaction_pool.clone(),
-			spawn_handle: task_manager.spawn_handle(),
-			import_queue,
-			on_demand: None,
-			block_announce_validator_builder: None,
-		})?;
+	let (network, system_rpc_tx, network_starter) = sc_service::build_network(sc_service::BuildNetworkParams {
+		config: &config,
+		client: client.clone(),
+		transaction_pool: transaction_pool.clone(),
+		spawn_handle: task_manager.spawn_handle(),
+		import_queue,
+		on_demand: None,
+		block_announce_validator_builder: None,
+	})?;
 
 	if config.offchain_worker.enabled {
 		sc_service::build_offchain_workers(&config, task_manager.spawn_handle(), client.clone(), network.clone());
@@ -296,8 +280,8 @@ pub fn new_full_base(
 
 		let permit_pool = Arc::new(Semaphore::new(rpc_params.ethapi_max_permits as usize));
 
-		let (trace_filter_task, trace_filter_requester) = if ethapi.contains(&EthApiCmd::Trace) {
-			let (trace_filter_task, trace_filter_requester) = moonbeam_rpc_trace::CacheTask::create(
+		let (trace_filter_task, trace_filter_requester) = if cli.run.ethapi.contains(&EthApiCmd::Trace) {
+			let (trace_filter_task, trace_filter_requester) = edgeware_rpc_trace::CacheTask::create(
 				Arc::clone(&client),
 				Arc::clone(&backend),
 				Duration::from_secs(rpc_params.ethapi_trace_cache_duration),
@@ -308,7 +292,7 @@ pub fn new_full_base(
 			(None, None)
 		};
 
-		let (debug_task, debug_requester) = if ethapi.contains(&EthApiCmd::Debug) {
+		let (debug_task, debug_requester) = if cli.run.ethapi.contains(&EthApiCmd::Debug) {
 			let (debug_task, debug_requester) = DebugHandler::task(
 				Arc::clone(&client),
 				Arc::clone(&backend),
@@ -319,7 +303,17 @@ pub fn new_full_base(
 		} else {
 			(None, None)
 		};
+		// Spawn trace_filter cache task if enabled.
+		if let Some(trace_filter_task) = trace_filter_task {
+			task_manager
+				.spawn_essential_handle()
+				.spawn("trace-filter-cache", trace_filter_task);
+		}
 
+		// Spawn debug task if enabled.
+		if let Some(debug_task) = debug_task {
+			task_manager.spawn_essential_handle().spawn("ethapi-debug", debug_task);
+		}
 		let rpc_extensions_builder = move |deny_unsafe, _| {
 			let deps = edgeware_rpc::FullDeps {
 				client: client.clone(),
@@ -343,7 +337,7 @@ pub fn new_full_base(
 				filter_pool: filter_pool.clone(),
 				backend: frontier_backend.clone(),
 				max_past_logs,
-				ethapi_cmd: ethapi_cmd.clone(),
+				ethapi_cmd: cli.run.ethapi.clone(),
 				debug_requester: debug_requester.clone(),
 				trace_filter_requester: trace_filter_requester.clone(),
 				trace_filter_max_count: rpc_params.ethapi_trace_max_count,
@@ -378,24 +372,9 @@ pub fn new_full_base(
 		task_manager: &mut task_manager,
 		on_demand: None,
 		remote_blockchain: None,
-		network_status_sinks: network_status_sinks.clone(),
 		system_rpc_tx,
 		telemetry: telemetry.as_mut(),
 	})?;
-
-	// Spawn trace_filter cache task if enabled.
-	if let Some(trace_filter_task) = trace_filter_task {
-		task_manager
-			.spawn_essential_handle()
-			.spawn("trace-filter-cache", trace_filter_task);
-	}
-
-	// Spawn debug task if enabled.
-	if let Some(debug_task) = debug_task {
-		task_manager
-			.spawn_essential_handle()
-			.spawn("ethapi-debug", debug_task);
-	}
 
 	// Spawn Frontier EthFilterApi maintenance task.
 	if let Some(filter_pool) = filter_pool {
@@ -508,7 +487,7 @@ pub fn new_full_base(
 		name: Some(name),
 		observer_enabled: false,
 		keystore,
-		is_authority: role.is_authority(),
+		local_role: role,
 		telemetry: telemetry.as_ref().map(|x| x.handle()),
 	};
 
@@ -541,7 +520,6 @@ pub fn new_full_base(
 		task_manager,
 		client,
 		network,
-		network_status_sinks,
 		transaction_pool,
 	})
 }
@@ -550,17 +528,12 @@ pub struct NewFullBase {
 	pub task_manager: TaskManager,
 	pub client: Arc<FullClient>,
 	pub network: Arc<NetworkService<Block, <Block as BlockT>::Hash>>,
-	pub network_status_sinks: sc_service::NetworkStatusSinks<Block>,
 	pub transaction_pool: Arc<sc_transaction_pool::FullPool<Block, FullClient>>,
 }
 
 /// Builds a new service for a full client.
-pub fn new_full(
-	config: Configuration,
-	cli: &Cli,
-	ethapi: Vec<EthApiCmd>,
-) -> Result<TaskManager, ServiceError> {
-	new_full_base(config, cli, ethapi).map(|NewFullBase { task_manager, .. }| task_manager)
+pub fn new_full(config: Configuration, cli: &Cli) -> Result<TaskManager, ServiceError> {
+	new_full_base(config, cli).map(|NewFullBase { task_manager, .. }| task_manager)
 }
 
 pub fn new_light_base(
@@ -614,17 +587,11 @@ pub fn new_light_base(
 		telemetry.as_ref().map(|x| x.handle()),
 	)?;
 
-	let aura_block_import =
-		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
-			grandpa_block_import.clone(),
-			client.clone(),
-		);
-
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?.slot_duration();
 
 	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			block_import: aura_block_import.clone(),
+			block_import: grandpa_block_import.clone(),
 			justification_import: Some(Box::new(grandpa_block_import.clone())),
 			client: client.clone(),
 			create_inherent_data_providers: move |_, ()| async move {
@@ -645,16 +612,15 @@ pub fn new_light_base(
 		},
 	)?;
 
-	let (network, network_status_sinks, system_rpc_tx, network_starter) =
-		sc_service::build_network(sc_service::BuildNetworkParams {
-			config: &config,
-			client: client.clone(),
-			transaction_pool: transaction_pool.clone(),
-			spawn_handle: task_manager.spawn_handle(),
-			import_queue,
-			on_demand: Some(on_demand.clone()),
-			block_announce_validator_builder: None,
-		})?;
+	let (network, system_rpc_tx, network_starter) = sc_service::build_network(sc_service::BuildNetworkParams {
+		config: &config,
+		client: client.clone(),
+		transaction_pool: transaction_pool.clone(),
+		spawn_handle: task_manager.spawn_handle(),
+		import_queue,
+		on_demand: Some(on_demand.clone()),
+		block_announce_validator_builder: None,
+	})?;
 	network_starter.start_network();
 
 	if config.offchain_worker.enabled {
@@ -679,7 +645,6 @@ pub fn new_light_base(
 		keystore: keystore_container.sync_keystore(),
 		config,
 		backend,
-		network_status_sinks,
 		system_rpc_tx,
 		network: network.clone(),
 		task_manager: &mut task_manager,

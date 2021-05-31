@@ -14,40 +14,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+use crate::opts::EthApi as EthApiCmd;
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
-
-use std::str::FromStr;
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum EthApi {
-	Txpool,
-	Debug,
-	Trace,
-}
-
-impl FromStr for EthApi {
-	type Err = String;
-
-	fn from_str(s: &str) -> Result<Self, Self::Err> {
-		Ok(match s {
-			"txpool" => Self::Txpool,
-			"debug" => Self::Debug,
-			"trace" => Self::Trace,
-			_ => {
-				return Err(format!(
-					"`{}` is not recognized as a supported Ethereum Api",
-					s
-				))
-			}
-		})
-	}
-}
 
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
 pub struct RunCmd {
-	#[allow(missing_docs)]
 	#[structopt(flatten)]
 	pub base: sc_cli::RunCmd,
 
@@ -69,7 +42,7 @@ pub struct RunCmd {
 		conflicts_with = "validator",
 		require_delimiter = true
 	)]
-	pub ethapi: Vec<EthApi>,
+	pub ethapi: Vec<EthApiCmd>,
 
 	/// Number of concurrent tracing tasks. Meant to be shared by both "debug"
 	/// and "trace" modules.

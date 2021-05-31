@@ -99,7 +99,6 @@ edgeware-runtime = { version = "3.3.0", path = "../runtime", default-features = 
 edgeware-rpc = { version = "3.3.0", path = "../rpc", default-features = false }
 edgeware-primitives = { version = "3.3.0", path = "../primitives", default-features = false }
 edgeware-executor = { version = "3.3.0", path = "../executor", default-features = false }
-edgeware-opts = { path = "../opts", default-features = false }
 edgeware-rpc-txpool = { path = "../../client/rpc/txpool", default-features = false }
 edgeware-rpc-primitives-txpool = { path = "../txpool", default-features = false }
 edgeware-rpc-debug = { path = "../../client/rpc/debug", default-features = false }
@@ -109,6 +108,7 @@ edgeware-rpc-trace = { path = "../../client/rpc/trace", default-features = false
 # CLI-specific dependencies
 sc-cli = { version = "0.9", optional = true }
 frame-benchmarking-cli = { version = "3.0", optional = true }
+edgeware-opts = { path = "../opts", version = "0.1.0", optional = true }
 
 fc-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
 fp-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
@@ -123,6 +123,8 @@ wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
 browser-utils = { version = "0.9", package = "substrate-browser-utils", optional = true }
 libp2p-wasm-ext = { version = "0.28", features = ["websocket"], optional = true }
+
+tokio = "0.2"
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
 edgeware-executor = { path = "../executor", features = [ "wasmtime" ] }
@@ -161,7 +163,9 @@ cli = [
 	"sc-finality-grandpa-warp-sync",
 	"structopt",
 	"substrate-build-script-utils",
+	"edgeware-opts"
 ]
+cli-completion = []
 runtime-benchmarks = [
 	"edgeware-runtime/runtime-benchmarks",
 	"frame-benchmarking-cli",

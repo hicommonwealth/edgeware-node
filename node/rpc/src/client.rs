@@ -28,8 +28,8 @@ use std::sync::Arc;
 
 /// A set of APIs that polkadot-like runtimes must implement.
 ///
-/// This trait has no methods or associated type. It is a concise marker for all the trait bounds
-/// that it contains.
+/// This trait has no methods or associated type. It is a concise marker for all
+/// the trait bounds that it contains.
 pub trait RuntimeApiCollection:
 	sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block>
 	+ sp_api::ApiExt<Block>
@@ -101,15 +101,15 @@ where
 
 /// Execute something with the client instance.
 ///
-/// As there exist multiple chains inside Edgeware, like Edgeware itself, Beresheet,
-/// more eventually etc, there can exist different kinds of client types. As these
-/// client types differ in the generics that are being used, we can not easily
-/// return them from a function. For returning them from a function there exists
-/// [`Client`]. However, the problem on how to use this client instance still
-/// exists. This trait "solves" it in a dirty way. It requires a type to
-/// implement this trait and than the [`execute_with_client`](ExecuteWithClient:
-/// :execute_with_client) function can be called with any possible client
-/// instance.
+/// As there exist multiple chains inside Edgeware, like Edgeware itself,
+/// Beresheet, more eventually etc, there can exist different kinds of client
+/// types. As these client types differ in the generics that are being used, we
+/// can not easily return them from a function. For returning them from a
+/// function there exists [`Client`]. However, the problem on how to use this
+/// client instance still exists. This trait "solves" it in a dirty way. It
+/// requires a type to implement this trait and than the
+/// [`execute_with_client`](ExecuteWithClient: :execute_with_client) function
+/// can be called with any possible client instance.
 ///
 /// In a perfect world, we could make a closure work in this way.
 pub trait ExecuteWithClient {
@@ -128,9 +128,9 @@ pub trait ExecuteWithClient {
 
 /// A handle to a Edgeware client instance.
 ///
-/// The Edgeware service supports multiple different runtimes (Moonbase, Edgeware
-/// itself, etc). As each runtime has a specialized client, we need to hide them
-/// behind a trait. This is this trait.
+/// The Edgeware service supports multiple different runtimes (Moonbase,
+/// Edgeware itself, etc). As each runtime has a specialized client, we need to
+/// hide them behind a trait. This is this trait.
 ///
 /// When wanting to work with the inner client, you need to use `execute_with`.
 pub trait ClientHandle {
@@ -141,15 +141,14 @@ pub trait ClientHandle {
 /// A client instance of Edgeware.
 #[derive(Clone)]
 pub enum Client {
+	/// Edgeware Client
 	Edgeware(Arc<crate::FullClient<edgeware_runtime::RuntimeApi, edgeware_executor::Executor>>),
 }
 
 impl ClientHandle for Client {
 	fn execute_with<T: ExecuteWithClient>(&self, t: T) -> T::Output {
 		match self {
-			Self::Edgeware(client) => {
-				T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone())
-			}
+			Self::Edgeware(client) => T::execute_with_client::<_, _, crate::FullBackend>(t, client.clone()),
 		}
 	}
 }
@@ -163,10 +162,7 @@ impl sc_client_api::UsageProvider<Block> for Client {
 }
 
 impl sc_client_api::BlockBackend<Block> for Client {
-	fn block_body(
-		&self,
-		id: &BlockId<Block>,
-	) -> sp_blockchain::Result<Option<Vec<<Block as BlockT>::Extrinsic>>> {
+	fn block_body(&self, id: &BlockId<Block>) -> sp_blockchain::Result<Option<Vec<<Block as BlockT>::Extrinsic>>> {
 		match self {
 			Self::Edgeware(client) => client.block_body(id),
 		}
@@ -190,28 +186,19 @@ impl sc_client_api::BlockBackend<Block> for Client {
 		}
 	}
 
-	fn block_hash(
-		&self,
-		number: NumberFor<Block>,
-	) -> sp_blockchain::Result<Option<<Block as BlockT>::Hash>> {
+	fn block_hash(&self, number: NumberFor<Block>) -> sp_blockchain::Result<Option<<Block as BlockT>::Hash>> {
 		match self {
 			Self::Edgeware(client) => client.block_hash(number),
 		}
 	}
 
-	fn indexed_transaction(
-		&self,
-		hash: &<Block as BlockT>::Hash,
-	) -> sp_blockchain::Result<Option<Vec<u8>>> {
+	fn indexed_transaction(&self, hash: &<Block as BlockT>::Hash) -> sp_blockchain::Result<Option<Vec<u8>>> {
 		match self {
 			Self::Edgeware(client) => client.indexed_transaction(hash),
 		}
 	}
 
-	fn has_indexed_transaction(
-		&self,
-		hash: &<Block as BlockT>::Hash,
-	) -> sp_blockchain::Result<bool> {
+	fn has_indexed_transaction(&self, hash: &<Block as BlockT>::Hash) -> sp_blockchain::Result<bool> {
 		match self {
 			Self::Edgeware(client) => client.has_indexed_transaction(hash),
 		}
@@ -219,21 +206,13 @@ impl sc_client_api::BlockBackend<Block> for Client {
 }
 
 impl sc_client_api::StorageProvider<Block, crate::FullBackend> for Client {
-	fn storage(
-		&self,
-		id: &BlockId<Block>,
-		key: &StorageKey,
-	) -> sp_blockchain::Result<Option<StorageData>> {
+	fn storage(&self, id: &BlockId<Block>, key: &StorageKey) -> sp_blockchain::Result<Option<StorageData>> {
 		match self {
 			Self::Edgeware(client) => client.storage(id, key),
 		}
 	}
 
-	fn storage_keys(
-		&self,
-		id: &BlockId<Block>,
-		key_prefix: &StorageKey,
-	) -> sp_blockchain::Result<Vec<StorageKey>> {
+	fn storage_keys(&self, id: &BlockId<Block>, key_prefix: &StorageKey) -> sp_blockchain::Result<Vec<StorageKey>> {
 		match self {
 			Self::Edgeware(client) => client.storage_keys(id, key_prefix),
 		}
@@ -264,9 +243,7 @@ impl sc_client_api::StorageProvider<Block, crate::FullBackend> for Client {
 		id: &BlockId<Block>,
 		prefix: Option<&'a StorageKey>,
 		start_key: Option<&StorageKey>,
-	) -> sp_blockchain::Result<
-		KeyIterator<'a, <crate::FullBackend as sc_client_api::Backend<Block>>::State, Block>,
-	> {
+	) -> sp_blockchain::Result<KeyIterator<'a, <crate::FullBackend as sc_client_api::Backend<Block>>::State, Block>> {
 		match self {
 			Self::Edgeware(client) => client.storage_keys_iter(id, prefix, start_key),
 		}

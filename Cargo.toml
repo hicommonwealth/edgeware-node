@@ -10,6 +10,7 @@ members = [
 	"pallets/orml-nft",
 	"pallets/nft",
 	"node/cli",
+	"node/opts",
 	"node/executor",
 	"node/evm_tracer",
 	"node/primitives",

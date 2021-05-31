@@ -29,6 +29,7 @@
 
 #![warn(missing_docs)]
 
+pub use edgeware_opts as opts;
 use edgeware_opts::EthApi as EthApiCmd;
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use fc_rpc::{OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override, StorageOverride};
@@ -45,25 +46,22 @@ use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
 use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
+use sc_transaction_graph::{ChainApi, Pool};
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
-use sc_transaction_graph::{ChainApi, Pool};
 use std::{collections::BTreeMap, sync::Arc};
 
 use edgeware_rpc_debug::{Debug, DebugRequester, DebugServer};
 use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, Trace, TraceServer};
 use edgeware_rpc_txpool::{TxPool, TxPoolServer};
-
+/// RPC Client
 pub mod client;
 use client::RuntimeApiCollection;
 
-use sc_service::{
-	TFullBackend,
-	TFullClient,
-};
+use sc_service::{TFullBackend, TFullClient};
 
 type FullClient<RuntimeApi, Executor> = TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = TFullBackend<Block>;
@@ -276,10 +274,7 @@ where
 	));
 
 	if ethapi_cmd.contains(&EthApiCmd::Txpool) {
-		io.extend_with(TxPoolServer::to_delegate(TxPool::new(
-			Arc::clone(&client),
-			graph,
-		)));
+		io.extend_with(TxPoolServer::to_delegate(TxPool::new(Arc::clone(&client), graph)));
 	}
 
 	if let Some(trace_filter_requester) = trace_filter_requester {
