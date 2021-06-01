@@ -99,7 +99,7 @@ pub fn new_partial(
 		sp_consensus::DefaultImportQueue<Block, FullClient>,
 		sc_transaction_pool::FullPool<Block, FullClient>,
 		(
-			sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>,
+			FrontierBlockImport<Block, FullGrandpaBlockImport, FullClient>,
 			sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 			PendingTransactions,
 			Option<FilterPool>,
@@ -154,6 +154,12 @@ pub fn new_partial(
 		telemetry.as_ref().map(|x| x.handle()),
 	)?;
 
+	let frontier_block_import = FrontierBlockImport::new(
+		grandpa_block_import.clone(),
+		client.clone(),
+		frontier_backend.clone(),
+	);
+
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 	let raw_slot_duration = slot_duration.slot_duration();
 
@@ -161,7 +167,7 @@ pub fn new_partial(
 
 	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			block_import: grandpa_block_import.clone(),
+			block_import: frontier_block_import.clone(),
 			justification_import: Some(Box::new(grandpa_block_import.clone())),
 			client: client.clone(),
 			create_inherent_data_providers: move |_, ()| async move {
@@ -193,7 +199,7 @@ pub fn new_partial(
 		select_chain,
 		transaction_pool,
 		other: (
-			grandpa_block_import,
+			frontier_block_import,
 			grandpa_link,
 			pending_transactions,
 			filter_pool,
@@ -230,7 +236,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		keystore_container,
 		select_chain,
 		transaction_pool,
-		other: (aura_block_import, grandpa_link, pending_transactions, filter_pool, frontier_backend, mut telemetry),
+		other: (block_import, grandpa_link, pending_transactions, filter_pool, frontier_backend, mut telemetry),
 	} = new_partial(&config, cli)?;
 
 	config
@@ -422,7 +428,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 					slot_duration,
 					client: client.clone(),
 					select_chain,
-					block_import: aura_block_import,
+					block_import: block_import,
 					proposer_factory,
 					create_inherent_data_providers: move |_, ()| async move {
 						let timestamp = sp_timestamp::InherentDataProvider::from_system_time();

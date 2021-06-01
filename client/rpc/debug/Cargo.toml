@@ -14,18 +14,18 @@ jsonrpc-core = "15.0.0"
 
 ethereum = { version = "0.7.1", default-features = false, features = ["with-codec"] }
 ethereum-types = "0.11.0"
-sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
-sp-utils = { git = "https://github.com/webb-tools/substrate", branch = "erup-4-up" }
+sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+sp-utils = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
 
 edgeware-rpc-core-debug = { path = "../../rpc-core/debug" }
 edgeware-rpc-primitives-debug = { path = "../../../node/debug" }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
-fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
