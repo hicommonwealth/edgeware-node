@@ -534,7 +534,6 @@ impl pallet_election_provider_multi_phase::Config for Runtime {
 	type DataProvider = Staking;
 	type Event = Event;
 	type Fallback = Fallback;
-	type ForceOrigin = EnsureRootOrHalfCouncil;
 	type MinerMaxIterations = MinerMaxIterations;
 	type MinerMaxLength = MinerMaxLength;
 	type MinerMaxWeight = MinerMaxWeight;
