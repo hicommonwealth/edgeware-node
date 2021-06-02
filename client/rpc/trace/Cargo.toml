@@ -28,7 +28,7 @@ sp-std = {version = "*" }
 sp-blockchain = {version = "*" }
 sp-transaction-pool = {version = "*" }
 sp-block-builder = {version = "*" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 edgeware-rpc-primitives-debug = { path = "../../../node/debug" }
 
 # Client and RPC
@@ -36,7 +36,7 @@ jsonrpc-core = "15.0.0"
 sc-client-api = {version = "*" }
 sc-network = {version = "*" }
 sc-transaction-graph = {version = "*" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 edgeware-rpc-core-trace = { path = "../../rpc-core/trace" }

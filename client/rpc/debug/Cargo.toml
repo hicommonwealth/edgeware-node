@@ -25,7 +25,7 @@ sp-utils = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" 
 
 edgeware-rpc-core-debug = { path = "../../rpc-core/debug" }
 edgeware-rpc-primitives-debug = { path = "../../../node/debug" }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
