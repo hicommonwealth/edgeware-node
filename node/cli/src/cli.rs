@@ -17,6 +17,42 @@
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
 
+use std::{fmt, str::FromStr};
+
+/// Ethereum API Features
+#[derive(Debug, PartialEq, Clone)]
+pub enum EthApi {
+	/// Transactions Pool
+	Txpool,
+	/// Debugging
+	Debug,
+	/// Tracing.
+	Trace,
+}
+
+impl FromStr for EthApi {
+	type Err = String;
+
+	fn from_str(s: &str) -> Result<Self, Self::Err> {
+		Ok(match s {
+			"txpool" => Self::Txpool,
+			"debug" => Self::Debug,
+			"trace" => Self::Trace,
+			_ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
+		})
+	}
+}
+
+impl fmt::Display for EthApi {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		match self {
+			EthApi::Txpool => write!(f, "txpool"),
+			EthApi::Debug => write!(f, "debug"),
+			EthApi::Trace => write!(f, "trace"),
+		}
+	}
+}
+
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]
 pub struct RunCmd {
@@ -34,6 +70,31 @@ pub struct RunCmd {
 	/// The dynamic-fee pallet target gas price set by block author
 	#[structopt(long, default_value = "1")]
 	pub target_gas_price: u64,
+
+	/// Enable EVM tracing module on a non-authority node.
+	#[structopt(
+		long,
+		conflicts_with = "collator",
+		conflicts_with = "validator",
+		require_delimiter = true
+	)]
+	pub ethapi: Vec<EthApi>,
+
+	/// Number of concurrent tracing tasks. Meant to be shared by both "debug"
+	/// and "trace" modules.
+	#[structopt(long, default_value = "10")]
+	pub ethapi_max_permits: u32,
+
+	/// Maximum number of trace entries a single request of `trace_filter` is
+	/// allowed to return. A request asking for more or an unbounded one going
+	/// over this limit will both return an error.
+	#[structopt(long, default_value = "500")]
+	pub ethapi_trace_max_count: u32,
+
+	/// Duration (in seconds) after which the cache of `trace_filter` for a
+	/// given block will be discarded.
+	#[structopt(long, default_value = "300")]
+	pub ethapi_trace_cache_duration: u64,
 }
 
 /// An overarching CLI command definition.

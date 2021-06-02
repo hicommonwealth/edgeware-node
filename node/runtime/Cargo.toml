@@ -47,6 +47,9 @@ sp-npos-elections = { version = "3.0", default-features = false }
 
 # edgeware primitives
 edgeware-primitives = { version = "3.3.0", path = "../primitives", default-features = false }
+edgeware-evm-tracer = { path = "../evm_tracer", default-features = false }
+edgeware-rpc-primitives-debug = { path = "../debug", default-features = false }
+edgeware-rpc-primitives-txpool = { path = "../txpool", default-features = false }
 
 # pallet dependencies
 pallet-assets = { version = "3.0", default-features = false }
@@ -106,6 +109,8 @@ pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier"
 pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
 
+sha3 = { version = "0.9", default-features = false }
+
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4", optional = true }
@@ -130,6 +135,7 @@ sp-io = { version = "3.0" }
 default = ["std"]
 no-reaping = []
 std = [
+	"sha3/std",
 	"sp-authority-discovery/std",
 	"pallet-assets/std",
 	"pallet-authority-discovery/std",
@@ -208,6 +214,9 @@ std = [
     "webb-tokens/std",
     "orml-nft/std",
     "nft/std",
+    "edgeware-evm-tracer/std",
+	"edgeware-rpc-primitives-debug/std",
+	"edgeware-rpc-primitives-txpool/std",
 ]
 
 runtime-benchmarks = [

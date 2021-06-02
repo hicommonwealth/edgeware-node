@@ -1,15 +1,26 @@
 [workspace]
 members = [
+	"client/rpc/debug",
+	"client/rpc/trace",
+	"client/rpc/txpool",
+	"client/rpc-core/debug",
+	"client/rpc-core/trace",
+	"client/rpc-core/txpool",
 	"pallets/edge-treasury-reward",
 	"pallets/orml-nft",
 	"pallets/nft",
 	"node/cli",
+	"node/opts",
 	"node/executor",
+	"node/evm_tracer",
 	"node/primitives",
+	"node/opts",
 	"node/rpc",
 	"node/rpc-client",
 	"node/runtime",
 	"node/runtime-interface",
+	"node/debug",
+	"node/txpool",
 ]
 exclude = ["vendor"]
 
@@ -84,6 +95,7 @@ pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier.g
 pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4" }
 
 # substrate deps
+sc-finality-grandpa-warp-sync = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 fork-tree = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 frame-benchmarking = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
 frame-benchmarking-cli = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }

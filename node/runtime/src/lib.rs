@@ -26,7 +26,10 @@ use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Nonce, Signature};
 use frame_support::{
 	construct_runtime, parameter_types,
-	traits::{Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, U128CurrencyToVote},
+	traits::{
+		Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier, MaxEncodedLen, OnUnbalanced,
+		U128CurrencyToVote,
+	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 		DispatchClass, IdentityFee, Weight,
@@ -40,6 +43,9 @@ use frame_system::{
 	limits::{BlockLength, BlockWeights},
 	EnsureOneOf, EnsureRoot,
 };
+
+use edgeware_rpc_primitives_txpool::TxPoolResponse;
+use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction};
 
 pub use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 pub use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
@@ -263,11 +269,18 @@ parameter_types! {
 
 /// The type used to represent the kinds of proxying allowed.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+#[repr(u8)]
 pub enum ProxyType {
 	Any = 0,
 	NonTransfer = 1,
 	Governance = 2,
 	Staking = 3,
+}
+
+impl MaxEncodedLen for ProxyType {
+	fn max_encoded_len() -> usize {
+		1 // one byte
+	}
 }
 
 impl Default for ProxyType {
@@ -918,18 +931,18 @@ parameter_types! {
 }
 
 impl pallet_assets::Config for Runtime {
-	type Event = Event;
-	type Balance = u64;
-	type AssetId = u32;
-	type Currency = Balances;
-	type ForceOrigin = EnsureRoot<AccountId>;
+	type ApprovalDeposit = ApprovalDeposit;
 	type AssetDeposit = AssetDeposit;
+	type AssetId = u32;
+	type Balance = u64;
+	type Currency = Balances;
+	type Event = Event;
+	type Extra = ();
+	type ForceOrigin = EnsureRoot<AccountId>;
+	type Freezer = ();
 	type MetadataDepositBase = MetadataDepositBase;
 	type MetadataDepositPerByte = MetadataDepositPerByte;
-	type ApprovalDeposit = ApprovalDeposit;
 	type StringLimit = StringLimit;
-	type Freezer = ();
-	type Extra = ();
 	type WeightInfo = pallet_assets::weights::SubstrateWeight<Runtime>;
 }
 
@@ -975,25 +988,25 @@ parameter_types! {
 }
 
 impl pallet_contracts::Config for Runtime {
-	type Time = Timestamp;
-	type Randomness = RandomnessCollectiveFlip;
+	type CallStack = [pallet_contracts::Frame<Self>; 31];
+	type ChainExtension = ();
 	type Currency = Balances;
-	type Event = Event;
-	type RentPayment = ();
-	type SignedClaimHandicap = SignedClaimHandicap;
-	type TombstoneDeposit = TombstoneDeposit;
+	type DeletionQueueDepth = DeletionQueueDepth;
+	type DeletionWeightLimit = DeletionWeightLimit;
 	type DepositPerContract = DepositPerContract;
 	type DepositPerStorageByte = DepositPerStorageByte;
 	type DepositPerStorageItem = DepositPerStorageItem;
+	type Event = Event;
+	type Randomness = RandomnessCollectiveFlip;
 	type RentFraction = RentFraction;
-	type SurchargeReward = SurchargeReward;
-	type CallStack = [pallet_contracts::Frame<Self>; 31];
-	type WeightPrice = pallet_transaction_payment::Module<Self>;
-	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-	type ChainExtension = ();
-	type DeletionQueueDepth = DeletionQueueDepth;
-	type DeletionWeightLimit = DeletionWeightLimit;
+	type RentPayment = ();
 	type Schedule = Schedule;
+	type SignedClaimHandicap = SignedClaimHandicap;
+	type SurchargeReward = SurchargeReward;
+	type Time = Timestamp;
+	type TombstoneDeposit = TombstoneDeposit;
+	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
+	type WeightPrice = pallet_transaction_payment::Module<Self>;
 }
 
 parameter_types! {
@@ -1194,18 +1207,18 @@ parameter_types! {
 }
 
 impl nft::Config for Runtime {
-	type Event = Event;
 	type CreateClassDeposit = CreateClassDeposit;
 	type CreateTokenDeposit = CreateTokenDeposit;
+	type Event = Event;
 	type PalletId = NftPalletId;
 	type WeightInfo = ();
 }
 
 impl orml_nft::Config for Runtime {
-	type ClassId = u32;
-	type TokenId = u64;
 	type ClassData = nft::ClassData<Balance>;
+	type ClassId = u32;
 	type TokenData = nft::TokenData<Balance>;
+	type TokenId = u64;
 }
 
 construct_runtime!(
@@ -1669,6 +1682,218 @@ impl_runtime_apis! {
 				None
 			} else {
 				Some(v)
+			}
+		}
+	}
+
+	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
+		fn trace_transaction(
+			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+			transaction: &EthereumTransaction,
+			trace_type: edgeware_rpc_primitives_debug::single::TraceType,
+		) -> Result<
+			edgeware_rpc_primitives_debug::single::TransactionTrace,
+			sp_runtime::DispatchError
+		> {
+			use edgeware_rpc_primitives_debug::single::TraceType;
+			use edgeware_evm_tracer::{RawTracer, CallListTracer};
+
+			// Apply the a subset of extrinsics: all the substrate-specific or ethereum transactions
+			// that preceded the requested transaction.
+			for ext in extrinsics.into_iter() {
+				let _ = match &ext.function {
+					Call::Ethereum(transact(t)) => {
+						if t == transaction {
+							return match trace_type {
+								TraceType::Raw {
+									disable_storage,
+									disable_memory,
+									disable_stack,
+								} => {
+									Ok(RawTracer::new(disable_storage,
+										disable_memory,
+										disable_stack,)
+										.trace(|| Executive::apply_extrinsic(ext))
+										.0
+										.into_tx_trace()
+									)
+								},
+								TraceType::CallList => {
+									Ok(CallListTracer::new()
+										.trace(|| Executive::apply_extrinsic(ext))
+										.0
+										.into_tx_trace()
+									)
+								}
+							}
+
+						} else {
+							Executive::apply_extrinsic(ext)
+						}
+					},
+					_ => Executive::apply_extrinsic(ext)
+				};
+			}
+
+			Err(sp_runtime::DispatchError::Other(
+				"Failed to find Ethereum transaction among the extrinsics."
+			))
+		}
+
+		fn trace_block(
+			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+		) -> Result<
+			Vec<
+				edgeware_rpc_primitives_debug::block::TransactionTrace>,
+				sp_runtime::DispatchError
+			> {
+			use edgeware_rpc_primitives_debug::{single, block, CallResult, CreateResult, CreateType};
+			use edgeware_evm_tracer::CallListTracer;
+
+			let mut config = <Runtime as pallet_evm::Config>::config().clone();
+			config.estimate = true;
+
+			let mut traces = vec![];
+			let mut eth_tx_index = 0;
+
+			// Apply all extrinsics. Ethereum extrinsics are traced.
+			for ext in extrinsics.into_iter() {
+				match &ext.function {
+					Call::Ethereum(transact(_transaction)) => {
+						let tx_traces = CallListTracer::new()
+							.trace(|| Executive::apply_extrinsic(ext))
+							.0
+							.into_tx_trace();
+
+						let tx_traces = match tx_traces {
+							single::TransactionTrace::CallList(t) => t,
+							_ => return Err(sp_runtime::DispatchError::Other("Runtime API error")),
+						};
+
+						// Convert traces from "single" format to "block" format.
+						let mut tx_traces: Vec<_> = tx_traces.into_iter().map(|trace|
+							match trace.inner {
+								single::CallInner::Call {
+									input, to, res, call_type
+								} => block::TransactionTrace {
+									action: block::TransactionTraceAction::Call {
+										call_type,
+										from: trace.from,
+										gas: trace.gas,
+										input,
+										to,
+										value: trace.value,
+									},
+									// Can't be known here, must be inserted upstream.
+									block_hash: H256::default(),
+									// Can't be known here, must be inserted upstream.
+									block_number: 0,
+									output: match res {
+										CallResult::Output(output) => {
+											block::TransactionTraceOutput::Result(
+												block::TransactionTraceResult::Call {
+													gas_used: trace.gas_used,
+													output
+												})
+										},
+										CallResult::Error(error) =>
+											block::TransactionTraceOutput::Error(error),
+									},
+									subtraces: trace.subtraces,
+									trace_address: trace.trace_address,
+									// Can't be known here, must be inserted upstream.
+									transaction_hash: H256::default(),
+									transaction_position: eth_tx_index,
+								},
+								single::CallInner::Create { init, res } => block::TransactionTrace {
+									action: block::TransactionTraceAction::Create {
+										creation_method: CreateType::Create,
+										from: trace.from,
+										gas: trace.gas,
+										init,
+										value: trace.value,
+									},
+									// Can't be known here, must be inserted upstream.
+									block_hash: H256::default(),
+									// Can't be known here, must be inserted upstream.
+									block_number: 0,
+									output: match res {
+										CreateResult::Success {
+											created_contract_address_hash,
+											created_contract_code
+										} => {
+											block::TransactionTraceOutput::Result(
+												block::TransactionTraceResult::Create {
+													gas_used: trace.gas_used,
+													code: created_contract_code,
+													address: created_contract_address_hash,
+												}
+											)
+										},
+										CreateResult::Error {
+											error
+										} => block::TransactionTraceOutput::Error(error),
+									},
+									subtraces: trace.subtraces,
+									trace_address: trace.trace_address,
+									// Can't be known here, must be inserted upstream.
+									transaction_hash: H256::default(),
+									transaction_position: eth_tx_index,
+
+								},
+								single::CallInner::SelfDestruct {
+									balance,
+									refund_address
+								} => block::TransactionTrace {
+									action: block::TransactionTraceAction::Suicide {
+										address: trace.from,
+										balance,
+										refund_address,
+									},
+									// Can't be known here, must be inserted upstream.
+									block_hash: H256::default(),
+									// Can't be known here, must be inserted upstream.
+									block_number: 0,
+									output: block::TransactionTraceOutput::Result(
+												block::TransactionTraceResult::Suicide
+											),
+									subtraces: trace.subtraces,
+									trace_address: trace.trace_address,
+									// Can't be known here, must be inserted upstream.
+									transaction_hash: H256::default(),
+									transaction_position: eth_tx_index,
+
+								},
+							}
+						).collect();
+
+						traces.append(&mut tx_traces);
+
+						eth_tx_index += 1;
+					},
+					_ => {let _ = Executive::apply_extrinsic(ext); }
+				};
+			}
+
+			Ok(traces)
+		}
+	}
+
+
+	impl edgeware_rpc_primitives_txpool::TxPoolRuntimeApi<Block> for Runtime {
+		fn extrinsic_filter(
+			xts_ready: Vec<<Block as BlockT>::Extrinsic>,
+			xts_future: Vec<<Block as BlockT>::Extrinsic>
+		) -> TxPoolResponse {
+			TxPoolResponse {
+				ready: xts_ready.into_iter().filter_map(|xt| match xt.function {
+					Call::Ethereum(transact(t)) => Some(t),
+					_ => None
+				}).collect(),
+				future: xts_future.into_iter().filter_map(|xt| match xt.function {
+					Call::Ethereum(transact(t)) => Some(t),
+					_ => None
+				}).collect(),
 			}
 		}
 	}

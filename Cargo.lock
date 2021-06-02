@@ -312,7 +312,7 @@ dependencies = [
  "async-io",
  "async-lock",
  "async-process",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "futures-channel",
  "futures-core",
  "futures-io",
@@ -1120,7 +1120,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06ed27e177f16d65f0f0c22a213e17c696ace5dd64b14258b52f9417ccb52db4"
 dependencies = [
  "cfg-if 1.0.0",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
 ]
 
 [[package]]
@@ -1141,8 +1141,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94af6efb46fef72616855b036a624cf27ba656ffc9be1b9a3c931cfc7749a9a9"
 dependencies = [
  "cfg-if 1.0.0",
- "crossbeam-epoch 0.9.4",
- "crossbeam-utils 0.8.4",
+ "crossbeam-epoch 0.9.5",
+ "crossbeam-utils 0.8.5",
 ]
 
 [[package]]
@@ -1162,12 +1162,12 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-epoch"
-version = "0.9.4"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "52fb27eab85b17fbb9f6fd667089e07d6a2eb8743d02639ee7f6a7a7729c9c94"
+checksum = "4ec02e091aa634e2c3ada4a392989e7c3116673ef0ac5b72232439094d73b7fd"
 dependencies = [
  "cfg-if 1.0.0",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "lazy_static",
  "memoffset 0.6.4",
  "scopeguard",
@@ -1197,11 +1197,10 @@ dependencies = [
 
 [[package]]
 name = "crossbeam-utils"
-version = "0.8.4"
+version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4feb231f0d4d6af81aed15928e58ecf5816aa62a2393e2c82f46973e92a9a278"
+checksum = "d82cfc11ce7f2c3faef78d8a684447b40d503d9681acebed6cb728d45940c4db"
 dependencies = [
- "autocfg",
  "cfg-if 1.0.0",
  "lazy_static",
 ]
@@ -1509,8 +1508,14 @@ version = "3.3.0"
 dependencies = [
  "assert_cmd",
  "edgeware-executor",
+ "edgeware-opts",
  "edgeware-primitives",
  "edgeware-rpc",
+ "edgeware-rpc-debug",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
+ "edgeware-rpc-trace",
+ "edgeware-rpc-txpool",
  "edgeware-runtime",
  "fc-consensus",
  "fc-db",
@@ -1527,6 +1532,7 @@ dependencies = [
  "hex-literal",
  "jsonrpc-core 15.1.0",
  "jsonrpc-pubsub 15.1.0",
+ "libp2p-wasm-ext",
  "log",
  "nix",
  "pallet-authority-discovery",
@@ -1555,6 +1561,7 @@ dependencies = [
  "sc-consensus-aura",
  "sc-consensus-epochs",
  "sc-finality-grandpa",
+ "sc-finality-grandpa-warp-sync",
  "sc-keystore",
  "sc-network",
  "sc-offchain",
@@ -1583,9 +1590,27 @@ dependencies = [
  "substrate-build-script-utils",
  "substrate-frame-cli",
  "tempfile",
+ "tokio 0.2.25",
  "tracing",
  "wasm-bindgen",
  "wasm-bindgen-futures",
+]
+
+[[package]]
+name = "edgeware-evm-tracer"
+version = "0.1.0"
+dependencies = [
+ "edgeware-rpc-primitives-debug",
+ "ethereum-types",
+ "evm",
+ "evm-gasometer",
+ "evm-runtime",
+ "fp-evm",
+ "pallet-evm",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -1618,6 +1643,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "edgeware-opts"
+version = "0.1.0"
+
+[[package]]
 name = "edgeware-primitives"
 version = "3.3.0"
 dependencies = [
@@ -1634,7 +1663,14 @@ dependencies = [
 name = "edgeware-rpc"
 version = "3.3.0"
 dependencies = [
+ "edgeware-executor",
+ "edgeware-opts",
  "edgeware-primitives",
+ "edgeware-rpc-debug",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
+ "edgeware-rpc-trace",
+ "edgeware-rpc-txpool",
  "edgeware-runtime",
  "fc-db",
  "fc-rpc",
@@ -1647,6 +1683,7 @@ dependencies = [
  "pallet-merkle",
  "pallet-merkle-rpc",
  "pallet-transaction-payment-rpc",
+ "pallet-transaction-payment-rpc-runtime-api",
  "sc-client-api",
  "sc-consensus-aura",
  "sc-consensus-epochs",
@@ -1656,12 +1693,18 @@ dependencies = [
  "sc-network",
  "sc-rpc",
  "sc-rpc-api",
+ "sc-service",
+ "sc-transaction-graph",
+ "sc-transaction-pool",
  "sp-api",
  "sp-block-builder",
  "sp-blockchain",
  "sp-consensus",
  "sp-consensus-aura",
+ "sp-offchain",
  "sp-runtime",
+ "sp-session",
+ "sp-storage",
  "sp-transaction-pool",
  "substrate-frame-rpc-system",
 ]
@@ -1680,11 +1723,164 @@ dependencies = [
 ]
 
 [[package]]
+name = "edgeware-rpc-core-debug"
+version = "0.1.0"
+dependencies = [
+ "edgeware-rpc-primitives-debug",
+ "ethereum-types",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "serde",
+ "serde_json",
+ "sp-core",
+]
+
+[[package]]
+name = "edgeware-rpc-core-trace"
+version = "0.6.0"
+dependencies = [
+ "edgeware-rpc-primitives-debug",
+ "ethereum-types",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "edgeware-rpc-core-txpool"
+version = "0.6.0"
+dependencies = [
+ "ethereum",
+ "ethereum-types",
+ "fc-rpc-core",
+ "jsonrpc-core 15.1.0",
+ "jsonrpc-core-client 14.2.0",
+ "jsonrpc-derive 14.2.2",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "edgeware-rpc-debug"
+version = "0.1.0"
+dependencies = [
+ "edgeware-rpc-core-debug",
+ "edgeware-rpc-primitives-debug",
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-db",
+ "fc-rpc",
+ "fp-rpc",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "sc-client-api",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-utils",
+ "tokio 0.2.25",
+]
+
+[[package]]
+name = "edgeware-rpc-primitives-debug"
+version = "0.1.0"
+dependencies = [
+ "ethereum",
+ "ethereum-types",
+ "hex 0.4.3",
+ "parity-scale-codec 2.1.1",
+ "serde",
+ "serde_json",
+ "sp-api",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+]
+
+[[package]]
+name = "edgeware-rpc-primitives-txpool"
+version = "0.1.0"
+dependencies = [
+ "ethereum",
+ "parity-scale-codec 2.1.1",
+ "sp-api",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+]
+
+[[package]]
+name = "edgeware-rpc-trace"
+version = "0.6.0"
+dependencies = [
+ "edgeware-rpc-core-trace",
+ "edgeware-rpc-primitives-debug",
+ "ethereum",
+ "ethereum-types",
+ "fc-consensus",
+ "fc-rpc",
+ "fc-rpc-core",
+ "fp-rpc",
+ "futures 0.3.15",
+ "jsonrpc-core 15.1.0",
+ "sc-client-api",
+ "sc-network",
+ "sc-transaction-graph",
+ "serde",
+ "sha3 0.8.2",
+ "sp-api",
+ "sp-block-builder",
+ "sp-blockchain",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "sp-transaction-pool",
+ "sp-utils",
+ "tokio 0.2.25",
+ "tracing",
+]
+
+[[package]]
+name = "edgeware-rpc-txpool"
+version = "0.6.0"
+dependencies = [
+ "edgeware-rpc-core-txpool",
+ "edgeware-rpc-primitives-txpool",
+ "ethereum",
+ "ethereum-types",
+ "fc-rpc",
+ "frame-system",
+ "jsonrpc-core 15.1.0",
+ "sc-transaction-graph",
+ "serde",
+ "sha3 0.8.2",
+ "sp-api",
+ "sp-blockchain",
+ "sp-io",
+ "sp-runtime",
+ "sp-std 3.0.0",
+ "sp-transaction-pool",
+]
+
+[[package]]
 name = "edgeware-runtime"
 version = "3.3.0"
 dependencies = [
  "edge-treasury-reward",
+ "edgeware-evm-tracer",
  "edgeware-primitives",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
  "evm",
  "evm-runtime",
  "fp-rpc",
@@ -1751,6 +1947,7 @@ dependencies = [
  "rustc-hex",
  "safe-mix",
  "serde",
+ "sha3 0.9.1",
  "sp-api",
  "sp-application-crypto",
  "sp-authority-discovery",
@@ -2037,7 +2234,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2062,7 +2259,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "1.0.0"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "kvdb",
  "kvdb-rocksdb",
@@ -2076,7 +2273,7 @@ dependencies = [
 [[package]]
 name = "fc-mapping-sync"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "fc-consensus",
  "fc-db",
@@ -2094,7 +2291,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2135,7 +2332,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core 15.1.0",
@@ -2239,7 +2436,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "1.0.0"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "ethereum",
  "parity-scale-codec 2.1.1",
@@ -2253,7 +2450,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "2.0.0"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "impl-trait-for-tuples 0.1.3",
@@ -2266,7 +2463,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "2.0.0"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2282,7 +2479,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "1.0.1"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 
 [[package]]
 name = "frame-benchmarking"
@@ -2922,6 +3119,9 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "hex-literal"
@@ -5010,7 +5210,7 @@ dependencies = [
 [[package]]
 name = "pallet-dynamic-fee"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "async-trait",
  "frame-support",
@@ -5062,7 +5262,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -5090,7 +5290,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "4.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -5115,7 +5315,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-blake2"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5126,7 +5326,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-bn128"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5138,7 +5338,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-curve25519"
 version = "1.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "curve25519-dalek 3.1.0",
  "evm",
@@ -5152,7 +5352,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-dispatch"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5166,7 +5366,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-ed25519"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "ed25519-dalek",
  "evm",
@@ -5178,7 +5378,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5190,7 +5390,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5202,7 +5402,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#958d9153bc0dc7d55ff1130947ac0f9b670c90b4"
 dependencies = [
  "evm",
  "fp-evm",
@@ -6528,7 +6728,7 @@ checksum = "d78120e2c850279833f1dd3582f730c4ab53ed95aeaaaa862a2a5c71b1656d8e"
 dependencies = [
  "crossbeam-channel",
  "crossbeam-deque 0.8.0",
- "crossbeam-utils 0.8.4",
+ "crossbeam-utils 0.8.5",
  "lazy_static",
  "num_cpus",
 ]
@@ -7342,6 +7542,27 @@ dependencies = [
  "serde_json",
  "sp-blockchain",
  "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
+name = "sc-finality-grandpa-warp-sync"
+version = "0.9.0"
+source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#0e5c23844faa7a99f0a9e24731827205db7094fb"
+dependencies = [
+ "derive_more",
+ "futures 0.3.15",
+ "log",
+ "num-traits",
+ "parity-scale-codec 2.1.1",
+ "parking_lot 0.11.1",
+ "prost",
+ "sc-client-api",
+ "sc-finality-grandpa",
+ "sc-network",
+ "sc-service",
+ "sp-blockchain",
+ "sp-finality-grandpa",
  "sp-runtime",
 ]
 
@@ -9781,7 +10002,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.3.23",
+ "rand 0.7.3",
  "static_assertions",
 ]
 

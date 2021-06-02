@@ -29,6 +29,8 @@
 
 #![warn(missing_docs)]
 
+pub use edgeware_opts as opts;
+use edgeware_opts::EthApi as EthApiCmd;
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use fc_rpc::{OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override, StorageOverride};
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
@@ -44,12 +46,25 @@ use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
 use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
+use sc_transaction_graph::{ChainApi, Pool};
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 use std::{collections::BTreeMap, sync::Arc};
+
+use edgeware_rpc_debug::{Debug, DebugRequester, DebugServer};
+use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, Trace, TraceServer};
+use edgeware_rpc_txpool::{TxPool, TxPoolServer};
+/// RPC Client
+pub mod client;
+use client::RuntimeApiCollection;
+
+use sc_service::{TFullBackend, TFullClient};
+
+type FullClient<RuntimeApi, Executor> = TFullClient<Block, RuntimeApi, Executor>;
+type FullBackend = TFullBackend<Block>;
 
 /// Public io handler for exporting into other modules
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
@@ -81,11 +96,13 @@ pub struct GrandpaDeps<B> {
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B> {
+pub struct FullDeps<C, P, SC, B, A: ChainApi> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
 	pub pool: Arc<P>,
+	/// Graph pool instance.
+	pub graph: Arc<Pool<A>>,
 	/// The SelectChain Strategy
 	pub select_chain: SC,
 	/// The Node authority flag
@@ -106,11 +123,19 @@ pub struct FullDeps<C, P, SC, B> {
 	pub backend: Arc<fc_db::Backend<Block>>,
 	/// Maximum number of logs in a query.
 	pub max_past_logs: u32,
+	/// The list of optional RPC extensions.
+	pub ethapi_cmd: Vec<EthApiCmd>,
+	/// Debug server requester.
+	pub debug_requester: Option<DebugRequester>,
+	/// Trace filter cache server requester.
+	pub trace_filter_requester: Option<TraceFilterCacheRequester>,
+	/// Trace filter max count.
+	pub trace_filter_max_count: u32,
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B>(
-	deps: FullDeps<C, P, SC, B>,
+pub fn create_full<C, P, SC, B, A>(
+	deps: FullDeps<C, P, SC, B, A>,
 	subscription_task_executor: SubscriptionTaskExecutor,
 ) -> jsonrpc_core::IoHandler<sc_rpc_api::Metadata>
 where
@@ -118,7 +143,6 @@ where
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C: BlockchainEvents<Block>,
-	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
@@ -129,6 +153,8 @@ where
 	SC: SelectChain<Block> + 'static,
 	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
 	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+	A: ChainApi<Block = Block> + 'static,
+	C::Api: RuntimeApiCollection<StateBackend = B::State>,
 {
 	use fc_rpc::{
 		EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi, EthPubSubApiServer,
@@ -142,6 +168,7 @@ where
 	let FullDeps {
 		client,
 		pool,
+		graph,
 		select_chain: _,
 		enable_dev_signer,
 		is_authority,
@@ -152,6 +179,10 @@ where
 		filter_pool,
 		backend,
 		max_past_logs,
+		debug_requester,
+		trace_filter_requester,
+		trace_filter_max_count,
+		ethapi_cmd,
 	} = deps;
 	let GrandpaDeps {
 		shared_voter_state,
@@ -241,6 +272,22 @@ where
 			finality_provider,
 		),
 	));
+
+	if ethapi_cmd.contains(&EthApiCmd::Txpool) {
+		io.extend_with(TxPoolServer::to_delegate(TxPool::new(Arc::clone(&client), graph)));
+	}
+
+	if let Some(trace_filter_requester) = trace_filter_requester {
+		io.extend_with(TraceServer::to_delegate(Trace::new(
+			client,
+			trace_filter_requester,
+			trace_filter_max_count,
+		)));
+	}
+
+	if let Some(debug_requester) = debug_requester {
+		io.extend_with(DebugServer::to_delegate(Debug::new(debug_requester)));
+	}
 
 	io
 }

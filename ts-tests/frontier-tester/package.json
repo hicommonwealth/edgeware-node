@@ -16,6 +16,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@webb-tools/type-definitions": "^0.1.2-68",
+    "@webb-tools/api": "^0.1.2-68",
+    "@webb-tools/types": "^0.1.2-68",
+    "@webb-tools/app-util": "^0.1.2-68",
+    "@webb-tools/sdk-core": "^0.1.2-68",
+    "@webb-tools/sdk-mixer": "^0.1.2-68",
     "@edgeware/node-types": "^3.4.0-erup-4.3",
     "@openzeppelin/contracts": "^2.5.0",
     "@polkadot/api-contract": "4.11.2",
