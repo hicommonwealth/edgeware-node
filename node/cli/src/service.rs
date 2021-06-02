@@ -24,6 +24,8 @@ use edgeware_opts::{EthApi as EthApiCmd, RpcParams};
 use edgeware_primitives::Block;
 use edgeware_rpc_debug::DebugHandler;
 use edgeware_runtime::RuntimeApi;
+#[cfg(feature = "frontier-block-import")]
+use fc_consensus::FrontierBlockImport;
 use fc_mapping_sync::MappingSyncWorker;
 use fc_rpc::EthTask;
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
@@ -44,13 +46,28 @@ use std::{
 	time::Duration,
 };
 use tokio::sync::Semaphore;
-use fc_consensus::FrontierBlockImport;
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
 type FullGrandpaBlockImport = sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>;
 type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
+
+#[cfg(feature = "frontier-block-import")]
+type ConsensusResult = sc_consensus_aura::AuraBlockImport<
+	Block,
+	FullClient,
+	FrontierBlockImport<Block, FullGrandpaBlockImport, FullClient>,
+	sp_consensus_aura::ed25519::AuthorityPair,
+>;
+
+#[cfg(not(feature = "frontier-block-import"))]
+type ConsensusResult = sc_consensus_aura::AuraBlockImport<
+	Block,
+	FullClient,
+	FullGrandpaBlockImport,
+	sp_consensus_aura::ed25519::AuthorityPair,
+>;
 
 /// Can be called for a `Configuration` to check if it is a configuration for
 /// the `Kusama` network.
@@ -101,7 +118,7 @@ pub fn new_partial(
 		sp_consensus::DefaultImportQueue<Block, FullClient>,
 		sc_transaction_pool::FullPool<Block, FullClient>,
 		(
-			FrontierBlockImport<Block, FullGrandpaBlockImport, FullClient>,
+			ConsensusResult,
 			sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 			PendingTransactions,
 			Option<FilterPool>,
@@ -156,12 +173,18 @@ pub fn new_partial(
 		telemetry.as_ref().map(|x| x.handle()),
 	)?;
 
-	let frontier_block_import = FrontierBlockImport::new(
-		grandpa_block_import.clone(),
-		client.clone(),
-		frontier_backend.clone(),
-	);
+	#[cfg(feature = "frontier-block-import")]
+	let frontier_block_import =
+		FrontierBlockImport::new(grandpa_block_import.clone(), client.clone(), frontier_backend.clone());
 
+	let aura_block_import =
+		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
+			#[cfg(feature = "frontier-block-import")]
+			frontier_block_import,
+			#[cfg(not(feature = "frontier-block-import"))]
+			grandpa_block_import.clone(),
+			client.clone(),
+		);
 	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 	let raw_slot_duration = slot_duration.slot_duration();
 
@@ -169,7 +192,7 @@ pub fn new_partial(
 
 	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			block_import: frontier_block_import.clone(),
+			block_import: aura_block_import.clone(),
 			justification_import: Some(Box::new(grandpa_block_import.clone())),
 			client: client.clone(),
 			create_inherent_data_providers: move |_, ()| async move {
@@ -201,7 +224,7 @@ pub fn new_partial(
 		select_chain,
 		transaction_pool,
 		other: (
-			frontier_block_import,
+			aura_block_import,
 			grandpa_link,
 			pending_transactions,
 			filter_pool,
@@ -432,7 +455,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 					slot_duration,
 					client: client.clone(),
 					select_chain,
-					block_import: block_import,
+					block_import,
 					proposer_factory,
 					create_inherent_data_providers: move |_, ()| async move {
 						let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
