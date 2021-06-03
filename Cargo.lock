@@ -1804,7 +1804,7 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-std 2.0.1",
+ "sp-std 3.0.0",
 ]
 
 [[package]]
@@ -1843,7 +1843,7 @@ dependencies = [
  "sp-blockchain",
  "sp-io",
  "sp-runtime",
- "sp-std 2.0.1",
+ "sp-std 3.0.0",
  "sp-transaction-pool",
  "sp-utils",
  "tokio 0.2.25",
@@ -5483,7 +5483,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "bulletproofs-gadgets",
  "curve25519-dalek 3.1.0",
@@ -5507,7 +5507,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle-rpc"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -5524,7 +5524,7 @@ dependencies = [
 [[package]]
 name = "pallet-mixer"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "bencher",
  "bulletproofs-gadgets",
@@ -10001,7 +10001,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "04f8ab788026715fa63b31960869617cba39117e520eb415b0139543e325ab59"
 dependencies = [
  "cfg-if 0.1.10",
- "rand 0.3.23",
+ "rand 0.7.3",
  "static_assertions",
 ]
 
@@ -10643,7 +10643,7 @@ dependencies = [
 [[package]]
 name = "webb-currencies"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -10660,7 +10660,7 @@ dependencies = [
 [[package]]
 name = "webb-tokens"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "bencher",
  "frame-benchmarking",
@@ -10678,7 +10678,7 @@ dependencies = [
 [[package]]
 name = "webb-traits"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "frame-support",
  "funty",
@@ -10695,7 +10695,7 @@ dependencies = [
 [[package]]
 name = "webb-utilities"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#10e0772658237849c305c6b9a97fbc6fe9f8b59d"
+source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
 dependencies = [
  "frame-support",
  "funty",
