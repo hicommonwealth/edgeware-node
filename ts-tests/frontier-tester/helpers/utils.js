@@ -89,8 +89,8 @@ async function startEdgewareNode() {
     '--pruning=archive',
     '--no-telemetry',
     '--no-prometheus',
-    // '--tmp',
-    `--base-path=${basePath}`,
+    '--tmp',
+    // `--base-path=${basePath}`,
     '--force-authoring',
     '--alice',
     '--validator',
@@ -178,7 +178,7 @@ function describeWithEdgeware(title, cb) {
         context.web3.currentProvider.engine.stop();
       }
 
-      // console.log(`\x1b[31m Stopping RPC\x1b[0m`);
+      console.log(`\x1b[31m Stopping RPC\x1b[0m`);
       await new Promise((resolve) => {
         context.binary.on('exit', () => {
           // console.log('RPC STOPPED');

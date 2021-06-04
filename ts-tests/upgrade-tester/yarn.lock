@@ -37,10 +37,10 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
-"@edgeware/node-types@^3.5.1-erup-4":
-  version "3.5.1-erup-4"
-  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.5.1-erup-4.tgz#802ad24359546de58f02c79e88036eaa2ac2f1dc"
-  integrity sha512-10xPby539QLqsL543HljhBYnm8YvzU6dVWVWk4QkW/PKdPYsZY4MN7zZWRhertKl1HU3CibCgH0hJNWO8IjAsg==
+"@edgeware/node-types@3.6.0-erup-4.1":
+  version "3.6.0-erup-4.1"
+  resolved "https://registry.yarnpkg.com/@edgeware/node-types/-/node-types-3.6.0-erup-4.1.tgz#a651c91770f67aaddb128cb64b5ff9d09c4bf284"
+  integrity sha512-/plWyFDdOU5ZN9ePMI6EYQYaegnR2JOG4NNc9GmZBLO3/yuj+3UY44N73q5NDROEBSrqA859NJSvqGEbTGKbTQ==
 
 "@polkadot/api-derive@4.12.1":
   version "4.12.1"
