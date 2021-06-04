@@ -5,7 +5,7 @@ import { assert } from 'chai';
 const { convertToEvmAddress, convertToSubstrateAddress, describeWithEdgeware } = require('../helpers/utils.js');
 import BN from 'bn.js';
 import { spec } from '@edgeware/node-types';
-import { TypeRegistry } from '@polkadot/types';
+import { OverrideBundleType } from '@polkadot/types/types';
 
 describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
   let web3: Web3;
@@ -54,6 +54,8 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
       provider: new WsProvider(polkadotUrl),
       ...spec,
     });
+    const chainInfo = await api.rpc.state.getRuntimeVersion();
+    console.log(`API connected to chain ${chainInfo.specName.toString()}:${+chainInfo.specVersion}!`);
     const { ss58Format } = await api.rpc.system.properties();
     const substrateId = +ss58Format.unwrap();
 
@@ -65,7 +67,7 @@ describeWithEdgeware('Substrate <> EVM balances test', async (context) => {
   });
 
   after(async () => {
-    if (api) {
+    if (api && api.isConnected) {
       await api.disconnect();
     }
   });
