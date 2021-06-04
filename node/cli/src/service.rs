@@ -392,8 +392,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 			client.clone(),
 			backend.clone(),
 			frontier_backend.clone(),
-		)
-		.for_each(|()| futures::future::ready(())),
+		).for_each(|()| futures::future::ready(()))
 	);
 
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
@@ -425,7 +424,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 	// Spawn Frontier pending transactions maintenance task (as essential, otherwise
 	// we leak).
 	if let Some(pending_transactions) = pending_transactions {
-		const TRANSACTION_RETAIN_THRESHOLD: u64 = 5;
+		const TRANSACTION_RETAIN_THRESHOLD: u64 = 1000;
 		task_manager.spawn_essential_handle().spawn(
 			"frontier-pending-transactions",
 			EthTask::pending_transaction_task(Arc::clone(&client), pending_transactions, TRANSACTION_RETAIN_THRESHOLD),
