@@ -58,9 +58,8 @@ use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_transaction_pool::TransactionPool;
 use std::{
-	collections::{BTreeMap, HashMap},
-	str::FromStr,
-	sync::{Arc, Mutex},
+	collections::{BTreeMap},
+	sync::{Arc},
 	time::Duration,
 };
 use fc_rpc::EthTask;
@@ -79,11 +78,6 @@ use futures::StreamExt;
 /// RPC Client
 pub mod client;
 use client::RuntimeApiCollection;
-
-use sc_service::{TFullBackend, TFullClient};
-
-type FullClient<RuntimeApi, Executor> = TFullClient<Block, RuntimeApi, Executor>;
-type FullBackend = TFullBackend<Block>;
 
 /// Public io handler for exporting into other modules
 pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
@@ -339,17 +333,27 @@ where
 	io
 }
 
+/// Parameters for various rpc utilities
 pub struct RpcRequesters {
+	/// debug
 	pub debug: Option<DebugRequester>,
+	/// trace
 	pub trace: Option<TraceFilterCacheRequester>,
 }
 
+/// Parameters for various services to start
 pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
+	/// task manager
 	pub task_manager: &'a TaskManager,
+	/// substrate client
 	pub client: Arc<C>,
+	/// substrate backend
 	pub substrate_backend: Arc<BE>,
+	/// frontier backend
 	pub frontier_backend: Arc<fc_db::Backend<B>>,
+	/// pending txes
 	pub pending_transactions: PendingTransactions,
+	/// ethereum filter pool
 	pub filter_pool: Option<FilterPool>,
 }
 
