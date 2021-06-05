@@ -10,6 +10,7 @@ description = "Edgeware rpc"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
+futures = { version = "0.3.1", features = ["compat"] }
 jsonrpc-core = "15.0.0"
 jsonrpc-pubsub = "15.0.0"
 pallet-contracts-rpc = { version = "3.0" }
@@ -30,6 +31,7 @@ sp-block-builder = { version = "3.0" }
 sp-blockchain = { version = "3.0" }
 sp-consensus = { version = "0.9" }
 sp-consensus-aura = { version = "0.9" }
+sp-core = { version = "3.0" }
 sp-offchain = { version = "3.0" }
 sp-runtime = { version = "3.0" }
 sp-storage = { version = "3.0" }
@@ -38,12 +40,14 @@ sp-transaction-pool = { version = "3.0" }
 sc-transaction-pool = { version = "3.0" }
 sc-transaction-graph = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
+tokio = { version = "0.2.13", features = ["macros", "sync"] }
 
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4" }
 
@@ -56,3 +60,6 @@ edgeware-rpc-primitives-txpool = { path = "../txpool" }
 edgeware-rpc-debug = { path = "../../client/rpc/debug" }
 edgeware-rpc-primitives-debug = { path = "../debug" }
 edgeware-rpc-trace = { path = "../../client/rpc/trace" }
+
+[features]
+std = []

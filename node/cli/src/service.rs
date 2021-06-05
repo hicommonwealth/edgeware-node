@@ -20,18 +20,18 @@
 
 use crate::Cli;
 use edgeware_executor::Executor;
-use edgeware_opts::{EthApi as EthApiCmd, RpcParams};
+use edgeware_opts::{EthApi as EthApiCmd, RpcConfig};
 use edgeware_primitives::Block;
-use edgeware_rpc_debug::DebugHandler;
+
 use edgeware_runtime::RuntimeApi;
 #[cfg(feature = "frontier-block-import")]
 use fc_consensus::FrontierBlockImport;
-use fc_mapping_sync::MappingSyncWorker;
-use fc_rpc::EthTask;
+
+
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
 use futures::prelude::*;
 use sc_cli::SubstrateCli;
-use sc_client_api::{BlockchainEvents, ExecutorProvider, RemoteBackend};
+use sc_client_api::{ExecutorProvider, RemoteBackend};
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_network::{Event, NetworkService};
 use sc_service::{config::Configuration, error::Error as ServiceError, BasePath, ChainSpec, RpcHandlers, TaskManager};
@@ -45,7 +45,7 @@ use std::{
 	sync::{Arc, Mutex},
 	time::Duration,
 };
-use tokio::sync::Semaphore;
+
 
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
@@ -236,12 +236,6 @@ pub fn new_partial(
 
 /// Creates a full service from the configuration.
 pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase, ServiceError> {
-	let rpc_params = RpcParams {
-		ethapi_max_permits: cli.run.ethapi_max_permits,
-		ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
-		ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,
-		max_past_logs: cli.run.max_past_logs,
-	};
 	let ethapi: Vec<_> = cli
 		.run
 		.ethapi
@@ -249,6 +243,14 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		.map(|v| EthApiCmd::from_str(&v.to_string()))
 		.flatten()
 		.collect();
+
+	let rpc_config = RpcConfig {
+		ethapi: ethapi.clone(),
+		ethapi_max_permits: cli.run.ethapi_max_permits,
+		ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
+		ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,
+		max_past_logs: cli.run.max_past_logs,
+	};
 
 	let enable_dev_signer = cli.run.enable_dev_signer;
 	let target_gas_price = U256::from(cli.run.target_gas_price);
@@ -290,6 +292,18 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 	let enable_grandpa = !config.disable_grandpa;
 	let prometheus_registry = config.prometheus_registry().cloned();
 
+	let spawned_requesters = edgeware_rpc::spawn_tasks(
+		&rpc_config,
+		edgeware_rpc::SpawnTasksParams {
+			task_manager: &task_manager,
+			client: client.clone(),
+			substrate_backend: backend.clone(),
+			frontier_backend: frontier_backend.clone(),
+			pending_transactions: pending_transactions.clone(),
+			filter_pool: filter_pool.clone(),
+		},
+	);
+
 	let (rpc_extensions_builder, rpc_setup) = {
 		let justification_stream = grandpa_link.justification_stream();
 		let shared_authority_set = grandpa_link.shared_authority_set().clone();
@@ -307,48 +321,12 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		let pending = pending_transactions.clone();
 		let filter_pool = filter_pool.clone();
 		let frontier_backend = frontier_backend.clone();
-		let max_past_logs = cli.run.max_past_logs;
+		let max_past_logs = rpc_config.max_past_logs;
 
 		let is_authority = config.role.clone().is_authority();
 		let _keystore = keystore_container.sync_keystore();
 		let subscription_executor = sc_rpc::SubscriptionTaskExecutor::new(task_manager.spawn_handle());
 
-		let permit_pool = Arc::new(Semaphore::new(rpc_params.ethapi_max_permits as usize));
-
-		let (trace_filter_task, trace_filter_requester) = if ethapi.contains(&EthApiCmd::Trace) {
-			let (trace_filter_task, trace_filter_requester) = edgeware_rpc_trace::CacheTask::create(
-				Arc::clone(&client),
-				Arc::clone(&backend),
-				Duration::from_secs(rpc_params.ethapi_trace_cache_duration),
-				Arc::clone(&permit_pool),
-			);
-			(Some(trace_filter_task), Some(trace_filter_requester))
-		} else {
-			(None, None)
-		};
-
-		let (debug_task, debug_requester) = if ethapi.contains(&EthApiCmd::Debug) {
-			let (debug_task, debug_requester) = DebugHandler::task(
-				Arc::clone(&client),
-				Arc::clone(&backend),
-				Arc::clone(&frontier_backend),
-				Arc::clone(&permit_pool),
-			);
-			(Some(debug_task), Some(debug_requester))
-		} else {
-			(None, None)
-		};
-		// Spawn trace_filter cache task if enabled.
-		if let Some(trace_filter_task) = trace_filter_task {
-			task_manager
-				.spawn_essential_handle()
-				.spawn("trace-filter-cache", trace_filter_task);
-		}
-
-		// Spawn debug task if enabled.
-		if let Some(debug_task) = debug_task {
-			task_manager.spawn_essential_handle().spawn("ethapi-debug", debug_task);
-		}
 		let rpc_extensions_builder = move |deny_unsafe, _| {
 			let deps = edgeware_rpc::FullDeps {
 				client: client.clone(),
@@ -373,9 +351,9 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 				backend: frontier_backend.clone(),
 				max_past_logs,
 				ethapi_cmd: ethapi.clone(),
-				debug_requester: debug_requester.clone(),
-				trace_filter_requester: trace_filter_requester.clone(),
-				trace_filter_max_count: rpc_params.ethapi_trace_max_count,
+				debug_requester: spawned_requesters.debug.clone(),
+				trace_filter_requester: spawned_requesters.trace.clone(),
+				trace_filter_max_count: rpc_config.ethapi_trace_max_count,
 			};
 
 			edgeware_rpc::create_full(deps, subscription_executor.clone())
@@ -383,17 +361,6 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 
 		(rpc_extensions_builder, rpc_setup)
 	};
-
-	task_manager.spawn_essential_handle().spawn(
-		"frontier-mapping-sync-worker",
-		MappingSyncWorker::new(
-			client.import_notification_stream(),
-			Duration::new(6, 0),
-			client.clone(),
-			backend.clone(),
-			frontier_backend.clone(),
-		).for_each(|()| futures::future::ready(()))
-	);
 
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config,
@@ -410,26 +377,6 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		system_rpc_tx,
 		telemetry: telemetry.as_mut(),
 	})?;
-
-	// Spawn Frontier EthFilterApi maintenance task.
-	if let Some(filter_pool) = filter_pool {
-		// Each filter is allowed to stay in the pool for 100 blocks.
-		const FILTER_RETAIN_THRESHOLD: u64 = 100;
-		task_manager.spawn_essential_handle().spawn(
-			"frontier-filter-pool",
-			EthTask::filter_pool_task(Arc::clone(&client), filter_pool, FILTER_RETAIN_THRESHOLD),
-		);
-	}
-
-	// Spawn Frontier pending transactions maintenance task (as essential, otherwise
-	// we leak).
-	if let Some(pending_transactions) = pending_transactions {
-		const TRANSACTION_RETAIN_THRESHOLD: u64 = 1000;
-		task_manager.spawn_essential_handle().spawn(
-			"frontier-pending-transactions",
-			EthTask::pending_transaction_task(Arc::clone(&client), pending_transactions, TRANSACTION_RETAIN_THRESHOLD),
-		);
-	}
 
 	let (shared_voter_state, _finality_proof_provider) = rpc_setup;
 
