@@ -16,6 +16,7 @@
 
 use super::*;
 use crate::mock::*;
+use mock::{Event, last_event};
 
 use frame_support::traits::OnFinalize;
 
@@ -45,50 +46,102 @@ fn basic_setup_works() {
 fn setting_treasury_block_reward() {
 	new_test_ext().execute_with(|| {
 		// Initial Era and session
+		// Minting interval is 1
 		let treasury_address = Treasury::account_id();
+
+		// 95 EDG to block 1
 		System::set_block_number(1);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(1);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 9500000, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(9500000, 1, treasury_address.clone())
+                ));
+
+		// 95 EDG to block 2
 		System::set_block_number(2);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(2);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000000, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000000, 2, treasury_address.clone())
+                ));
 
+		// Reduce minting interval to 2
 		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(), 95).unwrap();
 		<TreasuryReward>::set_minting_interval(frame_system::RawOrigin::Root.into(), 2).unwrap();
 
+		// 0 EDG to block 3
 		System::set_block_number(3);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(3);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000000, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000000, 2, treasury_address.clone())
+                ));
+
+		// 95 EDG to block 4
 		System::set_block_number(4);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(4);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone())
+                ));
 
+		// Reduce payout to 0
 		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(), 0).unwrap();
 
+		// 0 EDG to block 5
 		System::set_block_number(5);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(5);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone())
+                ));
+
+		// 0 EDG to block 6
 		System::set_block_number(6);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(6);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone())
+                ));
 
+		// Increase payout to 105
 		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(), 105).unwrap();
 
+		// 0 EDG to block 7
 		System::set_block_number(7);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(7);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone())
+                ));
+
+		// 105 EDG to block 8
 		System::set_block_number(8);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(8);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000200, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000200, 8, treasury_address.clone())
+                ));
 
+		// Reduce payout to 10
+		// Set minting interval to every block
 		<TreasuryReward>::set_minting_interval(frame_system::RawOrigin::Root.into(), 1).unwrap();
 		<TreasuryReward>::set_current_payout(frame_system::RawOrigin::Root.into(), 10).unwrap();
 
+		// 10 EDG to block 9
 		System::set_block_number(9);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(9);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000210, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000210, 9, treasury_address.clone())
+                ));
+
+		// 10 EDG to block 10
 		System::set_block_number(10);
 		<TreasuryReward as OnFinalize<u64>>::on_finalize(10);
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000220, true);
+		assert_eq!(last_event(), Event::treasury_reward(
+                    crate::Event::TreasuryMinting(19000220, 10, treasury_address.clone())
+                ));
 	});
 }

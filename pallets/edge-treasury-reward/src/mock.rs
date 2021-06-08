@@ -148,3 +148,10 @@ pub fn new_test_ext() -> sp_io::TestExternalities {
 
 	t.into()
 }
+
+pub fn last_event() -> Event {
+	frame_system::Pallet::<Test>::events()
+		.pop()
+		.expect("Event expected")
+		.event
+}
