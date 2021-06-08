@@ -97,6 +97,7 @@ pub mod pallet {
 		fn on_finalize(_n: T::BlockNumber) {
 			if <frame_system::Pallet<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
+				if reward.is_zero() { return; }
 				<T as Config>::Currency::deposit_creating(&<pallet_treasury::Pallet<T>>::account_id(), reward);
 				Self::deposit_event(Event::TreasuryMinting(
 					<pallet_balances::Pallet<T>>::free_balance(<pallet_treasury::Pallet<T>>::account_id()),
