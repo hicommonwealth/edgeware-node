@@ -1,16 +1,26 @@
 [workspace]
 members = [
-	"modules/edge-treasury-reward",
-	"modules/chainbridge",
-	"modules/edge-chainbridge",
+	"client/rpc/debug",
+	"client/rpc/trace",
+	"client/rpc/txpool",
+	"client/rpc-core/debug",
+	"client/rpc-core/trace",
+	"client/rpc-core/txpool",
+	"pallets/edge-treasury-reward",
+	"pallets/orml-nft",
+	"pallets/nft",
 	"node/cli",
+	"node/opts",
 	"node/executor",
+	"node/evm_tracer",
 	"node/primitives",
+	"node/opts",
 	"node/rpc",
 	"node/rpc-client",
 	"node/runtime",
 	"node/runtime-interface",
-	"node/testing",
+	"node/debug",
+	"node/txpool",
 ]
 exclude = ["vendor"]
 
@@ -66,157 +76,159 @@ x25519-dalek = { opt-level = 3 }
 yamux = { opt-level = 3 }
 zeroize = { opt-level = 3 }
 
-# Generated with: `cargo lock -s | grep substrate.git | cut -d' ' -f2 | awk '{print $0, "= { git = \"https://github.com/paritytech/substrate.git\", rev = \"b2a50198d3fa71959c77d22edb5fdb8c1e74006c\" }"}'`
+# Generated with: `cargo lock -s | grep substrate.git | cut -d' ' -f2 | awk '{print $0, "= { git = \"https://github.com/webb-tools/substrate.git\", rev = \"22f09c602704aeee2b59b14f427f73f6cb8b5e2f\" }"}'`
 # Make sure to have cargo-lock installed with: `cargo install cargo-lock --features=cli`
 
 [patch.crates-io]
 # frontier deps
-fc-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-fc-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-fc-rpc-core = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-fp-consensus = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-fp-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-fp-rpc = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-pallet-ethereum = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-pallet-evm = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-pallet-evm-precompile-modexp = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
-pallet-evm-precompile-simple = { git = "https://github.com/hicommonwealth/frontier.git", rev = "d3179acb5a111d58af6c48a12588ecd38750a9bb" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+fc-rpc-core = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+fp-consensus = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+fp-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+pallet-dynamic-fee = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
+pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier.git", branch = "erup-4-minimal-changes" }
 
 # substrate deps
-fork-tree = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-benchmarking = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-executive = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-metadata = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-support = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-support-procedural = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-support-procedural-tools = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-support-procedural-tools-derive = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-system = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-frame-system-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-aura = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-balances = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-bounties = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-collective = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-contracts = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-contracts-primitives = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-contracts-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-contracts-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-contracts-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-democracy = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-grandpa = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-identity = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-im-online = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-indices = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-multisig = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-offences = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-proxy = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-randomness-collective-flip = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-recovery = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-scheduler = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-session = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-staking = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-staking-reward-curve = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-sudo = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-timestamp = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-tips = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-transaction-payment = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-treasury = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-utility = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-pallet-vesting = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-basic-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-block-builder = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-chain-spec = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-chain-spec-derive = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-cli = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-cli-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-client-api = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-client-db = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-consensus = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-consensus-aura = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-consensus-babe = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-consensus-epochs = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-consensus-slots = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-consensus-uncles = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-executor = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-executor-common = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-executor-wasmi = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-executor-wasmtime = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-finality-grandpa-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-informant = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-keystore = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-light = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-network = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-network-gossip = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-offchain = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-peerset = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-proposer-metrics = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-rpc-api = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-rpc-server = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-service = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-state-db = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-telemetry = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-tracing = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-transaction-graph = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-allocator = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-api = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-api-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-application-crypto = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-arithmetic = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-authority-discovery = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-authorship = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-block-builder = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-chain-spec = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-consensus = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-consensus-aura = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-consensus-babe = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-consensus-slots = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-consensus-vrf = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-core = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-database = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-debug-derive = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-externalities = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-finality-grandpa = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-inherents = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-io = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-keyring = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-keystore = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-npos-elections = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-npos-elections-compact = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-offchain = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-panic-handler = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-rpc = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-runtime = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-runtime-interface = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-runtime-interface-proc-macro = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-sandbox = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-serializer = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-session = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-staking = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-state-machine = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-std = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-storage = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-tasks = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-timestamp = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-tracing = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-trie = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-utils = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-version = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-sp-wasm-interface = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-substrate-browser-utils = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-substrate-frame-cli = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-substrate-prometheus-endpoint = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
-substrate-test-client = { git = "https://github.com/paritytech/substrate.git", rev = "b2a50198d3fa71959c77d22edb5fdb8c1e74006c" }
+sc-finality-grandpa-warp-sync = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+fork-tree = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-benchmarking = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-benchmarking-cli = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-executive = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-metadata = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-support = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-support-procedural = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-support-procedural-tools = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-support-procedural-tools-derive = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-system = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+frame-system-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-assets = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-aura = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-authority-discovery = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-authorship = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-balances = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-bounties = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-collective = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-contracts = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-contracts-primitives = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-contracts-proc-macro = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-contracts-rpc = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-contracts-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-democracy = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-elections-phragmen = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-election-provider-multi-phase = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-grandpa = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-identity = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-im-online = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-indices = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-multisig = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-offences = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-proxy = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-randomness-collective-flip = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-recovery = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-scheduler = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-session = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-staking = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-staking-reward-curve = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-sudo = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-timestamp = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-tips = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-transaction-payment = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-transaction-payment-rpc = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-treasury = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-utility = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+pallet-vesting = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-authority-discovery = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-basic-authorship = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-block-builder = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-chain-spec = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-chain-spec-derive = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-cli = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-client-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-client-db = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-consensus = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-consensus-aura = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-consensus-babe = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-consensus-epochs = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-consensus-slots = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-consensus-uncles = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-executor = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-executor-common = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-executor-wasmi = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-executor-wasmtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-finality-grandpa = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-finality-grandpa-rpc = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-informant = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-keystore = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-light = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-network = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-network-gossip = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-offchain = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-peerset = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-proposer-metrics = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-rpc = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-rpc-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-rpc-server = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-service = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-state-db = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-telemetry = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-tracing = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-transaction-graph = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sc-transaction-pool = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-allocator = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-api = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-api-proc-macro = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-application-crypto = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-arithmetic = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-authority-discovery = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-authorship = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-block-builder = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-blockchain = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-chain-spec = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-consensus = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-consensus-aura = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-consensus-babe = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-consensus-slots = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-consensus-vrf = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-core = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-database = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-debug-derive = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-externalities = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-finality-grandpa = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-inherents = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-io = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-keyring = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-keystore = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-npos-elections = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-npos-elections-compact = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-offchain = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-panic-handler = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-rpc = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-runtime-interface = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-runtime-interface-proc-macro = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-sandbox = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-serializer = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-session = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-staking = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-state-machine = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-std = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-storage = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-tasks = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-timestamp = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-tracing = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-transaction-pool = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-trie = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-utils = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-version = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+sp-wasm-interface = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+substrate-browser-utils = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+substrate-frame-cli = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+substrate-frame-rpc-system = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }
+substrate-prometheus-endpoint = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4" }

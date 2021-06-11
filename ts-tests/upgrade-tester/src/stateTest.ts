@@ -12,7 +12,7 @@ abstract class StateTest {
     // the publicly-displayable name of the test (usually set in the `super` call)
     public readonly name: string,
   ) {
-    this.accounts = createTestPairs();
+    this.accounts = createTestPairs({ ss58Format: 7 });
   }
 
   // checks if the test has completed

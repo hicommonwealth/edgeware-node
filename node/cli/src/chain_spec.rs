@@ -16,13 +16,10 @@
 
 //! Substrate chain configurations.
 
-use edgeware_runtime::constants::currency::*;
-use edgeware_runtime::Block;
 use edgeware_runtime::{
-	AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, CouncilConfig,
-	DemocracyConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
-	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig,
-	TreasuryRewardConfig, VestingConfig, wasm_binary_unwrap, EVMConfig,
+	constants::currency::*, wasm_binary_unwrap, AuraConfig, AuthorityDiscoveryConfig, BalancesConfig, Block,
+	CouncilConfig, DemocracyConfig, EVMConfig, GrandpaConfig, ImOnlineConfig, IndicesConfig, SessionConfig,
+	SessionKeys, StakerStatus, StakingConfig, SudoConfig, SystemConfig, TreasuryRewardConfig, VestingConfig,
 };
 use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
@@ -31,7 +28,7 @@ use sc_telemetry::TelemetryEndpoints;
 use serde::{Deserialize, Serialize};
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_aura::ed25519::AuthorityId as AuraId;
-use sp_core::{sr25519, Pair, Public, U256, H160,};
+use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_finality_grandpa::AuthorityId as GrandpaId;
 use sp_runtime::{
 	traits::{IdentifyAccount, One, Verify},
@@ -39,16 +36,11 @@ use sp_runtime::{
 };
 
 pub use edgeware_primitives::{AccountId, Balance, BlockNumber, Signature};
-pub use edgeware_runtime::constants::time::*;
-pub use edgeware_runtime::GenesisConfig;
+pub use edgeware_runtime::{constants::time::*, GenesisConfig};
 
 use hex::FromHex;
 use serde_json::Result;
-use std::fs::File;
-use std::io::Read;
-use std::path::Path;
-use std::collections::BTreeMap;
-use std::str::FromStr;
+use std::{collections::BTreeMap, fs::File, io::Read, path::Path, str::FromStr};
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -90,7 +82,7 @@ pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 pub fn edgeware_mainnet_official() -> ChainSpec {
 	match ChainSpec::from_json_bytes(&include_bytes!("../res/mainnet.chainspec.json")[..]) {
 		Ok(spec) => spec,
-		Err(e) => panic!(e),
+		Err(e) => panic!("{}", e),
 	}
 }
 
@@ -98,7 +90,7 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 pub fn edgeware_beresheet_official() -> ChainSpec {
 	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheet.chainspec.json")[..]) {
 		Ok(spec) => spec,
-		Err(e) => panic!(e),
+		Err(e) => panic!("{}", e),
 	}
 }
 
@@ -132,7 +124,9 @@ where
 }
 
 /// Helper function to generate stash, controller and session key from seed
-pub fn get_authority_keys_from_seed(seed: &str) -> (
+pub fn get_authority_keys_from_seed(
+	seed: &str,
+) -> (
 	AccountId,
 	AccountId,
 	GrandpaId,
@@ -152,7 +146,14 @@ pub fn get_authority_keys_from_seed(seed: &str) -> (
 
 /// Helper function to create GenesisConfig for testing
 pub fn testnet_genesis(
-	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId, ImOnlineId, AuthorityDiscoveryId)>,
+	initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		GrandpaId,
+		AuraId,
+		ImOnlineId,
+		AuthorityDiscoveryId,
+	)>,
 	_root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	_enable_println: bool,
@@ -162,14 +163,23 @@ pub fn testnet_genesis(
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
+	evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
+		nonce: 0.into(),
+		balance: U256::from(123456_123_000_000_000_000_000u128),
+		storage: BTreeMap::new(),
+		code: vec![],
+	});
+	// account used in frontier
 	evm_accounts.insert(
-		alice_evm_account_id,
+		H160::from_str("6be02d1d3665660d22ff9624b7be0551ee1ac91b")
+			.expect("internal H160 is valid; qed"),
 		pallet_evm::GenesisAccount {
-			nonce: 0.into(),
-			balance: U256::from(123456_123_000_000_000_000_000u128),
-			storage: BTreeMap::new(),
-			code: vec![],
-		},
+			balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
+				.expect("internal U256 is valid; qed"),
+			code: Default::default(),
+			nonce: Default::default(),
+			storage: Default::default(),
+		}
 	);
 
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
@@ -199,10 +209,7 @@ pub fn testnet_genesis(
 	});
 
 	const STASH: Balance = 100000000 * DOLLARS;
-	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts
-		.iter()
-		.map(|k| (k.clone(), STASH))
-		.collect();
+	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
 
 	// add founders and balances to endowed if not already in list
 	founder_allocation.iter().chain(balances.iter()).for_each(|x| {
@@ -212,15 +219,15 @@ pub fn testnet_genesis(
 	});
 
 	GenesisConfig {
-		frame_system: Some(SystemConfig {
+		frame_system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
 			changes_trie_config: Default::default(),
-		}),
-		pallet_balances: Some(BalancesConfig {
+		},
+		pallet_balances: BalancesConfig {
 			balances: endowed_balances,
-		}),
-		pallet_indices: Some(IndicesConfig { indices: vec![] }),
-		pallet_session: Some(SessionConfig {
+		},
+		pallet_indices: IndicesConfig { indices: vec![] },
+		pallet_session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
@@ -231,8 +238,8 @@ pub fn testnet_genesis(
 					)
 				})
 				.collect::<Vec<_>>(),
-		}),
-		pallet_staking: Some(StakingConfig {
+		},
+		pallet_staking: StakingConfig {
 			validator_count: 20,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities
@@ -242,31 +249,27 @@ pub fn testnet_genesis(
 			invulnerables: [].to_vec(),
 			slash_reward_fraction: Perbill::from_percent(10),
 			..Default::default()
-		}),
-		pallet_democracy: Some(DemocracyConfig::default()),
-		pallet_collective_Instance1: Some(CouncilConfig {
+		},
+		pallet_democracy: DemocracyConfig::default(),
+		pallet_collective_Instance1: CouncilConfig {
 			members: crate::testnet_fixtures::get_testnet_election_members(),
 			phantom: Default::default(),
-		}),
-		pallet_aura: Some(AuraConfig {
-			authorities: vec![],
-		}),
-		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
-		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
-		pallet_grandpa: Some(GrandpaConfig {
-			authorities: vec![],
-		}),
-		pallet_treasury: Some(Default::default()),
-		pallet_elections_phragmen: Some(Default::default()),
-		pallet_sudo: Some(SudoConfig { key: _root_key }),
-		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(EVMConfig { accounts: evm_accounts }),
-		pallet_contracts: Some(Default::default()),
-		pallet_ethereum: Some(Default::default()),
-		treasury_reward: Some(TreasuryRewardConfig {
+		},
+		pallet_aura: AuraConfig { authorities: vec![] },
+		pallet_im_online: ImOnlineConfig { keys: vec![] },
+		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
+		pallet_grandpa: GrandpaConfig { authorities: vec![] },
+		pallet_treasury: Default::default(),
+		pallet_elections_phragmen: Default::default(),
+		pallet_sudo: SudoConfig { key: _root_key },
+		pallet_vesting: VestingConfig { vesting },
+		pallet_ethereum: Default::default(),
+		pallet_evm: EVMConfig { accounts: evm_accounts },
+		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
-		}),
+		},
+		orml_nft: Default::default(),
 	}
 }
 
@@ -460,19 +463,19 @@ pub fn mainnet_genesis(
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 ) -> GenesisConfig {
 	GenesisConfig {
-		frame_system: Some(SystemConfig {
+		frame_system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
 			changes_trie_config: Default::default(),
-		}),
-		pallet_balances: Some(BalancesConfig {
+		},
+		pallet_balances: BalancesConfig {
 			balances: founder_allocation
 				.iter()
 				.map(|x| (x.0.clone(), x.1.clone()))
 				.chain(balances.clone())
 				.collect(),
-		}),
-		pallet_indices: Some(IndicesConfig { indices: vec![] }),
-		pallet_session: Some(SessionConfig {
+		},
+		pallet_indices: IndicesConfig { indices: vec![] },
+		pallet_session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
@@ -483,51 +486,40 @@ pub fn mainnet_genesis(
 					)
 				})
 				.collect::<Vec<_>>(),
-		}),
-		pallet_staking: Some(StakingConfig {
+		},
+		pallet_staking: StakingConfig {
 			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities
 				.iter()
-				.map(|x| {
-					(
-						x.0.clone(),
-						x.1.clone(),
-						x.2.clone(),
-						StakerStatus::Validator,
-					)
-				})
+				.map(|x| (x.0.clone(), x.1.clone(), x.2.clone(), StakerStatus::Validator))
 				.collect(),
 			invulnerables: vec![],
 			slash_reward_fraction: Perbill::from_percent(10),
 			..Default::default()
-		}),
-		pallet_democracy: Some(DemocracyConfig::default()),
-		pallet_collective_Instance1: Some(CouncilConfig {
+		},
+		pallet_democracy: DemocracyConfig::default(),
+		pallet_collective_Instance1: CouncilConfig {
 			members: crate::mainnet_fixtures::get_mainnet_election_members(),
 			phantom: Default::default(),
-		}),
-		pallet_aura: Some(AuraConfig {
-			authorities: vec![],
-		}),
-		pallet_im_online: Some(ImOnlineConfig { keys: vec![] }),
-		pallet_authority_discovery: Some(AuthorityDiscoveryConfig { keys: vec![] }),
-		pallet_grandpa: Some(GrandpaConfig {
-			authorities: vec![],
-		}),
-		pallet_treasury: Some(Default::default()),
-		pallet_elections_phragmen: Some(Default::default()),
-		pallet_sudo: Some(SudoConfig {
+		},
+		pallet_aura: AuraConfig { authorities: vec![] },
+		pallet_im_online: ImOnlineConfig { keys: vec![] },
+		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
+		pallet_grandpa: GrandpaConfig { authorities: vec![] },
+		pallet_treasury: Default::default(),
+		pallet_elections_phragmen: Default::default(),
+		pallet_sudo: SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
-		}),
-		pallet_vesting: Some(VestingConfig { vesting: vesting }),
-		pallet_evm: Some(Default::default()),
-		pallet_contracts: Some(Default::default()),
-		pallet_ethereum: Some(Default::default()),
-		treasury_reward: Some(TreasuryRewardConfig {
+		},
+		pallet_vesting: VestingConfig { vesting },
+		pallet_ethereum: Default::default(),
+		pallet_evm: Default::default(),
+		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
-		}),
+		},
+		orml_nft: Default::default(),
 	}
 }
 

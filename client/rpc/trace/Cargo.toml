@@ -1,0 +1,42 @@
+[package]
+name = "edgeware-rpc-trace"
+version = '0.6.0'
+authors = ['PureStake']
+edition = '2018'
+homepage = 'https://edgewa.re'
+license = 'GPL-3.0-only'
+repository = 'https://github.com/PureStake/moonbeam/'
+
+[dependencies]
+# Utils
+serde = { version = "1.0", features = ["derive"] }
+sha3 = "0.8"
+ethereum-types = "0.11.0"
+ethereum = { version = "0.7.1", features = ["with-codec"] }
+
+# Async and logs
+tokio = { version = "0.2.13", features = ["sync", "time"] }
+futures = { version = "0.3", features = ["compat"] }
+tracing = "0.1.25"
+
+# Primitives
+sp-runtime = {version = "*" }
+sp-utils = {version = "*" }
+sp-api = {version = "*" }
+sp-io = {version = "*" }
+sp-std = {version = "*" }
+sp-blockchain = {version = "*" }
+sp-transaction-pool = {version = "*" }
+sp-block-builder = {version = "*" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+edgeware-rpc-primitives-debug = { path = "../../../node/debug" }
+
+# Client and RPC
+jsonrpc-core = "15.0.0"
+sc-client-api = {version = "*" }
+sc-network = {version = "*" }
+sc-transaction-graph = {version = "*" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+edgeware-rpc-core-trace = { path = "../../rpc-core/trace" }

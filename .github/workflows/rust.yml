@@ -1,0 +1,36 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: 'Run tests'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Init
+      run: |
+        scripts/init-ci.sh
+        cargo --version
+        rustc --version
+        cargo +$WASM_BUILD_TOOLCHAIN --version
+        rustc +$WASM_BUILD_TOOLCHAIN --version
+      env:
+        WASM_BUILD_TOOLCHAIN: nightly-2021-03-15
+    - name: Cache Cargo
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          ~/.cargo/bin
+          target
+        key: cargo-cache
+    - name: Build (with no-reaping)
+      run: cargo build --release --features no-reaping
+    - name: Run tests
+      run: scripts/test.sh

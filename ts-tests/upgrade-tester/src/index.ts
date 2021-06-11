@@ -6,8 +6,8 @@ import { factory, formatFilename } from './logging';
 const log = factory.getLogger(formatFilename(__filename));
 
 const CHAINSPEC = `${__dirname}/scripts/forker-data/fork.json`;
-// const BINARY_PATH = '../../../edgeware-node-3.1.0/target/release/edgeware';
-const BINARY_PATH = '../../target/release/edgeware';
+const BINARY_PATH = '../../../../edgeware-node/target/release/edgeware';
+// const BINARY_PATH = '../../target/release/edgeware';
 const CHAIN_BASE_PATH = `${__dirname}/../db`;
 const ACCOUNTS = [ '//Alice' ];
 const SS58_PREFIX = 7; // edgeware ss58
@@ -26,12 +26,12 @@ async function main() {
   // TODO: make this a part of the arg initialization
   const tests: StateTest[] = [];
   tests.push(
-    new ((await import('./tests/staking')).default)(),
-    new ((await import('./tests/identity')).default)(),
-    new ((await import('./tests/democracy')).default)(),
+    // new ((await import('./tests/staking')).default)(),
+    // new ((await import('./tests/identity')).default)(),
+    // new ((await import('./tests/democracy')).default)(),
     new ((await import('./tests/council')).default)(),
-    new ((await import('./tests/treasury')).default)(),
-    new ((await import('./tests/storage')).default)(),
+    // new ((await import('./tests/treasury')).default)(),
+    // new ((await import('./tests/storage')).default)(),
   );
 
   // construct tester

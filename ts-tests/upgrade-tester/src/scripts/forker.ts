@@ -10,7 +10,7 @@ import { execFileSync, execSync } from 'child_process';
 
 // input paths
 const binaryPath = '../../target/release/edgeware';
-const wasmPath = '../../../edgeware-node-3.1.0/edgeware_runtime.wasm';
+const wasmPath = '../../../../edgeware-node/edgeware_runtime.wasm';
 
 // output paths
 const outputDir = path.join(__dirname, 'forker-data');

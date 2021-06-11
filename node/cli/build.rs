@@ -1,18 +1,20 @@
-// Copyright 2018-2020 Commonwealth Labs, Inc.
-// This file is part of Edgeware.
+// This file is part of Substrate.
 
-// Edgeware is free software: you can redistribute it and/or modify
+// Copyright (C) 2017-2021 Parity Technologies (UK) Ltd.
+// SPDX-License-Identifier: GPL-3.0-or-later WITH Classpath-exception-2.0
+
+// This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 
-// Edgeware is distributed in the hope that it will be useful,
+// This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 // GNU General Public License for more details.
 
 // You should have received a copy of the GNU General Public License
-// along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
+// along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 fn main() {
 	#[cfg(feature = "cli")]
@@ -23,11 +25,14 @@ fn main() {
 mod cli {
 	include!("src/cli.rs");
 
-	use std::{fs, env, path::Path};
+	#[cfg(feature = "cli-completion")]
 	use sc_cli::structopt::clap::Shell;
+	#[cfg(feature = "cli-completion")]
+	use std::{env, fs, path::Path};
 	use substrate_build_script_utils::{generate_cargo_keys, rerun_if_git_head_changed};
 
 	pub fn main() {
+		#[cfg(feature = "cli-completion")]
 		build_shell_completion();
 		generate_cargo_keys();
 
@@ -36,6 +41,7 @@ mod cli {
 
 	/// Build shell completion scripts for all known shells
 	/// Full list in https://github.com/kbknapp/clap-rs/blob/e9d0562a1dc5dfe731ed7c767e6cee0af08f0cf9/src/app/parser.rs#L123
+	#[cfg(feature = "cli-completion")]
 	fn build_shell_completion() {
 		for shell in &[Shell::Bash, Shell::Fish, Shell::Zsh, Shell::Elvish, Shell::PowerShell] {
 			build_completion(shell);
@@ -43,19 +49,23 @@ mod cli {
 	}
 
 	/// Build the shell auto-completion for a given Shell
+	#[cfg(feature = "cli-completion")]
 	fn build_completion(shell: &Shell) {
 		let outdir = match env::var_os("OUT_DIR") {
 			None => return,
 			Some(dir) => dir,
 		};
 		let path = Path::new(&outdir)
-			.parent().unwrap()
-			.parent().unwrap()
-			.parent().unwrap()
+			.parent()
+			.unwrap()
+			.parent()
+			.unwrap()
+			.parent()
+			.unwrap()
 			.join("completion-scripts");
 
 		fs::create_dir(&path).ok();
 
-		Cli::clap().gen_completions("edgeware-node", *shell, &path);
+		Cli::clap().gen_completions("substrate-node", *shell, &path);
 	}
 }

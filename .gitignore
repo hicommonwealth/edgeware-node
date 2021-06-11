@@ -22,3 +22,6 @@ forker-data
 beresheet-state.json
 build
 *yalc*
+
+# IDEs
+.vim

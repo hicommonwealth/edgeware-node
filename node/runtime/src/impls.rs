@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Some configurable implementations as associated type for the substrate runtime.
+//! Some configurable implementations as associated type for the substrate
+//! runtime.
 
-use frame_support::traits::{OnUnbalanced, Currency};
-use crate::{Balances, Authorship, NegativeImbalance};
+use crate::{Authorship, Balances, NegativeImbalance};
+use frame_support::traits::{Currency, OnUnbalanced};
 
 pub struct Author;
 impl OnUnbalanced<NegativeImbalance> for Author {

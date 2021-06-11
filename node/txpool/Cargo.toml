@@ -1,0 +1,26 @@
+[package]
+name = "edgeware-rpc-primitives-txpool"
+version = '0.1.0'
+authors = ['PureStake']
+edition = '2018'
+homepage = 'https://edgewa.re'
+license = 'GPL-3.0-only'
+repository = 'https://github.com/hicommonwealth/edgeware-node/'
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false }
+ethereum = { version = "0.7.1", default-features = false, features = ["with-codec"] }
+sp-runtime = { version = "3.0", default-features = false }
+sp-api = { version = "3.0", default-features = false }
+sp-io = { version = "3.0", default-features = false }
+sp-std = { version = "3.0", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"sp-api/std",
+	"sp-runtime/std",
+	"sp-io/std",
+	"sp-std/std",
+	"ethereum/std",
+]

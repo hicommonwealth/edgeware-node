@@ -18,48 +18,48 @@ use sp_runtime_interface::runtime_interface;
 
 #[runtime_interface]
 pub trait Storage {
-    fn child_storage_kill(_a: u64, _b: u64, _c: u32) {
-        return;
-    }
+	fn child_storage_kill(_a: u64, _b: u64, _c: u32) {
+		return;
+	}
 
-    fn child_root(_a: u64) -> Option<u64> {
-        return Some(_a);
-    }
+	fn child_root(_a: u64) -> Option<u64> {
+		return Some(_a);
+	}
 
-    fn child_get(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
-        return Some(_a);
-    }
+	fn child_get(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
+		return Some(_a);
+	}
 
-    fn child_storage_key_or_panic(_a: u64) -> u64 {
-        return _a;
-    }
+	fn child_storage_key_or_panic(_a: u64) -> u64 {
+		return _a;
+	}
 
-    fn child_read(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64, _f: u32) -> Option<u32> {
-        return Some(_c);
-    }
+	fn child_read(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64, _f: u32) -> Option<u32> {
+		return Some(_c);
+	}
 
-    fn child_clear(_a: u64, _b: u64, _c: u32, _d: u64) {
-        return;
-    }
+	fn child_clear(_a: u64, _b: u64, _c: u32, _d: u64) {
+		return;
+	}
 
-    fn child_set(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64) {
-        return;
-    }
-    
-    /*
-        Not sure if these will be needed in the future but
-        commenting out since combing the git history is annoying
-    */ 
+	fn child_set(_a: u64, _b: u64, _c: u32, _d: u64, _e: u64) {
+		return;
+	}
 
-    // fn child_exists(_a: u64, _b: u64, _c: u32, _d: u64) -> bool {
-    //     return false;
-    // }
+	/*
+		Not sure if these will be needed in the future but
+		commenting out since combing the git history is annoying
+	*/
 
-    // fn child_clear_prefix(_a: u64, _b: u64, _c: u32, _d: u64) {
-    //     return;
-    // }
+	// fn child_exists(_a: u64, _b: u64, _c: u32, _d: u64) -> bool {
+	//     return false;
+	// }
 
-    // fn child_next_key(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
-    //     return;
-    // }
+	// fn child_clear_prefix(_a: u64, _b: u64, _c: u32, _d: u64) {
+	//     return;
+	// }
+
+	// fn child_next_key(_a: u64, _b: u64, _c: u32, _d: u64) -> Option<u64> {
+	//     return;
+	// }
 }

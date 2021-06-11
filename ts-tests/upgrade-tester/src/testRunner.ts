@@ -140,6 +140,7 @@ class TestRunner {
       '--force-authoring',
       '--no-telemetry',
       '--no-prometheus',
+      '-linfo',
     ];
     log.info(`Executing ${this.options.binaryPath} with args ${JSON.stringify(args)}`);
     this._chainProcess = child_process.spawn(
@@ -338,7 +339,7 @@ class TestRunner {
     }
 
     // [5.] Upgrade chain via API
-    await this._doUpgrade();
+    await this._doUpgrade(false);
 
     // [6.] Restart chain with upgraded binary (if needed)
     if (this.options.upgrade.binaryPath
