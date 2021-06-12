@@ -130,8 +130,8 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 
 /// Runtime version.
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("edgeware"),
-	impl_name: create_runtime_str!("edgeware-node"),
+	spec_name: create_runtime_str!("beresheet"),
+	impl_name: create_runtime_str!("beresheet-node"),
 	authoring_version: 16,
 	// Per convention: if the runtime behavior changes, increment spec_version
 	// and set impl_version to equal spec_version. If only runtime
@@ -1010,7 +1010,7 @@ impl pallet_contracts::Config for Runtime {
 }
 
 parameter_types! {
-	pub const EthChainId: u64 = 2021;
+	pub const EthChainId: u64 = 2022;
 }
 
 /// Clone of Istanbul config with `create_contract_limit` raised.
