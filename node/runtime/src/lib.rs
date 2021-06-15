@@ -109,8 +109,6 @@ use constants::{currency::*, time::*};
 use pallet_contracts::weights::WeightInfo;
 use sp_runtime::generic::Era;
 
-use merkle::{utils::keys::ScalarData, weights::Weights as MerkleWeights};
-use mixer::weights::Weights as MixerWeights;
 use webb_currencies::BasicCurrencyAdapter;
 
 // Make the WASM binary available.
@@ -1132,21 +1130,6 @@ impl treasury_reward::Config for Runtime {
 }
 
 parameter_types! {
-	pub const MaxTreeDepth: u8 = 32;
-	pub const CacheBlockLength: BlockNumber = 100;
-}
-
-impl merkle::Config for Runtime {
-	type CacheBlockLength = CacheBlockLength;
-	type Event = Event;
-	type MaxTreeDepth = MaxTreeDepth;
-	type TreeId = u32;
-	type KeyId = u32;
-	type Randomness = RandomnessCollectiveFlip;
-	type WeightInfo = MerkleWeights<Self>;
-}
-
-parameter_types! {
 	pub const TokensPalletId: PalletId = PalletId(*b"py/token");
 	pub const NativeCurrencyId: CurrencyId = 0;
 	pub const CurrencyDeposit: Balance = 100 * DOLLARS;
@@ -1176,30 +1159,6 @@ impl webb_currencies::Config for Runtime {
 	type MultiCurrency = Tokens;
 	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
 	type WeightInfo = ();
-}
-
-parameter_types! {
-	pub const MixerPalletId: PalletId = PalletId(*b"py/mixer");
-	pub const MinimumDepositLength: BlockNumber = 10 * 60 * 24 * 28;
-	pub const DefaultAdminKey: AccountId = AccountId::new([0; 32]);
-	pub MixerSizes: Vec<Balance> = [
-		DOLLARS * 1_000,
-		DOLLARS * 10_000,
-		DOLLARS * 100_000,
-		DOLLARS * 1_000_000
-	].to_vec();
-}
-
-impl mixer::Config for Runtime {
-	type Currency = Currencies;
-	type DefaultAdmin = DefaultAdminKey;
-	type DepositLength = MinimumDepositLength;
-	type Event = Event;
-	type MixerSizes = MixerSizes;
-	type NativeCurrencyId = NativeCurrencyId;
-	type PalletId = MixerPalletId;
-	type Tree = Merkle;
-	type WeightInfo = MixerWeights<Self>;
 }
 
 parameter_types! {
@@ -1244,7 +1203,6 @@ construct_runtime!(
 		Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 10,
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 11,
 		PhragmenElection: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
-		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
 
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>} = 15,
@@ -1267,21 +1225,18 @@ construct_runtime!(
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,
 		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
-		// TODO: Find if reusing old index is bad
-		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 35,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
 
-		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 37,
-		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
+		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 37,
 
-		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 40,
-		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 41,
-		Mixer: mixer::{Pallet, Call, Storage, Event<T>} = 42,
-		Merkle: merkle::{Pallet, Call, Storage, Event<T>} = 43,
-
-		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 44,
-		NFT: nft::{Pallet, Call, Event<T>} = 45,
+		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 38,
+		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 39,
+		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 40,
+		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 41,
+		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 42,
+		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
+		NFT: nft::{Pallet, Call, Event<T>} = 44,
 
 	}
 );
@@ -1674,17 +1629,6 @@ impl_runtime_apis! {
 				Self::current_receipts(),
 				Self::current_transaction_statuses(),
 			)
-		}
-	}
-
-	impl merkle::MerkleApi<Block> for Runtime {
-		fn get_leaf(tree_id: u32, index: u32) -> Option<ScalarData> {
-			let v = Merkle::leaves(tree_id, index);
-			if v == ScalarData::default() {
-				None
-			} else {
-				Some(v)
-			}
 		}
 	}
 

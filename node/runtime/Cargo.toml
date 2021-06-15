@@ -111,9 +111,6 @@ pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/fronti
 
 sha3 = { version = "0.9", default-features = false }
 
-merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon" }
-mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon" }
-merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", optional = true }
 webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon" }
 webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon" }
 webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon" }
@@ -207,9 +204,6 @@ std = [
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",
-    "merkle/std",
-    "merkle-rpc",
-    "mixer/std",
     "webb-currencies/std",
     "webb-tokens/std",
     "orml-nft/std",
