@@ -42,12 +42,12 @@ sc-transaction-graph = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
 tokio = { version = "0.2.13", features = ["macros", "sync"] }
 
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon" }
 merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon" }
 
