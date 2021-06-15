@@ -23,9 +23,9 @@ dependencies = [
 
 [[package]]
 name = "addr2line"
-version = "0.15.1"
+version = "0.15.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "03345e98af8f3d786b6d9f656ccfa6ac316d954e92bc4841f0bba20789d5fb5a"
+checksum = "e7a2e47a1fbe209ee101dd6d61285226744c6c8d3c21c8dc878ba6cb9f467f3a"
 dependencies = [
  "gimli 0.24.0",
 ]
@@ -136,9 +136,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.40"
+version = "1.0.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28b2cd92db5cbd74e8e5028f7e27dd7aa3090e89e4f2a197cc7c8dfb69c7063b"
+checksum = "15af2628f6890fe2609a3b91bef4c83450512802e59489f9c1cb1fa5df064a61"
 
 [[package]]
 name = "approx"
@@ -181,9 +181,9 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 
 [[package]]
 name = "arrayvec"
-version = "0.7.0"
+version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5a2f58b0bb10c380af2b26e57212856b8c9a59e0925b4c20f4a174a49734eaf7"
+checksum = "be4dc07131ffa69b8072d35f5007352af944213cde02545e2103680baed38fcd"
 
 [[package]]
 name = "asn1_der"
@@ -424,12 +424,12 @@ version = "0.3.60"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7815ea54e4d821e791162e078acbebfd6d8c8939cd559c9335dceb1c8ca7282"
 dependencies = [
- "addr2line 0.15.1",
+ "addr2line 0.15.2",
  "cc",
  "cfg-if 1.0.0",
  "libc",
  "miniz_oxide",
- "object 0.25.1",
+ "object 0.25.3",
  "rustc-demangle",
 ]
 
@@ -499,12 +499,22 @@ checksum = "cf1de2fe8c75bc145a2f577add951f8134889b4795d47466a54a5c846d691693"
 
 [[package]]
 name = "bitvec"
+version = "0.17.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "41262f11d771fd4a61aa3ce019fca363b4b6c282fca9da2a31186d3965a47a5c"
+dependencies = [
+ "either",
+ "radium 0.3.0",
+]
+
+[[package]]
+name = "bitvec"
 version = "0.20.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7774144344a4faa177370406a7ff5f1da24303817368584c6206c8303eb07848"
 dependencies = [
  "funty",
- "radium",
+ "radium 0.6.2",
  "tap",
  "wyz",
 ]
@@ -656,14 +666,17 @@ dependencies = [
 
 [[package]]
 name = "bulletproofs-gadgets"
-version = "2.0.0"
+version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f730544daa13f48320a9be1bf804dd3544193f20a4194901317fd3ec354861fb"
+checksum = "94aea73d25b120dc50af0196f944e5df2e1e6aab93d8793e810b6b42c4d52b3e"
 dependencies = [
  "bencher",
  "curve25519-dalek 3.1.0",
+ "hex 0.4.3",
  "merlin",
+ "num-bigint 0.3.2",
  "parity-scale-codec 1.3.7",
+ "rand_chacha 0.2.2",
  "rand_core 0.5.1",
  "sp-std 2.0.1",
  "webb-bulletproofs",
@@ -1060,7 +1073,7 @@ dependencies = [
  "cranelift-codegen",
  "cranelift-entity",
  "cranelift-frontend",
- "itertools 0.10.0",
+ "itertools 0.10.1",
  "log",
  "serde",
  "smallvec 1.6.1",
@@ -1088,7 +1101,7 @@ dependencies = [
  "clap",
  "criterion-plot",
  "csv",
- "itertools 0.10.0",
+ "itertools 0.10.1",
  "lazy_static",
  "num-traits",
  "oorandom",
@@ -2238,7 +2251,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2263,7 +2276,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "1.0.0"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "kvdb",
  "kvdb-rocksdb",
@@ -2277,7 +2290,7 @@ dependencies = [
 [[package]]
 name = "fc-mapping-sync"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "fc-consensus",
  "fc-db",
@@ -2295,7 +2308,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2336,7 +2349,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "ethereum-types",
  "jsonrpc-core 15.1.0",
@@ -2389,7 +2402,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cfcf0ed7fe52a17a03854ec54a9f76d6d84508d1c0e66bc1793301c73fc8493c"
 dependencies = [
  "byteorder",
- "rand 0.8.3",
+ "rand 0.8.4",
  "rustc-hex",
  "static_assertions",
 ]
@@ -2440,7 +2453,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "1.0.0"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "ethereum",
  "parity-scale-codec 2.1.1",
@@ -2454,7 +2467,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "2.0.0"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "impl-trait-for-tuples 0.1.3",
@@ -2467,7 +2480,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "2.0.0"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2483,7 +2496,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "1.0.1"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 
 [[package]]
 name = "frame-benchmarking"
@@ -2988,9 +3001,9 @@ checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 
 [[package]]
 name = "globset"
-version = "0.4.6"
+version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c152169ef1e421390738366d2f796655fec62621dabbd0fd476f905934061e4a"
+checksum = "f0fc1b9fa0e64ffb1aa5b95daa0f0f167734fd528b7c02eabc581d9d843649b1"
 dependencies = [
  "aho-corasick",
  "bstr",
@@ -3497,9 +3510,9 @@ dependencies = [
 
 [[package]]
 name = "ipnet"
-version = "2.3.0"
+version = "2.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47be2f14c678be2fdcab04ab1171db51b2762ce6f0a8ee87c8dd4a04ed216135"
+checksum = "68f2d64f2edebec4ce84ad108148e67e1064789bee435edc5b60ad398714a3a9"
 
 [[package]]
 name = "itertools"
@@ -3512,9 +3525,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.10.0"
+version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "37d572918e350e82412fe766d24b15e6682fb2ed2bbe018280caa810397cb319"
+checksum = "69ddb889f9d0d08a67338271fa9b62996bc788c7796a5c18cf057420aaed5eaf"
 dependencies = [
  "either",
 ]
@@ -3834,9 +3847,9 @@ checksum = "3576a87f2ba00f6f106fdfcd16db1d698d648a26ad8e0573cad8537c3c362d2a"
 
 [[package]]
 name = "libc"
-version = "0.2.95"
+version = "0.2.97"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "789da6d93f1b866ffe175afc5322a4d76c038605a1c3319bb57b06967ca98a36"
+checksum = "12b8adadd720df158f4d70dfe7ccc6adb0472d7c55ca83445f6a5ab3e36f8fb6"
 
 [[package]]
 name = "libloading"
@@ -4063,7 +4076,7 @@ dependencies = [
  "libp2p-core",
  "libp2p-swarm",
  "log",
- "rand 0.8.3",
+ "rand 0.8.4",
  "smallvec 1.6.1",
  "socket2 0.4.0",
  "void",
@@ -4949,18 +4962,18 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.25.1"
+version = "0.25.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9023c1c0973b327f073c7f2fceb9bcc049862f93a7d14c6feb46c8a56460a0d5"
+checksum = "a38f2be3697a57b4060074ff41b44c16870d916ad7877c17696e063257482bc7"
 dependencies = [
  "memchr",
 ]
 
 [[package]]
 name = "once_cell"
-version = "1.7.2"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af8b08b04175473088b46763e51ee54da5f9a164bc162f615b91bc179dbf15a3"
+checksum = "692fcb63b64b1758029e0a96ee63e049ce8c5948587f2f7208df04625e5f6b56"
 dependencies = [
  "parking_lot 0.11.1",
 ]
@@ -5217,7 +5230,7 @@ dependencies = [
 [[package]]
 name = "pallet-dynamic-fee"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "async-trait",
  "frame-support",
@@ -5269,7 +5282,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -5297,7 +5310,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "4.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -5322,7 +5335,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-blake2"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5333,7 +5346,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-bn128"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5345,7 +5358,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-curve25519"
 version = "1.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "curve25519-dalek 3.1.0",
  "evm",
@@ -5359,7 +5372,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-dispatch"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5373,7 +5386,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-ed25519"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "ed25519-dalek",
  "evm",
@@ -5385,7 +5398,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5397,7 +5410,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5409,7 +5422,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#dede92a2f078a85994bef88d6ea4df1ea2fadd51"
+source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4-minimal-changes#90b70ac076e0181102603a098ad32e7a12d179a8"
 dependencies = [
  "evm",
  "fp-evm",
@@ -5490,7 +5503,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "bulletproofs-gadgets",
  "curve25519-dalek 3.1.0",
@@ -5501,7 +5514,7 @@ dependencies = [
  "merlin",
  "pallet-balances",
  "parity-scale-codec 2.1.1",
- "rand_core 0.5.1",
+ "rand_chacha 0.2.2",
  "serde",
  "sha2 0.9.5",
  "sp-api",
@@ -5514,7 +5527,7 @@ dependencies = [
 [[package]]
 name = "pallet-merkle-rpc"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 15.1.0",
@@ -5531,7 +5544,7 @@ dependencies = [
 [[package]]
 name = "pallet-mixer"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "bencher",
  "bulletproofs-gadgets",
@@ -5823,9 +5836,9 @@ dependencies = [
 
 [[package]]
 name = "parity-db"
-version = "0.2.3"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "495197c078e54b8735181aa35c00a327f7f3a3cc00a1ee8c95926dd010f0ec6b"
+checksum = "2e337f62db341435f0da05b8f6b97e984ef4ea5800510cd07c2d624688c40b47"
 dependencies = [
  "blake2-rfc",
  "crc32fast",
@@ -5835,7 +5848,7 @@ dependencies = [
  "log",
  "memmap2",
  "parking_lot 0.11.1",
- "rand 0.8.3",
+ "rand 0.8.4",
 ]
 
 [[package]]
@@ -5863,8 +5876,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a4b26b16c7687c3075982af47719e481815df30bc544f7a6690763a25ca16e9d"
 dependencies = [
  "arrayvec 0.5.2",
+ "bitvec 0.17.4",
  "byte-slice-cast 0.3.5",
  "parity-scale-codec-derive 1.2.3",
+ "serde",
 ]
 
 [[package]]
@@ -5873,8 +5888,8 @@ version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0f518afaa5a47d0d6386229b0a6e01e86427291d643aa4cabb4992219f504f8"
 dependencies = [
- "arrayvec 0.7.0",
- "bitvec",
+ "arrayvec 0.7.1",
+ "bitvec 0.20.4",
  "byte-slice-cast 1.0.0",
  "parity-scale-codec-derive 2.1.0",
  "serde",
@@ -6284,14 +6299,14 @@ dependencies = [
 
 [[package]]
 name = "polling"
-version = "2.0.3"
+version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fc12d774e799ee9ebae13f4076ca003b40d18a11ac0f3641e6f899618580b7b"
+checksum = "92341d779fa34ea8437ef4d82d440d5e1ce3f3ff7f824aa64424cd481f9a1f25"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
  "log",
- "wepoll-sys",
+ "wepoll-ffi",
  "winapi 0.3.9",
 ]
 
@@ -6567,6 +6582,12 @@ dependencies = [
 
 [[package]]
 name = "radium"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "def50a86306165861203e7f84ecffbbdfdea79f0e51039b33de1e952358c47ac"
+
+[[package]]
+name = "radium"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "643f8f41a8ebc4c5dc4515c82bb8abd397b527fc20fd681b7c011c2aee5d44fb"
@@ -6610,14 +6631,14 @@ dependencies = [
 
 [[package]]
 name = "rand"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ef9e7e66b4468674bfcb0c81af8b7fa0bb154fa9f28eb840da5c447baeb8d7e"
+checksum = "2e7573632e6454cf6b99d7aac4ccca54be06da05aca2ef7423d22d27d4d4bcd8"
 dependencies = [
  "libc",
- "rand_chacha 0.3.0",
- "rand_core 0.6.2",
- "rand_hc 0.3.0",
+ "rand_chacha 0.3.1",
+ "rand_core 0.6.3",
+ "rand_hc 0.3.1",
 ]
 
 [[package]]
@@ -6632,12 +6653,12 @@ dependencies = [
 
 [[package]]
 name = "rand_chacha"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e12735cf05c9e10bf21534da50a147b924d555dc7a547c42e6bb2d5b6017ae0d"
+checksum = "e6c10a63a0fa32252be49d21e7709d4d4baf8d231c2dbce1eaa8141b9b127d88"
 dependencies = [
  "ppv-lite86",
- "rand_core 0.6.2",
+ "rand_core 0.6.3",
 ]
 
 [[package]]
@@ -6666,9 +6687,9 @@ dependencies = [
 
 [[package]]
 name = "rand_core"
-version = "0.6.2"
+version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34cf66eb183df1c5876e2dcf6b13d57340741e8dc255b48e40a26de954d06ae7"
+checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
 dependencies = [
  "getrandom 0.2.3",
 ]
@@ -6693,11 +6714,11 @@ dependencies = [
 
 [[package]]
 name = "rand_hc"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3190ef7066a446f2e7f42e239d161e905420ccab01eb967c9eb27d21b2322a73"
+checksum = "d51e9f596de227fda2ea6c84607f5558e196eeaf43c986b724ba4fb8fdf497e7"
 dependencies = [
- "rand_core 0.6.2",
+ "rand_core 0.6.3",
 ]
 
 [[package]]
@@ -9259,7 +9280,7 @@ dependencies = [
  "byteorder",
  "crunchy",
  "lazy_static",
- "rand 0.8.3",
+ "rand 0.8.4",
  "rustc-hex",
 ]
 
@@ -9378,9 +9399,9 @@ checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "syn"
-version = "1.0.72"
+version = "1.0.73"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1e8cdbefb79a9a5a65e0db8b47b723ee907b7c7f8496c76a1770b5c310bab82"
+checksum = "f71489ff30030d2ae598524f61326b902466f72a0fb1a8564c001cc63425bcc7"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -9425,7 +9446,7 @@ checksum = "dac1c663cfc93810f88aed9b8941d48cabf856a1b111c29a40439018d870eb22"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
- "rand 0.8.3",
+ "rand 0.8.4",
  "redox_syscall 0.2.8",
  "remove_dir_all",
  "winapi 0.3.9",
@@ -9981,7 +10002,7 @@ dependencies = [
  "ipnet",
  "lazy_static",
  "log",
- "rand 0.8.3",
+ "rand 0.8.4",
  "smallvec 1.6.1",
  "thiserror",
  "tinyvec",
@@ -10640,9 +10661,9 @@ dependencies = [
 
 [[package]]
 name = "webb-bulletproofs"
-version = "2.0.0"
+version = "2.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d3dcc103f95a2509aea2ca010f7f06b137bc4693cf57f39947937ae00d487266"
+checksum = "fab7788f5651d9df9225919e5a487ac1f522cc57e5c58ff03911eeec597259f6"
 dependencies = [
  "byteorder",
  "clear_on_drop",
@@ -10662,7 +10683,7 @@ dependencies = [
 [[package]]
 name = "webb-currencies"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -10679,7 +10700,7 @@ dependencies = [
 [[package]]
 name = "webb-tokens"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "bencher",
  "frame-benchmarking",
@@ -10697,7 +10718,7 @@ dependencies = [
 [[package]]
 name = "webb-traits"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "frame-support",
  "funty",
@@ -10714,7 +10735,7 @@ dependencies = [
 [[package]]
 name = "webb-utilities"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/anon?branch=erup-4#f493dd9dd6385e584346fb210c674ea5f5578aad"
+source = "git+https://github.com/webb-tools/anon#1918d7a371e7e90fa2d8892f822d540e6ea953a8"
 dependencies = [
  "frame-support",
  "funty",
@@ -10745,10 +10766,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "wepoll-sys"
-version = "3.0.1"
+name = "wepoll-ffi"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0fcb14dea929042224824779fbc82d9fab8d2e6d3cbc0ac404de8edf489e77ff"
+checksum = "d743fdedc5c64377b5fc2bc036b01c7fd642205a0d96356034ae3404d49eb7fb"
 dependencies = [
  "cc",
 ]
@@ -10858,7 +10879,7 @@ dependencies = [
  "log",
  "nohash-hasher",
  "parking_lot 0.11.1",
- "rand 0.8.3",
+ "rand 0.8.4",
  "static_assertions",
 ]
 

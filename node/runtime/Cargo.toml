@@ -111,12 +111,12 @@ pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/fronti
 
 sha3 = { version = "0.9", default-features = false }
 
-merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", branch = "erup-4", optional = true }
-webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
-webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon", branch = "erup-4" }
+merkle = { package = "pallet-merkle", default-features = false, git = "https://github.com/webb-tools/anon" }
+mixer = { package = "pallet-mixer", default-features = false, git = "https://github.com/webb-tools/anon" }
+merkle-rpc = { package = "pallet-merkle-rpc", git = "https://github.com/webb-tools/anon", optional = true }
+webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon" }
+webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon" }
+webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon" }
 
 evm = { version = "0.27.0", default-features = false, features = ["with-codec"] }
 
