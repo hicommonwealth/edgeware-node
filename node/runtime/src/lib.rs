@@ -1007,8 +1007,14 @@ impl pallet_contracts::Config for Runtime {
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
 }
 
+#[cfg(not(feature = "beresheet-runtime"))]
 parameter_types! {
 	pub const EthChainId: u64 = 2021;
+}
+
+#[cfg(feature = "beresheet-runtime")]
+parameter_types! {
+	pub const EthChainId: u64 = 2022;
 }
 
 /// Clone of Istanbul config with `create_contract_limit` raised.

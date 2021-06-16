@@ -88,7 +88,7 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 
 /// Beresheet Testnet configuration
 pub fn edgeware_beresheet_official() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheet.chainspec.json")[..]) {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheetv2.chainspec.json")[..]) {
 		Ok(spec) => spec,
 		Err(e) => panic!("{}", e),
 	}
@@ -211,13 +211,6 @@ pub fn testnet_genesis(
 	const STASH: Balance = 100000000 * DOLLARS;
 	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
 
-	// add founders and balances to endowed if not already in list
-	founder_allocation.iter().chain(balances.iter()).for_each(|x| {
-		if !endowed_accounts.contains(&x.0) {
-			endowed_balances.push((x.0.clone(), x.1.clone()));
-		}
-	});
-
 	GenesisConfig {
 		frame_system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
@@ -251,10 +244,7 @@ pub fn testnet_genesis(
 			..Default::default()
 		},
 		pallet_democracy: DemocracyConfig::default(),
-		pallet_collective_Instance1: CouncilConfig {
-			members: crate::testnet_fixtures::get_testnet_election_members(),
-			phantom: Default::default(),
-		},
+		pallet_collective_Instance1: Default::default(),
 		pallet_aura: AuraConfig { authorities: vec![] },
 		pallet_im_online: ImOnlineConfig { keys: vec![] },
 		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
@@ -284,20 +274,6 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		})
 		.filter(|b| b.1 > 0)
 		.collect();
-	let vesting = allocation
-		.vesting
-		.iter()
-		.map(|b| {
-			let vesting_balance = b.3.to_string().parse::<Balance>().unwrap();
-			return (
-				(<[u8; 32]>::from_hex(b.0.clone()).unwrap()).into(),
-				b.1,
-				b.2,
-				vesting_balance,
-			);
-		})
-		.filter(|b| b.3 > 0)
-		.collect();
 
 	let initial_authorities = crate::testnet_fixtures::get_mtestnet_initial_authorities();
 
@@ -307,7 +283,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		None,
 		true,
 		balances,
-		vesting,
+		vec![],
 		crate::mainnet_fixtures::get_commonwealth_allocation(),
 	)
 }
