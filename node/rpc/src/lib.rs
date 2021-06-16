@@ -159,7 +159,6 @@ where
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
-	C::Api: merkle::MerkleApi<Block>,
 	C::Api: BlockBuilder<Block>,
 	P: TransactionPool<Block = Block> + 'static,
 	SC: SelectChain<Block> + 'static,
