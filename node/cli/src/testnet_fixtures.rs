@@ -34,19 +34,19 @@ pub fn get_testnet_root_key() -> AccountId {
 /// MTestnet bootnodes (network compatible from Edgeware mainnet launch)
 pub fn get_mtestnet_bootnodes() -> Vec<MultiaddrWithPeerId> {
 	return vec![
-		"/ip4/45.77.148.197/tcp/30333/p2p/QmUeUUGWMthMvmqKVRPKdXsuDMynCQfmZ7sjVMvce9VU7V"
+		"/ip4/45.77.148.197/tcp/30333/p2p/12D3KooWGq9cJfDdY3Mg7TZGZpLFTyMkdNB8G2gKCr2HQQgdcxwX"
 			.parse()
 			.unwrap(),
-		"/ip4/45.77.106.16/tcp/30333/p2p/QmcfVBingGpGxZX34KW5JNmknTvPXPP5n6yV6VC9sLot4o"
+		"/ip4/45.77.106.16/tcp/30333/p2p/12D3KooWDwSqpLiVERs9rhM6MQdfZun46WyDNJ5ufXDLxvPH65by"
 			.parse()
 			.unwrap(),
-		"/ip4/207.148.19.178/tcp/30333/p2p/QmZFSZSkT5EjPFtocrFmm4qxfnzuz5gen21mNLM4gZ3ETs"
+		"/ip4/207.148.19.178/tcp/30333/p2p/12D3KooWQnQPmHNJCDXcNUSKdAe2PE3Y573tYr6wF8pBGXhbiEun"
 			.parse()
 			.unwrap(),
-		"/ip4/45.63.20.50/tcp/30333/p2p/QmWuqHRV2FRaGpDW4TYYhwEeUut8Tqurwh5Nx4xWCMhPZq"
+		"/ip4/45.63.20.50/tcp/30333/p2p/12D3KooWBLzbi2Ur7nxXQfnKoDQAFvgc3jthaDRkGkWBFatZp8KW"
 			.parse()
 			.unwrap(),
-		"/ip4/108.61.132.86/tcp/30333/p2p/Qma1a5Wqn8XrVabVkvg5RW7fUQqJrjZoajTMb4wXFBY8ko"
+		"/ip4/108.61.132.86/tcp/30333/p2p/12D3KooWAn2uPuZCABHSm4JyhYJt7mSQa1GRrpSWcEkSg4oqY4gm"
 			.parse()
 			.unwrap(),
 	];
