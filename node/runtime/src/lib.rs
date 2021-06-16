@@ -109,8 +109,6 @@ use constants::{currency::*, time::*};
 use pallet_contracts::weights::WeightInfo;
 use sp_runtime::generic::Era;
 
-use merkle::{utils::keys::ScalarData, weights::Weights as MerkleWeights};
-use mixer::weights::Weights as MixerWeights;
 use webb_currencies::BasicCurrencyAdapter;
 
 // Make the WASM binary available.
@@ -1132,19 +1130,6 @@ impl treasury_reward::Config for Runtime {
 }
 
 parameter_types! {
-	pub const MaxTreeDepth: u8 = 32;
-	pub const CacheBlockLength: BlockNumber = 100;
-}
-
-impl merkle::Config for Runtime {
-	type CacheBlockLength = CacheBlockLength;
-	type Event = Event;
-	type MaxTreeDepth = MaxTreeDepth;
-	type TreeId = u32;
-	type WeightInfo = MerkleWeights<Self>;
-}
-
-parameter_types! {
 	pub const TokensPalletId: PalletId = PalletId(*b"py/token");
 	pub const NativeCurrencyId: CurrencyId = 0;
 	pub const CurrencyDeposit: Balance = 100 * DOLLARS;
@@ -1177,30 +1162,6 @@ impl webb_currencies::Config for Runtime {
 }
 
 parameter_types! {
-	pub const MixerPalletId: PalletId = PalletId(*b"py/mixer");
-	pub const MinimumDepositLength: BlockNumber = 10 * 60 * 24 * 28;
-	pub const DefaultAdminKey: AccountId = AccountId::new([0; 32]);
-	pub MixerSizes: Vec<Balance> = [
-		DOLLARS * 1_000,
-		DOLLARS * 10_000,
-		DOLLARS * 100_000,
-		DOLLARS * 1_000_000
-	].to_vec();
-}
-
-impl mixer::Config for Runtime {
-	type Currency = Currencies;
-	type DefaultAdmin = DefaultAdminKey;
-	type DepositLength = MinimumDepositLength;
-	type Event = Event;
-	type MixerSizes = MixerSizes;
-	type NativeCurrencyId = NativeCurrencyId;
-	type PalletId = MixerPalletId;
-	type Tree = Merkle;
-	type WeightInfo = MixerWeights<Self>;
-}
-
-parameter_types! {
 	pub const NftPalletId: PalletId = PalletId(*b"edge/NFT");
 	pub CreateClassDeposit: Balance = 500 * MILLICENTS;
 	pub CreateTokenDeposit: Balance = 100 * MILLICENTS;
@@ -1230,20 +1191,16 @@ construct_runtime!(
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>} = 0,
 		Utility: pallet_utility::{Pallet, Call, Event} = 1,
 		Aura: pallet_aura::{Pallet, Config<T>} = 2,
-
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 3,
 		Authorship: pallet_authorship::{Pallet, Call, Storage, Inherent} = 4,
 		Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 5,
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 6,
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 7,
-
 		Staking: pallet_staking::{Pallet, Call, Config<T>, Storage, Event<T>} = 8,
 		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 9,
 		Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 10,
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 11,
 		PhragmenElection: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
-		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
-
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>} = 15,
 		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
@@ -1254,33 +1211,25 @@ construct_runtime!(
 		Historical: pallet_session_historical::{Pallet} = 21,
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 22,
 		Identity: pallet_identity::{Pallet, Call, Storage, Event<T>} = 23,
-
 		Recovery: pallet_recovery::{Pallet, Call, Storage, Event<T>} = 24,
 		Vesting: pallet_vesting::{Pallet, Call, Storage, Event<T>, Config<T>} = 25,
 		Scheduler: pallet_scheduler::{Pallet, Call, Storage, Event<T>} = 26,
 		Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>} = 27,
 		Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>} = 28,
 		Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 29,
-
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,
 		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
-		// TODO: Find if reusing old index is bad
-		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 35,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
-
 		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 37,
 		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
-
-		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 40,
-		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 41,
-		Mixer: mixer::{Pallet, Call, Storage, Event<T>} = 42,
-		Merkle: merkle::{Pallet, Call, Storage, Event<T>} = 43,
-
-		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 44,
-		NFT: nft::{Pallet, Call, Event<T>} = 45,
-
+		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
+		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 40,
+		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 41,
+		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 42,
+		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
+		NFT: nft::{Pallet, Call, Event<T>} = 44,
 	}
 );
 
@@ -1672,17 +1621,6 @@ impl_runtime_apis! {
 				Self::current_receipts(),
 				Self::current_transaction_statuses(),
 			)
-		}
-	}
-
-	impl merkle::MerkleApi<Block> for Runtime {
-		fn get_leaf(tree_id: u32, index: u32) -> Option<ScalarData> {
-			let v = Merkle::leaves(tree_id, index);
-			if v == ScalarData::default() {
-				None
-			} else {
-				Some(v)
-			}
 		}
 	}
 

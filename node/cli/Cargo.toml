@@ -91,8 +91,8 @@ pallet-im-online = { version = "3.0", default-features = false }
 pallet-authority-discovery = { version = "3.0" }
 pallet-staking = { version = "3.0" }
 pallet-grandpa = { version = "3.0" }
-pallet-dynamic-fee = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+pallet-dynamic-fee = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 
 # node-specific dependencies
 edgeware-runtime = { version = "3.3.0", path = "../runtime", default-features = false }
@@ -110,13 +110,13 @@ sc-cli = { version = "0.9", optional = true }
 frame-benchmarking-cli = { version = "3.0", optional = true }
 edgeware-opts = { path = "../opts", version = "0.1.0", optional = true }
 
-fc-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fp-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes", features = ["rpc_binary_search_estimate"] }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
-fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-minimal-changes" }
+fc-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fp-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4", features = ["rpc_binary_search_estimate"] }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
