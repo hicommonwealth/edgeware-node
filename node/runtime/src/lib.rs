@@ -1191,19 +1191,16 @@ construct_runtime!(
 		System: frame_system::{Pallet, Call, Config, Storage, Event<T>} = 0,
 		Utility: pallet_utility::{Pallet, Call, Event} = 1,
 		Aura: pallet_aura::{Pallet, Config<T>} = 2,
-
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 3,
 		Authorship: pallet_authorship::{Pallet, Call, Storage, Inherent} = 4,
 		Indices: pallet_indices::{Pallet, Call, Storage, Config<T>, Event<T>} = 5,
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 6,
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 7,
-
 		Staking: pallet_staking::{Pallet, Call, Config<T>, Storage, Event<T>} = 8,
 		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 9,
 		Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 10,
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 11,
 		PhragmenElection: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
-
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>} = 15,
 		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
@@ -1214,30 +1211,25 @@ construct_runtime!(
 		Historical: pallet_session_historical::{Pallet} = 21,
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 22,
 		Identity: pallet_identity::{Pallet, Call, Storage, Event<T>} = 23,
-
 		Recovery: pallet_recovery::{Pallet, Call, Storage, Event<T>} = 24,
 		Vesting: pallet_vesting::{Pallet, Call, Storage, Event<T>, Config<T>} = 25,
 		Scheduler: pallet_scheduler::{Pallet, Call, Storage, Event<T>} = 26,
 		Proxy: pallet_proxy::{Pallet, Call, Storage, Event<T>} = 27,
 		Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>} = 28,
 		Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 29,
-
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,
 		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
-
-		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 37,
-
-		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 38,
-		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 39,
-		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 40,
+		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 37,
+		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
+		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
+		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 40,
 		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 41,
 		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 42,
 		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
 		NFT: nft::{Pallet, Call, Event<T>} = 44,
-
 	}
 );
 
