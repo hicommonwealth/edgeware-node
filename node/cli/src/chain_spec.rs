@@ -157,9 +157,9 @@ pub fn testnet_genesis(
 	_root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	_enable_println: bool,
-	balances: Vec<(AccountId, Balance)>,
+	_balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
-	founder_allocation: Vec<(AccountId, Balance)>,
+	_founder_allocation: Vec<(AccountId, Balance)>,
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
@@ -209,7 +209,7 @@ pub fn testnet_genesis(
 	});
 
 	const STASH: Balance = 100000000 * DOLLARS;
-	let mut endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
+	let endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
 
 	GenesisConfig {
 		frame_system: SystemConfig {
@@ -233,7 +233,7 @@ pub fn testnet_genesis(
 				.collect::<Vec<_>>(),
 		},
 		pallet_staking: StakingConfig {
-			validator_count: 20,
+			validator_count: 7,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities
 				.iter()
