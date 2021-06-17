@@ -59,6 +59,11 @@ Build Edgeware:
 ```
 cargo build --release
 ```
+Build for Edgeware's Beresheet testnet, which uses a different runtime version and EVM chain ID:
+
+```
+cargo build --release --features beresheet-runtime
+```
 
 Ensure you have a fresh start if updating from another version:
 ```
