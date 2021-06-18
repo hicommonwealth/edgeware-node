@@ -127,6 +127,7 @@ pub fn wasm_binary_unwrap() -> &'static [u8] {
 }
 
 /// Runtime version.
+#[cfg(not(feature = "beresheet-runtime"))]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("edgeware"),
 	impl_name: create_runtime_str!("edgeware-node"),
@@ -137,6 +138,21 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// is and increment impl_version.
 	spec_version: 47,
 	impl_version: 47,
+	apis: RUNTIME_API_VERSIONS,
+	transaction_version: 2,
+};
+
+#[cfg(feature = "beresheet-runtime")]
+pub const VERSION: RuntimeVersion = RuntimeVersion {
+	spec_name: create_runtime_str!("beresheet"),
+	impl_name: create_runtime_str!("beresheet-node"),
+	authoring_version: 16,
+	// Per convention: if the runtime behavior changes, increment spec_version
+	// and set impl_version to equal spec_version. If only runtime
+	// implementation changes and behavior does not, then leave spec_version as
+	// is and increment impl_version.
+	spec_version: 10047,
+	impl_version: 10047,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -1007,8 +1023,14 @@ impl pallet_contracts::Config for Runtime {
 	type WeightPrice = pallet_transaction_payment::Module<Self>;
 }
 
+#[cfg(not(feature = "beresheet-runtime"))]
 parameter_types! {
 	pub const EthChainId: u64 = 2021;
+}
+
+#[cfg(feature = "beresheet-runtime")]
+parameter_types! {
+	pub const EthChainId: u64 = 2022;
 }
 
 /// Clone of Istanbul config with `create_contract_limit` raised.

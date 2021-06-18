@@ -131,6 +131,7 @@ sp-io = { version = "3.0" }
 [features]
 default = ["std"]
 no-reaping = []
+beresheet-runtime = []
 std = [
 	"sha3/std",
 	"sp-authority-discovery/std",
