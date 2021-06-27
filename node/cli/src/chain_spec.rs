@@ -219,15 +219,15 @@ pub fn testnet_genesis(
 	});
 
 	GenesisConfig {
-		frame_system: SystemConfig {
+		system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
 			changes_trie_config: Default::default(),
 		},
-		pallet_balances: BalancesConfig {
+		balances: BalancesConfig {
 			balances: endowed_balances,
 		},
-		pallet_indices: IndicesConfig { indices: vec![] },
-		pallet_session: SessionConfig {
+		indices: IndicesConfig { indices: vec![] },
+		session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
@@ -239,7 +239,7 @@ pub fn testnet_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
-		pallet_staking: StakingConfig {
+		staking: StakingConfig {
 			validator_count: 20,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities
@@ -250,26 +250,26 @@ pub fn testnet_genesis(
 			slash_reward_fraction: Perbill::from_percent(10),
 			..Default::default()
 		},
-		pallet_democracy: DemocracyConfig::default(),
-		pallet_collective_Instance1: CouncilConfig {
+		democracy: DemocracyConfig::default(),
+		council: CouncilConfig {
 			members: crate::testnet_fixtures::get_testnet_election_members(),
 			phantom: Default::default(),
 		},
-		pallet_aura: AuraConfig { authorities: vec![] },
-		pallet_im_online: ImOnlineConfig { keys: vec![] },
-		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-		pallet_grandpa: GrandpaConfig { authorities: vec![] },
-		pallet_treasury: Default::default(),
-		pallet_elections_phragmen: Default::default(),
-		pallet_sudo: SudoConfig { key: _root_key },
-		pallet_vesting: VestingConfig { vesting },
-		pallet_ethereum: Default::default(),
-		pallet_evm: EVMConfig { accounts: evm_accounts },
+		aura: AuraConfig { authorities: vec![] },
+		im_online: ImOnlineConfig { keys: vec![] },
+		authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
+		grandpa: GrandpaConfig { authorities: vec![] },
+		treasury: Default::default(),
+		phragmen_election: Default::default(),
+		sudo: SudoConfig { key: _root_key },
+		vesting: VestingConfig { vesting },
+		ethereum: Default::default(),
+		evm: EVMConfig { accounts: evm_accounts },
 		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		},
-		orml_nft: Default::default(),
+		non_fungible_token_module: Default::default(),
 	}
 }
 
@@ -463,19 +463,19 @@ pub fn mainnet_genesis(
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 ) -> GenesisConfig {
 	GenesisConfig {
-		frame_system: SystemConfig {
+		system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
 			changes_trie_config: Default::default(),
 		},
-		pallet_balances: BalancesConfig {
+		balances: BalancesConfig {
 			balances: founder_allocation
 				.iter()
 				.map(|x| (x.0.clone(), x.1.clone()))
 				.chain(balances.clone())
 				.collect(),
 		},
-		pallet_indices: IndicesConfig { indices: vec![] },
-		pallet_session: SessionConfig {
+		indices: IndicesConfig { indices: vec![] },
+		session: SessionConfig {
 			keys: initial_authorities
 				.iter()
 				.map(|x| {
@@ -487,7 +487,7 @@ pub fn mainnet_genesis(
 				})
 				.collect::<Vec<_>>(),
 		},
-		pallet_staking: StakingConfig {
+		staking: StakingConfig {
 			validator_count: 60,
 			minimum_validator_count: initial_authorities.len() as u32,
 			stakers: initial_authorities
@@ -498,28 +498,28 @@ pub fn mainnet_genesis(
 			slash_reward_fraction: Perbill::from_percent(10),
 			..Default::default()
 		},
-		pallet_democracy: DemocracyConfig::default(),
-		pallet_collective_Instance1: CouncilConfig {
+		democracy: DemocracyConfig::default(),
+		council: CouncilConfig {
 			members: crate::mainnet_fixtures::get_mainnet_election_members(),
 			phantom: Default::default(),
 		},
-		pallet_aura: AuraConfig { authorities: vec![] },
-		pallet_im_online: ImOnlineConfig { keys: vec![] },
-		pallet_authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
-		pallet_grandpa: GrandpaConfig { authorities: vec![] },
-		pallet_treasury: Default::default(),
-		pallet_elections_phragmen: Default::default(),
-		pallet_sudo: SudoConfig {
+		aura: AuraConfig { authorities: vec![] },
+		im_online: ImOnlineConfig { keys: vec![] },
+		authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
+		grandpa: GrandpaConfig { authorities: vec![] },
+		treasury: Default::default(),
+		phragmen_election: Default::default(),
+		sudo: SudoConfig {
 			key: crate::mainnet_fixtures::get_mainnet_root_key(),
 		},
-		pallet_vesting: VestingConfig { vesting },
-		pallet_ethereum: Default::default(),
-		pallet_evm: Default::default(),
+		vesting: VestingConfig { vesting },
+		ethereum: Default::default(),
+		evm: Default::default(),
 		treasury_reward: TreasuryRewardConfig {
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		},
-		orml_nft: Default::default(),
+		non_fungible_token_module: Default::default(),
 	}
 }
 

@@ -376,15 +376,18 @@ parameter_types! {
 	// For weight estimation, we assume that the most locks on an individual account will be 50.
 	// This number may need to be adjusted in the future if this assumption no longer holds true.
 	pub const MaxLocks: u32 = 50;
+	pub const MaxReserves: u32 = 50;
 }
 
 impl pallet_balances::Config for Runtime {
-	type AccountStore = frame_system::Pallet<Runtime>;
+	type MaxLocks = MaxLocks;
+	type MaxReserves = MaxReserves;
+	type ReserveIdentifier = [u8; 8];
 	type Balance = Balance;
 	type DustRemoval = ();
 	type Event = Event;
 	type ExistentialDeposit = ExistentialDeposit;
-	type MaxLocks = MaxLocks;
+	type AccountStore = frame_system::Pallet<Runtime>;
 	type WeightInfo = pallet_balances::weights::SubstrateWeight<Runtime>;
 }
 
@@ -526,29 +529,33 @@ sp_npos_elections::generate_solution_type!(
 pub const MAX_NOMINATIONS: u32 = <NposCompactSolution16 as sp_npos_elections::CompactSolution>::LIMIT as u32;
 
 impl pallet_election_provider_multi_phase::Config for Runtime {
-	type BenchmarkingConfig = ();
-	type CompactSolution = NposCompactSolution16;
-	type Currency = Balances;
-	type DataProvider = Staking;
 	type Event = Event;
-	type Fallback = Fallback;
-	type MinerMaxIterations = MinerMaxIterations;
-	type MinerMaxLength = MinerMaxLength;
-	type MinerMaxWeight = MinerMaxWeight;
-	type MinerTxPriority = MultiPhaseUnsignedPriority;
-	type OffchainRepeat = OffchainRepeat;
-	type OnChainAccuracy = Perbill;
+	type Currency = Balances;
 	type SignedPhase = SignedPhase;
-	type SolutionImprovementThreshold = SolutionImprovementThreshold;
 	type UnsignedPhase = UnsignedPhase;
+	type SolutionImprovementThreshold = SolutionImprovementThreshold;
+	type OffchainRepeat = OffchainRepeat;
+	type MinerMaxIterations = MinerMaxIterations;
+	type MinerMaxWeight = MinerMaxWeight;
+	type MinerMaxLength = MinerMaxLength;
+	type MinerTxPriority = MultiPhaseUnsignedPriority;
+	type DataProvider = Staking;
+	type OnChainAccuracy = Perbill;
+	type CompactSolution = NposCompactSolution16;
+	type Fallback = Fallback;
 	type WeightInfo = pallet_election_provider_multi_phase::weights::SubstrateWeight<Runtime>;
+	type ForceOrigin = EnsureRootOrHalfCouncil;
+	type BenchmarkingConfig = ();
 }
 
+use frame_election_provider_support::onchain;
 impl pallet_staking::Config for Runtime {
 	type BondingDuration = BondingDuration;
 	type Currency = Balances;
 	type CurrencyToVote = U128CurrencyToVote;
 	type ElectionProvider = ElectionProviderMultiPhase;
+	type GenesisElectionProvider =
+		onchain::OnChainSequentialPhragmen<pallet_election_provider_multi_phase::OnChainConfig<Self>>;
 	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
 	type Event = Event;
 	type MaxNominatorRewardedPerValidator = MaxNominatorRewardedPerValidator;
@@ -1182,6 +1189,8 @@ impl orml_nft::Config for Runtime {
 	type TokenId = u64;
 }
 
+impl pallet_randomness_collective_flip::Config for Runtime {}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -1198,7 +1207,7 @@ construct_runtime!(
 		TransactionPayment: pallet_transaction_payment::{Pallet, Storage} = 7,
 		Staking: pallet_staking::{Pallet, Call, Config<T>, Storage, Event<T>} = 8,
 		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 9,
-		Democracy: pallet_democracy::{Pallet, Call, Storage, Config, Event<T>} = 10,
+		Democracy: pallet_democracy::{Pallet, Call, Storage, Config<T>, Event<T>} = 10,
 		Council: pallet_collective::<Instance1>::{Pallet, Call, Storage, Origin<T>, Event<T>, Config<T>} = 11,
 		PhragmenElection: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
@@ -1206,10 +1215,10 @@ construct_runtime!(
 		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 17,
 		ImOnline: pallet_im_online::{Pallet, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 18,
-		AuthorityDiscovery: pallet_authority_discovery::{Pallet, Call, Config} = 19,
-		Offences: pallet_offences::{Pallet, Call, Storage, Event} = 20,
+		AuthorityDiscovery: pallet_authority_discovery::{Pallet, Config} = 19,
+		Offences: pallet_offences::{Pallet, Storage, Event} = 20,
 		Historical: pallet_session_historical::{Pallet} = 21,
-		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 22,
+		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage} = 22,
 		Identity: pallet_identity::{Pallet, Call, Storage, Event<T>} = 23,
 		Recovery: pallet_recovery::{Pallet, Call, Storage, Event<T>} = 24,
 		Vesting: pallet_vesting::{Pallet, Call, Storage, Event<T>, Config<T>} = 25,

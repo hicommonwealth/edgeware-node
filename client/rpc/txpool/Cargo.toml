@@ -24,4 +24,4 @@ frame-system = { version = "3.0" }
 serde = { version = "1.0", features = ["derive"] }
 
 edgeware-rpc-primitives-txpool = { path = "../../../node/txpool" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-up-substrate-master" }

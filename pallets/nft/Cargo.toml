@@ -18,7 +18,7 @@ sp-runtime = { version = "3.0", default-features = false }
 sp-std = { version = "3.0", default-features = false }
 
 orml-nft = { path = "../orml-nft", default-features = false }
-orml-traits = { package = "webb-traits", git = "https://github.com/webb-tools/anon", default-features = false }
+orml-traits = { package = "webb-traits", git = "https://github.com/webb-tools/anon", branch = "erup-4-up-substrate-master", default-features = false }
 
 [dev-dependencies]
 sp-core = { version = "3.0", default-features = false }
@@ -26,8 +26,8 @@ sp-io = { version = "3.0", default-features = false }
 pallet-balances = { version = "3.0", default-features = false }
 pallet-utility = { version = "3.0", default-features = false }
 
-orml-tokens = { package = "webb-tokens", git = "https://github.com/webb-tools/anon" }
-currencies = { package = "webb-currencies", git = "https://github.com/webb-tools/anon" }
+orml-tokens = { package = "webb-tokens", git = "https://github.com/webb-tools/anon", branch = "erup-4-up-substrate-master" }
+currencies = { package = "webb-currencies", git = "https://github.com/webb-tools/anon", branch = "erup-4-up-substrate-master" }
 
 [features]
 default = ["std"]
