@@ -1313,22 +1313,31 @@ pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
 /// Executive: handles dispatch to the various modules.
+#[cfg(not(feature = "beresheet-runtime"))]
 pub type Executive = frame_executive::Executive<
 	Runtime,
 	Block,
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPallets,
-	(
-		custom_migration::Upgrade,
-		// custom_migration::GrandpaStoragePrefixMigration
-	),
+	(custom_migration::Upgrade),
+>;
+
+#[cfg(feature = "beresheet-runtime")]
+pub type Executive = frame_executive::Executive<
+	Runtime,
+	Block,
+	frame_system::ChainContext<Runtime>,
+	Runtime,
+	AllPallets,
+	(),
 >;
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
 
 /// Custom runtime upgrade to execute the balances migration before the account
 /// migration.
+#[cfg(not(feature = "beresheet-runtime"))]
 mod custom_migration {
 	use super::*;
 	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
