@@ -4576,6 +4576,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "max-encoded-len",
  "orml-nft",
  "pallet-balances",
  "pallet-proxy",
