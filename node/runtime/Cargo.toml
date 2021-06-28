@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime"
-version = "3.3.1"
+version = "3.3.2"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 edition = "2018"
 build = "build.rs"
@@ -46,7 +46,7 @@ sp-offchain = { version = "3.0", default-features = false }
 sp-npos-elections = { version = "3.0", default-features = false }
 
 # edgeware primitives
-edgeware-primitives = { version = "3.3.1", path = "../primitives", default-features = false }
+edgeware-primitives = { version = "3.3.2", path = "../primitives", default-features = false }
 edgeware-evm-tracer = { path = "../evm_tracer", default-features = false }
 edgeware-rpc-primitives-debug = { path = "../debug", default-features = false }
 edgeware-rpc-primitives-txpool = { path = "../txpool", default-features = false }
