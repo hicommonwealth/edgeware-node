@@ -244,10 +244,7 @@ pub fn testnet_genesis(
 			..Default::default()
 		},
 		democracy: DemocracyConfig::default(),
-		council: CouncilConfig {
-			members: crate::testnet_fixtures::get_testnet_election_members(),
-			phantom: Default::default(),
-		},
+		council: Default::default(),
 		aura: AuraConfig { authorities: vec![] },
 		im_online: ImOnlineConfig { keys: vec![] },
 		authority_discovery: AuthorityDiscoveryConfig { keys: vec![] },
