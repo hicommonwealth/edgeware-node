@@ -112,7 +112,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// Sets the fixed treasury payout per minting interval.
 		#[pallet::weight(5_000_000)]
-		pub(super) fn set_current_payout(origin: OriginFor<T>, payout: BalanceOf<T>) -> DispatchResultWithPostInfo {
+		pub fn set_current_payout(origin: OriginFor<T>, payout: BalanceOf<T>) -> DispatchResultWithPostInfo {
 			ensure_root(origin)?;
 			<CurrentPayout<T>>::put(payout);
 			Ok(().into())
@@ -120,7 +120,7 @@ pub mod pallet {
 
 		/// Sets the treasury minting interval.
 		#[pallet::weight(5_000_000)]
-		pub(super) fn set_minting_interval(
+		pub fn set_minting_interval(
 			origin: OriginFor<T>,
 			interval: T::BlockNumber,
 		) -> DispatchResultWithPostInfo {

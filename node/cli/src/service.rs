@@ -54,20 +54,10 @@ type FullGrandpaBlockImport = sc_finality_grandpa::GrandpaBlockImport<FullBacken
 type LightClient = sc_service::TLightClient<Block, RuntimeApi, Executor>;
 
 #[cfg(feature = "frontier-block-import")]
-type ConsensusResult = sc_consensus_aura::AuraBlockImport<
-	Block,
-	FullClient,
-	FrontierBlockImport<Block, FullGrandpaBlockImport, FullClient>,
-	sp_consensus_aura::ed25519::AuthorityPair,
->;
+type ConsensusResult = FrontierBlockImport<Block, FullGrandpaBlockImport, FullClient>;
 
 #[cfg(not(feature = "frontier-block-import"))]
-type ConsensusResult = sc_consensus_aura::AuraBlockImport<
-	Block,
-	FullClient,
-	FullGrandpaBlockImport,
-	sp_consensus_aura::ed25519::AuthorityPair,
->;
+type ConsensusResult = FullGrandpaBlockImport;
 
 /// Can be called for a `Configuration` to check if it is a configuration for
 /// the `Kusama` network.
@@ -156,7 +146,7 @@ pub fn new_partial(
 		config.transaction_pool.clone(),
 		config.role.is_authority().into(),
 		config.prometheus_registry(),
-		task_manager.spawn_handle(),
+		task_manager.spawn_essential_handle(),
 		client.clone(),
 	);
 
@@ -177,31 +167,28 @@ pub fn new_partial(
 	let frontier_block_import =
 		FrontierBlockImport::new(grandpa_block_import.clone(), client.clone(), frontier_backend.clone());
 
-	let aura_block_import =
-		sc_consensus_aura::AuraBlockImport::<_, _, _, sp_consensus_aura::ed25519::AuthorityPair>::new(
-			#[cfg(feature = "frontier-block-import")]
-			frontier_block_import,
-			#[cfg(not(feature = "frontier-block-import"))]
-			grandpa_block_import.clone(),
-			client.clone(),
-		);
-	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-	let raw_slot_duration = slot_duration.slot_duration();
+	#[cfg(feature = "frontier-block-import")]
+	let block_import = frontier_block_import.clone();
+	#[cfg(not(feature = "frontier-block-import"))]
+	let block_import = grandpa_block_import.clone();
+
+	let slot_duration = sc_consensus_aura::slot_duration(&*client)?.slot_duration();
 
 	let target_gas_price = U256::from(cli.run.target_gas_price);
 
 	let import_queue = sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(
 		ImportQueueParams {
-			block_import: aura_block_import.clone(),
-			justification_import: Some(Box::new(grandpa_block_import.clone())),
+			block_import: block_import.clone(),
+			justification_import: Some(Box::new(block_import.clone())),
 			client: client.clone(),
 			create_inherent_data_providers: move |_, ()| async move {
 				let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
 
-				let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
-					*timestamp,
-					raw_slot_duration,
-				);
+				let slot =
+					sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+						*timestamp,
+						slot_duration,
+					);
 
 				let fee = pallet_dynamic_fee::InherentDataProvider(target_gas_price);
 
@@ -224,7 +211,7 @@ pub fn new_partial(
 		select_chain,
 		transaction_pool,
 		other: (
-			aura_block_import,
+			block_import,
 			grandpa_link,
 			pending_transactions,
 			filter_pool,
@@ -271,7 +258,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		.extra_sets
 		.push(sc_finality_grandpa::grandpa_peers_set_config());
 
-	let (network, network_status_sinks, system_rpc_tx, network_starter) =
+	let (network, system_rpc_tx, network_starter) =
 		sc_service::build_network(sc_service::BuildNetworkParams {
 			config: &config,
 			client: client.clone(),
@@ -373,7 +360,6 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		task_manager: &mut task_manager,
 		on_demand: None,
 		remote_blockchain: None,
-		network_status_sinks: network_status_sinks.clone(),
 		system_rpc_tx,
 		telemetry: telemetry.as_mut(),
 	})?;
@@ -395,35 +381,37 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 		let raw_slot_duration = slot_duration.slot_duration();
 
-		let aura =
-			sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _, _>(
-				StartAuraParams {
-					slot_duration,
-					client: client.clone(),
-					select_chain,
-					block_import,
-					proposer_factory,
-					create_inherent_data_providers: move |_, ()| async move {
-						let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
+		let aura = sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _, _, _>(
+			StartAuraParams {
+				slot_duration,
+				client: client.clone(),
+				select_chain,
+				block_import,
+				proposer_factory,
+				create_inherent_data_providers: move |_, ()| async move {
+					let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
 
-						let slot = sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+					let slot =
+						sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
 							*timestamp,
 							raw_slot_duration,
 						);
 
-						let fee = pallet_dynamic_fee::InherentDataProvider(target_gas_price);
+					let fee = pallet_dynamic_fee::InherentDataProvider(target_gas_price);
 
-						Ok((timestamp, slot, fee))
-					},
-					force_authoring,
-					backoff_authoring_blocks,
-					keystore: keystore_container.sync_keystore(),
-					can_author_with,
-					sync_oracle: network.clone(),
-					block_proposal_slot_portion: SlotProportion::new(2f32 / 3f32),
-					telemetry: telemetry.as_ref().map(|x| x.handle()),
+					Ok((timestamp, slot, fee))
 				},
-			)?;
+				force_authoring,
+				backoff_authoring_blocks,
+				keystore: keystore_container.sync_keystore(),
+				can_author_with,
+				sync_oracle: network.clone(),
+				justification_sync_link: network.clone(),
+				block_proposal_slot_portion: SlotProportion::new(2f32 / 3f32),
+				max_block_proposal_slot_portion: None,
+				telemetry: telemetry.as_ref().map(|x| x.handle()),
+			},
+		)?;
 
 		// the AURA authoring task is considered essential, i.e. if it
 		// fails we take down the service with it.
@@ -469,7 +457,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli) -> Result<NewFullBase
 		name: Some(name),
 		observer_enabled: false,
 		keystore,
-		is_authority: role.is_authority(),
+		local_role: role,
 		telemetry: telemetry.as_ref().map(|x| x.handle()),
 	};
 
@@ -557,7 +545,7 @@ pub fn new_light_base(
 	let transaction_pool = Arc::new(sc_transaction_pool::BasicPool::new_light(
 		config.transaction_pool.clone(),
 		config.prometheus_registry(),
-		task_manager.spawn_handle(),
+		task_manager.spawn_essential_handle(),
 		client.clone(),
 		on_demand.clone(),
 	));
@@ -594,7 +582,7 @@ pub fn new_light_base(
 		},
 	)?;
 
-	let (network, network_status_sinks, system_rpc_tx, network_starter) =
+	let (network, system_rpc_tx, network_starter) =
 		sc_service::build_network(sc_service::BuildNetworkParams {
 			config: &config,
 			client: client.clone(),
@@ -629,7 +617,6 @@ pub fn new_light_base(
 		keystore: keystore_container.sync_keystore(),
 		config,
 		backend,
-		network_status_sinks,
 		system_rpc_tx,
 		network: network.clone(),
 		task_manager: &mut task_manager,

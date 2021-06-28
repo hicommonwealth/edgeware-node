@@ -48,7 +48,7 @@ fn create_class_should_work() {
 			vec![1],
 			Default::default()
 		));
-		let event = Event::nft(crate::Event::CreatedClass(class_id_account(), CLASS_ID));
+		let event = Event::NFTModule(crate::Event::CreatedClass(class_id_account(), CLASS_ID));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(
@@ -80,7 +80,7 @@ fn mint_should_work() {
 			vec![1],
 			Properties(ClassProperty::Transferable | ClassProperty::Burnable)
 		));
-		let event = Event::nft(crate::Event::CreatedClass(class_id_account(), CLASS_ID));
+		let event = Event::NFTModule(crate::Event::CreatedClass(class_id_account(), CLASS_ID));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(
@@ -95,7 +95,7 @@ fn mint_should_work() {
 			vec![2],
 			2
 		));
-		let event = Event::nft(crate::Event::MintedToken(class_id_account(), BOB, CLASS_ID, 2));
+		let event = Event::NFTModule(crate::Event::MintedToken(class_id_account(), BOB, CLASS_ID, 2));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(
@@ -197,7 +197,7 @@ fn transfer_should_work() {
 		);
 
 		assert_ok!(NFTModule::transfer(Origin::signed(BOB), ALICE, (CLASS_ID, TOKEN_ID)));
-		let event = Event::nft(crate::Event::TransferredToken(BOB, ALICE, CLASS_ID, TOKEN_ID));
+		let event = Event::NFTModule(crate::Event::TransferredToken(BOB, ALICE, CLASS_ID, TOKEN_ID));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(
@@ -210,7 +210,7 @@ fn transfer_should_work() {
 		);
 
 		assert_ok!(NFTModule::transfer(Origin::signed(ALICE), BOB, (CLASS_ID, TOKEN_ID)));
-		let event = Event::nft(crate::Event::TransferredToken(ALICE, BOB, CLASS_ID, TOKEN_ID));
+		let event = Event::NFTModule(crate::Event::TransferredToken(ALICE, BOB, CLASS_ID, TOKEN_ID));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(
@@ -301,7 +301,7 @@ fn burn_should_work() {
 			1
 		));
 		assert_ok!(NFTModule::burn(Origin::signed(BOB), (CLASS_ID, TOKEN_ID)));
-		let event = Event::nft(crate::Event::BurnedToken(BOB, CLASS_ID, TOKEN_ID));
+		let event = Event::NFTModule(crate::Event::BurnedToken(BOB, CLASS_ID, TOKEN_ID));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(
@@ -403,7 +403,7 @@ fn burn_with_remark_should_work() {
 			(CLASS_ID, TOKEN_ID),
 			remark
 		));
-		let event = Event::nft(crate::Event::BurnedTokenWithRemark(
+		let event = Event::NFTModule(crate::Event::BurnedTokenWithRemark(
 			BOB,
 			CLASS_ID,
 			TOKEN_ID,
@@ -443,7 +443,7 @@ fn destroy_class_should_work() {
 			CLASS_ID,
 			ALICE
 		));
-		let event = Event::nft(crate::Event::DestroyedClass(class_id_account(), CLASS_ID));
+		let event = Event::NFTModule(crate::Event::DestroyedClass(class_id_account(), CLASS_ID));
 		assert_eq!(last_event(), event);
 
 		assert_eq!(free_balance(&class_id_account()), 0);
