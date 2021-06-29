@@ -136,8 +136,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 47,
-	impl_version: 47,
+	spec_version: 48,
+	impl_version: 48,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -151,8 +151,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 10047,
-	impl_version: 10047,
+	spec_version: 10048,
+	impl_version: 10048,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -1248,8 +1248,8 @@ construct_runtime!(
 		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
 		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
 		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 40,
-		Tokens: webb_tokens::{Pallet, Storage, Event<T>} = 41,
-		Currencies: webb_currencies::{Pallet, Storage, Event<T>} = 42,
+		Tokens: webb_tokens::{Pallet, Call, Storage, Event<T>} = 41,
+		Currencies: webb_currencies::{Pallet, Call, Storage, Event<T>} = 42,
 		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
 		NFT: nft::{Pallet, Call, Event<T>} = 44,
 	}
