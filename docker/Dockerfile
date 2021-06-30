@@ -2,10 +2,10 @@ FROM ubuntu as builder
 
 LABEL maintainer="eliott@nuclei.studio"
 
-ARG RUST_VERSION=nightly-2020-10-06
+ARG RUST_VERSION=nightly-2021-06-01
 ARG PROFILE=release
 ARG GIT_REPO=https://github.com/hicommonwealth/edgeware-node
-ARG GIT_BRANCH=v3.2.0
+ARG GIT_BRANCH=v3.3.3
 ARG BINARY_NAME=edgeware
 ARG PACKAGE_NAME=edgeware-cli
 
@@ -23,10 +23,8 @@ RUN curl https://raw.githubusercontent.com/rust-lang/rustup/master/rustup-init.s
     git clone ${GIT_REPO} source && \
     cd source && \
     git checkout ${GIT_BRANCH} && \
-    git submodule update --init --recursive && \
-    rustup default stable && \
-    rustup uninstall nightly && \	
-    rustup toolchain install ${RUST_VERSION} && \	
+    rustup toolchain install ${RUST_VERSION} && \
+    rustup default $RUST_VERSION && \
     rustup target add wasm32-unknown-unknown --toolchain ${RUST_VERSION} && \
     cargo build -p ${PACKAGE_NAME} --${PROFILE} && \
     cp target/${PROFILE}/${BINARY_NAME} /node
