@@ -1,16 +1,14 @@
 version: '3.3'
 services:
   edgeware:
-    image: hicommonwealth/edgeware:v3.2.0
+    image: hicommonwealth/edgeware:v3.3.3
     logging:
       driver: "json-file"
       options:
         max-size: "100M"
         max-file: "2"
-    volumes:
-      - ./data_edg_mainnet:/data/chains
     ports:
       - "127.0.0.1:9933:9933"
       - "127.0.0.1:9944:9944"
       - "127.0.0.1:30333:30333"
-    command: ['--chain', 'edgeware', '--name', 'substrate_playground', '--ws-external', '--rpc-external', '--rpc-cors', 'all' ]
+    command: ['--chain', '/data/chains/mainnet.chainspec.json', '--name', 'docker_compose_mainnet', '--ws-external', '--rpc-external', '--rpc-cors', 'all' ]
