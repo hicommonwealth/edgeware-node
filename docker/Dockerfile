@@ -2,7 +2,7 @@ FROM ubuntu as builder
 
 LABEL maintainer="jake@commonwealth.im"
 
-ARG RUST_VERSION=nightly-2020-10-06
+ARG RUST_VERSION=nightly-2021-06-01
 ARG PROFILE=release
 ARG GIT_REPO=https://github.com/hicommonwealth/edgeware-node
 ARG GIT_BRANCH=v3.3.3
