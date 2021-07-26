@@ -1033,7 +1033,7 @@ parameter_types! {
 	pub const EthChainId: u64 = 2022;
 }
 
-/// Clone of Istanbul config with `create_contract_limit` raised.
+/// Clone of Istanbul config: https://github.com/rust-blockchain/evm/blob/master/runtime/src/lib.rs
 static EVM_CONFIG: EvmConfig = EvmConfig {
 	gas_ext_code: 700,
 	gas_ext_code_hash: 700,
@@ -1059,7 +1059,7 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 	stack_limit: 1024,
 	memory_limit: usize::max_value(),
 	call_stack_limit: 1024,
-	create_contract_limit: None,
+	create_contract_limit: Some(0x6000),
 	call_stipend: 2300,
 	has_delegate_call: true,
 	has_create2: true,
