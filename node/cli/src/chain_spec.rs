@@ -169,18 +169,6 @@ pub fn testnet_genesis(
 		storage: BTreeMap::new(),
 		code: vec![],
 	});
-	// account used in frontier
-	evm_accounts.insert(
-		H160::from_str("6be02d1d3665660d22ff9624b7be0551ee1ac91b")
-			.expect("internal H160 is valid; qed"),
-		pallet_evm::GenesisAccount {
-			balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
-				.expect("internal U256 is valid; qed"),
-			code: Default::default(),
-			nonce: Default::default(),
-			storage: Default::default(),
-		}
-	);
 
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
