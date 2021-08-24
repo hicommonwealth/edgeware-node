@@ -17,7 +17,7 @@ frame-support = { version = "3.0", default-features = false }
 frame-system = { version = "3.0", default-features = false }
 
 [dev-dependencies]
-sp-io = { version = "3.0", default-features = false }
+sp-io = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-core = { version = "3.0", default-features = false }
 
 [features]

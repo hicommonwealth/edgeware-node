@@ -15,7 +15,7 @@ ethereum = { version = "0.7.1", default-features = false, features = ["with-code
 ethereum-types = { version = "0.11.0", default-features = false }
 sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-api = { version = "*", default-features = false }
-sp-io = { version = "*", default-features = false }
+sp-io = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-std = { version = "*", default-features = false }
 sp-core = { version = "*", default-features = false }
 serde = { version = "1.0", features = ["derive"], optional = true }

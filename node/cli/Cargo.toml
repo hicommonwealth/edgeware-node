@@ -56,7 +56,7 @@ sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "er
 sp-timestamp = { version = "3.0", default-features = false }
 sp-inherents = { version = "3.0" }
 sp-keyring = { version = "3.0" }
-sp-io = { version = "3.0" }
+sp-io = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking" }
 sp-consensus = { version = "0.9" }
 sp-transaction-pool = { version = "3.0" }
 

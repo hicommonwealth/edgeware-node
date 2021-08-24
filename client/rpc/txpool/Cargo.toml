@@ -15,7 +15,7 @@ ethereum = { version = "0.7.1", default-features = false, features = ["with-code
 edgeware-rpc-core-txpool = { path = "../../rpc-core/txpool" }
 sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-api = { version = "3.0" }
-sp-io = { version = "3.0" }
+sp-io = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking" }
 sp-std = { version = "3.0" }
 sp-blockchain = { version = "3.0" }
 sp-transaction-pool = { version = "3.0" }

@@ -21,9 +21,9 @@ tracing = "0.1.25"
 
 # Primitives
 sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking" }
+sp-io = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking" }
 sp-utils = {version = "*" }
 sp-api = {version = "*" }
-sp-io = {version = "*" }
 sp-std = {version = "*" }
 sp-blockchain = {version = "*" }
 sp-transaction-pool = {version = "*" }
