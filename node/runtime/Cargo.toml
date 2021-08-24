@@ -119,7 +119,7 @@ evm = { version = "0.27.0", default-features = false, features = ["with-codec"] 
 
 # used for runtime benchmarking
 frame-benchmarking = { version = "3.0", default-features = false, optional = true }
-frame-system-benchmarking = { version = "3.0", default-features = false, optional = true }
+frame-system-benchmarking = { package = "frame-system-benchmarking", path = "../../frame/system/benchmarking", default-features = false, optional = true }
 hex-literal = { version = "0.3.1", optional = true }
 
 [build-dependencies]
