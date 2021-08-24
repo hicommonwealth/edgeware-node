@@ -13,7 +13,7 @@ repository = 'https://github.com/PureStake/moonbeam/'
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false }
 ethereum = { version = "0.7.1", default-features = false, features = ["with-codec"] }
 ethereum-types = { version = "0.11.0", default-features = false }
-sp-runtime = { version = "3.0", default-features = false }
+sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-api = { version = "*", default-features = false }
 sp-io = { version = "*", default-features = false }
 sp-std = { version = "*", default-features = false }

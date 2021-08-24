@@ -11,7 +11,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "2.0.0" }
-sp-runtime = { version = "3.0" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-runtime-interface = { version = "3.0" }
 sp-runtime-interface-proc-macro = { version = "3.0" }
 edgeware-primitives = { path = "../primitives" }

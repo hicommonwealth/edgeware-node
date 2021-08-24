@@ -33,7 +33,7 @@ sp-consensus = { version = "0.9" }
 sp-consensus-aura = { version = "0.9" }
 sp-core = { version = "3.0" }
 sp-offchain = { version = "3.0" }
-sp-runtime = { version = "3.0" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 sp-storage = { version = "3.0" }
 sp-session = { version = "3.0" }
 sp-transaction-pool = { version = "3.0" }
@@ -42,12 +42,12 @@ sc-transaction-graph = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
 tokio = { version = "0.2.13", features = ["macros", "sync"] }
 
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }

@@ -14,7 +14,7 @@ codec = { package = "parity-scale-codec", version = "2.0.0", default-features = 
 frame-system = { version = "3.0", default-features = false }
 sp-application-crypto = { version = "3.0", default-features = false }
 sp-core = { version = "3.0", default-features = false }
-sp-runtime = { version = "3.0", default-features = false }
+sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking", default-features = false }
 
 [dev-dependencies]
 sp-serializer = { version = "3.0" }

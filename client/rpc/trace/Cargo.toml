@@ -20,7 +20,7 @@ futures = { version = "0.3", features = ["compat"] }
 tracing = "0.1.25"
 
 # Primitives
-sp-runtime = {version = "*" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate.git", branch = "erup-4-benchmarking" }
 sp-utils = {version = "*" }
 sp-api = {version = "*" }
 sp-io = {version = "*" }
@@ -28,7 +28,7 @@ sp-std = {version = "*" }
 sp-blockchain = {version = "*" }
 sp-transaction-pool = {version = "*" }
 sp-block-builder = {version = "*" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
 edgeware-rpc-primitives-debug = { path = "../../../node/debug" }
 
 # Client and RPC
@@ -36,7 +36,7 @@ jsonrpc-core = "15.0.0"
 sc-client-api = {version = "*" }
 sc-network = {version = "*" }
 sc-transaction-graph = {version = "*" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
+fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-4-benchmarking" }
 edgeware-rpc-core-trace = { path = "../../rpc-core/trace" }
