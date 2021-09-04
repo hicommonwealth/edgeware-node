@@ -7,10 +7,9 @@ services:
       - "127.0.0.1:9933:9933/tcp"
       - "127.0.0.1:9944:9944/tcp"
       - "127.0.0.1:30333:30333/tcp"
-    image: decentration/edgeware:latest
+    image: decentration/edgeware:v3.3.3
     volumes:
       - "edgeware-data:/data"
     command: edgeware
-
 volumes:
   edgeware-data:
