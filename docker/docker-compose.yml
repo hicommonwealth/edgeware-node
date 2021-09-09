@@ -4,12 +4,13 @@ services:
     build:
       context: .
     ports:
-      - "127.0.0.1:9933:9933/tcp"
-      - "127.0.0.1:9944:9944/tcp"
-      - "127.0.0.1:30333:30333/tcp"
+      - "0.0.0.0:9933:9933/tcp"
+      - "0.0.0.0:9944:9944/tcp"
+      - "0.0.0.0:30333:30333/tcp"
     image: decentration/edgeware:v3.3.3
+    command: bash -c "edgeware --chain=edgeware --name <INSERT NAME> --wasm-execution Compiled"
     volumes:
-      - "edgeware-data:/data"
-    command: edgeware
+     - "edgeware-data:/data"
+    
 volumes:
   edgeware-data:
