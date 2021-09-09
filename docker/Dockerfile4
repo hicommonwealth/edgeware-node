@@ -1,9 +1,0 @@
-FROM hicommonwealth/edgeware:v3.3.3 as builder
-LABEL description="This is the build stage for edgeware. Here we create the binary."
-
-USER edgeware
-EXPOSE 30333 9933 9944
-VOLUME ["/data"]
-
-CMD ["/usr/local/bin/edgeware"]
-    
