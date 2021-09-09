@@ -83,15 +83,24 @@ To start up the Edgeware node and connect to the Beresheet testnet, run:
 To run a local build using docker, run:
 
 ```
-docker build -f docker/Dockerfile.local .
+docker build -f docker/Dockerfile .
 ```
 
-If you want to use our previously-built image `hicommonwealth/edgeware`, you can use docker-compose:
+If you want to use our previously-built image `decentration/edgeware:v3.3.3`, you can use docker-compose:
 
 ```
 cd docker; docker-compose up
 ```
 You will have exposed ports 9933, 9944 and 30333.
+
+Then run:
+
+```
+docker run --rm -it decentration/edgeware:v3.3.3 edgeware --chain=edgeware --name <INSERT NAME> --wasm-execution Compiled
+```
+
+
+
 
 ### Module Benchmarking
 
