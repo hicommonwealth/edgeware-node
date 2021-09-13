@@ -1074,7 +1074,11 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 
 /// Current (safe) approximation of the gas/s consumption considering
 /// EVM execution over compiled WASM.
+#[cfg(feature = "beresheet-runtime")]
 pub const GAS_PER_SECOND: u64 = 150_000_000;
+
+#[cfg(not(feature = "beresheet-runtime"))]
+pub const GAS_PER_SECOND: u64 = 8_000_000;
 
 /// Approximate ratio of the amount of Weight per Gas.
 /// u64 works for approximations because Weight is a very small unit compared to
