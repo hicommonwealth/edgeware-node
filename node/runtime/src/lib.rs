@@ -136,8 +136,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 48,
-	impl_version: 48,
+	spec_version: 50,
+	impl_version: 50,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -151,8 +151,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 10048,
-	impl_version: 10048,
+	spec_version: 10050,
+	impl_version: 10050,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -1033,7 +1033,7 @@ parameter_types! {
 	pub const EthChainId: u64 = 2022;
 }
 
-/// Clone of Istanbul config with `create_contract_limit` raised.
+/// Clone of Istanbul config: https://github.com/rust-blockchain/evm/blob/master/runtime/src/lib.rs
 static EVM_CONFIG: EvmConfig = EvmConfig {
 	gas_ext_code: 700,
 	gas_ext_code_hash: 700,
@@ -1059,7 +1059,7 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 	stack_limit: 1024,
 	memory_limit: usize::max_value(),
 	call_stack_limit: 1024,
-	create_contract_limit: None,
+	create_contract_limit: Some(0x6000),
 	call_stipend: 2300,
 	has_delegate_call: true,
 	has_create2: true,
@@ -1074,6 +1074,10 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 
 /// Current (safe) approximation of the gas/s consumption considering
 /// EVM execution over compiled WASM.
+#[cfg(feature = "beresheet-runtime")]
+pub const GAS_PER_SECOND: u64 = 150_000_000;
+
+#[cfg(not(feature = "beresheet-runtime"))]
 pub const GAS_PER_SECOND: u64 = 8_000_000;
 
 /// Approximate ratio of the amount of Weight per Gas.
@@ -1094,7 +1098,8 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 }
 
 parameter_types! {
-	pub BlockGasLimit: U256 = U256::from(u32::max_value());
+        pub BlockGasLimit: U256
+               = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
 }
 
 impl pallet_evm::Config for Runtime {
