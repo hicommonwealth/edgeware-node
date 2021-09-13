@@ -136,8 +136,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 49,
-	impl_version: 49,
+	spec_version: 50,
+	impl_version: 50,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -151,8 +151,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 10049,
-	impl_version: 10049,
+	spec_version: 10050,
+	impl_version: 10050,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -1074,7 +1074,7 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 
 /// Current (safe) approximation of the gas/s consumption considering
 /// EVM execution over compiled WASM.
-pub const GAS_PER_SECOND: u64 = 8_000_000;
+pub const GAS_PER_SECOND: u64 = 150_000_000;
 
 /// Approximate ratio of the amount of Weight per Gas.
 /// u64 works for approximations because Weight is a very small unit compared to
