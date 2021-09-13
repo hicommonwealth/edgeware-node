@@ -82,7 +82,7 @@ pub use pallet_session::historical as pallet_session_historical;
 
 use evm_runtime::Config as EvmConfig;
 use fp_rpc::TransactionStatus;
-use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, HashedAddressMapping, Runner};
+use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, HashedAddressMapping, Runner};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -1094,15 +1094,8 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 }
 
 parameter_types! {
-	pub BlockGasLimit: U256
-		= U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
-}
-
-pub struct FixedGasPrice;
-impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		1_000_000_000.into()
-	}
+        pub BlockGasLimit: U256
+               = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
 }
 
 impl pallet_evm::Config for Runtime {
@@ -1112,7 +1105,7 @@ impl pallet_evm::Config for Runtime {
 	type ChainId = EthChainId;
 	type Currency = Balances;
 	type Event = Event;
-	type FeeCalculator = FixedGasPrice;
+	type FeeCalculator = pallet_dynamic_fee::Pallet<Self>;
 	type GasWeightMapping = EdgewareGasWeightMapping;
 	type OnChargeTransaction = ();
 	type Precompiles = EdgewarePrecompiles<Self>;
