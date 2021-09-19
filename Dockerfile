@@ -1,4 +1,5 @@
-FROM paritytech/ci-linux:production as builder
+#FROM paritytech/ci-linux:production as builder
+FROM decentration/edgeware:v3.3.3 as builder
 
 LABEL description="This is the build stage for edgeware. Here we create the binary."
 
@@ -35,3 +36,4 @@ VOLUME ["/data"]
 
 CMD ["/usr/local/bin/edgeware"]
     
+
