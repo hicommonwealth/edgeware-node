@@ -109,8 +109,6 @@ use constants::{currency::*, time::*};
 use pallet_contracts::weights::WeightInfo;
 use sp_runtime::generic::Era;
 
-use webb_currencies::BasicCurrencyAdapter;
-
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
@@ -1156,59 +1154,6 @@ impl treasury_reward::Config for Runtime {
 	type Event = Event;
 }
 
-parameter_types! {
-	pub const TokensPalletId: PalletId = PalletId(*b"py/token");
-	pub const NativeCurrencyId: CurrencyId = 0;
-	pub const CurrencyDeposit: Balance = 100 * DOLLARS;
-}
-
-impl webb_tokens::Config for Runtime {
-	type Amount = Amount;
-	type ApprovalDeposit = ApprovalDeposit;
-	type Balance = Balance;
-	type CurrencyDeposit = CurrencyDeposit;
-	type CurrencyId = CurrencyId;
-	type DustAccount = ();
-	type Event = Event;
-	type Extra = ();
-	type ForceOrigin = frame_system::EnsureRoot<AccountId>;
-	type MetadataDepositBase = MetadataDepositBase;
-	type MetadataDepositPerByte = MetadataDepositPerByte;
-	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-	type PalletId = TokensPalletId;
-	type StringLimit = StringLimit;
-	type WeightInfo = ();
-}
-
-impl webb_currencies::Config for Runtime {
-	type Event = Event;
-	type GetNativeCurrencyId = NativeCurrencyId;
-	type MultiCurrency = Tokens;
-	type NativeCurrency = BasicCurrencyAdapter<Runtime, Balances, Amount, BlockNumber>;
-	type WeightInfo = ();
-}
-
-parameter_types! {
-	pub const NftPalletId: PalletId = PalletId(*b"edge/NFT");
-	pub CreateClassDeposit: Balance = 500 * MILLICENTS;
-	pub CreateTokenDeposit: Balance = 100 * MILLICENTS;
-}
-
-impl nft::Config for Runtime {
-	type CreateClassDeposit = CreateClassDeposit;
-	type CreateTokenDeposit = CreateTokenDeposit;
-	type Event = Event;
-	type PalletId = NftPalletId;
-	type WeightInfo = ();
-}
-
-impl orml_nft::Config for Runtime {
-	type ClassData = nft::ClassData<Balance>;
-	type ClassId = u32;
-	type TokenData = nft::TokenData<Balance>;
-	type TokenId = u64;
-}
-
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -1253,10 +1198,10 @@ construct_runtime!(
 		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
 		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
 		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 40,
-		Tokens: webb_tokens::{Pallet, Call, Storage, Event<T>} = 41,
-		Currencies: webb_currencies::{Pallet, Call, Storage, Event<T>} = 42,
-		NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
-		NFT: nft::{Pallet, Call, Event<T>} = 44,
+		// REMOVED: Tokens: webb_tokens::{Pallet, Call, Storage, Event<T>} = 41,
+		// REMOVED: Currencies: webb_currencies::{Pallet, Call, Storage, Event<T>} = 42,
+		// REMOVED: NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
+		// REMOVED: NFT: nft::{Pallet, Call, Event<T>} = 44,
 	}
 );
 

@@ -109,10 +109,6 @@ pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/fronti
 
 sha3 = { version = "0.9", default-features = false }
 
-webb-currencies = { default-features = false, git = "https://github.com/webb-tools/anon" }
-webb-tokens = { default-features = false, git = "https://github.com/webb-tools/anon" }
-webb-traits = { default-features = false, git = "https://github.com/webb-tools/anon" }
-
 evm = { version = "0.27.0", default-features = false, features = ["with-codec"] }
 
 # used for runtime benchmarking
@@ -203,8 +199,7 @@ std = [
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",
-    "webb-currencies/std",
-    "edgeware-evm-tracer/std",
+	"edgeware-evm-tracer/std",
 	"edgeware-rpc-primitives-debug/std",
 	"edgeware-rpc-primitives-txpool/std",
 ]
