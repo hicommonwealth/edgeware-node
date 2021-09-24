@@ -80,18 +80,32 @@ To start up the Edgeware node and connect to the Beresheet testnet, run:
 
 ### Docker
 
+#### Compile in Docker
 To run a local build using docker, run:
 
 ```
-docker build -f docker/Dockerfile.local .
+docker build -f docker/Dockerfile .
 ```
+Images that have failed to build typically are hard to remove. The best way to reclaim the wasted space is to uninstall Docker and then reinstall. 
 
-If you want to use our previously-built image `hicommonwealth/edgeware`, you can use docker-compose:
+If the above image failed to compile `edgeware-cli`, then it's because your machine doesnt have enough memory; or your docker doesn't have enough memory available. Try and increase Docker's available memory by a few notches, by going to Docker Desktop settings. 
+
+#### Pull image and run (no compile)
+If you want to use our previously-built image `decentration/edgeware:v3.3.3`, you can use docker-compose:
 
 ```
 cd docker; docker-compose up
 ```
 You will have exposed ports 9933, 9944 and 30333.
+
+Then run:
+
+```
+docker run --rm -it decentration/edgeware:v3.3.3 edgeware --chain=edgeware --name <INSERT NAME> --wasm-execution Compiled
+```
+
+
+
 
 ### Module Benchmarking
 
