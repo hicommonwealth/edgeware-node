@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-cli"
-version = "3.3.3"
+version = "3.3.5"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 build = "build.rs"
@@ -95,10 +95,10 @@ pallet-dynamic-fee = { git = "https://github.com/webb-tools/frontier", branch = 
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 
 # node-specific dependencies
-edgeware-runtime = { version = "3.3.3", path = "../runtime", default-features = false }
-edgeware-rpc = { version = "3.3.3", path = "../rpc" }
-edgeware-primitives = { version = "3.3.3", path = "../primitives", default-features = false }
-edgeware-executor = { version = "3.3.3", path = "../executor", default-features = false }
+edgeware-runtime = { version = "3.3.5", path = "../runtime", default-features = false }
+edgeware-rpc = { version = "3.3.5", path = "../rpc" }
+edgeware-primitives = { version = "3.3.5", path = "../primitives", default-features = false }
+edgeware-executor = { version = "3.3.5", path = "../executor", default-features = false }
 edgeware-rpc-txpool = { path = "../../client/rpc/txpool", default-features = false }
 edgeware-rpc-primitives-txpool = { path = "../txpool", default-features = false }
 edgeware-rpc-debug = { path = "../../client/rpc/debug", default-features = false }
