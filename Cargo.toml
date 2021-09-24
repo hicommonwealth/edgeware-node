@@ -7,8 +7,6 @@ members = [
 	"client/rpc-core/trace",
 	"client/rpc-core/txpool",
 	"pallets/edge-treasury-reward",
-	"pallets/orml-nft",
-	"pallets/nft",
 	"node/cli",
 	"node/opts",
 	"node/executor",
@@ -29,8 +27,6 @@ exclude = ["vendor"]
 panic = "unwind"
 
 [profile.dev.package]
-aes-soft = { opt-level = 3 }
-aesni = { opt-level = 3 }
 blake2 = { opt-level = 3 }
 blake2-rfc = { opt-level = 3 }
 blake2b_simd = { opt-level = 3 }
