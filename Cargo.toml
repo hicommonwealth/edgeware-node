@@ -25,6 +25,7 @@ exclude = ["vendor"]
 [profile.release]
 # Edgeware runtime requires unwinding.
 panic = "unwind"
+codegen-units=1
 
 [profile.dev.package]
 blake2 = { opt-level = 3 }
