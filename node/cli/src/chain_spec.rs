@@ -191,6 +191,8 @@ pub fn testnet_genesis(
 		]
 	});
 
+	endowed_accounts.push(_root_key.clone());
+
 	initial_authorities.iter().for_each(|x| {
 		if !endowed_accounts.contains(&x.0) {
 			endowed_accounts.push(x.0.clone());
