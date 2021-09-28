@@ -88,7 +88,7 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 
 /// Beresheet Testnet configuration
 pub fn edgeware_beresheet_official() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheetv2.chainspec.json")[..]) {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheetv3.chainspec.json")[..]) {
 		Ok(spec) => spec,
 		Err(e) => panic!("{}", e),
 	}
@@ -160,12 +160,12 @@ pub fn testnet_genesis(
 	_balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	_founder_allocation: Vec<(AccountId, Balance)>,
-	force_endow_initial_authorities: bool,
+	create_evm_alice: bool,
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
 
-	if force_endow_initial_authorities {
+	if create_evm_alice {
 		evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
 			nonce: 0.into(),
 			balance: U256::from(123456_123_000_000_000_000_000u128),
@@ -191,16 +191,14 @@ pub fn testnet_genesis(
 		]
 	});
 
-	if force_endow_initial_authorities {
-		initial_authorities.iter().for_each(|x| {
-			if !endowed_accounts.contains(&x.0) {
-				endowed_accounts.push(x.0.clone());
-			}
-			if !endowed_accounts.contains(&x.1) {
-				endowed_accounts.push(x.1.clone());
-			}
-		});
-	}
+	initial_authorities.iter().for_each(|x| {
+		if !endowed_accounts.contains(&x.0) {
+			endowed_accounts.push(x.0.clone());
+		}
+		if !endowed_accounts.contains(&x.1) {
+			endowed_accounts.push(x.1.clone());
+		}
+	});
 
 	const STASH: Balance = 100000000 * DOLLARS;
 	let endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
@@ -273,7 +271,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 	testnet_genesis(
 		initial_authorities,
 		crate::testnet_fixtures::get_testnet_root_key(),
-		None,
+		Some(vec![]),
 		true,
 		balances,
 		vec![],
