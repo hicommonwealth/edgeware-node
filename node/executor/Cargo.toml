@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-executor"
-version = "3.3.5"
+version = "3.3.6"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware implementation using a substrate node."
 edition = "2018"
@@ -19,9 +19,9 @@ sp-core = { version = "3.0" }
 sp-trie = { version = "3.0" }
 frame-benchmarking = { version = "3.0" }
 
-edgeware-primitives = { version = "3.3.5", path = "../primitives" }
-edgeware-runtime = { version = "3.3.5", path = "../runtime" }
-edgeware-runtime-interface = { version = "3.3.5", path = "../runtime-interface" }
+edgeware-primitives = { version = "3.3.6", path = "../primitives" }
+edgeware-runtime = { version = "3.3.6", path = "../runtime" }
+edgeware-runtime-interface = { version = "3.3.6", path = "../runtime-interface" }
 
 [dev-dependencies]
 sp-runtime = { version = "3.0" }

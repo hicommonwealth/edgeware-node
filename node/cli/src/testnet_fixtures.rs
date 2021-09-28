@@ -27,12 +27,12 @@ use sp_finality_grandpa::AuthorityId as GrandpaId;
 
 /// Testnet root key
 pub fn get_testnet_root_key() -> AccountId {
-	// 5G8jA2TLTQqnofx2jCE1MAtaZNqnJf1ujv7LdZBv2LGznJE2
+	// Beresheet sudo key: 5HVniu9naSbxjFLYBUn6aUTpExoxBzweJCQGRT2GZTMsr5a7
 	return hex!["f04eaed79cba531626964ba59d727b670524247c92cdd0b5f5da04c8eccb796b"].into();
 }
 
-/// MTestnet bootnodes (network compatible from Edgeware mainnet launch)
-pub fn get_mtestnet_bootnodes() -> Vec<MultiaddrWithPeerId> {
+/// Beresheet bootnodes
+pub fn get_beresheet_bootnodes() -> Vec<MultiaddrWithPeerId> {
 	return vec![
 		"/ip4/45.77.148.197/tcp/30333/p2p/12D3KooWGq9cJfDdY3Mg7TZGZpLFTyMkdNB8G2gKCr2HQQgdcxwX"
 			.parse()
@@ -52,8 +52,8 @@ pub fn get_mtestnet_bootnodes() -> Vec<MultiaddrWithPeerId> {
 	];
 }
 
-/// Testnet initial authorities
-pub fn get_mtestnet_initial_authorities() -> Vec<(
+/// Beresheet initial authorities
+pub fn get_beresheet_initial_authorities() -> Vec<(
 	AccountId,
 	AccountId,
 	GrandpaId,
