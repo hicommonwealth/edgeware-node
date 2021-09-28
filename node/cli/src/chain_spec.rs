@@ -247,7 +247,6 @@ pub fn testnet_genesis(
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		},
-		orml_nft: Default::default(),
 	}
 }
 
@@ -483,7 +482,6 @@ pub fn mainnet_genesis(
 			current_payout: 95 * DOLLARS,
 			minting_interval: One::one(),
 		},
-		orml_nft: Default::default(),
 	}
 }
 

@@ -7,8 +7,6 @@ members = [
 	"client/rpc-core/trace",
 	"client/rpc-core/txpool",
 	"pallets/edge-treasury-reward",
-	"pallets/orml-nft",
-	"pallets/nft",
 	"node/cli",
 	"node/opts",
 	"node/executor",
@@ -27,10 +25,9 @@ exclude = ["vendor"]
 [profile.release]
 # Edgeware runtime requires unwinding.
 panic = "unwind"
+codegen-units=1
 
 [profile.dev.package]
-aes-soft = { opt-level = 3 }
-aesni = { opt-level = 3 }
 blake2 = { opt-level = 3 }
 blake2-rfc = { opt-level = 3 }
 blake2b_simd = { opt-level = 3 }

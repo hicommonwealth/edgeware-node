@@ -69,8 +69,6 @@ pub type Block = generic::Block<Header, OpaqueExtrinsic>;
 /// Block ID.
 pub type BlockId = generic::BlockId<Block>;
 
-/// NFT balance for nft module
-pub type NFTBalance = u128;
 /// Asset id type for assets module
 pub type AssetId = u32;
 /// Token amount type for tokens module
