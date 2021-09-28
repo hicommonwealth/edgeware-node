@@ -160,15 +160,19 @@ pub fn testnet_genesis(
 	_balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	_founder_allocation: Vec<(AccountId, Balance)>,
+	force_endow_initial_authorities: bool,
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
-	evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
-		nonce: 0.into(),
-		balance: U256::from(123456_123_000_000_000_000_000u128),
-		storage: BTreeMap::new(),
-		code: vec![],
-	});
+
+	if force_endow_initial_authorities {
+		evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
+			nonce: 0.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		});
+	}
 
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
@@ -187,14 +191,16 @@ pub fn testnet_genesis(
 		]
 	});
 
-	initial_authorities.iter().for_each(|x| {
-		if !endowed_accounts.contains(&x.0) {
-			endowed_accounts.push(x.0.clone());
-		}
-		if !endowed_accounts.contains(&x.1) {
-			endowed_accounts.push(x.1.clone());
-		}
-	});
+	if force_endow_initial_authorities {
+		initial_authorities.iter().for_each(|x| {
+			if !endowed_accounts.contains(&x.0) {
+				endowed_accounts.push(x.0.clone());
+			}
+			if !endowed_accounts.contains(&x.1) {
+				endowed_accounts.push(x.1.clone());
+			}
+		});
+	}
 
 	const STASH: Balance = 100000000 * DOLLARS;
 	let endowed_balances: Vec<(AccountId, Balance)> = endowed_accounts.iter().map(|k| (k.clone(), STASH)).collect();
@@ -262,7 +268,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		.filter(|b| b.1 > 0)
 		.collect();
 
-	let initial_authorities = crate::testnet_fixtures::get_mtestnet_initial_authorities();
+	let initial_authorities = crate::testnet_fixtures::get_beresheet_initial_authorities();
 
 	testnet_genesis(
 		initial_authorities,
@@ -272,6 +278,7 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		balances,
 		vec![],
 		crate::mainnet_fixtures::get_commonwealth_allocation(),
+		false,
 	)
 }
 
@@ -284,7 +291,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 			"tokenSymbol": "tEDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
-	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
+	let boot_nodes = crate::testnet_fixtures::get_beresheet_bootnodes();
 
 	ChainSpec::from_genesis(
 		&testnet_name,
@@ -319,6 +326,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		true,
 	)
 }
 
@@ -332,6 +340,7 @@ pub fn development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		true,
 	)
 }
 
@@ -392,6 +401,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		true,
 	)
 }
 

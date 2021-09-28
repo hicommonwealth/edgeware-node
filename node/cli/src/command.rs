@@ -55,8 +55,8 @@ impl SubstrateCli for Cli {
 			"multi-dev" | "multi" => Box::new(chain_spec::multi_development_config()),
 			"local" => Box::new(chain_spec::local_testnet_config()),
 			"testnet-conf" => Box::new(chain_spec::edgeware_testnet_config(
-				"Beresheet v2".to_string(),
-				"beresheet_v2_edgeware_testnet".to_string(),
+				"Beresheet v3".to_string(),
+				"beresheet_v3_edgeware_testnet".to_string(),
 			)),
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
 			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),

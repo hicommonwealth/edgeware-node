@@ -149,8 +149,8 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 10051,
-	impl_version: 10051,
+	spec_version: 10052,
+	impl_version: 10052,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 };
@@ -1260,49 +1260,9 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPallets,
-	(
-		custom_migration::Upgrade,
-		// custom_migration::GrandpaStoragePrefixMigration
-	),
 >;
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
-
-/// Custom runtime upgrade to execute the balances migration before the account
-/// migration.
-mod custom_migration {
-	use super::*;
-	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
-
-	pub struct Upgrade;
-	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
-		type AccountId = AccountId;
-		type Balance = Balance;
-		type Module = PhragmenElection;
-	}
-
-	impl OnRuntimeUpgrade for Upgrade {
-		fn on_runtime_upgrade() -> Weight {
-			let mut weight = 0;
-			// custom migration for edgeware.
-			weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
-			// old VotingBond
-			let old_voter_bond: Balance = 10 * DOLLARS;
-			// old CandidacyBond
-			let old_candidacy_bond: Balance = 1_000 * DOLLARS;
-			// elections migrations.
-			pallet_elections_phragmen::migrations::v3::migrate_voters_to_recorded_deposit::<Self>(old_voter_bond);
-			pallet_elections_phragmen::migrations::v3::migrate_candidates_to_recorded_deposit::<Self>(
-				old_candidacy_bond,
-			);
-			pallet_elections_phragmen::migrations::v3::migrate_runners_up_to_recorded_deposit::<Self>(
-				old_candidacy_bond,
-			);
-			pallet_elections_phragmen::migrations::v3::migrate_members_to_recorded_deposit::<Self>(old_candidacy_bond);
-			weight
-		}
-	}
-}
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
