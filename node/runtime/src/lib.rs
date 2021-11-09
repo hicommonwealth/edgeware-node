@@ -21,8 +21,6 @@
 // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 #![recursion_limit = "256"]
 
-use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
-
 pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Nonce, Signature};
 use frame_support::{
 	construct_runtime, parameter_types,
@@ -36,6 +34,8 @@ use frame_support::{
 	},
 	ConsensusEngineId, PalletId, RuntimeDebug,
 };
+use pallet_evm::EnsureAddressNever;
+use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 
 use codec::{Decode, Encode};
 use frame_support::traits::InstanceFilter;
@@ -82,7 +82,10 @@ pub use pallet_session::historical as pallet_session_historical;
 
 use evm_runtime::Config as EvmConfig;
 use fp_rpc::TransactionStatus;
-use pallet_evm::{Account as EVMAccount, EnsureAddressTruncated, HashedAddressMapping, Runner};
+use pallet_evm::{
+	Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, EnsureAddressTruncated, GasWeightMapping,
+	HashedAddressMapping, Runner,
+};
 
 pub use sp_inherents::{CheckInherentsResult, InherentData};
 use static_assertions::const_assert;
@@ -307,8 +310,8 @@ impl InstanceFilter<Call> for ProxyType {
 			ProxyType::NonTransfer => !matches!(
 				c,
 				Call::Balances(..)
-					| Call::Vesting(pallet_vesting::Call::vested_transfer(..))
-					| Call::Indices(pallet_indices::Call::transfer(..))
+					| Call::Vesting(pallet_vesting::Call::vested_transfer { .. })
+					| Call::Indices(pallet_indices::Call::transfer { .. })
 			),
 			ProxyType::Governance => matches!(
 				c,
@@ -483,22 +486,19 @@ pallet_staking_reward_curve::build! {
 }
 
 parameter_types! {
-	// 1 hour session, 6 hour era
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
-	// 2 * 28 eras * 6 hours/era = 14 day bonding duration
-	pub const BondingDuration: pallet_staking::EraIndex = 2 * 28;
-	// 28 eras * 6 hours/era = 7 day slash duration
-	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
-	pub const RewardCurve: &'static PiecewiseLinear<'static> = &CURVE;
-	pub const ElectionLookahead: BlockNumber = EPOCH_DURATION_IN_BLOCKS / 4;
-	pub const MaxNominatorRewardedPerValidator: u32 = 128;
-	pub const MaxIterations: u32 = 5;
-	// 0.05%. The higher the value, the more strict solution acceptance becomes.
-	pub MinSolutionScoreBump: Perbill = Perbill::from_rational(5u32, 10_000);
-	pub OffchainSolutionWeightLimit: Weight = RuntimeBlockWeights::get()
-		.get(DispatchClass::Normal)
-		.max_extrinsic.expect("Normal extrinsics have a weight limit configured; qed")
-		.saturating_sub(BlockExecutionWeight::get());
+	pub const BondingDuration: pallet_staking::EraIndex = 24 * 28;
+	pub const SlashDeferDuration: pallet_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
+	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
+	pub const MaxNominatorRewardedPerValidator: u32 = 256;
+	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
+	pub OffchainRepeat: BlockNumber = 5;
+}
+
+use frame_election_provider_support::onchain;
+impl onchain::Config for Runtime {
+	type Accuracy = Perbill;
+	type DataProvider = Staking;
 }
 
 parameter_types! {
@@ -506,15 +506,16 @@ parameter_types! {
 	pub const SignedPhase: u32 = EPOCH_DURATION_IN_BLOCKS / 4;
 	pub const UnsignedPhase: u32 = EPOCH_DURATION_IN_BLOCKS / 4;
 
-	// fallback: no need to do on-chain phragmen initially.
-	pub const Fallback: pallet_election_provider_multi_phase::FallbackStrategy =
-		pallet_election_provider_multi_phase::FallbackStrategy::OnChain;
+	// signed config
+	pub const SignedMaxSubmissions: u32 = 10;
+	pub const SignedRewardBase: Balance = 1 * DOLLARS;
+	pub const SignedDepositBase: Balance = 1 * DOLLARS;
+	pub const SignedDepositByte: Balance = 1 * CENTS;
 
 	pub SolutionImprovementThreshold: Perbill = Perbill::from_rational(1u32, 10_000);
 
 	// miner configs
 	pub const MultiPhaseUnsignedPriority: TransactionPriority = StakingUnsignedPriority::get() - 1u64;
-	pub const MinerMaxIterations: u32 = 10;
 	pub MinerMaxWeight: Weight = RuntimeBlockWeights::get()
 		.get(DispatchClass::Normal)
 		.max_extrinsic.expect("Normal extrinsics have a weight limit configured; qed")
@@ -525,37 +526,98 @@ parameter_types! {
 		.max
 		.get(DispatchClass::Normal);
 
-	pub OffchainRepeat: BlockNumber = 5;
+	// BagsList allows a practically unbounded count of nominators to participate in NPoS elections.
+	// To ensure we respect memory limits when using the BagsList this must be set to a number of
+	// voters we know can fit into a single vec allocation.
+	pub const VoterSnapshotPerBlock: u32 = 10_000;
 }
 
 sp_npos_elections::generate_solution_type!(
 	#[compact]
-	pub struct NposCompactSolution16::<
+	pub struct NposSolution16::<
 		VoterIndex = u32,
 		TargetIndex = u16,
 		Accuracy = sp_runtime::PerU16,
 	>(16)
 );
 
-pub const MAX_NOMINATIONS: u32 = <NposCompactSolution16 as sp_npos_elections::CompactSolution>::LIMIT as u32;
+pub const MAX_NOMINATIONS: u32 = <NposSolution16 as sp_npos_elections::NposSolution>::LIMIT as u32;
+
+/// The numbers configured here could always be more than the the maximum limits
+/// of staking pallet to ensure election snapshot will not run out of memory.
+/// For now, we set them to smaller values since the staking is bounded and the
+/// weight pipeline takes hours for this single pallet.
+pub struct BenchmarkConfig;
+impl pallet_election_provider_multi_phase::BenchmarkingConfig for BenchmarkConfig {
+	const ACTIVE_VOTERS: [u32; 2] = [500, 800];
+	const DESIRED_TARGETS: [u32; 2] = [200, 400];
+	const MAXIMUM_TARGETS: u32 = 300;
+	const MINER_MAXIMUM_VOTERS: u32 = 1000;
+	const SNAPSHOT_MAXIMUM_VOTERS: u32 = 1000;
+	const TARGETS: [u32; 2] = [500, 1000];
+	const VOTERS: [u32; 2] = [1000, 2000];
+}
+
+/// Maximum number of iterations for balancing that will be executed in the
+/// embedded OCW miner of election provider multi phase.
+pub const MINER_MAX_ITERATIONS: u32 = 10;
+
+/// A source of random balance for NposSolver, which is meant to be run by the
+/// OCW election miner.
+pub struct OffchainRandomBalancing;
+impl frame_support::pallet_prelude::Get<Option<(usize, sp_npos_elections::ExtendedBalance)>>
+	for OffchainRandomBalancing
+{
+	fn get() -> Option<(usize, sp_npos_elections::ExtendedBalance)> {
+		use sp_runtime::traits::TrailingZeroInput;
+		let iters = match MINER_MAX_ITERATIONS {
+			0 => 0,
+			max @ _ => {
+				let seed = sp_io::offchain::random_seed();
+				let random = <u32>::decode(&mut TrailingZeroInput::new(&seed))
+					.expect("input is padded with zeroes; qed")
+					% max.saturating_add(1);
+				random as usize
+			}
+		};
+
+		Some((iters, 0))
+	}
+}
 
 impl pallet_election_provider_multi_phase::Config for Runtime {
-	type BenchmarkingConfig = ();
-	type CompactSolution = NposCompactSolution16;
+	type BenchmarkingConfig = BenchmarkConfig;
 	type Currency = Balances;
+	// nothing to do upon rewards
 	type DataProvider = Staking;
+	type EstimateCallFee = TransactionPayment;
 	type Event = Event;
-	type Fallback = Fallback;
-	type MinerMaxIterations = MinerMaxIterations;
+	type Fallback = pallet_election_provider_multi_phase::NoFallback<Self>;
+	type ForceOrigin = EnsureRootOrHalfCouncil;
 	type MinerMaxLength = MinerMaxLength;
 	type MinerMaxWeight = MinerMaxWeight;
 	type MinerTxPriority = MultiPhaseUnsignedPriority;
 	type OffchainRepeat = OffchainRepeat;
-	type OnChainAccuracy = Perbill;
+	// burn slashes
+	type RewardHandler = ();
+	type SignedDepositBase = SignedDepositBase;
+	type SignedDepositByte = SignedDepositByte;
+	type SignedDepositWeight = ();
+	type SignedMaxSubmissions = SignedMaxSubmissions;
+	type SignedMaxWeight = MinerMaxWeight;
 	type SignedPhase = SignedPhase;
+	type SignedRewardBase = SignedRewardBase;
+	type SlashHandler = ();
+	type Solution = NposSolution16;
 	type SolutionImprovementThreshold = SolutionImprovementThreshold;
+	type Solver = frame_election_provider_support::SequentialPhragmen<
+		AccountId,
+		pallet_election_provider_multi_phase::SolutionAccuracyOf<Self>,
+		OffchainRandomBalancing,
+	>;
 	type UnsignedPhase = UnsignedPhase;
-	type WeightInfo = pallet_election_provider_multi_phase::weights::SubstrateWeight<Runtime>;
+	type VoterSnapshotPerBlock = VoterSnapshotPerBlock;
+	type WeightInfo = pallet_election_provider_multi_phase::weights::SubstrateWeight<Self>;
 }
 
 impl pallet_staking::Config for Runtime {
@@ -976,16 +1038,10 @@ impl pallet_sudo::Config for Runtime {
 }
 
 parameter_types! {
-	pub TombstoneDeposit: Balance = deposit(
+	pub ContractDeposit: Balance = deposit(
 		1,
 		<pallet_contracts::Pallet<Runtime>>::contract_info_size(),
 	);
-	pub DepositPerContract: Balance = TombstoneDeposit::get();
-	pub const DepositPerStorageByte: Balance = deposit(0, 1);
-	pub const DepositPerStorageItem: Balance = deposit(1, 0);
-	pub RentFraction: Perbill = Perbill::from_rational(1u32, 30 * DAYS);
-	pub const SurchargeReward: Balance = 150 * MILLICENTS;
-	pub const SignedClaimHandicap: u32 = 2;
 	pub const MaxValueSize: u32 = 16 * 1024;
 	// The lazy deletion runs inside on_initialize.
 	pub DeletionWeightLimit: Weight = AVERAGE_ON_INITIALIZE_RATIO *
@@ -1000,25 +1056,27 @@ parameter_types! {
 }
 
 impl pallet_contracts::Config for Runtime {
+	type Call = Call;
+	/// The safest default is to allow no calls at all.
+	///
+	/// Runtimes should whitelist dispatchables that are allowed to be called
+	/// from contracts and make sure they are stable. Dispatchables exposed to
+	/// contracts are not allowed to change because that would break already
+	/// deployed contracts. The `Call` structure itself is not allowed to change
+	/// the indices of existing pallets, too.
+	type CallFilter = frame_support::traits::Nothing;
 	type CallStack = [pallet_contracts::Frame<Self>; 31];
 	type ChainExtension = ();
+	type ContractDeposit = ContractDeposit;
 	type Currency = Balances;
 	type DeletionQueueDepth = DeletionQueueDepth;
 	type DeletionWeightLimit = DeletionWeightLimit;
-	type DepositPerContract = DepositPerContract;
-	type DepositPerStorageByte = DepositPerStorageByte;
-	type DepositPerStorageItem = DepositPerStorageItem;
 	type Event = Event;
 	type Randomness = RandomnessCollectiveFlip;
-	type RentFraction = RentFraction;
-	type RentPayment = ();
 	type Schedule = Schedule;
-	type SignedClaimHandicap = SignedClaimHandicap;
-	type SurchargeReward = SurchargeReward;
 	type Time = Timestamp;
-	type TombstoneDeposit = TombstoneDeposit;
 	type WeightInfo = pallet_contracts::weights::SubstrateWeight<Self>;
-	type WeightPrice = pallet_transaction_payment::Module<Self>;
+	type WeightPrice = pallet_transaction_payment::Pallet<Self>;
 }
 
 #[cfg(not(feature = "beresheet-runtime"))]
@@ -1070,13 +1128,16 @@ static EVM_CONFIG: EvmConfig = EvmConfig {
 	estimate: false,
 };
 
-/// Current (safe) approximation of the gas/s consumption considering
-/// EVM execution over compiled WASM.
+/// Current approximation of the gas/s consumption considering
+/// EVM execution over compiled WASM (on 4.4Ghz CPU).
+/// Given the 500ms Weight, from which 75% only are used for transactions,
+/// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~=
+/// 15_000_000.
+#[cfg(not(feature = "beresheet-runtime"))]
+pub const GAS_PER_SECOND: u64 = 40_000_000;
+
 #[cfg(feature = "beresheet-runtime")]
 pub const GAS_PER_SECOND: u64 = 150_000_000;
-
-#[cfg(not(feature = "beresheet-runtime"))]
-pub const GAS_PER_SECOND: u64 = 8_000_000;
 
 /// Approximate ratio of the amount of Weight per Gas.
 /// u64 works for approximations because Weight is a very small unit compared to
@@ -1087,37 +1148,62 @@ pub struct EdgewareGasWeightMapping;
 
 impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 	fn gas_to_weight(gas: u64) -> Weight {
-		Weight::try_from(gas.saturating_mul(WEIGHT_PER_GAS)).unwrap_or(Weight::MAX)
+		gas.saturating_mul(WEIGHT_PER_GAS)
 	}
 
 	fn weight_to_gas(weight: Weight) -> u64 {
-		weight.wrapping_div(WEIGHT_PER_GAS)
+		u64::try_from(weight.wrapping_div(WEIGHT_PER_GAS)).unwrap_or(u32::MAX as u64)
 	}
 }
 
 parameter_types! {
-		pub BlockGasLimit: U256
-			   = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
+	pub BlockGasLimit: U256
+		= U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
+	/// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
+	/// than this will decrease the weight and more will increase.
+	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
+	/// The adjustment variable of the runtime. Higher values will cause `TargetBlockFullness` to
+	/// change the fees more rapidly. This low value causes changes to occur slowly over time.
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
+	/// Minimum amount of the multiplier. This value cannot be too low. A test case should ensure
+	/// that combined with `AdjustmentVariable`, we can recover from the minimum.
+	/// See `multiplier_can_grow_from_zero` in integration_tests.rs.
+	/// This value is currently only used by pallet-transaction-payment as an assertion that the
+	/// next multiplier is always > min value.
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
 }
+
+/// Parameterized slow adjusting fee updated based on
+/// https://w3f-research.readthedocs.io/en/latest/polkadot/overview/2-token-economics.html#-2.-slow-adjusting-mechanism // editorconfig-checker-disable-line
+///
+/// The adjustment algorithm boils down to:
+///
+/// diff = (previous_block_weight - target) / maximum_block_weight
+/// next_multiplier = prev_multiplier * (1 + (v * diff) + ((v * diff)^2 / 2))
+/// assert(next_multiplier > min)
+///     where: v is AdjustmentVariable
+///            target is TargetBlockFullness
+///            min is MinimumMultiplier
+pub type SlowAdjustingFeeUpdate<R> =
+	TargetedFeeAdjustment<R, TargetBlockFullness, AdjustmentVariable, MinimumMultiplier>;
 
 impl pallet_evm::Config for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type BlockGasLimit = BlockGasLimit;
+	type BlockHashMapping = pallet_ethereum::EthereumBlockHashMapping<Self>;
 	type CallOrigin = EnsureAddressTruncated;
 	type ChainId = EthChainId;
 	type Currency = Balances;
 	type Event = Event;
 	type FeeCalculator = pallet_dynamic_fee::Pallet<Self>;
+	type FindAuthor = EthereumFindAuthor<Aura>;
 	type GasWeightMapping = EdgewareGasWeightMapping;
 	type OnChargeTransaction = ();
 	type Precompiles = EdgewarePrecompiles<Self>;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type WithdrawOrigin = EnsureAddressTruncated;
-
-	/// EVM config used in the module.
-	fn config() -> &'static EvmConfig {
-		&EVM_CONFIG
-	}
+	// type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances,
+	// DealWithFees<Runtime>>;
 }
 
 pub struct EthereumFindAuthor<F>(PhantomData<F>);
@@ -1197,7 +1283,7 @@ construct_runtime!(
 		Bounties: pallet_bounties::{Pallet, Call, Storage, Event<T>} = 37,
 		Tips: pallet_tips::{Pallet, Call, Storage, Event<T>} = 38,
 		ElectionProviderMultiPhase: pallet_election_provider_multi_phase::{Pallet, Call, Storage, Event<T>, ValidateUnsigned} = 39,
-		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Event<T>, Inherent} = 40,
+		DynamicFee: pallet_dynamic_fee::{Pallet, Call, Storage, Inherent} = 40,
 		// REMOVED: Tokens: webb_tokens::{Pallet, Call, Storage, Event<T>} = 41,
 		// REMOVED: Currencies: webb_currencies::{Pallet, Call, Storage, Event<T>} = 42,
 		// REMOVED: NonFungibleTokenModule: orml_nft::{Pallet, Storage, Config<T>} = 43,
@@ -1209,14 +1295,14 @@ pub struct TransactionConverter;
 
 impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
 	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> UncheckedExtrinsic {
-		UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact(transaction).into())
+		UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact { transaction }.into())
 	}
 }
 
 impl fp_rpc::ConvertTransaction<sp_runtime::OpaqueExtrinsic> for TransactionConverter {
 	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> sp_runtime::OpaqueExtrinsic {
 		let extrinsic =
-			UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact(transaction).into());
+			UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact { transaction }.into());
 		let encoded = extrinsic.encode();
 		sp_runtime::OpaqueExtrinsic::decode(&mut &encoded[..]).expect("Encoded extrinsic is always valid")
 	}
@@ -1363,6 +1449,10 @@ impl_runtime_apis! {
 			Grandpa::grandpa_authorities()
 		}
 
+		fn current_set_id() -> fg_primitives::SetId {
+			Grandpa::current_set_id()
+		}
+
 		fn submit_report_equivocation_unsigned_extrinsic(
 			equivocation_proof: fg_primitives::EquivocationProof<
 				<Block as BlockT>::Hash,
@@ -1434,9 +1524,9 @@ impl_runtime_apis! {
 			code: pallet_contracts_primitives::Code<Hash>,
 			data: Vec<u8>,
 			salt: Vec<u8>,
-		) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, BlockNumber>
+		) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId>
 		{
-			Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true, true)
+			Contracts::bare_instantiate(origin, endowment, gas_limit, code, data, salt, true)
 		}
 
 		fn get_storage(
@@ -1445,13 +1535,8 @@ impl_runtime_apis! {
 		) -> pallet_contracts_primitives::GetStorageResult {
 			Contracts::get_storage(address, key)
 		}
-
-		fn rent_projection(
-			address: AccountId,
-		) -> pallet_contracts_primitives::RentProjectionResult<BlockNumber> {
-			Contracts::rent_projection(address)
-		}
 	}
+
 
 	impl pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<
 		Block,
@@ -1612,7 +1697,7 @@ impl_runtime_apis! {
 			// that preceded the requested transaction.
 			for ext in extrinsics.into_iter() {
 				let _ = match &ext.function {
-					Call::Ethereum(transact(t)) => {
+					Call::Ethereum(transact { transaction: t }) => {
 						if t == transaction {
 							return match trace_type {
 								TraceType::Raw {
@@ -1669,7 +1754,7 @@ impl_runtime_apis! {
 			// Apply all extrinsics. Ethereum extrinsics are traced.
 			for ext in extrinsics.into_iter() {
 				match &ext.function {
-					Call::Ethereum(transact(_transaction)) => {
+					Call::Ethereum(transact { transaction: _transaction }) => {
 						let tx_traces = CallListTracer::new()
 							.trace(|| Executive::apply_extrinsic(ext))
 							.0
@@ -1797,11 +1882,11 @@ impl_runtime_apis! {
 		) -> TxPoolResponse {
 			TxPoolResponse {
 				ready: xts_ready.into_iter().filter_map(|xt| match xt.function {
-					Call::Ethereum(transact(t)) => Some(t),
+					Call::Ethereum(transact { transaction: t }) => Some(t),
 					_ => None
 				}).collect(),
 				future: xts_future.into_iter().filter_map(|xt| match xt.function {
-					Call::Ethereum(transact(t)) => Some(t),
+					Call::Ethereum(transact { transactionn: t }) => Some(t),
 					_ => None
 				}).collect(),
 			}

@@ -675,6 +675,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "631ae5198c9be5e753e5cc215e1bd73c2b466a3565173db433f52bb9d3e66dba"
 
 [[package]]
+name = "camino"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52d74260d9bf6944e2208aa46841b4b8f0d7ffc0849a06837b2f510337f86b2b"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "cargo-platform"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -685,10 +694,11 @@ dependencies = [
 
 [[package]]
 name = "cargo_metadata"
-version = "0.12.3"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7714a157da7991e23d90686b9524b9e12e0407a108647f52e9328f4b3d51ac7f"
+checksum = "081e3f0755c1f380c2d010481b6fa2e02973586d5f2b24eebb7a2a1d98b143d8"
 dependencies = [
+ "camino",
  "cargo-platform",
  "semver 0.11.0",
  "semver-parser 0.10.2",
@@ -1199,6 +1209,19 @@ dependencies = [
  "byteorder",
  "digest 0.9.0",
  "rand_core 0.5.1",
+ "subtle 2.4.1",
+ "zeroize",
+]
+
+[[package]]
+name = "curve25519-dalek"
+version = "4.0.0-pre.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4033478fbf70d6acf2655ac70da91ee65852d69daf7a67bf7a2f518fb47aafcf"
+dependencies = [
+ "byteorder",
+ "digest 0.9.0",
+ "rand_core 0.6.3",
  "subtle 2.4.1",
  "zeroize",
 ]
@@ -1793,6 +1816,12 @@ version = "3.3.5"
 dependencies = [
  "edge-treasury-reward",
  "edgeware-primitives",
+ "edgeware-rpc-primitives-debug",
+ "edgeware-rpc-primitives-txpool",
+ "evm",
+ "evm-runtime",
+ "evm-tracing-events",
+ "fp-rpc",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
@@ -1813,8 +1842,19 @@ dependencies = [
  "pallet-contracts-primitives",
  "pallet-contracts-rpc-runtime-api",
  "pallet-democracy",
+ "pallet-dynamic-fee",
  "pallet-election-provider-multi-phase",
  "pallet-elections-phragmen",
+ "pallet-ethereum",
+ "pallet-evm",
+ "pallet-evm-precompile-blake2",
+ "pallet-evm-precompile-bn128",
+ "pallet-evm-precompile-curve25519",
+ "pallet-evm-precompile-dispatch",
+ "pallet-evm-precompile-ed25519",
+ "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-sha3fips",
+ "pallet-evm-precompile-simple",
  "pallet-grandpa",
  "pallet-identity",
  "pallet-im-online",
@@ -1839,6 +1879,7 @@ dependencies = [
  "parity-scale-codec",
  "rustc-hex",
  "safe-mix",
+ "scale-info",
  "serde",
  "sha3 0.9.1",
  "sp-api",
@@ -5189,6 +5230,64 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-evm-precompile-blake2"
+version = "2.0.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
+dependencies = [
+ "fp-evm",
+ "sp-core",
+ "sp-io",
+]
+
+[[package]]
+name = "pallet-evm-precompile-bn128"
+version = "2.0.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
+dependencies = [
+ "fp-evm",
+ "sp-core",
+ "sp-io",
+ "substrate-bn",
+]
+
+[[package]]
+name = "pallet-evm-precompile-curve25519"
+version = "1.0.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
+dependencies = [
+ "curve25519-dalek 4.0.0-pre.1",
+ "fp-evm",
+ "frame-support",
+ "parity-scale-codec",
+ "sp-core",
+ "sp-io",
+]
+
+[[package]]
+name = "pallet-evm-precompile-dispatch"
+version = "2.0.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
+dependencies = [
+ "fp-evm",
+ "frame-support",
+ "pallet-evm",
+ "parity-scale-codec",
+ "sp-core",
+ "sp-io",
+]
+
+[[package]]
+name = "pallet-evm-precompile-ed25519"
+version = "2.0.0-dev"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
+dependencies = [
+ "ed25519-dalek",
+ "fp-evm",
+ "sp-core",
+ "sp-io",
 ]
 
 [[package]]
@@ -8778,6 +8877,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "substrate-bn"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "lazy_static",
+ "rand 0.8.4",
+ "rustc-hex",
+]
+
+[[package]]
 name = "substrate-build-script-utils"
 version = "3.0.0"
 source = "git+https://github.com/webb-tools/substrate?branch=erup-5#cc789d4f32f093bd5ca6d1f5b3957f06f45d4876"
@@ -8836,14 +8948,13 @@ dependencies = [
 
 [[package]]
 name = "substrate-wasm-builder"
-version = "3.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79091baab813855ddf65b191de9fe53e656b6b67c1e9bd23fdcbff8788164684"
+version = "5.0.0-dev"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-5#cc789d4f32f093bd5ca6d1f5b3957f06f45d4876"
 dependencies = [
  "ansi_term 0.12.1",
- "atty",
  "build-helper",
  "cargo_metadata",
+ "sp-maybe-compressed-blob",
  "tempfile",
  "toml",
  "walkdir",
@@ -9215,7 +9326,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "matchers",
- "parking_lot 0.11.2",
+ "parking_lot 0.10.2",
  "regex",
  "serde",
  "serde_json",
@@ -9321,8 +9432,8 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 0.1.10",
- "rand 0.7.3",
+ "cfg-if 1.0.0",
+ "rand 0.8.4",
  "static_assertions",
 ]
 
