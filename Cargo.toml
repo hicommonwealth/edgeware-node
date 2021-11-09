@@ -14,7 +14,6 @@ members = [
 	"primitives/rpc/evm-tracing-events",
 	"node/primitives",
 	"node/rpc",
-	"node/rpc-client",
 	"node/runtime",
 	"node/runtime-interface",
 	"primitives/rpc/debug",
