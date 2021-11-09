@@ -11,6 +11,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, optional = true }
+scale-info = { version = "1.0.0", default-features = false, features = ["derive"] }
 safe-mix = { version = "1.0", default-features = false }
 codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
 sp-std = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
@@ -35,6 +36,7 @@ default = ["std"]
 std = [
 	"serde",
 	"safe-mix/std",
+	"scale-info/std",
 	"codec/std",
 	"sp-std/std",
 	"sp-runtime/std",

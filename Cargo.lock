@@ -1449,6 +1449,7 @@ dependencies = [
  "pallet-treasury",
  "parity-scale-codec",
  "safe-mix",
+ "scale-info",
  "serde",
  "sp-core",
  "sp-io",

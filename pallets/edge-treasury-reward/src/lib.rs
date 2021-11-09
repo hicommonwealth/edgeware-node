@@ -47,7 +47,6 @@ pub mod pallet {
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(crate) fn deposit_event)]
-	#[pallet::metadata(T::Balance = "Balance", T::BlockNumber = "BlockNumber", T::AccountId = "AccountId")]
 	pub enum Event<T: Config> {
 		/// Treasury minting event
 		TreasuryMinting(T::Balance, T::BlockNumber, T::AccountId),
@@ -97,7 +96,9 @@ pub mod pallet {
 		fn on_finalize(_n: T::BlockNumber) {
 			if <frame_system::Pallet<T>>::block_number() % Self::minting_interval() == Zero::zero() {
 				let reward = Self::current_payout();
-				if reward.is_zero() { return; }
+				if reward.is_zero() {
+					return;
+				}
 				<T as Config>::Currency::deposit_creating(&<pallet_treasury::Pallet<T>>::account_id(), reward);
 				Self::deposit_event(Event::TreasuryMinting(
 					<pallet_balances::Pallet<T>>::free_balance(<pallet_treasury::Pallet<T>>::account_id()),
@@ -112,7 +113,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// Sets the fixed treasury payout per minting interval.
 		#[pallet::weight(5_000_000)]
-		pub(super) fn set_current_payout(origin: OriginFor<T>, payout: BalanceOf<T>) -> DispatchResultWithPostInfo {
+		pub fn set_current_payout(origin: OriginFor<T>, payout: BalanceOf<T>) -> DispatchResultWithPostInfo {
 			ensure_root(origin)?;
 			<CurrentPayout<T>>::put(payout);
 			Ok(().into())
@@ -120,10 +121,7 @@ pub mod pallet {
 
 		/// Sets the treasury minting interval.
 		#[pallet::weight(5_000_000)]
-		pub(super) fn set_minting_interval(
-			origin: OriginFor<T>,
-			interval: T::BlockNumber,
-		) -> DispatchResultWithPostInfo {
+		pub fn set_minting_interval(origin: OriginFor<T>, interval: T::BlockNumber) -> DispatchResultWithPostInfo {
 			ensure_root(origin)?;
 			<MintingInterval<T>>::put(interval);
 			Ok(().into())
