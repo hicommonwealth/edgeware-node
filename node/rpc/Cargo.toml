@@ -41,7 +41,7 @@ sc-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch 
 substrate-frame-rpc-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 tokio = { version = "0.2.13", features = ["macros", "sync"] }
 
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", features = ["runtime-benchmarks"] }
 fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }

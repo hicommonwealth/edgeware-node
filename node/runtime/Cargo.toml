@@ -23,7 +23,6 @@ safe-mix = { version = "1.0", default-features = false }
 rustc-hex = { version = "2.0", optional = true }
 serde = { version = "1.0.102", optional = true }
 static_assertions = "1.1.0"
-evm-runtime = { version = "0.33.0", default-features = false }
 log = { version = "0.4.14", default-features = false }
 
 # primitives
@@ -47,9 +46,9 @@ sp-npos-elections = { git = "https://github.com/webb-tools/substrate", branch = 
 
 # edgeware primitives
 edgeware-primitives = { path = "../primitives", default-features = false }
-evm-tracing-events = { path = "../../primitives/rpc/evm-tracing-events", default-features = false }
-edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug", default-features = false }
-edgeware-rpc-primitives-txpool = { path = "../../primitives/rpc/txpool", default-features = false }
+# evm-tracing-events = { path = "../../primitives/rpc/evm-tracing-events", default-features = false }
+# edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug", default-features = false }
+# edgeware-rpc-primitives-txpool = { path = "../../primitives/rpc/txpool", default-features = false }
 
 # pallet dependencies
 pallet-assets = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
@@ -94,10 +93,11 @@ pallet-vesting = { git = "https://github.com/webb-tools/substrate", branch = "er
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge-treasury-reward", default-features = false }
 
-pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# evm-runtime = { version = "0.33.0", default-features = false }
+# pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+# fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+# pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false,  }
 # pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
 # pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
 # pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
@@ -109,7 +109,7 @@ pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "er
 
 sha3 = { version = "0.9", default-features = false }
 
-evm = { version = "0.33.0", default-features = false, features = ["with-codec"] }
+# evm = { version = "0.33.0", default-features = false, features = ["with-codec"] }
 
 # used for runtime benchmarking
 frame-benchmarking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, optional = true }
@@ -184,10 +184,10 @@ std = [
 	"sp-offchain/std",
 	"edgeware-primitives/std",
 	"treasury-reward/std",
-	"fp-rpc/std",
-	"pallet-ethereum/std",
-	"evm-runtime/std",
-	"evm/std",
+	# "fp-rpc/std",
+	# "pallet-ethereum/std",
+	# "evm-runtime/std",
+	# "evm/std",
 	# "pallet-evm-precompile-simple/std",
 	# "pallet-evm-precompile-modexp/std",
 	# "pallet-evm-precompile-ed25519/std",
@@ -199,9 +199,9 @@ std = [
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",
-	"evm-tracing-events/std",
-	"edgeware-rpc-primitives-debug/std",
-	"edgeware-rpc-primitives-txpool/std",
+	# "evm-tracing-events/std",
+	# "edgeware-rpc-primitives-debug/std",
+	# "edgeware-rpc-primitives-txpool/std",
 ]
 
 runtime-benchmarks = [
