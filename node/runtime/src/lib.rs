@@ -1218,6 +1218,8 @@ impl treasury_reward::Config for Runtime {
 	type Event = Event;
 }
 
+impl pallet_randomness_collective_flip::Config for Runtime {}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -1242,10 +1244,10 @@ construct_runtime!(
 		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 17,
 		ImOnline: pallet_im_online::{Pallet, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 18,
-		AuthorityDiscovery: pallet_authority_discovery::{Pallet, Call, Config} = 19,
-		Offences: pallet_offences::{Pallet, Call, Storage, Event} = 20,
+		AuthorityDiscovery: pallet_authority_discovery::{Pallet, Config} = 19,
+		Offences: pallet_offences::{Pallet, Storage, Event} = 20,
 		Historical: pallet_session_historical::{Pallet} = 21,
-		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Call, Storage} = 22,
+		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage} = 22,
 		Identity: pallet_identity::{Pallet, Call, Storage, Event<T>} = 23,
 		Recovery: pallet_recovery::{Pallet, Call, Storage, Event<T>} = 24,
 		Vesting: pallet_vesting::{Pallet, Call, Storage, Event<T>, Config<T>} = 25,
@@ -1342,7 +1344,6 @@ mod custom_migration {
 	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
 		type AccountId = AccountId;
 		type Balance = Balance;
-		type Module = PhragmenElection;
 	}
 
 	impl OnRuntimeUpgrade for Upgrade {
