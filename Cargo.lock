@@ -13,25 +13,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "account"
-version = "0.1.1"
-dependencies = [
- "blake2-rfc",
- "hex 0.4.3",
- "libsecp256k1 0.7.0",
- "log",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sha3 0.9.1",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-runtime-interface",
- "sp-std",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1272,19 +1253,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "curve25519-dalek"
-version = "4.0.0-pre.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4033478fbf70d6acf2655ac70da91ee65852d69daf7a67bf7a2f518fb47aafcf"
-dependencies = [
- "byteorder",
- "digest 0.9.0",
- "rand_core 0.6.3",
- "subtle 2.4.1",
- "zeroize",
-]
-
-[[package]]
 name = "data-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1585,7 +1553,6 @@ dependencies = [
 name = "edgeware-cli-opt"
 version = "0.14.2"
 dependencies = [
- "account",
  "libsecp256k1 0.7.0",
  "primitive-types",
  "sha3 0.9.1",
@@ -1645,6 +1612,7 @@ dependencies = [
  "frame-system",
  "parity-scale-codec",
  "pretty_assertions",
+ "scale-info",
  "sp-application-crypto",
  "sp-core",
  "sp-runtime",
@@ -1917,14 +1885,6 @@ dependencies = [
  "pallet-elections-phragmen",
  "pallet-ethereum",
  "pallet-evm",
- "pallet-evm-precompile-blake2",
- "pallet-evm-precompile-bn128",
- "pallet-evm-precompile-curve25519",
- "pallet-evm-precompile-dispatch",
- "pallet-evm-precompile-ed25519",
- "pallet-evm-precompile-modexp",
- "pallet-evm-precompile-sha3fips",
- "pallet-evm-precompile-simple",
  "pallet-grandpa",
  "pallet-identity",
  "pallet-im-online",
@@ -5443,64 +5403,6 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
-]
-
-[[package]]
-name = "pallet-evm-precompile-blake2"
-version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
-dependencies = [
- "fp-evm",
- "sp-core",
- "sp-io",
-]
-
-[[package]]
-name = "pallet-evm-precompile-bn128"
-version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
-dependencies = [
- "fp-evm",
- "sp-core",
- "sp-io",
- "substrate-bn",
-]
-
-[[package]]
-name = "pallet-evm-precompile-curve25519"
-version = "1.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
-dependencies = [
- "curve25519-dalek 4.0.0-pre.1",
- "fp-evm",
- "frame-support",
- "parity-scale-codec",
- "sp-core",
- "sp-io",
-]
-
-[[package]]
-name = "pallet-evm-precompile-dispatch"
-version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
-dependencies = [
- "fp-evm",
- "frame-support",
- "pallet-evm",
- "parity-scale-codec",
- "sp-core",
- "sp-io",
-]
-
-[[package]]
-name = "pallet-evm-precompile-ed25519"
-version = "2.0.0-dev"
-source = "git+https://github.com/webb-tools/frontier?branch=erup-5-webb#c43937170fc08cec1d11a0ff37aa33622f9447f1"
-dependencies = [
- "ed25519-dalek",
- "fp-evm",
- "sp-core",
- "sp-io",
 ]
 
 [[package]]
@@ -9131,19 +9033,6 @@ dependencies = [
  "schnorrkel",
  "sha2 0.9.8",
  "zeroize",
-]
-
-[[package]]
-name = "substrate-bn"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
-dependencies = [
- "byteorder",
- "crunchy",
- "lazy_static",
- "rand 0.8.4",
- "rustc-hex",
 ]
 
 [[package]]

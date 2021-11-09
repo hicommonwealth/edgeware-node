@@ -15,12 +15,11 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 use std::str::FromStr;
 
-pub mod account_key;
-
 /// Block authoring scheme to be used by the dev service.
 #[derive(Debug)]
 pub enum Sealing {
-	/// Author a block immediately upon receiving a transaction into the transaction pool
+	/// Author a block immediately upon receiving a transaction into the
+	/// transaction pool
 	Instant,
 	/// Author a block upon receiving an RPC command
 	Manual,
@@ -36,8 +35,7 @@ impl FromStr for Sealing {
 			"instant" => Self::Instant,
 			"manual" => Self::Manual,
 			s => {
-				let millis =
-					u64::from_str_radix(s, 10).map_err(|_| "couldn't decode sealing param")?;
+				let millis = u64::from_str_radix(s, 10).map_err(|_| "couldn't decode sealing param")?;
 				Self::Interval(millis)
 			}
 		})
@@ -59,12 +57,7 @@ impl FromStr for EthApi {
 			"txpool" => Self::Txpool,
 			"debug" => Self::Debug,
 			"trace" => Self::Trace,
-			_ => {
-				return Err(format!(
-					"`{}` is not recognized as a supported Ethereum Api",
-					s
-				))
-			}
+			_ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
 		})
 	}
 }

@@ -177,10 +177,7 @@ impl<'a> From<evm::tracing::Event<'a>> for EvmEvent {
 				target,
 				balance,
 			},
-			evm::tracing::Event::Exit {
-				reason,
-				return_value,
-			} => Self::Exit {
+			evm::tracing::Event::Exit { reason, return_value } => Self::Exit {
 				reason: reason.clone(),
 				return_value: return_value.to_vec(),
 			},

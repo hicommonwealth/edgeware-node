@@ -15,7 +15,7 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 use futures::{future::BoxFuture, FutureExt, SinkExt, StreamExt};
 use jsonrpc_core::Result as RpcResult;
-pub use moonbeam_rpc_core_debug::{Debug as DebugT, DebugServer, TraceParams};
+pub use edgeware_rpc_core_debug::{Debug as DebugT, DebugServer, TraceParams};
 
 use tokio::{
 	self,
@@ -25,9 +25,9 @@ use tokio::{
 use ethereum_types::{H128, H256};
 use fc_rpc::{frontier_backend_client, internal_err};
 use fp_rpc::EthereumRuntimeRPCApi;
-use moonbeam_client_evm_tracing::{formatters::ResponseFormatter, types::single};
-use moonbeam_rpc_core_types::{RequestBlockId, RequestBlockTag};
-use moonbeam_rpc_primitives_debug::{DebugRuntimeApi, TracerInput};
+use edgeware_client_evm_tracing::{formatters::ResponseFormatter, types::single};
+use edgeware_rpc_core_types::{RequestBlockId, RequestBlockTag};
+use edgeware_rpc_primitives_debug::{DebugRuntimeApi, TracerInput};
 use sc_client_api::backend::Backend;
 use sc_utils::mpsc::TracingUnboundedSender;
 use sp_api::{BlockId, Core, HeaderT, ProvideRuntimeApi};
@@ -371,17 +371,17 @@ where
 						reference_id, e
 					))
 				})?;
-			Ok(moonbeam_rpc_primitives_debug::Response::Block)
+			Ok(edgeware_rpc_primitives_debug::Response::Block)
 		};
 
 		return match trace_type {
 			single::TraceType::CallList => {
-				let mut proxy = moonbeam_client_evm_tracing::listeners::CallList::default();
+				let mut proxy = edgeware_client_evm_tracing::listeners::CallList::default();
 				proxy.using(f)?;
 				proxy.finish_transaction();
 				let response = match tracer_input {
 					TracerInput::CallTracer => {
-						moonbeam_client_evm_tracing::formatters::CallTracer::format(proxy)
+						edgeware_client_evm_tracing::formatters::CallTracer::format(proxy)
 							.ok_or("Trace result is empty.")
 							.map_err(|e| internal_err(format!("{:?}", e)))
 					}
@@ -464,7 +464,7 @@ where
 						.map_err(|e| internal_err(format!("Runtime api access error: {:?}", e)))?
 						.map_err(|e| internal_err(format!("DispatchError: {:?}", e)))?;
 
-					Ok(moonbeam_rpc_primitives_debug::Response::Single)
+					Ok(edgeware_rpc_primitives_debug::Response::Single)
 				};
 
 				return match trace_type {
@@ -473,29 +473,29 @@ where
 						disable_memory,
 						disable_stack,
 					} => {
-						let mut proxy = moonbeam_client_evm_tracing::listeners::Raw::new(
+						let mut proxy = edgeware_client_evm_tracing::listeners::Raw::new(
 							disable_storage,
 							disable_memory,
 							disable_stack,
 						);
 						proxy.using(f)?;
 						Ok(Response::Single(
-							moonbeam_client_evm_tracing::formatters::Raw::format(proxy).unwrap(),
+							edgeware_client_evm_tracing::formatters::Raw::format(proxy).unwrap(),
 						))
 					}
 					single::TraceType::CallList => {
-						let mut proxy = moonbeam_client_evm_tracing::listeners::CallList::default();
+						let mut proxy = edgeware_client_evm_tracing::listeners::CallList::default();
 						proxy.using(f)?;
 						proxy.finish_transaction();
 						let response = match tracer_input {
 							TracerInput::Blockscout => {
-								moonbeam_client_evm_tracing::formatters::Blockscout::format(proxy)
+								edgeware_client_evm_tracing::formatters::Blockscout::format(proxy)
 									.ok_or("Trace result is empty.")
 									.map_err(|e| internal_err(format!("{:?}", e)))
 							}
 							TracerInput::CallTracer => {
 								let mut res =
-									moonbeam_client_evm_tracing::formatters::CallTracer::format(
+									edgeware_client_evm_tracing::formatters::CallTracer::format(
 										proxy,
 									)
 									.ok_or("Trace result is empty.")

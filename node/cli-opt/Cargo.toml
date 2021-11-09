@@ -14,4 +14,3 @@ libsecp256k1 = "0.7"
 primitive-types = "0.10.0"
 sha3 = "0.9"
 tiny-hderive = "0.3.0"
-account = { path = "../../primitives/account" }

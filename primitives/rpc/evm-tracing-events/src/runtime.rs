@@ -112,10 +112,7 @@ impl<'a> From<evm_runtime::tracing::Event<'a>> for RuntimeEvent {
 				stack: stack.into(),
 				memory: memory.into(),
 			},
-			evm_runtime::tracing::Event::StepResult {
-				result,
-				return_value,
-			} => Self::StepResult {
+			evm_runtime::tracing::Event::StepResult { result, return_value } => Self::StepResult {
 				result: match result {
 					Ok(_) => Ok(()),
 					Err(capture) => match capture {
@@ -125,24 +122,8 @@ impl<'a> From<evm_runtime::tracing::Event<'a>> for RuntimeEvent {
 				},
 				return_value: return_value.to_vec(),
 			},
-			evm_runtime::tracing::Event::SLoad {
-				address,
-				index,
-				value,
-			} => Self::SLoad {
-				address,
-				index,
-				value,
-			},
-			evm_runtime::tracing::Event::SStore {
-				address,
-				index,
-				value,
-			} => Self::SStore {
-				address,
-				index,
-				value,
-			},
+			evm_runtime::tracing::Event::SLoad { address, index, value } => Self::SLoad { address, index, value },
+			evm_runtime::tracing::Event::SStore { address, index, value } => Self::SStore { address, index, value },
 		}
 	}
 }

@@ -14,8 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-//! A Proxy in this context is an environmental trait implementor meant to be used for capturing
-//! EVM trace events sent to a Host function from the Runtime. Works like:
+//! A Proxy in this context is an environmental trait implementor meant to be
+//! used for capturing EVM trace events sent to a Host function from the
+//! Runtime. Works like:
 //! - Runtime Api call `using` environmental.
 //! - Runtime calls a Host function with some scale-encoded Evm event.
 //! - Host function emits an additional event to this Listener.
@@ -23,26 +24,28 @@
 //!
 //! There are two proxy types: `Raw` and `CallList`.
 //! - `Raw` - used for opcode-level traces.
-//! - `CallList` - used for block tracing (stack of call stacks) and custom tracing outputs.
+//! - `CallList` - used for block tracing (stack of call stacks) and custom
+//!   tracing outputs.
 //!
 //! The EVM event types may contain references and not implement Encode/Decode.
-//! This module provide mirror types and conversion into them from the original events.
+//! This module provide mirror types and conversion into them from the original
+//! events.
 
 #![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;
 
-pub mod evm;
+pub mod evm_utils;
 pub mod gasometer;
 pub mod runtime;
 
-pub use self::evm::EvmEvent;
+pub use evm_utils::EvmEvent;
 pub use gasometer::GasometerEvent;
 pub use runtime::RuntimeEvent;
 
-use ::evm::Opcode;
 use alloc::vec::Vec;
 use codec::{Decode, Encode};
 use ethereum_types::{H160, U256};
+use evm::Opcode;
 
 environmental::environmental!(listener: dyn Listener + 'static);
 
@@ -52,17 +55,18 @@ pub fn using<R, F: FnOnce() -> R>(l: &mut (dyn Listener + 'static), f: F) -> R {
 
 #[derive(Clone, Eq, PartialEq, Debug, Encode, Decode)]
 pub enum Event {
-	Evm(evm::EvmEvent),
+	Evm(evm_utils::EvmEvent),
 	Gasometer(gasometer::GasometerEvent),
 	Runtime(runtime::RuntimeEvent),
 	CallListNew(),
 }
 
 impl Event {
-	/// Access the global reference and call it's `event` method, passing the `Event` itself as
-	/// argument.
+	/// Access the global reference and call it's `event` method, passing the
+	/// `Event` itself as argument.
 	///
-	/// This only works if we are `using` a global reference to a `Listener` implementor.
+	/// This only works if we are `using` a global reference to a `Listener`
+	/// implementor.
 	pub fn emit(self) {
 		listener::with(|listener| listener.event(self));
 	}

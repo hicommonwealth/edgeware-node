@@ -2,14 +2,15 @@ use codec::Decode;
 use evm::{executor::PrecompileOutput, Context, ExitError};
 use frame_support::dispatch::{Dispatchable, GetDispatchInfo, PostDispatchInfo};
 use pallet_evm::{Precompile, PrecompileSet};
-use pallet_evm_precompile_blake2::Blake2F;
-use pallet_evm_precompile_bn128::{Bn128Add, Bn128Mul, Bn128Pairing};
-use pallet_evm_precompile_curve25519::{Curve25519Add, Curve25519ScalarMul};
-use pallet_evm_precompile_dispatch::Dispatch;
-use pallet_evm_precompile_ed25519::Ed25519Verify;
-use pallet_evm_precompile_modexp::Modexp;
-use pallet_evm_precompile_sha3fips::Sha3FIPS256;
-use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
+// use pallet_evm_precompile_blake2::Blake2F;
+// use pallet_evm_precompile_bn128::{Bn128Add, Bn128Mul, Bn128Pairing};
+// use pallet_evm_precompile_curve25519::{Curve25519Add, Curve25519ScalarMul};
+// use pallet_evm_precompile_dispatch::Dispatch;
+// use pallet_evm_precompile_ed25519::Ed25519Verify;
+// use pallet_evm_precompile_modexp::Modexp;
+// use pallet_evm_precompile_sha3fips::Sha3FIPS256;
+// use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity,
+// Ripemd160, Sha256};
 use sp_core::H160;
 
 use sp_std::{fmt::Debug, marker::PhantomData};
@@ -47,22 +48,22 @@ where
 	) -> Option<core::result::Result<PrecompileOutput, ExitError>> {
 		match address {
 			// Ethereum precompiles
-			a if a == hash(1) => Some(ECRecover::execute(input, target_gas, context)),
-			a if a == hash(2) => Some(Sha256::execute(input, target_gas, context)),
-			a if a == hash(3) => Some(Ripemd160::execute(input, target_gas, context)),
-			a if a == hash(4) => Some(Identity::execute(input, target_gas, context)),
-			a if a == hash(5) => Some(Modexp::execute(input, target_gas, context)),
-			a if a == hash(6) => Some(Bn128Add::execute(input, target_gas, context)),
-			a if a == hash(7) => Some(Bn128Mul::execute(input, target_gas, context)),
-			a if a == hash(8) => Some(Bn128Pairing::execute(input, target_gas, context)),
-			a if a == hash(9) => Some(Blake2F::execute(input, target_gas, context)),
-			// Non-Edgeware specific nor Ethereum precompiles :
-			a if a == hash(1024) => Some(Sha3FIPS256::execute(input, target_gas, context)),
-			a if a == hash(1025) => Some(Dispatch::<R>::execute(input, target_gas, context)),
-			a if a == hash(1026) => Some(ECRecoverPublicKey::execute(input, target_gas, context)),
-			a if a == hash(1027) => Some(Ed25519Verify::execute(input, target_gas, context)),
-			a if a == hash(1028) => Some(Curve25519Add::execute(input, target_gas, context)),
-			a if a == hash(1029) => Some(Curve25519ScalarMul::execute(input, target_gas, context)),
+			// a if a == hash(1) => Some(ECRecover::execute(input, target_gas, context)),
+			// a if a == hash(2) => Some(Sha256::execute(input, target_gas, context)),
+			// a if a == hash(3) => Some(Ripemd160::execute(input, target_gas, context)),
+			// a if a == hash(4) => Some(Identity::execute(input, target_gas, context)),
+			// a if a == hash(5) => Some(Modexp::execute(input, target_gas, context)),
+			// a if a == hash(6) => Some(Bn128Add::execute(input, target_gas, context)),
+			// a if a == hash(7) => Some(Bn128Mul::execute(input, target_gas, context)),
+			// a if a == hash(8) => Some(Bn128Pairing::execute(input, target_gas, context)),
+			// a if a == hash(9) => Some(Blake2F::execute(input, target_gas, context)),
+			// // Non-Edgeware specific nor Ethereum precompiles :
+			// a if a == hash(1024) => Some(Sha3FIPS256::execute(input, target_gas, context)),
+			// a if a == hash(1025) => Some(Dispatch::<R>::execute(input, target_gas, context)),
+			// a if a == hash(1026) => Some(ECRecoverPublicKey::execute(input, target_gas, context)),
+			// a if a == hash(1027) => Some(Ed25519Verify::execute(input, target_gas, context)),
+			// a if a == hash(1028) => Some(Curve25519Add::execute(input, target_gas, context)),
+			// a if a == hash(1029) => Some(Curve25519ScalarMul::execute(input, target_gas, context)),
 			_ => None,
 		}
 	}

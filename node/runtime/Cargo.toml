@@ -98,14 +98,14 @@ pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
-pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+# pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
 
 sha3 = { version = "0.9", default-features = false }
 
@@ -188,14 +188,14 @@ std = [
 	"pallet-ethereum/std",
 	"evm-runtime/std",
 	"evm/std",
-	"pallet-evm-precompile-simple/std",
-	"pallet-evm-precompile-modexp/std",
-	"pallet-evm-precompile-ed25519/std",
-	"pallet-evm-precompile-bn128/std",
-	"pallet-evm-precompile-dispatch/std",
-	"pallet-evm-precompile-sha3fips/std",
-	"pallet-evm-precompile-blake2/std",
-	"pallet-evm-precompile-curve25519/std",
+	# "pallet-evm-precompile-simple/std",
+	# "pallet-evm-precompile-modexp/std",
+	# "pallet-evm-precompile-ed25519/std",
+	# "pallet-evm-precompile-bn128/std",
+	# "pallet-evm-precompile-dispatch/std",
+	# "pallet-evm-precompile-sha3fips/std",
+	# "pallet-evm-precompile-blake2/std",
+	# "pallet-evm-precompile-curve25519/std",
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",
