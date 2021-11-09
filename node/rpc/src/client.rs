@@ -14,11 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 pub use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Header, Index};
-use sp_runtime::{
-	traits::{BlakeTwo256},
-};
-
-
+use sp_runtime::traits::BlakeTwo256;
 
 /// A set of APIs that polkadot-like runtimes must implement.
 ///

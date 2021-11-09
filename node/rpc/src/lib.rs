@@ -32,6 +32,7 @@
 pub use edgeware_opts as opts;
 use edgeware_opts::EthApi as EthApiCmd;
 use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
+use fc_mapping_sync::MappingSyncWorker;
 use fc_rpc::{OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override, StorageOverride};
 use fc_rpc_core::types::{FilterPool, PendingTransactions};
 use jsonrpc_pubsub::manager::SubscriptionManager;
@@ -41,38 +42,30 @@ use sc_client_api::{
 	client::BlockchainEvents,
 	BlockOf,
 };
-use fc_mapping_sync::MappingSyncWorker;
 
-use sc_service::TaskManager;
+use edgeware_rpc_debug::{Debug, DebugHandler, DebugRequester, DebugServer};
+use edgeware_rpc_primitives_debug::DebugRuntimeApi;
+use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, CacheTask, Trace, TraceServer};
+use edgeware_rpc_txpool::{TxPool, TxPoolServer};
+use fc_rpc::EthTask;
+use fp_rpc::EthereumRuntimeRPCApi;
+use futures::StreamExt;
 use sc_finality_grandpa::{FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
 use sc_rpc::SubscriptionTaskExecutor;
 pub use sc_rpc_api::DenyUnsafe;
+use sc_service::TaskManager;
 use sc_transaction_graph::{ChainApi, Pool};
 use sp_api::{HeaderT, ProvideRuntimeApi};
-use sp_core::H256;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
-use sp_transaction_pool::TransactionPool;
-use std::{
-	collections::{BTreeMap},
-	sync::{Arc},
-	time::Duration,
-};
-use fc_rpc::EthTask;
-use edgeware_rpc_trace::CacheTask;
-use edgeware_rpc_debug::DebugHandler;
+use sp_core::H256;
 use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
+use sp_transaction_pool::TransactionPool;
+use std::{collections::BTreeMap, sync::Arc, time::Duration};
 use tokio::sync::Semaphore;
-use edgeware_rpc_primitives_debug::DebugRuntimeApi;
-use fp_rpc::EthereumRuntimeRPCApi;
-use edgeware_rpc_debug::{Debug, DebugRequester, DebugServer};
-use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, Trace, TraceServer};
-use edgeware_rpc_txpool::{TxPool, TxPoolServer};
-use futures::StreamExt;
-
 
 /// RPC Client
 pub mod client;
@@ -356,10 +349,7 @@ pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
 }
 
 /// Spawn the tasks that are required to run Moonbeam.
-pub fn spawn_tasks<B, C, BE>(
-	rpc_config: &edgeware_opts::RpcConfig,
-	params: SpawnTasksParams<B, C, BE>,
-) -> RpcRequesters
+pub fn spawn_tasks<B, C, BE>(rpc_config: &edgeware_opts::RpcConfig, params: SpawnTasksParams<B, C, BE>) -> RpcRequesters
 where
 	C: ProvideRuntimeApi<B> + BlockOf,
 	C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + 'static,
@@ -374,18 +364,17 @@ where
 {
 	let permit_pool = Arc::new(Semaphore::new(rpc_config.ethapi_max_permits as usize));
 
-	let (trace_filter_task, trace_filter_requester) =
-		if rpc_config.ethapi.contains(&EthApiCmd::Trace) {
-			let (trace_filter_task, trace_filter_requester) = CacheTask::create(
-				Arc::clone(&params.client),
-				Arc::clone(&params.substrate_backend),
-				Duration::from_secs(rpc_config.ethapi_trace_cache_duration),
-				Arc::clone(&permit_pool),
-			);
-			(Some(trace_filter_task), Some(trace_filter_requester))
-		} else {
-			(None, None)
-		};
+	let (trace_filter_task, trace_filter_requester) = if rpc_config.ethapi.contains(&EthApiCmd::Trace) {
+		let (trace_filter_task, trace_filter_requester) = CacheTask::create(
+			Arc::clone(&params.client),
+			Arc::clone(&params.substrate_backend),
+			Duration::from_secs(rpc_config.ethapi_trace_cache_duration),
+			Arc::clone(&permit_pool),
+		);
+		(Some(trace_filter_task), Some(trace_filter_requester))
+	} else {
+		(None, None)
+	};
 
 	let (debug_task, debug_requester) = if rpc_config.ethapi.contains(&EthApiCmd::Debug) {
 		let (debug_task, debug_requester) = DebugHandler::task(
@@ -438,11 +427,7 @@ where
 		const FILTER_RETAIN_THRESHOLD: u64 = 100;
 		params.task_manager.spawn_essential_handle().spawn(
 			"frontier-filter-pool",
-			EthTask::filter_pool_task(
-				Arc::clone(&params.client),
-				filter_pool,
-				FILTER_RETAIN_THRESHOLD,
-			),
+			EthTask::filter_pool_task(Arc::clone(&params.client), filter_pool, FILTER_RETAIN_THRESHOLD),
 		);
 	}
 

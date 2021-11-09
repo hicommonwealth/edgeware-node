@@ -3,29 +3,31 @@ name = "edgeware-rpc-debug"
 version = '0.1.0'
 authors = ['PureStake']
 edition = '2018'
-homepage = 'https://edgewa.re'
+homepage = 'https://moonbeam.network'
 license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
-tokio = { version = "0.2.21", features = ["sync", "time"] }
+tokio = { version = "1.10", features = ["sync", "time"] }
 futures = { version = "0.3", features = ["compat"] }
-jsonrpc-core = "15.0.0"
+jsonrpc-core = "18.0.0"
 
-ethereum = { version = "0.7.1", default-features = false, features = ["with-codec"] }
-ethereum-types = "0.11.0"
-sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
-sp-utils = { git = "https://github.com/webb-tools/substrate", branch = "erup-4" }
+ethereum = { version = "0.10.0", default-features = false, features = ["with-codec"] }
+ethereum-types = "0.12.0"
+sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-utils = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 
 edgeware-rpc-core-debug = { path = "../../rpc-core/debug" }
-edgeware-rpc-primitives-debug = { path = "../../../node/debug" }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+edgeware-rpc-core-types = { path = "../../rpc-core/types" }
+edgeware-client-evm-tracing = { path = "../../evm-tracing" }
+edgeware-rpc-primitives-debug = { path = "../../../primitives/rpc/debug" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", features = ["rpc_binary_search_estimate"] }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }

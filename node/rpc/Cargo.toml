@@ -42,21 +42,21 @@ sc-transaction-graph = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
 tokio = { version = "0.2.13", features = ["macros", "sync"] }
 
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-rpc-core = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-db = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-mapping-sync = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
 edgeware-executor = { path = "../executor" }
-edgeware-opts = { path = "../opts" }
+edgeware-cli-opt = { path = "../cli-opt" }
 edgeware-rpc-txpool = { path = "../../client/rpc/txpool" }
-edgeware-rpc-primitives-txpool = { path = "../txpool" }
+edgeware-rpc-primitives-txpool = { path = "../../primitives/rpc/txpool" }
 edgeware-rpc-debug = { path = "../../client/rpc/debug" }
-edgeware-rpc-primitives-debug = { path = "../debug" }
+edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug" }
 edgeware-rpc-trace = { path = "../../client/rpc/trace" }
 
 [features]

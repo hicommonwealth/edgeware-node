@@ -3,25 +3,25 @@ name = "edgeware-rpc-txpool"
 version = '0.6.0'
 authors = ['PureStake']
 edition = '2018'
-homepage = 'https://edgewa.re'
+homepage = 'https://moonbeam.network'
 license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
-sha3 = "0.8"
-jsonrpc-core = "15.0.0"
-ethereum-types = "0.11.0"
-ethereum = { version = "0.7.1", default-features = false, features = ["with-codec"] }
+rlp = "0.5"
+sha3 = "0.9"
+jsonrpc-core = "18.0.0"
+ethereum-types = "0.12.0"
 edgeware-rpc-core-txpool = { path = "../../rpc-core/txpool" }
-sp-runtime = { version = "3.0" }
-sp-api = { version = "3.0" }
-sp-io = { version = "3.0" }
-sp-std = { version = "3.0" }
-sp-blockchain = { version = "3.0" }
-sp-transaction-pool = { version = "3.0" }
-sc-transaction-graph = { version = "3.0" }
-frame-system = { version = "3.0" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-std = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", features = ["test-helpers"] }
+sc-transaction-pool-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+frame-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 serde = { version = "1.0", features = ["derive"] }
 
-edgeware-rpc-primitives-txpool = { path = "../../../node/txpool" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
+edgeware-rpc-primitives-txpool = { path = "../../../primitives/rpc/txpool" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", features = ["rpc_binary_search_estimate"] }

@@ -27,100 +27,100 @@ evm-runtime = { version = "0.27.0", default-features = false }
 log = { version = "0.4.14", default-features = false }
 
 # primitives
-sp-application-crypto = { version = "3.0", default-features = false }
-sp-authority-discovery = { version = "3.0", default-features = false }
-sp-consensus-aura = { version = "0.9", default-features = false }
-sp-block-builder = { version = "3.0", default-features = false}
-sp-inherents = { version = "3.0", default-features = false }
-sp-core = { version = "3.0", default-features = false }
-sp-io = { version = "3.0", default-features = false }
-sp-std = { version = "3.0", default-features = false }
-sp-api = { version = "3.0", default-features = false }
-sp-runtime = { version = "3.0", default-features = false }
-sp-staking = { version = "3.0", default-features = false }
-sp-keyring = { version = "3.0", optional = true }
-sp-session = { version = "3.0", default-features = false }
-sp-transaction-pool = { version = "3.0", default-features = false }
-sp-version = { version = "3.0", default-features = false }
-sp-offchain = { version = "3.0", default-features = false }
-sp-npos-elections = { version = "3.0", default-features = false }
+sp-application-git = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-authority-discovery = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-consensus-aura = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false}
+sp-inherents = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-std = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-staking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-keyring = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
+sp-session = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-version = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-offchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-npos-elections = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 
 # edgeware primitives
-edgeware-primitives = { version = "3.3.5", path = "../primitives", default-features = false }
-edgeware-evm-tracer = { path = "../evm_tracer", default-features = false }
-edgeware-rpc-primitives-debug = { path = "../debug", default-features = false }
-edgeware-rpc-primitives-txpool = { path = "../txpool", default-features = false }
+edgeware-primitives = { path = "../primitives", default-features = false }
+evm-tracing-events = { path = "../../primitives/rpc/evm-tracing-events", default-features = false }
+edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug", default-features = false }
+edgeware-rpc-primitives-txpool = { path = "../../primitives/rpc/txpool", default-features = false }
 
 # pallet dependencies
-pallet-assets = { version = "3.0", default-features = false }
-pallet-authority-discovery = { version = "3.0", default-features = false }
-pallet-authorship = { version = "3.0", default-features = false }
-pallet-aura = { version = "3.0", default-features = false }
-pallet-balances = { version = "3.0", default-features = false }
-pallet-collective = { version = "3.0", default-features = false, features = ["runtime-benchmarks"] }
-pallet-contracts = { default-features = false, version = "3.0" }
-pallet-contracts-primitives = { default-features = false, version = "3.0" }
-pallet-contracts-rpc-runtime-api = { default-features = false, version = "3.0" }
-pallet-democracy = { version = "3.0", default-features = false }
-pallet-election-provider-multi-phase = { version = "3.0", default-features = false }
-pallet-elections-phragmen = { version = "4.0", default-features = false }
+pallet-assets = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-authorship = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-aura = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-balances = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-collective = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, features = ["runtime-benchmarks"] }
+pallet-contracts = { default-features = false, git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-contracts-primitives = { default-features = false, git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-democracy = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-election-provider-multi-phase = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-elections-phragmen = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 
-frame-executive = { version = "3.0", default-features = false }
-pallet-grandpa = { version = "3.0", default-features = false }
-pallet-identity = { version = "3.0", default-features = false }
-pallet-im-online = { version = "3.0", default-features = false }
-pallet-indices = { version = "3.0", default-features = false }
-pallet-multisig = { version = "3.0", default-features = false }
-pallet-offences = { version = "3.0", default-features = false }
-pallet-proxy = { version = "3.0", default-features = false }
-pallet-randomness-collective-flip = { version = "3.0", default-features = false }
-pallet-recovery = { version = "3.0", default-features = false }
-pallet-scheduler = { version = "3.0", default-features = false }
-pallet-session = { version = "3.0", default-features = false, features = ["historical"] }
-pallet-staking = { version = "3.0", default-features = false }
-pallet-staking-reward-curve = { version = "3.0" }
-pallet-sudo = { version = "3.0", default-features = false }
-frame-support = { version = "3.0", default-features = false }
-frame-system = { version = "3.0", default-features = false }
-frame-system-rpc-runtime-api = { version = "3.0", default-features = false }
-pallet-timestamp = { version = "3.0", default-features = false }
-pallet-treasury = { version = "3.0", default-features = false }
-pallet-tips = { version = "3.0", default-features = false }
-pallet-bounties = { version = "3.0", default-features = false }
-pallet-utility = { version = "3.0", default-features = false }
-pallet-transaction-payment = { version = "3.0", default-features = false }
-pallet-transaction-payment-rpc-runtime-api = { version = "3.0", default-features = false }
-pallet-vesting = { version = "3.0", default-features = false }
+frame-executive = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-grandpa = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-identity = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-im-online = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-indices = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-multisig = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-offences = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-proxy = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-randomness-collective-flip = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-recovery = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-scheduler = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-session = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, features = ["historical"] }
+pallet-staking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-staking-reward-curve = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-sudo = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+frame-support = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+frame-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+frame-system-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-timestamp = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-treasury = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-tips = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-bounties = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-utility = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-transaction-payment = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-vesting = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge-treasury-reward", default-features = false }
 
-pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
-pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
-pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-4", default-features = false }
+pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-blake2 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-modexp = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-bn128 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-dispatch = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-sha3fips = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
+pallet-evm-precompile-curve25519 = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", default-features = false }
 
 sha3 = { version = "0.9", default-features = false }
 
-evm = { version = "0.27.0", default-features = false, features = ["with-codec"] }
+evm = { version = "0.33.0", default-features = false, features = ["with-codec"] }
 
 # used for runtime benchmarking
-frame-benchmarking = { version = "3.0", default-features = false, optional = true }
-frame-system-benchmarking = { version = "3.0", default-features = false, optional = true }
+frame-benchmarking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, optional = true }
+frame-system-benchmarking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, optional = true }
 hex-literal = { version = "0.3.1", optional = true }
 
 [build-dependencies]
 substrate-wasm-builder = { package = "substrate-wasm-builder", version = "3.0.0" }
 
 [dev-dependencies]
-sp-io = { version = "3.0" }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 
 [features]
 default = ["std"]
@@ -199,7 +199,7 @@ std = [
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",
-	"edgeware-evm-tracer/std",
+	"evm-tracing-events/std",
 	"edgeware-rpc-primitives-debug/std",
 	"edgeware-rpc-primitives-txpool/std",
 ]

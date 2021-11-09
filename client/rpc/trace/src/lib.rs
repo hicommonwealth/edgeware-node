@@ -1,4 +1,4 @@
-// Copyright 2019-2020 PureStake Inc.
+// Copyright 2019-2021 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -24,38 +24,35 @@
 //! - For each traced block an async task responsible to wait for a permit, spawn a blocking
 //!   task and waiting for the result, then send it to the main `CacheTask`.
 
-use futures::{
-	compat::Compat,
-	future::{BoxFuture, TryFutureExt},
-	select,
-	stream::FuturesUnordered,
-	FutureExt, SinkExt, StreamExt,
-};
+use futures::{future::BoxFuture, select, stream::FuturesUnordered, FutureExt, SinkExt, StreamExt};
 use std::{collections::BTreeMap, future::Future, marker::PhantomData, sync::Arc, time::Duration};
 use tokio::{
 	sync::{mpsc, oneshot, Semaphore},
-	time::delay_for,
+	time::sleep,
 };
 use tracing::{instrument, Instrument};
 
 use jsonrpc_core::Result;
 use sc_client_api::backend::Backend;
-use sp_api::{BlockId, HeaderT, ProvideRuntimeApi};
+use sc_utils::mpsc::TracingUnboundedSender;
+use sp_api::{BlockId, Core, HeaderT, ProvideRuntimeApi};
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{
 	Backend as BlockchainBackend, Error as BlockChainError, HeaderBackend, HeaderMetadata,
 };
 use sp_runtime::traits::Block as BlockT;
-use sp_utils::mpsc::TracingUnboundedSender;
 
 use ethereum_types::H256;
 use fc_rpc::internal_err;
 use fp_rpc::EthereumRuntimeRPCApi;
 
-pub use edgeware_rpc_core_trace::{
-	FilterRequest, RequestBlockId, RequestBlockTag, Trace as TraceT, TraceServer, TransactionTrace,
+use moonbeam_client_evm_tracing::{
+	formatters::ResponseFormatter,
+	types::block::{self, TransactionTrace},
 };
-use edgeware_rpc_primitives_debug::{block, DebugRuntimeApi};
+pub use moonbeam_rpc_core_trace::{FilterRequest, Trace as TraceT, TraceServer};
+use moonbeam_rpc_core_types::{RequestBlockId, RequestBlockTag};
+use moonbeam_rpc_primitives_debug::DebugRuntimeApi;
 
 /// RPC handler. Will communicate with a `CacheTask` through a `CacheRequester`.
 pub struct Trace<B, C> {
@@ -104,6 +101,7 @@ where
 			Some(RequestBlockId::Tag(RequestBlockTag::Pending)) => {
 				Err(internal_err("'pending' is not supported"))
 			}
+			Some(RequestBlockId::Hash(_)) => Err(internal_err("Block hash not supported")),
 		}
 	}
 
@@ -242,9 +240,8 @@ where
 	fn filter(
 		&self,
 		filter: FilterRequest,
-	) -> Compat<BoxFuture<'static, jsonrpc_core::Result<Vec<TransactionTrace>>>> {
-		// Wraps the async function into futures compatibility layer.
-		self.clone().filter(filter).boxed().compat()
+	) -> BoxFuture<'static, jsonrpc_core::Result<Vec<TransactionTrace>>> {
+		self.clone().filter(filter).boxed()
 	}
 }
 
@@ -446,16 +443,15 @@ where
 	) -> (impl Future<Output = ()>, CacheRequester) {
 		// Communication with the outside world :
 		let (requester_tx, mut requester_rx) =
-			sp_utils::mpsc::tracing_unbounded("trace-filter-cache");
+			sc_utils::mpsc::tracing_unbounded("trace-filter-cache");
 
 		// Task running in the service.
 		let task = async move {
 			// The following variables are polled by the select! macro, and thus cannot be
 			// part of Self without introducing borrowing issues.
 			let mut batch_expirations = FuturesUnordered::new();
-			let (blocking_tx, blocking_rx) =
+			let (blocking_tx, mut blocking_rx) =
 				mpsc::channel(blocking_permits.available_permits() * 2);
-			let mut blocking_rx = blocking_rx.fuse();
 
 			// Contains the inner state of the cache task, excluding the pooled futures/channels.
 			// Having this object allow to refactor each event into its own function, simplifying
@@ -485,7 +481,7 @@ where
 								// Cannot be refactored inside `request_stop_batch` because
 								// it has an unnamable type :C
 								batch_expirations.push(async move {
-									delay_for(cache_duration).await;
+									sleep(cache_duration).await;
 									batch_id
 								});
 
@@ -493,7 +489,7 @@ where
 							},
 						}
 					},
-					message = blocking_rx.next() => {
+					message = blocking_rx.recv().fuse() => {
 						match message {
 							None => (),
 							Some(BlockingTaskMessage::Started { block_hash })
@@ -546,7 +542,7 @@ where
 				let (unqueue_sender, unqueue_receiver) = oneshot::channel();
 				let client = Arc::clone(&self.client);
 				let backend = Arc::clone(&self.backend);
-				let mut blocking_tx = blocking_tx.clone();
+				let blocking_tx = blocking_tx.clone();
 
 				// Spawn all block caching asynchronously.
 				// It will wait to obtain a permit, then spawn a blocking task.
@@ -819,6 +815,10 @@ where
 		};
 
 		let eth_block_hash = eth_block.header.hash();
+		let eth_tx_hashes = eth_transactions
+			.iter()
+			.map(|t| t.transaction_hash)
+			.collect();
 
 		// Get extrinsics (containing Ethereum ones)
 		let extrinsics = backend
@@ -838,21 +838,36 @@ where
 			})?;
 
 		// Trace the block.
-		let mut traces: Vec<_> = api
-			.trace_block(&substrate_parent_id, extrinsics)
-			.map_err(|e| {
-				internal_err(format!(
-					"Blockchain error when replaying block {} : {:?}",
-					height, e
-				))
-			})?
-			.map_err(|e| {
-				internal_err(format!(
-					"Internal runtime error when replaying block {} : {:?}",
-					height, e
-				))
-			})?;
+		let f = || -> Result<_> {
+			api.initialize_block(&substrate_parent_id, &block_header)
+				.map_err(|e| internal_err(format!("Runtime api access error: {:?}", e)))?;
 
+			let _result = api
+				.trace_block(&substrate_parent_id, extrinsics, eth_tx_hashes)
+				.map_err(|e| {
+					internal_err(format!(
+						"Blockchain error when replaying block {} : {:?}",
+						height, e
+					))
+				})?
+				.map_err(|e| {
+					tracing::warn!(
+						"Internal runtime error when replaying block {} : {:?}",
+						height,
+						e
+					);
+					internal_err(format!(
+						"Internal runtime error when replaying block {} : {:?}",
+						height, e
+					))
+				})?;
+			Ok(moonbeam_rpc_primitives_debug::Response::Block)
+		};
+
+		let mut proxy = moonbeam_client_evm_tracing::listeners::CallList::default();
+		proxy.using(f)?;
+		let mut traces: Vec<_> =
+			moonbeam_client_evm_tracing::formatters::TraceFilter::format(proxy).unwrap();
 		// Fill missing data.
 		for trace in traces.iter_mut() {
 			trace.block_hash = eth_block_hash;
@@ -879,7 +894,6 @@ where
 				}
 			}
 		}
-
 		Ok(traces)
 	}
 }

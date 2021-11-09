@@ -1,0 +1,26 @@
+[package]
+name = "edgeware-rpc-primitives-txpool"
+version = '0.6.0'
+authors = ['PureStake']
+edition = '2018'
+homepage = 'https://moonbeam.network'
+license = 'GPL-3.0-only'
+repository = 'https://github.com/PureStake/moonbeam/'
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "2.2", default-features = false }
+ethereum = { version = "0.10.0", default-features = false, features = ["with-codec"] }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-std = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"sp-api/std",
+	"sp-runtime/std",
+	"sp-io/std",
+	"sp-std/std",
+	"ethereum/std",
+]
