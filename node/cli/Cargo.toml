@@ -47,50 +47,49 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { version = "3.0" }
-sp-blockchain = { version = "3.0" }
-sp-consensus-aura = { version = "0.9" }
-sp-finality-grandpa = { version = "3.0" }
-sp-core = { version = "3.0" }
-sp-runtime = { version = "3.0" }
-sp-timestamp = { version = "3.0", default-features = false }
-sp-inherents = { version = "3.0" }
-sp-keyring = { version = "3.0" }
-sp-io = { version = "3.0" }
-sp-consensus = { version = "0.9" }
-sp-transaction-pool = { version = "3.0" }
+sp-authority-discovery = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-consensus-aura = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-finality-grandpa = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-timestamp = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sp-inherents = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-keyring = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-consensus = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 
 # client dependencies
-sc-client-api = { version = "3.0" }
-sc-chain-spec = { version = "3.0" }
-sc-consensus = { version = "0.9" }
-sc-transaction-pool = { version = "3.0" }
-sc-network = { version = "0.9" }
-sc-consensus-aura = { version = "0.9" }
-sc-finality-grandpa = { version = "0.9" }
-sc-client-db = { version = "0.9", default-features = false }
-sc-offchain = { version = "3.0" }
-sc-rpc = { version = "3.0" }
-sc-basic-authorship = { version = "0.9" }
-sc-service = { version = "0.9", default-features = false }
-sc-tracing = { version = "3.0" }
-sc-telemetry = { version = "3.0" }
-sc-authority-discovery = { version = "0.9" }
-sc-finality-grandpa-warp-sync = { version = "0.10.0", optional = true }
+sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-chain-spec = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-consensus = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-network = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-consensus-aura = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-finality-grandpa = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-client-db = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sc-offchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-basic-authorship = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-service = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+sc-tracing = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-telemetry = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-authority-discovery = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 
 
 # frame dependencies
-pallet-indices = { version = "3.0" }
-pallet-timestamp = { version = "3.0", default-features = false }
-pallet-contracts = { version = "3.0" }
-frame-system = { version = "3.0" }
-pallet-balances = { version = "3.0" }
-pallet-transaction-payment = { version = "3.0" }
-frame-support = { version = "3.0", default-features = false }
-pallet-im-online = { version = "3.0", default-features = false }
-pallet-authority-discovery = { version = "3.0" }
-pallet-staking = { version = "3.0" }
-pallet-grandpa = { version = "3.0" }
+pallet-indices = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-timestamp = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-contracts = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+frame-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-balances = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-transaction-payment = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+frame-support = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-im-online = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-authority-discovery = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-staking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-grandpa = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 pallet-dynamic-fee = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 
@@ -106,9 +105,9 @@ edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug", default-f
 edgeware-rpc-trace = { path = "../../client/rpc/trace", default-features = false }
 
 # CLI-specific dependencies
-sc-cli = { version = "0.9", optional = true }
-frame-benchmarking-cli = { version = "3.0", optional = true }
-edgeware-cli-opt = { path = "../cli-opt", version = "0.1.0", optional = true }
+sc-cli = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
+frame-benchmarking-cli = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
+edgeware-cli-opt = { path = "../cli-opt", optional = true }
 
 fc-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
 fp-consensus = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
@@ -121,21 +120,20 @@ fc-mapping-sync = { default-features = false, git = "https://github.com/webb-too
 # WASM-specific dependencies
 wasm-bindgen = { version = "0.2.57", optional = true }
 wasm-bindgen-futures = { version = "0.4.7", optional = true }
-browser-utils = { version = "0.9", package = "substrate-browser-utils", optional = true }
-libp2p-wasm-ext = { version = "0.28", features = ["websocket"], optional = true }
+libp2p-wasm-ext = { version = "0.29", features = ["websocket"], optional = true }
 
 tokio = "0.2"
 
 [target.'cfg(target_arch="x86_64")'.dependencies]
 edgeware-executor = { path = "../executor", features = [ "wasmtime" ] }
-sc-cli = { version = "0.9", features = [ "wasmtime" ] }
-sc-service = { version = "0.9", default-features = false, features = [ "wasmtime" ] }
-sp-trie = { version = "3.0", default-features = false, features = ["memory-tracker"] }
+sc-cli = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", features = [ "wasmtime" ] }
+sc-service = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, features = [ "wasmtime" ] }
+sp-trie = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false, features = ["memory-tracker"] }
 
 [dev-dependencies]
-sc-keystore = { version = "3.0" }
-sc-consensus = { version = "0.9" }
-sc-consensus-epochs = { version = "0.9" }
+sc-keystore = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-consensus = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-consensus-epochs = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 
 futures = "0.3.4"
 tempfile = "3.1.0"
@@ -147,10 +145,10 @@ platforms = "0.2.1"
 
 [build-dependencies]
 structopt = { version = "0.3", optional = true }
-frame-benchmarking-cli = { version = "3.0", optional = true }
-substrate-build-script-utils = { version = "3.0", optional = true }
-substrate-frame-cli = { version = "3.0", optional = true }
-sc-cli = { version = "0.9", optional = true }
+frame-benchmarking-cli = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
+substrate-build-script-utils = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
+substrate-frame-cli = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
+sc-cli = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", optional = true }
 
 [features]
 default = [ "cli" ]
@@ -160,7 +158,6 @@ cli = [
 	"frame-benchmarking-cli",
 	"substrate-frame-cli",
 	"sc-service/db",
-	"sc-finality-grandpa-warp-sync",
 	"structopt",
 	"substrate-build-script-utils",
 	"edgeware-cli-opt"

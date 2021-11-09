@@ -12,28 +12,28 @@ targets = ["x86_64-unknown-linux-gnu"]
 [dependencies]
 trie-root = "0.16.0"
 codec = { package = "parity-scale-codec", version = "2.0.0" }
-sp-io = { version = "3.0" }
-sp-state-machine = { version = "0.9" }
-sc-executor = { version = "0.9" }
-sp-core = { version = "3.0" }
-sp-trie = { version = "3.0" }
-frame-benchmarking = { version = "3.0" }
+sp-io = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-state-machine = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-executor = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-trie = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+frame-benchmarking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 
 edgeware-primitives = { version = "3.3.5", path = "../primitives" }
 edgeware-runtime = { version = "3.3.5", path = "../runtime" }
 edgeware-runtime-interface = { version = "3.3.5", path = "../runtime-interface" }
 
 [dev-dependencies]
-sp-runtime = { version = "3.0" }
-frame-support = { version = "3.0" }
-pallet-balances = { version = "3.0" }
-pallet-transaction-payment = { version = "3.0" }
-pallet-session = { version = "3.0" }
-frame-system = { version = "3.0" }
-pallet-timestamp = { version = "3.0" }
-pallet-treasury = { version = "3.0" }
-pallet-grandpa = { version = "3.0" }
-pallet-indices = { version = "3.0" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+frame-support = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-balances = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-transaction-payment = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-session = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+frame-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-timestamp = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-treasury = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-grandpa = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-indices = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 wabt = "0.10.0"
 criterion = "0.3.0"
 

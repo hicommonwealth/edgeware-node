@@ -10,7 +10,7 @@ edition = '2018'
 sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 structopt = "0.3.8"
 tiny-bip39 = "0.8"
-libsecp256k1 = "0.6"
+libsecp256k1 = "0.7"
 primitive-types = "0.10.0"
 sha3 = "0.9"
 tiny-hderive = "0.3.0"

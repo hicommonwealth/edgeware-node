@@ -13,33 +13,32 @@ targets = ["x86_64-unknown-linux-gnu"]
 futures = { version = "0.3.1", features = ["compat"] }
 jsonrpc-core = "15.0.0"
 jsonrpc-pubsub = "15.0.0"
-pallet-contracts-rpc = { version = "3.0" }
-pallet-transaction-payment-rpc = { version = "3.0" }
-pallet-transaction-payment-rpc-runtime-api = { version = "3.0" }
-sc-client-api = { version = "3.0" }
-sc-consensus-aura = { version = "0.9" }
-sc-consensus-epochs = { version = "0.9" }
-sc-finality-grandpa = { version = "0.9" }
-sc-finality-grandpa-rpc = { version = "0.9" }
-sc-keystore = { version = "3.0" }
-sc-network = { version = "0.9" }
-sc-rpc-api = { version = "0.9" }
-sc-rpc = { version = "3.0" }
-sc-service = { version = "0.9" }
-sp-api = { version = "3.0" }
-sp-block-builder = { version = "3.0" }
-sp-blockchain = { version = "3.0" }
-sp-consensus = { version = "0.9" }
-sp-consensus-aura = { version = "0.9" }
-sp-core = { version = "3.0" }
-sp-offchain = { version = "3.0" }
-sp-runtime = { version = "3.0" }
-sp-storage = { version = "3.0" }
-sp-session = { version = "3.0" }
-sp-transaction-pool = { version = "3.0" }
-sc-transaction-pool = { version = "3.0" }
-sc-transaction-graph = { version = "3.0" }
-substrate-frame-rpc-system = { version = "3.0" }
+pallet-contracts-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-transaction-payment-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-consensus-aura = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-consensus-epochs = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-finality-grandpa = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-finality-grandpa-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-keystore = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-network = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-rpc-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-service = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-consensus = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-consensus-aura = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-offchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-storage = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-session = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+substrate-frame-rpc-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 tokio = { version = "0.2.13", features = ["macros", "sync"] }
 
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }

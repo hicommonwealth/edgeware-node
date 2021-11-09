@@ -15,5 +15,5 @@ hyper = "0.12.35"
 jsonrpc-core-client = { version = "15.0.0", default-features = false, features = ["http"] }
 log = "0.4.8"
 edgeware-primitives = { path = "../primitives" }
-sp-tracing = { version = "3.0" }
-sc-rpc = { version = "3.0" }
+sp-tracing = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sc-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
