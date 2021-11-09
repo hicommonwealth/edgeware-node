@@ -24,17 +24,13 @@
 pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Hash, Index, Moment, Nonce, Signature};
 use frame_support::{
 	construct_runtime, parameter_types,
-	traits::{
-		Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier, MaxEncodedLen, OnUnbalanced,
-		U128CurrencyToVote,
-	},
+	traits::{Currency, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier, OnUnbalanced, U128CurrencyToVote},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
 		DispatchClass, IdentityFee, Weight,
 	},
 	ConsensusEngineId, PalletId, RuntimeDebug,
 };
-use pallet_evm::EnsureAddressNever;
 use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 
 use codec::{Decode, Encode};
@@ -292,12 +288,6 @@ pub enum ProxyType {
 	Staking = 3,
 }
 
-impl MaxEncodedLen for ProxyType {
-	fn max_encoded_len() -> usize {
-		1 // one byte
-	}
-}
-
 impl Default for ProxyType {
 	fn default() -> Self {
 		Self::Any
@@ -407,9 +397,20 @@ impl pallet_balances::Config for Runtime {
 
 parameter_types! {
 	pub const TransactionByteFee: Balance = 10 * MILLICENTS;
+	pub BlockGasLimit: U256
+		= U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
+	/// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
+	/// than this will decrease the weight and more will increase.
 	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(1, 100_000);
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000_000u128);
+	/// The adjustment variable of the runtime. Higher values will cause `TargetBlockFullness` to
+	/// change the fees more rapidly. This low value causes changes to occur slowly over time.
+	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
+	/// Minimum amount of the multiplier. This value cannot be too low. A test case should ensure
+	/// that combined with `AdjustmentVariable`, we can recover from the minimum.
+	/// See `multiplier_can_grow_from_zero` in integration_tests.rs.
+	/// This value is currently only used by pallet-transaction-payment as an assertion that the
+	/// next multiplier is always > min value.
+	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
 }
 
 impl pallet_transaction_payment::Config for Runtime {
@@ -457,7 +458,6 @@ parameter_types! {
 }
 
 impl pallet_session::Config for Runtime {
-	type DisabledValidatorsThreshold = DisabledValidatorsThreshold;
 	type Event = Event;
 	type Keys = SessionKeys;
 	type NextSessionRotation = pallet_session::PeriodicSessions<Period, Offset>;
@@ -475,7 +475,7 @@ impl pallet_session::historical::Config for Runtime {
 }
 
 pallet_staking_reward_curve::build! {
-	const CURVE: PiecewiseLinear<'static> = curve!(
+	const REWARD_CURVE: PiecewiseLinear<'static> = curve!(
 		min_inflation: 0_025_000,
 		max_inflation: 0_100_000,
 		ideal_stake: 0_500_000,
@@ -1156,23 +1156,6 @@ impl pallet_evm::GasWeightMapping for EdgewareGasWeightMapping {
 	}
 }
 
-parameter_types! {
-	pub BlockGasLimit: U256
-		= U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT / WEIGHT_PER_GAS);
-	/// The portion of the `NORMAL_DISPATCH_RATIO` that we adjust the fees with. Blocks filled less
-	/// than this will decrease the weight and more will increase.
-	pub const TargetBlockFullness: Perquintill = Perquintill::from_percent(25);
-	/// The adjustment variable of the runtime. Higher values will cause `TargetBlockFullness` to
-	/// change the fees more rapidly. This low value causes changes to occur slowly over time.
-	pub AdjustmentVariable: Multiplier = Multiplier::saturating_from_rational(3, 100_000);
-	/// Minimum amount of the multiplier. This value cannot be too low. A test case should ensure
-	/// that combined with `AdjustmentVariable`, we can recover from the minimum.
-	/// See `multiplier_can_grow_from_zero` in integration_tests.rs.
-	/// This value is currently only used by pallet-transaction-payment as an assertion that the
-	/// next multiplier is always > min value.
-	pub MinimumMultiplier: Multiplier = Multiplier::saturating_from_rational(1, 1_000_000u128);
-}
-
 /// Parameterized slow adjusting fee updated based on
 /// https://w3f-research.readthedocs.io/en/latest/polkadot/overview/2-token-economics.html#-2.-slow-adjusting-mechanism // editorconfig-checker-disable-line
 ///
@@ -1199,11 +1182,8 @@ impl pallet_evm::Config for Runtime {
 	type FindAuthor = EthereumFindAuthor<Aura>;
 	type GasWeightMapping = EdgewareGasWeightMapping;
 	type OnChargeTransaction = ();
-	type Precompiles = EdgewarePrecompiles<Self>;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 	type WithdrawOrigin = EnsureAddressTruncated;
-	// type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances,
-	// DealWithFees<Runtime>>;
 }
 
 pub struct EthereumFindAuthor<F>(PhantomData<F>);
@@ -1222,7 +1202,6 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for EthereumFindAuthor<F> {
 
 impl pallet_ethereum::Config for Runtime {
 	type Event = Event;
-	type FindAuthor = EthereumFindAuthor<Aura>;
 	type StateRoot = pallet_ethereum::IntermediateStateRoot;
 }
 
@@ -1231,7 +1210,6 @@ parameter_types! {
 }
 
 impl pallet_dynamic_fee::Config for Runtime {
-	type Event = Event;
 	type MinGasPriceBoundDivisor = BoundDivision;
 }
 
@@ -1276,7 +1254,7 @@ construct_runtime!(
 		Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>} = 28,
 		Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 29,
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
-		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, ValidateUnsigned} = 33,
+		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config} = 33,
 		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
@@ -1562,6 +1540,111 @@ impl_runtime_apis! {
 		}
 	}
 
+	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
+		fn trace_transaction(
+			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+			traced_transaction: &EthereumTransaction,
+		) -> Result<
+			(),
+			sp_runtime::DispatchError,
+		> {
+			#[cfg(feature = "evm-tracing")]
+			{
+				use edgeware_evm_tracer::tracer::EvmTracer;
+				// Apply the a subset of extrinsics: all the substrate-specific or ethereum
+				// transactions that preceded the requested transaction.
+				for ext in extrinsics.into_iter() {
+					let _ = match &ext.0.function {
+						Call::Ethereum(transact { transaction }) => {
+							if transaction == traced_transaction {
+								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
+								return Ok(());
+							} else {
+								Executive::apply_extrinsic(ext)
+							}
+						}
+						_ => Executive::apply_extrinsic(ext),
+					};
+				}
+
+				Err(sp_runtime::DispatchError::Other(
+					"Failed to find Ethereum transaction among the extrinsics.",
+				))
+			}
+			#[cfg(not(feature = "evm-tracing"))]
+			Err(sp_runtime::DispatchError::Other(
+				"Missing `evm-tracing` compile time feature flag.",
+			))
+		}
+
+		fn trace_block(
+			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+			known_transactions: Vec<H256>,
+		) -> Result<
+			(),
+			sp_runtime::DispatchError,
+		> {
+			#[cfg(feature = "evm-tracing")]
+			{
+				use edgeware_evm_tracer::tracer::EvmTracer;
+				use sha3::{Digest, Keccak256};
+
+				let mut config = <Runtime as pallet_evm::Config>::config().clone();
+				config.estimate = true;
+
+				// Apply all extrinsics. Ethereum extrinsics are traced.
+				for ext in extrinsics.into_iter() {
+					match &ext.0.function {
+						Call::Ethereum(transact { transaction }) => {
+							let eth_extrinsic_hash =
+								H256::from_slice(Keccak256::digest(&rlp::encode(transaction)).as_slice());
+							if known_transactions.contains(&eth_extrinsic_hash) {
+								// Each known extrinsic is a new call stack.
+								EvmTracer::emit_new();
+								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
+							} else {
+								let _ = Executive::apply_extrinsic(ext);
+							}
+						}
+						_ => {
+							let _ = Executive::apply_extrinsic(ext);
+						}
+					};
+				}
+
+				Ok(())
+			}
+			#[cfg(not(feature = "evm-tracing"))]
+			Err(sp_runtime::DispatchError::Other(
+				"Missing `evm-tracing` compile time feature flag.",
+			))
+		}
+	}
+
+	impl edgeware_rpc_primitives_txpool::TxPoolRuntimeApi<Block> for Runtime {
+		fn extrinsic_filter(
+			xts_ready: Vec<<Block as BlockT>::Extrinsic>,
+			xts_future: Vec<<Block as BlockT>::Extrinsic>,
+		) -> TxPoolResponse {
+			TxPoolResponse {
+				ready: xts_ready
+					.into_iter()
+					.filter_map(|xt| match xt.0.function {
+						Call::Ethereum(transact { transaction }) => Some(transaction),
+						_ => None,
+					})
+					.collect(),
+				future: xts_future
+					.into_iter()
+					.filter_map(|xt| match xt.0.function {
+						Call::Ethereum(transact { transaction }) => Some(transaction),
+						_ => None,
+					})
+					.collect(),
+			}
+		}
+	}
+
 	impl fp_rpc::EthereumRuntimeRPCApi<Block> for Runtime {
 		fn chain_id() -> u64 {
 			<Runtime as pallet_evm::Config>::ChainId::get()
@@ -1580,7 +1663,7 @@ impl_runtime_apis! {
 		}
 
 		fn author() -> H160 {
-			<pallet_ethereum::Pallet<Runtime>>::find_author()
+			<pallet_evm::Pallet<Runtime>>::find_author()
 		}
 
 		fn storage_at(address: H160, index: U256) -> H256 {
@@ -1615,8 +1698,11 @@ impl_runtime_apis! {
 				gas_limit.low_u64(),
 				gas_price,
 				nonce,
-				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			).map_err(|err| err.into())
+				config
+					.as_ref()
+					.unwrap_or_else(|| <Runtime as pallet_evm::Config>::config()),
+			)
+			.map_err(|err| err.into())
 		}
 
 		fn create(
@@ -1636,6 +1722,7 @@ impl_runtime_apis! {
 				None
 			};
 
+			#[allow(clippy::or_fun_call)] // suggestion not helpful here
 			<Runtime as pallet_evm::Config>::Runner::create(
 				from,
 				data,
@@ -1643,253 +1730,44 @@ impl_runtime_apis! {
 				gas_limit.low_u64(),
 				gas_price,
 				nonce,
-				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			).map_err(|err| err.into())
+				config
+					.as_ref()
+					.unwrap_or(<Runtime as pallet_evm::Config>::config()),
+			)
+			.map_err(|err| err.into())
 		}
 
 		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
-			match Ethereum::current_transaction_statuses() {
-				Some(elt) => Some(elt.into()),
-				None => None,
-			}
+			Ethereum::current_transaction_statuses()
 		}
 
 		fn current_block() -> Option<pallet_ethereum::Block> {
-			match Ethereum::current_block() {
-				Some(elt) => Some(elt.into()),
-				None => None,
-			}
+			Ethereum::current_block()
 		}
 
 		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
-			match Ethereum::current_receipts() {
-				Some(elt) => Some(elt.into()),
-				None => None,
-			}
+			Ethereum::current_receipts()
 		}
 
 		fn current_all() -> (
 			Option<pallet_ethereum::Block>,
 			Option<Vec<pallet_ethereum::Receipt>>,
-			Option<Vec<TransactionStatus>>
+			Option<Vec<TransactionStatus>>,
 		) {
 			(
-				Self::current_block(),
-				Self::current_receipts(),
-				Self::current_transaction_statuses(),
+				Ethereum::current_block(),
+				Ethereum::current_receipts(),
+				Ethereum::current_transaction_statuses(),
 			)
 		}
-	}
 
-	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
-		fn trace_transaction(
-			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			transaction: &EthereumTransaction,
-			trace_type: edgeware_rpc_primitives_debug::single::TraceType,
-		) -> Result<
-			edgeware_rpc_primitives_debug::single::TransactionTrace,
-			sp_runtime::DispatchError
-		> {
-			use edgeware_rpc_primitives_debug::single::TraceType;
-			use edgeware_evm_tracer::{RawTracer, CallListTracer};
-
-			// Apply the a subset of extrinsics: all the substrate-specific or ethereum transactions
-			// that preceded the requested transaction.
-			for ext in extrinsics.into_iter() {
-				let _ = match &ext.function {
-					Call::Ethereum(transact { transaction: t }) => {
-						if t == transaction {
-							return match trace_type {
-								TraceType::Raw {
-									disable_storage,
-									disable_memory,
-									disable_stack,
-								} => {
-									Ok(RawTracer::new(disable_storage,
-										disable_memory,
-										disable_stack,)
-										.trace(|| Executive::apply_extrinsic(ext))
-										.0
-										.into_tx_trace()
-									)
-								},
-								TraceType::CallList => {
-									Ok(CallListTracer::new()
-										.trace(|| Executive::apply_extrinsic(ext))
-										.0
-										.into_tx_trace()
-									)
-								}
-							}
-
-						} else {
-							Executive::apply_extrinsic(ext)
-						}
-					},
-					_ => Executive::apply_extrinsic(ext)
-				};
-			}
-
-			Err(sp_runtime::DispatchError::Other(
-				"Failed to find Ethereum transaction among the extrinsics."
-			))
-		}
-
-		fn trace_block(
-			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-		) -> Result<
-			Vec<
-				edgeware_rpc_primitives_debug::block::TransactionTrace>,
-				sp_runtime::DispatchError
-			> {
-			use edgeware_rpc_primitives_debug::{single, block, CallResult, CreateResult, CreateType};
-			use edgeware_evm_tracer::CallListTracer;
-
-			let mut config = <Runtime as pallet_evm::Config>::config().clone();
-			config.estimate = true;
-
-			let mut traces = vec![];
-			let mut eth_tx_index = 0;
-
-			// Apply all extrinsics. Ethereum extrinsics are traced.
-			for ext in extrinsics.into_iter() {
-				match &ext.function {
-					Call::Ethereum(transact { transaction: _transaction }) => {
-						let tx_traces = CallListTracer::new()
-							.trace(|| Executive::apply_extrinsic(ext))
-							.0
-							.into_tx_trace();
-
-						let tx_traces = match tx_traces {
-							single::TransactionTrace::CallList(t) => t,
-							_ => return Err(sp_runtime::DispatchError::Other("Runtime API error")),
-						};
-
-						// Convert traces from "single" format to "block" format.
-						let mut tx_traces: Vec<_> = tx_traces.into_iter().map(|trace|
-							match trace.inner {
-								single::CallInner::Call {
-									input, to, res, call_type
-								} => block::TransactionTrace {
-									action: block::TransactionTraceAction::Call {
-										call_type,
-										from: trace.from,
-										gas: trace.gas,
-										input,
-										to,
-										value: trace.value,
-									},
-									// Can't be known here, must be inserted upstream.
-									block_hash: H256::default(),
-									// Can't be known here, must be inserted upstream.
-									block_number: 0,
-									output: match res {
-										CallResult::Output(output) => {
-											block::TransactionTraceOutput::Result(
-												block::TransactionTraceResult::Call {
-													gas_used: trace.gas_used,
-													output
-												})
-										},
-										CallResult::Error(error) =>
-											block::TransactionTraceOutput::Error(error),
-									},
-									subtraces: trace.subtraces,
-									trace_address: trace.trace_address,
-									// Can't be known here, must be inserted upstream.
-									transaction_hash: H256::default(),
-									transaction_position: eth_tx_index,
-								},
-								single::CallInner::Create { init, res } => block::TransactionTrace {
-									action: block::TransactionTraceAction::Create {
-										creation_method: CreateType::Create,
-										from: trace.from,
-										gas: trace.gas,
-										init,
-										value: trace.value,
-									},
-									// Can't be known here, must be inserted upstream.
-									block_hash: H256::default(),
-									// Can't be known here, must be inserted upstream.
-									block_number: 0,
-									output: match res {
-										CreateResult::Success {
-											created_contract_address_hash,
-											created_contract_code
-										} => {
-											block::TransactionTraceOutput::Result(
-												block::TransactionTraceResult::Create {
-													gas_used: trace.gas_used,
-													code: created_contract_code,
-													address: created_contract_address_hash,
-												}
-											)
-										},
-										CreateResult::Error {
-											error
-										} => block::TransactionTraceOutput::Error(error),
-									},
-									subtraces: trace.subtraces,
-									trace_address: trace.trace_address,
-									// Can't be known here, must be inserted upstream.
-									transaction_hash: H256::default(),
-									transaction_position: eth_tx_index,
-
-								},
-								single::CallInner::SelfDestruct {
-									balance,
-									refund_address
-								} => block::TransactionTrace {
-									action: block::TransactionTraceAction::Suicide {
-										address: trace.from,
-										balance,
-										refund_address,
-									},
-									// Can't be known here, must be inserted upstream.
-									block_hash: H256::default(),
-									// Can't be known here, must be inserted upstream.
-									block_number: 0,
-									output: block::TransactionTraceOutput::Result(
-												block::TransactionTraceResult::Suicide
-											),
-									subtraces: trace.subtraces,
-									trace_address: trace.trace_address,
-									// Can't be known here, must be inserted upstream.
-									transaction_hash: H256::default(),
-									transaction_position: eth_tx_index,
-
-								},
-							}
-						).collect();
-
-						traces.append(&mut tx_traces);
-
-						eth_tx_index += 1;
-					},
-					_ => {let _ = Executive::apply_extrinsic(ext); }
-				};
-			}
-
-			Ok(traces)
-		}
-	}
-
-
-	impl edgeware_rpc_primitives_txpool::TxPoolRuntimeApi<Block> for Runtime {
 		fn extrinsic_filter(
-			xts_ready: Vec<<Block as BlockT>::Extrinsic>,
-			xts_future: Vec<<Block as BlockT>::Extrinsic>
-		) -> TxPoolResponse {
-			TxPoolResponse {
-				ready: xts_ready.into_iter().filter_map(|xt| match xt.function {
-					Call::Ethereum(transact { transaction: t }) => Some(t),
-					_ => None
-				}).collect(),
-				future: xts_future.into_iter().filter_map(|xt| match xt.function {
-					Call::Ethereum(transact { transactionn: t }) => Some(t),
-					_ => None
-				}).collect(),
-			}
+			xts: Vec<<Block as BlockT>::Extrinsic>,
+		) -> Vec<EthereumTransaction> {
+			xts.into_iter().filter_map(|xt| match xt.0.function {
+				Call::Ethereum(transact { transaction }) => Some(transaction),
+				_ => None
+			}).collect::<Vec<EthereumTransaction>>()
 		}
 	}
 

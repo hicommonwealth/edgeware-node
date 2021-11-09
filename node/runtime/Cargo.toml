@@ -80,6 +80,7 @@ pallet-session = { git = "https://github.com/webb-tools/substrate", branch = "er
 pallet-staking = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 pallet-staking-reward-curve = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 pallet-sudo = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+frame-election-provider-support = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 frame-support = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 frame-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 frame-system-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
@@ -201,6 +202,7 @@ std = [
 	"evm-tracing-events/std",
 	"edgeware-rpc-primitives-debug/std",
 	"edgeware-rpc-primitives-txpool/std",
+	"frame-election-provider-support/std",
 ]
 
 runtime-benchmarks = [
