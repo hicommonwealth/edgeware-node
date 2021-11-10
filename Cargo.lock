@@ -1434,7 +1434,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-cli"
-version = "3.3.5"
+version = "3.4.0"
 dependencies = [
  "assert_cmd",
  "edgeware-cli-opt",
@@ -1553,7 +1553,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-executor"
-version = "3.3.5"
+version = "3.4.0"
 dependencies = [
  "criterion",
  "edgeware-primitives",
@@ -1582,7 +1582,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-primitives"
-version = "3.3.5"
+version = "3.4.0"
 dependencies = [
  "frame-system",
  "parity-scale-codec",
@@ -1596,7 +1596,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-rpc"
-version = "3.3.5"
+version = "3.4.0"
 dependencies = [
  "edgeware-cli-opt",
  "edgeware-executor",
@@ -1813,7 +1813,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "3.3.5"
+version = "3.4.0"
 dependencies = [
  "edge-treasury-reward",
  "edgeware-primitives",
@@ -1910,7 +1910,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime-interface"
-version = "3.3.5"
+version = "3.4.0"
 dependencies = [
  "edgeware-primitives",
  "parity-scale-codec",
