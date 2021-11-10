@@ -23,7 +23,6 @@ use edgeware_cli_opt::{EthApi as EthApiCmd, RpcConfig};
 use edgeware_executor::EdgewareExecutor;
 use edgeware_primitives::Block;
 use sc_network::warp_request_handler::WarpSyncProvider;
-use edgeware_executor::EdgewareExecutor as Executor;
 use edgeware_executor::NativeElseWasmExecutor;
 use edgeware_runtime::RuntimeApi;
 #[cfg(feature = "frontier-block-import")]
@@ -47,8 +46,9 @@ use std::{
 	time::Duration,
 };
 use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
+use sc_client_api::ExecutorProvider;
 
-
+type Executor = NativeElseWasmExecutor<EdgewareExecutor>;
 type FullClient = sc_service::TFullClient<Block, RuntimeApi, Executor>;
 type FullBackend = sc_service::TFullBackend<Block>;
 type FullSelectChain = sc_consensus::LongestChain<FullBackend, Block>;
@@ -147,7 +147,12 @@ pub fn new_partial(
 		config.max_runtime_instances,
 	);
 
-	let (client, backend, keystore_container, task_manager) = sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
+	let (
+		client,
+		backend,
+		keystore_container,
+		task_manager
+	) = sc_service::new_full_parts::<Block, RuntimeApi, Executor>(
 		&config,
 		telemetry.as_ref().map(|(_, telemetry)| telemetry.handle()),
 		executor,
