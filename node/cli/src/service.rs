@@ -45,7 +45,6 @@ use std::{
 	sync::{Arc, Mutex},
 	time::Duration,
 };
-use sp_consensus_aura::sr25519::AuthorityPair as AuraPair;
 use sc_client_api::ExecutorProvider;
 
 type Executor = NativeElseWasmExecutor<EdgewareExecutor>;
@@ -193,7 +192,7 @@ pub fn new_partial(
 	let target_gas_price = U256::from(cli.run.target_gas_price);
 
 	let import_queue =
-	sc_consensus_aura::import_queue::<AuraPair, _, _, _, _, _, _>(ImportQueueParams {
+	sc_consensus_aura::import_queue::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _>(ImportQueueParams {
 		#[cfg(feature = "frontier-block-import")]
 		block_import: frontier_block_import.clone(),
 		#[cfg(not(feature = "frontier-block-import"))]
@@ -435,7 +434,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		let raw_slot_duration = slot_duration.slot_duration();
 		let target_gas_price = cli.run.target_gas_price;
 
-		let aura = sc_consensus_aura::start_aura::<AuraPair, _, _, _, _, _, _, _, _, _, _, _>(
+		let aura = sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _, _, _>(
 			StartAuraParams {
 				slot_duration,
 				client: client.clone(),
