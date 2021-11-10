@@ -31,6 +31,7 @@ use frame_support::{
 	},
 	ConsensusEngineId, PalletId, RuntimeDebug,
 };
+use scale_info::TypeInfo;
 use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 
 use codec::{Decode, Encode};
@@ -279,7 +280,7 @@ parameter_types! {
 }
 
 /// The type used to represent the kinds of proxying allowed.
-#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Encode, Decode, RuntimeDebug, TypeInfo)]
 #[repr(u8)]
 pub enum ProxyType {
 	Any = 0,
@@ -1256,7 +1257,7 @@ construct_runtime!(
 		Multisig: pallet_multisig::{Pallet, Call, Storage, Event<T>} = 28,
 		Assets: pallet_assets::{Pallet, Call, Storage, Event<T>} = 29,
 		TreasuryReward: treasury_reward::{Pallet, Call, Storage, Config<T>, Event<T>} = 32,
-		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config} = 33,
+		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 33,
 		EVM: pallet_evm::{Pallet, Config, Call, Storage, Event<T>} = 34,
 		// REMOVED: ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 35,
 		// REMOVED: EdgeBridge: edge_chainbridge::{Pallet, Call, Event<T>} = 36,
@@ -1344,6 +1345,7 @@ mod custom_migration {
 	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
 		type AccountId = AccountId;
 		type Balance = Balance;
+		type Pallet;
 	}
 
 	impl OnRuntimeUpgrade for Upgrade {
@@ -1412,8 +1414,9 @@ impl_runtime_apis! {
 		fn validate_transaction(
 			source: TransactionSource,
 			tx: <Block as BlockT>::Extrinsic,
+			block_hash: <Block as BlockT>::Hash,
 		) -> TransactionValidity {
-			Executive::validate_transaction(source, tx)
+			Executive::validate_transaction(source, tx, block_hash)
 		}
 	}
 
