@@ -17,13 +17,12 @@
 mod content;
 mod inspect;
 
-use ethereum::TransactionV0 as EthereumTransaction;
+use ethereum::TransactionV2 as EthereumTransaction;
 use ethereum_types::{H160, H256, U256};
 use serde::Serialize;
 use std::collections::HashMap;
 
-pub use self::content::Transaction;
-pub use self::inspect::Summary;
+pub use self::{content::Transaction, inspect::Summary};
 
 pub type TransactionMap<T> = HashMap<H160, HashMap<U256, T>>;
 

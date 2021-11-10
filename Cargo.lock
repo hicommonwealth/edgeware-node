@@ -1794,6 +1794,7 @@ version = "0.6.0"
 dependencies = [
  "edgeware-rpc-core-txpool",
  "edgeware-rpc-primitives-txpool",
+ "ethereum",
  "ethereum-types",
  "fc-rpc",
  "frame-system",

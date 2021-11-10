@@ -17,7 +17,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Decode, Encode};
-use ethereum::TransactionV0 as Transaction;
+use ethereum::TransactionV2 as Transaction;
 use ethereum_types::H256;
 use sp_std::vec::Vec;
 
@@ -42,8 +42,8 @@ pub enum TracerInput {
 	CallTracer,
 }
 
-/// DebugRuntimeApi V2 result. Trace response is stored in client and runtime api call response is
-/// empty.
+/// DebugRuntimeApi V2 result. Trace response is stored in client and runtime
+/// api call response is empty.
 #[derive(Debug)]
 pub enum Response {
 	Single,

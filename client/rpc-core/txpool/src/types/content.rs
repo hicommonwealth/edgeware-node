@@ -15,7 +15,7 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 use crate::GetT;
-use ethereum::{TransactionAction, TransactionV0 as EthereumTransaction};
+use ethereum::{TransactionAction, TransactionV2 as EthereumTransaction};
 use ethereum_types::{H160, H256, U256};
 use fc_rpc_core::types::Bytes;
 use serde::{Serialize, Serializer};
@@ -67,18 +67,48 @@ impl GetT for Transaction {
 	fn get(hash: H256, from_address: H160, txn: &EthereumTransaction) -> Self {
 		Self {
 			hash,
-			nonce: txn.nonce,
+			nonce: match txn {
+				EthereumTransaction::Legacy(tx) => tx.nonce,
+				EthereumTransaction::EIP2930(tx) => tx.nonce,
+				EthereumTransaction::EIP1559(tx) => tx.nonce,
+			},
 			block_hash: None,
 			block_number: None,
 			from: from_address,
-			to: match txn.action {
-				TransactionAction::Call(to) => Some(to),
-				_ => None,
+			to: match txn {
+				EthereumTransaction::Legacy(tx) => match tx.action {
+					TransactionAction::Call(to) => Some(to),
+					_ => None,
+				},
+				EthereumTransaction::EIP2930(tx) => match tx.action {
+					TransactionAction::Call(to) => Some(to),
+					_ => None,
+				},
+				EthereumTransaction::EIP1559(tx) => match tx.action {
+					TransactionAction::Call(to) => Some(to),
+					_ => None,
+				},
 			},
-			value: txn.value,
-			gas_price: txn.gas_price,
-			gas: txn.gas_limit,
-			input: Bytes(txn.input.clone()),
+			value: match txn {
+				EthereumTransaction::Legacy(tx) => tx.value,
+				EthereumTransaction::EIP2930(tx) => tx.value,
+				EthereumTransaction::EIP1559(tx) => tx.value,
+			},
+			gas_price: match txn {
+				EthereumTransaction::Legacy(tx) => tx.gas_price,
+				EthereumTransaction::EIP2930(tx) => tx.gas_price,
+				EthereumTransaction::EIP1559(tx) => tx.max_fee_per_gas,
+			},
+			gas: match txn {
+				EthereumTransaction::Legacy(tx) => tx.gas_limit,
+				EthereumTransaction::EIP2930(tx) => tx.gas_limit,
+				EthereumTransaction::EIP1559(tx) => tx.gas_limit,
+			},
+			input: match txn {
+				EthereumTransaction::Legacy(tx) => Bytes(tx.input.clone()),
+				EthereumTransaction::EIP2930(tx) => Bytes(tx.input.clone()),
+				EthereumTransaction::EIP1559(tx) => Bytes(tx.input.clone()),
+			},
 			transaction_index: None,
 		}
 	}

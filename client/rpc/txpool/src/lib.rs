@@ -22,6 +22,8 @@ use fc_rpc::{internal_err, public_key};
 use jsonrpc_core::Result as RpcResult;
 // TODO @tgmichel It looks like this graph stuff moved to the test-helpers
 // feature. Is it only for tests? Should we use it here?
+use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
+use ethereum::TransactionV2 as EthereumTransaction;
 use sc_transaction_pool::test_helpers::{ChainApi, Pool};
 use sc_transaction_pool_api::InPoolTransaction;
 use serde::Serialize;
@@ -30,8 +32,6 @@ use sp_api::{BlockId, ProvideRuntimeApi};
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_runtime::traits::Block as BlockT;
 use std::{collections::HashMap, marker::PhantomData, sync::Arc};
-
-use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
 
 pub struct TxPool<B: BlockT, C, A: ChainApi> {
 	client: Arc<C>,
@@ -87,10 +87,15 @@ where
 				Ok(pk) => H160::from(H256::from_slice(Keccak256::digest(&pk).as_slice())),
 				Err(_e) => H160::default(),
 			};
+			let nonce = match txn {
+				EthereumTransaction::Legacy(tx) => tx.nonce,
+				EthereumTransaction::EIP2930(tx) => tx.nonce,
+				EthereumTransaction::EIP1559(tx) => tx.nonce,
+			};
 			pending
 				.entry(from_address)
 				.or_insert_with(HashMap::new)
-				.insert(txn.nonce, T::get(hash, from_address, txn));
+				.insert(nonce, T::get(hash, from_address, txn));
 		}
 		let mut queued = TransactionMap::<T>::new();
 		for txn in ethereum_txns.future.iter() {
@@ -99,10 +104,15 @@ where
 				Ok(pk) => H160::from(H256::from_slice(Keccak256::digest(&pk).as_slice())),
 				Err(_e) => H160::default(),
 			};
+			let nonce = match txn {
+				EthereumTransaction::Legacy(tx) => tx.nonce,
+				EthereumTransaction::EIP2930(tx) => tx.nonce,
+				EthereumTransaction::EIP1559(tx) => tx.nonce,
+			};
 			queued
 				.entry(from_address)
 				.or_insert_with(HashMap::new)
-				.insert(txn.nonce, T::get(hash, from_address, txn));
+				.insert(nonce, T::get(hash, from_address, txn));
 		}
 		Ok(TxPoolResult { pending, queued })
 	}

@@ -15,7 +15,7 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 use crate::GetT;
-use ethereum::{TransactionAction, TransactionV0 as EthereumTransaction};
+use ethereum::{TransactionAction, TransactionV2 as EthereumTransaction};
 use ethereum_types::{H160, H256, U256};
 use serde::{Serialize, Serializer};
 
@@ -46,13 +46,35 @@ impl Serialize for Summary {
 impl GetT for Summary {
 	fn get(_hash: H256, _from_address: H160, txn: &EthereumTransaction) -> Self {
 		Self {
-			to: match txn.action {
-				TransactionAction::Call(to) => Some(to),
-				_ => None,
+			to: match txn {
+				EthereumTransaction::Legacy(tx) => match tx.action {
+					TransactionAction::Call(to) => Some(to),
+					_ => None,
+				},
+				EthereumTransaction::EIP2930(tx) => match tx.action {
+					TransactionAction::Call(to) => Some(to),
+					_ => None,
+				},
+				EthereumTransaction::EIP1559(tx) => match tx.action {
+					TransactionAction::Call(to) => Some(to),
+					_ => None,
+				},
 			},
-			value: txn.value,
-			gas_price: txn.gas_price,
-			gas: txn.gas_limit,
+			value: match txn {
+				EthereumTransaction::Legacy(tx) => tx.value,
+				EthereumTransaction::EIP2930(tx) => tx.value,
+				EthereumTransaction::EIP1559(tx) => tx.value,
+			},
+			gas_price: match txn {
+				EthereumTransaction::Legacy(tx) => tx.gas_price,
+				EthereumTransaction::EIP2930(tx) => tx.gas_price,
+				EthereumTransaction::EIP1559(tx) => tx.max_fee_per_gas,
+			},
+			gas: match txn {
+				EthereumTransaction::Legacy(tx) => tx.gas_limit,
+				EthereumTransaction::EIP2930(tx) => tx.gas_limit,
+				EthereumTransaction::EIP1559(tx) => tx.gas_limit,
+			},
 		}
 	}
 }
