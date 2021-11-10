@@ -27,7 +27,7 @@ edgeware-rpc-core-debug = { path = "../../rpc-core/debug" }
 edgeware-rpc-core-types = { path = "../../rpc-core/types" }
 edgeware-client-evm-tracing = { path = "../../evm-tracing" }
 edgeware-rpc-primitives-debug = { path = "../../../primitives/rpc/debug" }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
-fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", features = ["rpc_binary_search_estimate"] }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
+fc-db = { git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5", features = ["rpc_binary_search_estimate"] }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5" }

@@ -28,16 +28,16 @@ sp-std = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 sp-blockchain = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 sp-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 sp-block-builder = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
-fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fp-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
 edgeware-rpc-primitives-debug = { path = "../../../primitives/rpc/debug" }
 
 # Client and RPC
 jsonrpc-core = "18.0.0"
 sc-client-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 sc-network = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
-fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb", features = ["rpc_binary_search_estimate"] }
-fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
-fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-5-webb" }
+fc-rpc = { git = "https://github.com/webb-tools/frontier", branch = "erup-5", features = ["rpc_binary_search_estimate"] }
+fc-consensus = { git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
+fc-rpc-core = { git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
 edgeware-rpc-core-trace = { path = "../../rpc-core/trace" }
 edgeware-rpc-core-types = { path = "../../rpc-core/types" }
 edgeware-client-evm-tracing = { path = "../../evm-tracing" }

@@ -1679,7 +1679,8 @@ impl_runtime_apis! {
 			data: Vec<u8>,
 			value: U256,
 			gas_limit: U256,
-			gas_price: Option<U256>,
+			max_fee_per_gas: Option<U256>,
+			max_priority_fee_per_gas: Option<U256>,
 			nonce: Option<U256>,
 			estimate: bool,
 		) -> Result<pallet_evm::CallInfo, sp_runtime::DispatchError> {
@@ -1697,13 +1698,12 @@ impl_runtime_apis! {
 				data,
 				value,
 				gas_limit.low_u64(),
-				gas_price,
+				max_fee_per_gas,
+				max_priority_fee_per_gas,
 				nonce,
-				config
-					.as_ref()
-					.unwrap_or_else(|| <Runtime as pallet_evm::Config>::config()),
-			)
-			.map_err(|err| err.into())
+				Vec::new(),
+				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+			).map_err(|err| err.into())
 		}
 
 		fn create(
@@ -1711,7 +1711,8 @@ impl_runtime_apis! {
 			data: Vec<u8>,
 			value: U256,
 			gas_limit: U256,
-			gas_price: Option<U256>,
+			max_fee_per_gas: Option<U256>,
+			max_priority_fee_per_gas: Option<U256>,
 			nonce: Option<U256>,
 			estimate: bool,
 		) -> Result<pallet_evm::CreateInfo, sp_runtime::DispatchError> {
@@ -1723,19 +1724,17 @@ impl_runtime_apis! {
 				None
 			};
 
-			#[allow(clippy::or_fun_call)] // suggestion not helpful here
 			<Runtime as pallet_evm::Config>::Runner::create(
 				from,
 				data,
 				value,
 				gas_limit.low_u64(),
-				gas_price,
+				max_fee_per_gas,
+				max_priority_fee_per_gas,
 				nonce,
-				config
-					.as_ref()
-					.unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			)
-			.map_err(|err| err.into())
+				Vec::new(),
+				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+			).map_err(|err| err.into())
 		}
 
 		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
@@ -1753,12 +1752,12 @@ impl_runtime_apis! {
 		fn current_all() -> (
 			Option<pallet_ethereum::Block>,
 			Option<Vec<pallet_ethereum::Receipt>>,
-			Option<Vec<TransactionStatus>>,
+			Option<Vec<TransactionStatus>>
 		) {
 			(
 				Ethereum::current_block(),
 				Ethereum::current_receipts(),
-				Ethereum::current_transaction_statuses(),
+				Ethereum::current_transaction_statuses()
 			)
 		}
 

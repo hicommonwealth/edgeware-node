@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-use ethereum_types::{H160, H256, U256};
-use fc_rpc::{internal_err, public_key};
-use jsonrpc_core::Result as RpcResult;
 pub use edgeware_rpc_core_txpool::{
 	GetT, Summary, Transaction, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
 };
-// TODO @tgmichel It looks like this graph stuff moved to the test-helpers feature.
-// Is it only for tests? Should we use it here?
+use ethereum_types::{H160, H256, U256};
+use fc_rpc::{internal_err, public_key};
+use jsonrpc_core::Result as RpcResult;
+// TODO @tgmichel It looks like this graph stuff moved to the test-helpers
+// feature. Is it only for tests? Should we use it here?
 use sc_transaction_pool::test_helpers::{ChainApi, Pool};
 use sc_transaction_pool_api::InPoolTransaction;
 use serde::Serialize;
@@ -29,8 +29,7 @@ use sha3::{Digest, Keccak256};
 use sp_api::{BlockId, ProvideRuntimeApi};
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_runtime::traits::Block as BlockT;
-use std::collections::HashMap;
-use std::{marker::PhantomData, sync::Arc};
+use std::{collections::HashMap, marker::PhantomData, sync::Arc};
 
 use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
 
@@ -49,8 +48,8 @@ where
 	A: ChainApi<Block = B> + 'static,
 	C::Api: TxPoolRuntimeApi<B>,
 {
-	/// Use the transaction graph interface to get the extrinsics currently in the ready and future
-	/// queues.
+	/// Use the transaction graph interface to get the extrinsics currently in
+	/// the ready and future queues.
 	fn map_build<T>(&self) -> RpcResult<TxPoolResult<TransactionMap<T>>>
 	where
 		T: GetT + Serialize,
@@ -72,15 +71,14 @@ where
 			.map(|(_hash, extrinsic)| extrinsic.clone())
 			.collect();
 
-		// Use the runtime to match the (here) opaque extrinsics against ethereum transactions.
+		// Use the runtime to match the (here) opaque extrinsics against ethereum
+		// transactions.
 		let best_block: BlockId<B> = BlockId::Hash(self.client.info().best_hash);
 		let ethereum_txns: TxPoolResponse = self
 			.client
 			.runtime_api()
 			.extrinsic_filter(&best_block, txs_ready, txs_future)
-			.map_err(|err| {
-				internal_err(format!("fetch runtime extrinsic filter failed: {:?}", err))
-			})?;
+			.map_err(|err| internal_err(format!("fetch runtime extrinsic filter failed: {:?}", err)))?;
 		// Build the T response.
 		let mut pending = TransactionMap::<T>::new();
 		for txn in ethereum_txns.ready.iter() {
