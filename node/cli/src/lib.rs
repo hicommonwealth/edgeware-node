@@ -30,7 +30,6 @@
 
 #![warn(missing_docs)]
 
-pub use edgeware_opts as opts;
 pub mod chain_spec;
 
 #[macro_use]

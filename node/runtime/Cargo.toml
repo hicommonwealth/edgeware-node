@@ -92,11 +92,13 @@ pallet-utility = { git = "https://github.com/webb-tools/substrate", branch = "er
 pallet-transaction-payment = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 pallet-vesting = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
+pallet-bags-list = { git = "https://github.com/webb-tools/substrate", branch = "erup-5", default-features = false }
 
 treasury-reward = { package = "edge-treasury-reward", path = "../../pallets/edge-treasury-reward", default-features = false }
 
 evm-runtime = { version = "0.33.0", default-features = false }
 pallet-dynamic-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
+pallet-base-fee = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
 fp-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5" }
 pallet-evm = { git = "https://github.com/webb-tools/frontier", branch = "erup-5", default-features = false }
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5", default-features = false, features = ["runtime-benchmarks"] }
@@ -135,6 +137,7 @@ std = [
 	"sp-consensus-aura/std",
 	"pallet-aura/std",
 	"pallet-balances/std",
+	"pallet-bags-list/std",
 	"sp-block-builder/std",
 	"codec/std",
 	"pallet-collective/std",
@@ -196,6 +199,8 @@ std = [
 	"pallet-evm-precompile-sha3fips/std",
 	"pallet-evm-precompile-blake2/std",
 	"pallet-evm-precompile-curve25519/std",
+	"pallet-dynamic-fee/std",
+	"pallet-base-fee/std",
 	"pallet-tips/std",
 	"pallet-bounties/std",
 	"sp-npos-elections/std",

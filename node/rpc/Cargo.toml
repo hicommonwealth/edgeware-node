@@ -11,8 +11,8 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 futures = { version = "0.3.1", features = ["compat"] }
-jsonrpc-core = "15.0.0"
-jsonrpc-pubsub = "15.0.0"
+jsonrpc-core = "18.0.0"
+jsonrpc-pubsub = "18.0.0"
 pallet-contracts-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 pallet-transaction-payment-rpc = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 pallet-transaction-payment-rpc-runtime-api = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
@@ -39,7 +39,7 @@ sp-session = { git = "https://github.com/webb-tools/substrate", branch = "erup-5
 sp-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 sc-transaction-pool = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
 substrate-frame-rpc-system = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
-tokio = { version = "0.2.13", features = ["macros", "sync"] }
+tokio = { version = "1.12.0", features = ["macros", "sync"] }
 
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-5", features = ["runtime-benchmarks"] }
 fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-5" }

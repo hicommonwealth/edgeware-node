@@ -18,13 +18,23 @@
 //! the wasm to be executed is equivalent to the natively compiled code.
 
 use edgeware_runtime_interface;
-use sc_executor::native_executor_instance;
-pub use sc_executor::NativeExecutor;
-// Declare an instance of the native executor named `Executor`. Include the wasm
-// binary as the equivalent wasm code.
-native_executor_instance!(
-	pub Executor,
-	edgeware_runtime::api::dispatch,
-	edgeware_runtime::native_version,
-	(frame_benchmarking::benchmarking::HostFunctions, edgeware_runtime_interface::storage::HostFunctions),
-);
+pub use sc_executor::NativeElseWasmExecutor;
+
+// Declare an instance of the native executor named `ExecutorDispatch`. Include
+// the wasm binary as the equivalent wasm code.
+pub struct EdgewareExecutor;
+
+impl sc_executor::NativeExecutionDispatch for EdgewareExecutor {
+	type ExtendHostFunctions = (
+		frame_benchmarking::benchmarking::HostFunctions,
+		edgeware_runtime_interface::storage::HostFunctions,
+	);
+
+	fn dispatch(method: &str, data: &[u8]) -> Option<Vec<u8>> {
+		edgeware_runtime::api::dispatch(method, data)
+	}
+
+	fn native_version() -> sc_executor::NativeVersion {
+		edgeware_runtime::native_version()
+	}
+}

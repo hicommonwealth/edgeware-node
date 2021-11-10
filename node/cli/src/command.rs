@@ -15,7 +15,7 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 use crate::{chain_spec, service, service::new_partial, Cli, Subcommand};
-use edgeware_executor::Executor;
+use edgeware_cli_opt::{RpcConfig, EthApi};
 use edgeware_runtime::Block;
 use sc_cli::{ChainSpec, Result, Role, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
@@ -79,7 +79,7 @@ pub fn run() -> Result<()> {
 			if cfg!(feature = "runtime-benchmarks") {
 				let runner = cli.create_runner(cmd)?;
 
-				runner.sync_run(|config| cmd.run::<Block, Executor>(config))
+				runner.sync_run(|config| cmd.run::<Block, edgeware_executor::EdgewareExecutor>(config))
 			} else {
 				Err("Benchmarking wasn't enabled when building the node. \
 				You can enable it with `--features runtime-benchmarks`."
@@ -154,10 +154,25 @@ pub fn run() -> Result<()> {
 		}
 		None => {
 			let runner = cli.create_runner(&cli.run.base)?;
+
+			let rpc_config = RpcConfig {
+				ethapi: cli.run.ethapi.iter().map(|api| {
+					match api {
+						Txpool => edgeware_cli_opt::EthApi::Txpool,
+						Debug => edgeware_cli_opt::EthApi::Debug,
+						Trace => edgeware_cli_opt::EthApi::Trace,
+					}
+				}).collect(),
+				ethapi_max_permits: cli.run.ethapi_max_permits,
+				ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
+				ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,
+				eth_log_block_cache: cli.run.eth_log_block_cache,
+				max_past_logs: cli.run.max_past_logs,
+			};
+
 			runner.run_node_until_exit(|config| async move {
 				match config.role {
-					Role::Light => service::new_light(config),
-					_ => service::new_full(config, &cli),
+					_ => service::new_full(config, &cli, rpc_config),
 				}
 				.map_err(sc_cli::Error::Service)
 			})

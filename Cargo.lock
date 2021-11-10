@@ -1613,8 +1613,8 @@ dependencies = [
  "fc-rpc-core",
  "fp-rpc",
  "futures 0.3.17",
- "jsonrpc-core 15.1.0",
- "jsonrpc-pubsub 15.1.0",
+ "jsonrpc-core 18.0.0",
+ "jsonrpc-pubsub 18.0.0",
  "pallet-contracts-rpc",
  "pallet-ethereum",
  "pallet-transaction-payment-rpc",
@@ -1642,7 +1642,7 @@ dependencies = [
  "sp-storage",
  "sp-transaction-pool",
  "substrate-frame-rpc-system",
- "tokio 0.2.25",
+ "tokio 1.13.0",
 ]
 
 [[package]]
@@ -1837,7 +1837,9 @@ dependencies = [
  "pallet-aura",
  "pallet-authority-discovery",
  "pallet-authorship",
+ "pallet-bags-list",
  "pallet-balances",
+ "pallet-base-fee",
  "pallet-bounties",
  "pallet-collective",
  "pallet-contracts",
@@ -4961,6 +4963,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-bags-list"
+version = "4.0.0-dev"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-5#cc789d4f32f093bd5ca6d1f5b3957f06f45d4876"
+dependencies = [
+ "frame-election-provider-support",
+ "frame-support",
+ "frame-system",
+ "log",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-balances"
 version = "4.0.0-dev"
 source = "git+https://github.com/webb-tools/substrate?branch=erup-5#cc789d4f32f093bd5ca6d1f5b3957f06f45d4876"
@@ -4973,6 +4990,21 @@ dependencies = [
  "scale-info",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-base-fee"
+version = "1.0.0"
+source = "git+https://github.com/webb-tools/frontier?branch=erup-5#f0ff1e5a808a4b32dd3a308eb91af9318ade3e05"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-evm",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -9156,9 +9188,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6703a273949a90131b290be1fe7b039d0fc884aa1935860dfcbe056f28cd8092"
 dependencies = [
  "bytes 0.5.6",
- "fnv",
  "pin-project-lite 0.1.12",
- "tokio-macros",
 ]
 
 [[package]]
@@ -9176,14 +9206,15 @@ dependencies = [
  "once_cell",
  "pin-project-lite 0.2.7",
  "signal-hook-registry",
+ "tokio-macros",
  "winapi 0.3.9",
 ]
 
 [[package]]
 name = "tokio-macros"
-version = "0.2.6"
+version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e44da00bfc73a25f814cd8d7e57a68a5c31b74b3152a0a1d1f590c97ed06265a"
+checksum = "114383b041aa6212c579467afa0075fbbdd0718de036100bc0ba7961d8cb9095"
 dependencies = [
  "proc-macro2",
  "quote",
