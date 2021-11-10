@@ -38,15 +38,13 @@ use scale_info::TypeInfo;
 use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 
 use codec::{Decode, Encode, MaxEncodedLen};
+use edgeware_rpc_primitives_txpool::TxPoolResponse;
 use frame_support::traits::InstanceFilter;
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
 	EnsureOneOf, EnsureRoot,
 };
-
-use edgeware_rpc_primitives_txpool::TxPoolResponse;
 use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction};
-
 use pallet_evm::FeeCalculator;
 pub use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 pub use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
@@ -61,12 +59,14 @@ pub use sp_core::{
 	OpaqueMetadata, H160, H256, U256,
 };
 use sp_runtime::{
-	create_runtime_str, generic, impl_opaque_keys, ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill,
+	create_runtime_str, generic, impl_opaque_keys, traits::PostDispatchInfoOf,
+	transaction_validity::TransactionValidityError, ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill,
 	Perquintill,
 };
 
 use sp_runtime::traits::{
-	self, BlakeTwo256, Block as BlockT, ConvertInto, NumberFor, OpaqueKeys, SaturatedConversion, StaticLookup,
+	self, BlakeTwo256, Block as BlockT, ConvertInto, Dispatchable, NumberFor, OpaqueKeys, SaturatedConversion,
+	StaticLookup,
 };
 pub use sp_runtime::{
 	curve::PiecewiseLinear,
@@ -1332,11 +1332,11 @@ pub type SignedExtra = (
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
-pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+pub type UncheckedExtrinsic = fp_self_contained::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
 /// Extrinsic type that has already been checked.
-pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
+pub type CheckedExtrinsic = fp_self_contained::CheckedExtrinsic<AccountId, Call, SignedExtra, H160>;
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
 	Runtime,
@@ -1384,6 +1384,50 @@ mod custom_migration {
 			);
 			pallet_elections_phragmen::migrations::v3::migrate_members_to_recorded_deposit::<Self>(old_candidacy_bond);
 			weight
+		}
+	}
+}
+
+impl fp_self_contained::SelfContainedCall for Call {
+	type SignedInfo = H160;
+
+	fn is_self_contained(&self) -> bool {
+		match self {
+			Call::Ethereum(call) => call.is_self_contained(),
+			_ => false,
+		}
+	}
+
+	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo, TransactionValidityError>> {
+		match self {
+			Call::Ethereum(call) => call.check_self_contained(),
+			_ => None,
+		}
+	}
+
+	fn validate_self_contained(&self, info: &Self::SignedInfo) -> Option<TransactionValidity> {
+		match self {
+			Call::Ethereum(call) => call.validate_self_contained(info),
+			_ => None,
+		}
+	}
+
+	fn pre_dispatch_self_contained(&self, info: &Self::SignedInfo) -> Option<Result<(), TransactionValidityError>> {
+		match self {
+			Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
+			_ => None,
+		}
+	}
+
+	fn apply_self_contained(
+		self,
+		info: Self::SignedInfo,
+	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
+		match self {
+			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => {
+				Some(call.dispatch(Origin::from(pallet_ethereum::RawOrigin::EthereumTransaction(info))))
+			}
+			_ => None,
 		}
 	}
 }
@@ -1575,7 +1619,7 @@ impl_runtime_apis! {
 				// Apply the a subset of extrinsics: all the substrate-specific or ethereum
 				// transactions that preceded the requested transaction.
 				for ext in extrinsics.into_iter() {
-					let _ = match &ext.function {
+					let _ = match &ext.0.function {
 						Call::Ethereum(transact { transaction }) => {
 							if transaction == traced_transaction {
 								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
@@ -1650,14 +1694,14 @@ impl_runtime_apis! {
 			TxPoolResponse {
 				ready: xts_ready
 					.into_iter()
-					.filter_map(|xt| match xt.function {
+					.filter_map(|xt| match xt.0.function {
 						Call::Ethereum(transact { transaction }) => Some(transaction),
 						_ => None,
 					})
 					.collect(),
 				future: xts_future
 					.into_iter()
-					.filter_map(|xt| match xt.function {
+					.filter_map(|xt| match xt.0.function {
 						Call::Ethereum(transact { transaction }) => Some(transaction),
 						_ => None,
 					})
@@ -1784,7 +1828,7 @@ impl_runtime_apis! {
 		fn extrinsic_filter(
 			xts: Vec<<Block as BlockT>::Extrinsic>,
 		) -> Vec<EthereumTransaction> {
-			xts.into_iter().filter_map(|xt| match xt.function {
+			xts.into_iter().filter_map(|xt| match xt.0.function {
 				Call::Ethereum(transact { transaction }) => Some(transaction),
 				_ => None
 			}).collect::<Vec<EthereumTransaction>>()

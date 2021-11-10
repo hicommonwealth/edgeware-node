@@ -1823,6 +1823,7 @@ dependencies = [
  "evm-runtime",
  "evm-tracing-events",
  "fp-rpc",
+ "fp-self-contained",
  "frame-benchmarking",
  "frame-election-provider-support",
  "frame-executive",
