@@ -1,5 +1,8 @@
 use codec::Decode;
-use evm::{executor::stack::PrecompileResult, Context};
+use evm::{
+	executor::stack::{PrecompileFailure, PrecompileOutput},
+	Context,
+};
 use frame_support::dispatch::{Dispatchable, GetDispatchInfo, PostDispatchInfo};
 use pallet_evm::{Precompile, PrecompileSet};
 // use pallet_evm_precompile_blake2::Blake2F;
@@ -40,7 +43,12 @@ where
 	R::Call: Dispatchable<PostInfo = PostDispatchInfo> + GetDispatchInfo + Decode,
 	<R::Call as Dispatchable>::Origin: From<Option<R::AccountId>>,
 {
-	fn execute(address: H160, input: &[u8], target_gas: Option<u64>, context: &Context) -> Option<PrecompileResult> {
+	fn execute(
+		address: H160,
+		input: &[u8],
+		target_gas: Option<u64>,
+		context: &Context,
+	) -> Option<Result<PrecompileOutput, PrecompileFailure>> {
 		match address {
 			// Ethereum precompiles
 			// a if a == hash(1) => Some(ECRecover::execute(input, target_gas, context)),
