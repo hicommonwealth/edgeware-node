@@ -88,7 +88,7 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 
 /// Beresheet Testnet configuration
 pub fn edgeware_beresheet_official() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheetv2.chainspec.json")[..]) {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheetv3.chainspec.json")[..]) {
 		Ok(spec) => spec,
 		Err(e) => panic!("{}", e),
 	}
@@ -160,6 +160,7 @@ pub fn testnet_genesis(
 	_balances: Vec<(AccountId, Balance)>,
 	vesting: Vec<(AccountId, BlockNumber, BlockNumber, Balance)>,
 	_founder_allocation: Vec<(AccountId, Balance)>,
+	create_evm_alice: bool,
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
@@ -186,6 +187,8 @@ pub fn testnet_genesis(
 			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 		]
 	});
+
+	endowed_accounts.push(_root_key.clone());
 
 	initial_authorities.iter().for_each(|x| {
 		if !endowed_accounts.contains(&x.0) {
@@ -263,16 +266,17 @@ fn edgeware_testnet_config_genesis() -> GenesisConfig {
 		.filter(|b| b.1 > 0)
 		.collect();
 
-	let initial_authorities = crate::testnet_fixtures::get_mtestnet_initial_authorities();
+	let initial_authorities = crate::testnet_fixtures::get_beresheet_initial_authorities();
 
 	testnet_genesis(
 		initial_authorities,
 		crate::testnet_fixtures::get_testnet_root_key(),
-		None,
+		Some(vec![]),
 		true,
 		balances,
 		vec![],
 		crate::mainnet_fixtures::get_commonwealth_allocation(),
+		false,
 	)
 }
 
@@ -285,7 +289,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 			"tokenSymbol": "tEDG"
 		}"#;
 	let properties = serde_json::from_str(data).unwrap();
-	let boot_nodes = crate::testnet_fixtures::get_mtestnet_bootnodes();
+	let boot_nodes = crate::testnet_fixtures::get_beresheet_bootnodes();
 
 	ChainSpec::from_genesis(
 		&testnet_name,
@@ -320,6 +324,7 @@ fn multi_development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		true,
 	)
 }
 
@@ -333,6 +338,7 @@ pub fn development_config_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		true,
 	)
 }
 
@@ -393,6 +399,7 @@ fn local_testnet_genesis() -> GenesisConfig {
 		vec![],
 		vec![],
 		vec![],
+		true,
 	)
 }
 

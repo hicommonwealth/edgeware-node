@@ -1344,10 +1344,6 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPallets,
-	(
-		custom_migration::Upgrade,
-		// custom_migration::GrandpaStoragePrefixMigration
-	),
 >;
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
