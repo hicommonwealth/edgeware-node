@@ -45,7 +45,7 @@ parameter_types! {
 impl frame_system::Config for Test {
 	type AccountData = pallet_balances::AccountData<u64>;
 	type AccountId = AccountId;
-	type BaseCallFilter = ();
+	type BaseCallFilter = frame_support::traits::Everything;
 	type BlockHashCount = BlockHashCount;
 	type BlockLength = ();
 	type BlockNumber = BlockNumber;
@@ -71,6 +71,7 @@ impl frame_system::Config for Test {
 parameter_types! {
 	pub const ExistentialDeposit: Balance = 0;
 	pub const MaxLocks: u32 = 50;
+	pub const MaxReserves: u32 = 50;
 	pub const MaxTreeDepth: u8 = 32;
 	pub const CacheBlockLength: u64 = 5;
 	// Minimum deposit length is 1 month w/ 6 second blocks
@@ -84,6 +85,8 @@ impl pallet_balances::Config for Test {
 	type Event = Event;
 	type ExistentialDeposit = ExistentialDeposit;
 	type MaxLocks = MaxLocks;
+	type MaxReserves = MaxReserves;
+	type ReserveIdentifier = ();
 	type WeightInfo = ();
 }
 

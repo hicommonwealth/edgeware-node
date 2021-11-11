@@ -55,7 +55,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 9500000, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(9500000, 1, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(9500000, 1, treasury_address.clone()))
 		);
 
 		// 95 EDG to block 2
@@ -64,7 +64,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000000, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000000, 2, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000000, 2, treasury_address.clone()))
 		);
 
 		// Reduce minting interval to 2
@@ -77,7 +77,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000000, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000000, 2, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000000, 2, treasury_address.clone()))
 		);
 
 		// 95 EDG to block 4
@@ -86,7 +86,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
 		);
 
 		// Reduce payout to 0
@@ -98,7 +98,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
 		);
 
 		// 0 EDG to block 6
@@ -107,7 +107,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
 		);
 
 		// Increase payout to 105
@@ -119,7 +119,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000095, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000095, 4, treasury_address.clone()))
 		);
 
 		// 105 EDG to block 8
@@ -128,7 +128,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000200, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000200, 8, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000200, 8, treasury_address.clone()))
 		);
 
 		// Reduce payout to 10
@@ -142,7 +142,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000210, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000210, 9, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000210, 9, treasury_address.clone()))
 		);
 
 		// 10 EDG to block 10
@@ -151,7 +151,7 @@ fn setting_treasury_block_reward() {
 		assert_eq!(Balances::free_balance(treasury_address.clone()) == 19000220, true);
 		assert_eq!(
 			last_event(),
-			Event::treasury_reward(crate::Event::TreasuryMinting(19000220, 10, treasury_address.clone()))
+			mock::Event::TreasuryReward(crate::Event::TreasuryMinting(19000220, 10, treasury_address.clone()))
 		);
 	});
 }

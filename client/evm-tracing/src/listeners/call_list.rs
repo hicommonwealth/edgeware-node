@@ -625,7 +625,7 @@ mod tests {
 	use super::*;
 	use ethereum_types::H256;
 	use evm_tracing_events::{
-		evm::CreateScheme,
+		evm_utils::CreateScheme,
 		gasometer::Snapshot,
 		runtime::{Memory, Stack},
 		Context as EvmContext,
