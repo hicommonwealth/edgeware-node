@@ -17,6 +17,6 @@ jsonrpc-core-client = "18.0.0"
 jsonrpc-derive = "18.0.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-sp-core = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-core = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5" }
 edgeware-client-evm-tracing = { path = "../../evm-tracing" }
 edgeware-rpc-core-types = { path = "../types" }

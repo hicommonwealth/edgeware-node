@@ -7,7 +7,7 @@ authors = ["PureStake"]
 edition = '2018'
 
 [dependencies]
-sp-runtime = { git = "https://github.com/webb-tools/substrate", branch = "erup-5" }
+sp-runtime = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5" }
 structopt = "0.3.8"
 tiny-bip39 = "0.8"
 libsecp256k1 = "0.7"
