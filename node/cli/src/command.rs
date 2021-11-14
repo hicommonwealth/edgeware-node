@@ -15,9 +15,9 @@
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
 use crate::{chain_spec, service, service::new_partial, Cli, Subcommand};
-use edgeware_cli_opt::{RpcConfig, EthApi};
+use edgeware_cli_opt::RpcConfig;
 use edgeware_runtime::Block;
-use sc_cli::{ChainSpec, Result, Role, RuntimeVersion, SubstrateCli};
+use sc_cli::{ChainSpec, Result, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
 impl SubstrateCli for Cli {
@@ -156,13 +156,7 @@ pub fn run() -> Result<()> {
 			let runner = cli.create_runner(&cli.run.base)?;
 
 			let rpc_config = RpcConfig {
-				ethapi: cli.run.ethapi.iter().map(|api| {
-					match api {
-						Txpool => edgeware_cli_opt::EthApi::Txpool,
-						Debug => edgeware_cli_opt::EthApi::Debug,
-						Trace => edgeware_cli_opt::EthApi::Trace,
-					}
-				}).collect(),
+				ethapi: cli.run.ethapi.clone(),
 				ethapi_max_permits: cli.run.ethapi_max_permits,
 				ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
 				ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,

@@ -2156,7 +2156,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2182,7 +2182,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-storage",
  "kvdb",
@@ -2198,7 +2198,7 @@ dependencies = [
 [[package]]
 name = "fc-mapping-sync"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fc-consensus",
  "fc-db",
@@ -2216,7 +2216,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2261,7 +2261,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2375,7 +2375,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -2389,7 +2389,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "3.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "evm",
  "parity-scale-codec",
@@ -2401,7 +2401,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "3.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2418,7 +2418,7 @@ dependencies = [
 [[package]]
 name = "fp-self-contained"
 version = "1.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ethereum",
  "frame-support",
@@ -2435,7 +2435,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "2.0.0"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 
 [[package]]
 name = "frame-benchmarking"
@@ -4996,7 +4996,7 @@ dependencies = [
 [[package]]
 name = "pallet-base-fee"
 version = "1.0.0"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -5144,7 +5144,7 @@ dependencies = [
 [[package]]
 name = "pallet-dynamic-fee"
 version = "4.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "async-trait",
  "frame-support",
@@ -5199,7 +5199,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "4.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -5228,7 +5228,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "6.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -5256,7 +5256,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-blake2"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-evm",
  "sp-core",
@@ -5266,7 +5266,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-bn128"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-evm",
  "sp-core",
@@ -5277,7 +5277,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-curve25519"
 version = "1.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "curve25519-dalek 4.0.0-pre.1",
  "fp-evm",
@@ -5290,7 +5290,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-dispatch"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-evm",
  "frame-support",
@@ -5303,7 +5303,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-ed25519"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "ed25519-dalek",
  "fp-evm",
@@ -5314,7 +5314,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-evm",
  "num",
@@ -5325,7 +5325,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-evm",
  "sp-core",
@@ -5336,7 +5336,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#37f46511ec20705c7a2c425c2cd1f3eeb6648495"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5#dd513997543759e47f7286bd547c449b2459b7f6"
 dependencies = [
  "fp-evm",
  "ripemd160",
@@ -9346,7 +9346,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "matchers",
- "parking_lot 0.11.2",
+ "parking_lot 0.10.2",
  "regex",
  "serde",
  "serde_json",
@@ -9452,7 +9452,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 1.0.0",
+ "cfg-if 0.1.10",
  "rand 0.8.4",
  "static_assertions",
 ]

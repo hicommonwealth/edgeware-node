@@ -13,7 +13,7 @@
 
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
 /// Block authoring scheme to be used by the dev service.
 #[derive(Debug)]
@@ -42,10 +42,14 @@ impl FromStr for Sealing {
 	}
 }
 
+/// Ethereum API Features
 #[derive(Debug, PartialEq, Clone)]
 pub enum EthApi {
+	/// Transactions Pool
 	Txpool,
+	/// Debugging
 	Debug,
+	/// Tracing.
 	Trace,
 }
 
@@ -59,6 +63,16 @@ impl FromStr for EthApi {
 			"trace" => Self::Trace,
 			_ => return Err(format!("`{}` is not recognized as a supported Ethereum Api", s)),
 		})
+	}
+}
+
+impl fmt::Display for EthApi {
+	fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+		match self {
+			EthApi::Txpool => write!(f, "txpool"),
+			EthApi::Debug => write!(f, "debug"),
+			EthApi::Trace => write!(f, "trace"),
+		}
 	}
 }
 
