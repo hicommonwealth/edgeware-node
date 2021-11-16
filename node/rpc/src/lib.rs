@@ -30,10 +30,7 @@
 #![warn(missing_docs)]
 
 use edgeware_cli_opt::EthApi as EthApiCmd;
-use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
-use edgeware_rpc_debug::{Debug, DebugHandler, DebugRequester, DebugServer};
-use edgeware_rpc_primitives_debug::DebugRuntimeApi;
-use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, CacheTask, Trace, TraceServer};
+use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash};
 use edgeware_rpc_txpool::{TxPool, TxPoolServer};
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use fc_rpc::{
@@ -64,12 +61,12 @@ use sp_consensus::SelectChain;
 use sp_core::H256;
 use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
 use std::{collections::BTreeMap, sync::Arc, time::Duration};
-use tokio::sync::Semaphore;
 
 /// RPC Client
 pub mod client;
 use client::RuntimeApiCollection;
 
+///
 pub mod tracing;
 
 /// Public io handler for exporting into other modules
@@ -282,11 +279,17 @@ where
 	io
 }
 
+///
 pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
+	///
 	pub task_manager: &'a TaskManager,
+	///
 	pub client: Arc<C>,
+	///
 	pub substrate_backend: Arc<BE>,
+	///
 	pub frontier_backend: Arc<fc_db::Backend<B>>,
+	///
 	pub filter_pool: Option<FilterPool>,
 }
 

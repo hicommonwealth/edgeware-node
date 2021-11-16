@@ -164,13 +164,14 @@ pub fn testnet_genesis(
 ) -> GenesisConfig {
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
-	evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
-		nonce: 0u32.into(),
-		balance: U256::from(123456_123_000_000_000_000_000u128),
-		storage: BTreeMap::new(),
-		code: vec![],
-	});
-
+	if create_evm_alice {
+		evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
+			nonce: 0u32.into(),
+			balance: U256::from(123456_123_000_000_000_000_000u128),
+			storage: BTreeMap::new(),
+			code: vec![],
+		});
+	}
 	let mut endowed_accounts: Vec<AccountId> = endowed_accounts.unwrap_or_else(|| {
 		vec![
 			get_account_id_from_seed::<sr25519::Public>("Alice"),

@@ -21,11 +21,15 @@ use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, CacheTask,
 use tokio::sync::Semaphore;
 
 #[derive(Clone)]
+/// RPC requesters
 pub struct RpcRequesters {
+	/// Debug requester
 	pub debug: Option<DebugRequester>,
+	/// Trace requester
 	pub trace: Option<TraceFilterCacheRequester>,
 }
 
+/// Adds tracing functionality.
 pub fn extend_with_tracing<C, BE>(
 	client: Arc<C>,
 	requesters: RpcRequesters,
@@ -54,7 +58,7 @@ pub fn extend_with_tracing<C, BE>(
 	}
 }
 
-// Spawn the tasks that are required to run a Moonbeam tracing node.
+/// Spawn the tasks that are required to run a Moonbeam tracing node.
 pub fn spawn_tracing_tasks<B, C, BE>(
 	rpc_config: &edgeware_cli_opt::RpcConfig,
 	params: SpawnTasksParams<B, C, BE>,

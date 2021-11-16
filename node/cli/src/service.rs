@@ -34,13 +34,13 @@ use futures::prelude::*;
 use sc_cli::SubstrateCli;
 use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams};
 use sc_network::{Event, NetworkService};
-use sc_service::{config::Configuration, error::Error as ServiceError, BasePath, ChainSpec, RpcHandlers, TaskManager};
+use sc_service::{config::Configuration, error::Error as ServiceError, BasePath, ChainSpec, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
 use sp_consensus::SlotData;
 use sp_core::U256;
 use sp_runtime::traits::Block as BlockT;
 use std::{
-	collections::{BTreeMap, HashMap},
+	collections::BTreeMap,
 	str::FromStr,
 	sync::{Arc, Mutex},
 	time::Duration,
@@ -58,7 +58,7 @@ pub type TransactionPool = sc_transaction_pool::FullPool<Block, FullClient>;
 
 #[cfg(not(feature = "frontier-block-import"))]
 pub type ConsensusResult = (
-	sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>,
+	FullGrandpaBlockImport,
 	sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
 );
 
@@ -66,7 +66,7 @@ pub type ConsensusResult = (
 pub type ConsensusResult = (
 	FrontierBlockImport<
 		Block,
-		sc_finality_grandpa::GrandpaBlockImport<FullBackend, Block, FullClient, FullSelectChain>,
+		FullGrandpaBlockImport,
 		FullClient,
 	>,
 	sc_finality_grandpa::LinkHalf<Block, FullClient, FullSelectChain>,
@@ -253,7 +253,6 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		.collect();
 
 	let enable_dev_signer = cli.run.enable_dev_signer;
-	let target_gas_price = U256::from(cli.run.target_gas_price);
 
 	let sc_service::PartialComponents {
 		client,
@@ -432,7 +431,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 
 		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
 		let raw_slot_duration = slot_duration.slot_duration();
-		let target_gas_price = cli.run.target_gas_price;
+		let target_gas_price = U256::from(cli.run.target_gas_price);
 
 		let aura = sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _, _, _>(
 			StartAuraParams {
@@ -451,7 +450,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 						);
 
 					let dynamic_fee =
-						pallet_dynamic_fee::InherentDataProvider(U256::from(target_gas_price));
+						pallet_dynamic_fee::InherentDataProvider(target_gas_price);
 
 					Ok((timestamp, slot, dynamic_fee))
 				},

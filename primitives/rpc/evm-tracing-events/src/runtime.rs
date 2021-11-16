@@ -16,7 +16,10 @@
 
 extern crate alloc;
 
-use super::{opcodes_string, Context};
+#[cfg(feature = "evm-tracing")]
+use super::opcodes_string;
+
+use super::Context;
 use alloc::vec::Vec;
 use codec::{Decode, Encode};
 use ethereum_types::{H160, H256, U256};

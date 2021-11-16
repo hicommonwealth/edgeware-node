@@ -58,15 +58,18 @@ pub use sp_core::{
 	u32_trait::{_1, _2, _3, _4, _5},
 	OpaqueMetadata, H160, H256, U256,
 };
+#[cfg(feature = "enable-commented")]
 use sp_runtime::{
-	create_runtime_str, generic, impl_opaque_keys, traits::PostDispatchInfoOf,
-	transaction_validity::TransactionValidityError, ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill,
-	Perquintill,
+	traits::PostDispatchInfoOf,
+	transaction_validity::TransactionValidityError,
 };
-
-use sp_runtime::traits::{
-	self, BlakeTwo256, Block as BlockT, ConvertInto, Dispatchable, NumberFor, OpaqueKeys, SaturatedConversion,
-	StaticLookup,
+use sp_runtime::{
+	create_runtime_str, generic, impl_opaque_keys, ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill,
+	Perquintill,
+	traits::{
+		self, BlakeTwo256, Block as BlockT, ConvertInto, NumberFor, OpaqueKeys, SaturatedConversion,
+		StaticLookup
+	},
 };
 pub use sp_runtime::{
 	curve::PiecewiseLinear,
@@ -82,7 +85,7 @@ pub use pallet_session::historical as pallet_session_historical;
 
 use fp_rpc::TransactionStatus;
 use pallet_evm::{
-	Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, EnsureAddressTruncated, GasWeightMapping,
+	Account as EVMAccount, EnsureAddressTruncated,
 	HashedAddressMapping, Runner,
 };
 
@@ -501,8 +504,8 @@ pallet_staking_reward_curve::build! {
 
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
-	pub const BondingDuration: pallet_staking::EraIndex = 24 * 28;
-	pub const SlashDeferDuration: pallet_staking::EraIndex = 24 * 7; // 1/4 the bonding duration.
+	pub const BondingDuration: pallet_staking::EraIndex = 2 * 28;
+	pub const SlashDeferDuration: pallet_staking::EraIndex = 28;
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
 	pub const MaxNominatorRewardedPerValidator: u32 = 256;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
@@ -676,6 +679,7 @@ parameter_types! {
 	pub const MinimumDeposit: Balance = 100 * DOLLARS;
 	pub const InstantAllowed: bool = false;
 	pub const EnactmentPeriod: BlockNumber = 1 * 24 * 60 * MINUTES;
+	pub const VoteLockingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const PreimageByteDeposit: Balance = 1 * CENTS;
 	pub const MaxVotes: u32 = 100;
@@ -741,7 +745,7 @@ impl pallet_democracy::Config for Runtime {
 	type Slash = Treasury;
 	// No vetoing
 	type VetoOrigin = frame_system::EnsureNever<AccountId>;
-	type VoteLockingPeriod = EnactmentPeriod;
+	type VoteLockingPeriod = VoteLockingPeriod;
 	type VotingPeriod = VotingPeriod;
 	// Same as EnactmentPeriod
 	type WeightInfo = pallet_democracy::weights::SubstrateWeight<Runtime>;
@@ -1134,7 +1138,7 @@ parameter_types! {
 /// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~=
 /// 15_000_000.
 #[cfg(not(feature = "beresheet-runtime"))]
-pub const GAS_PER_SECOND: u64 = 40_000_000;
+pub const GAS_PER_SECOND: u64 = 8_000_000;
 
 #[cfg(feature = "beresheet-runtime")]
 pub const GAS_PER_SECOND: u64 = 150_000_000;
@@ -1385,49 +1389,50 @@ mod custom_migration {
 	}
 }
 
-// impl fp_self_contained::SelfContainedCall for Call {
-// 	type SignedInfo = H160;
+#[cfg(feature = "enable-commented")]
+impl fp_self_contained::SelfContainedCall for Call {
+	type SignedInfo = H160;
 
-// 	fn is_self_contained(&self) -> bool {
-// 		match self {
-// 			Call::Ethereum(call) => call.is_self_contained(),
-// 			_ => false,
-// 		}
-// 	}
+	fn is_self_contained(&self) -> bool {
+		match self {
+			Call::Ethereum(call) => call.is_self_contained(),
+			_ => false,
+		}
+	}
 
-// 	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo,
-// TransactionValidityError>> { 		match self {
-// 			Call::Ethereum(call) => call.check_self_contained(),
-// 			_ => None,
-// 		}
-// 	}
+	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo,
+TransactionValidityError>> { 		match self {
+			Call::Ethereum(call) => call.check_self_contained(),
+			_ => None,
+		}
+	}
 
-// 	fn validate_self_contained(&self, info: &Self::SignedInfo) ->
-// Option<TransactionValidity> { 		match self {
-// 			Call::Ethereum(call) => call.validate_self_contained(info),
-// 			_ => None,
-// 		}
-// 	}
+	fn validate_self_contained(&self, info: &Self::SignedInfo) ->
+Option<TransactionValidity> { 		match self {
+			Call::Ethereum(call) => call.validate_self_contained(info),
+			_ => None,
+		}
+	}
 
-// 	fn pre_dispatch_self_contained(&self, info: &Self::SignedInfo) ->
-// Option<Result<(), TransactionValidityError>> { 		match self {
-// 			Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
-// 			_ => None,
-// 		}
-// 	}
+	fn pre_dispatch_self_contained(&self, info: &Self::SignedInfo) ->
+Option<Result<(), TransactionValidityError>> { 		match self {
+			Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
+			_ => None,
+		}
+	}
 
-// 	fn apply_self_contained(
-// 		self,
-// 		info: Self::SignedInfo,
-// 	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
-// 		match self {
-// 			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => {
-// 				Some(call.dispatch(Origin::from(pallet_ethereum::RawOrigin::
-// EthereumTransaction(info)))) 			}
-// 			_ => None,
-// 		}
-// 	}
-// }
+	fn apply_self_contained(
+		self,
+		info: Self::SignedInfo,
+	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
+		match self {
+			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => {
+				Some(call.dispatch(Origin::from(pallet_ethereum::RawOrigin::
+EthereumTransaction(info)))) 			}
+			_ => None,
+		}
+	}
+}
 
 impl_runtime_apis! {
 	impl sp_api::Core<Block> for Runtime {
@@ -1604,8 +1609,8 @@ impl_runtime_apis! {
 
 	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
 		fn trace_transaction(
-			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			traced_transaction: &EthereumTransaction,
+			_extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+			_traced_transaction: &EthereumTransaction,
 		) -> Result<
 			(),
 			sp_runtime::DispatchError,
@@ -1615,10 +1620,10 @@ impl_runtime_apis! {
 				use edgeware_evm_tracer::tracer::EvmTracer;
 				// Apply the a subset of extrinsics: all the substrate-specific or ethereum
 				// transactions that preceded the requested transaction.
-				for ext in extrinsics.into_iter() {
+				for ext in _extrinsics.into_iter() {
 					let _ = match &ext.function {
 						Call::Ethereum(transact { transaction }) => {
-							if transaction == traced_transaction {
+							if transaction == _traced_transaction {
 								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));
 								return Ok(());
 							} else {
@@ -1640,8 +1645,8 @@ impl_runtime_apis! {
 		}
 
 		fn trace_block(
-			extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			known_transactions: Vec<H256>,
+			_extrinsics: Vec<<Block as BlockT>::Extrinsic>,
+			_known_transactions: Vec<H256>,
 		) -> Result<
 			(),
 			sp_runtime::DispatchError,
@@ -1655,12 +1660,12 @@ impl_runtime_apis! {
 				config.estimate = true;
 
 				// Apply all extrinsics. Ethereum extrinsics are traced.
-				for ext in extrinsics.into_iter() {
+				for ext in _extrinsics.into_iter() {
 					match &ext.function {
 						Call::Ethereum(transact { transaction }) => {
 							let eth_extrinsic_hash =
 								H256::from_slice(Keccak256::digest(&rlp::encode(transaction)).as_slice());
-							if known_transactions.contains(&eth_extrinsic_hash) {
+							if _known_transactions.contains(&eth_extrinsic_hash) {
 								// Each known extrinsic is a new call stack.
 								EvmTracer::emit_new();
 								EvmTracer::new().trace(|| Executive::apply_extrinsic(ext));

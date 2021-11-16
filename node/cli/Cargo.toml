@@ -107,7 +107,7 @@ edgeware-rpc-trace = { path = "../../client/rpc/trace", default-features = false
 # CLI-specific dependencies
 sc-cli = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5", optional = true }
 frame-benchmarking-cli = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5", optional = true }
-edgeware-cli-opt = { path = "../cli-opt", optional = true }
+edgeware-cli-opt = { package = "edgeware-cli-opt", path = "../cli-opt", optional = true }
 
 fc-consensus = { default-features = false, git = "https://github.com/edgeware-network/frontier", branch = "erup-5" }
 fp-consensus = { default-features = false, git = "https://github.com/edgeware-network/frontier", branch = "erup-5" }
@@ -149,6 +149,7 @@ frame-benchmarking-cli = { git = "https://github.com/edgeware-network/substrate"
 substrate-build-script-utils = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5", optional = true }
 substrate-frame-cli = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5", optional = true }
 sc-cli = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5", optional = true }
+edgeware-cli-opt = { package = "edgeware-cli-opt", path = "../cli-opt", optional = true }
 
 [features]
 default = [ "cli" ]
