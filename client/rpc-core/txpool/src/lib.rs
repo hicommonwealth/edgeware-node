@@ -21,13 +21,14 @@ use jsonrpc_derive::rpc;
 mod types;
 
 pub use crate::types::{Get as GetT, Summary, Transaction, TransactionMap, TxPoolResult};
+use pallet_ethereum::Transaction as ethtrans;
 
 pub use rpc_impl_TxPool::gen_server::TxPool as TxPoolServer;
 
 #[rpc(server)]
 pub trait TxPool {
 	#[rpc(name = "txpool_content")]
-	fn content(&self) -> Result<TxPoolResult<TransactionMap<Transaction>>>;
+	fn content(&self) -> Result<TxPoolResult<TransactionMap<ethtrans>>>;
 
 	#[rpc(name = "txpool_inspect")]
 	fn inspect(&self) -> Result<TxPoolResult<TransactionMap<Summary>>>;

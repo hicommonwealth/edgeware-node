@@ -23,7 +23,7 @@ use jsonrpc_core::Result as RpcResult;
 // TODO @tgmichel It looks like this graph stuff moved to the test-helpers
 // feature. Is it only for tests? Should we use it here?
 use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
-use ethereum::TransactionV2 as EthereumTransaction;
+use ethereum::TransactionV2;
 use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::InPoolTransaction;
 use serde::Serialize;
@@ -88,9 +88,9 @@ where
 				Err(_e) => H160::default(),
 			};
 			let nonce = match txn {
-				EthereumTransaction::Legacy(tx) => tx.nonce,
-				EthereumTransaction::EIP2930(tx) => tx.nonce,
-				EthereumTransaction::EIP1559(tx) => tx.nonce,
+				Transaction::Legacy(tx) => tx.nonce,
+				Transaction::EIP2930(tx) => tx.nonce,
+				Transaction::EIP1559(tx) => tx.nonce,
 			};
 			pending
 				.entry(from_address)
@@ -105,9 +105,9 @@ where
 				Err(_e) => H160::default(),
 			};
 			let nonce = match txn {
-				EthereumTransaction::Legacy(tx) => tx.nonce,
-				EthereumTransaction::EIP2930(tx) => tx.nonce,
-				EthereumTransaction::EIP1559(tx) => tx.nonce,
+				Transaction::Legacy(tx) => tx.nonce,
+				Transaction::EIP2930(tx) => tx.nonce,
+				Transaction::EIP1559(tx) => tx.nonce,
 			};
 			queued
 				.entry(from_address)

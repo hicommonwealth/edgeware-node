@@ -64,6 +64,7 @@ pallet-contracts-rpc-runtime-api = { default-features = false, git = "https://gi
 pallet-democracy = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 pallet-election-provider-multi-phase = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 pallet-elections-phragmen = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
+pallet-preimage = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 
 frame-executive = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 pallet-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
@@ -152,6 +153,7 @@ std = [
 	"pallet-election-provider-multi-phase/std",
 	"frame-executive/std",
 	"pallet-grandpa/std",
+	"pallet-preimage/std",
 	"pallet-identity/std",
 	"pallet-im-online/std",
 	"pallet-indices/std",
@@ -219,5 +221,6 @@ runtime-benchmarks = [
 	"frame-support/runtime-benchmarks",
 	"frame-system/runtime-benchmarks",
 	"frame-system-benchmarking",
+	"pallet-preimage/runtime-benchmarks",
 	"hex-literal",
 ]

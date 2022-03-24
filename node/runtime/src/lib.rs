@@ -34,7 +34,7 @@ use frame_support::{
 	},
 	ConsensusEngineId, PalletId, RuntimeDebug,
 };
-use pallet_ethereum::Transaction as EthereumTransaction;
+use pallet_ethereum::Transaction;
 use scale_info::TypeInfo;
 use sp_std::{convert::TryFrom, marker::PhantomData, prelude::*};
 use sp_staking::EraIndex;
@@ -47,7 +47,7 @@ use frame_system::{
 	EnsureRoot,
 };
 use pallet_ethereum::Call::transact;
-//use ethereum::TransactionV2 as EthereumTransaction;
+//use ethereum::TransactionV2 as Transaction;
 use pallet_evm::FeeCalculator;
 pub use pallet_grandpa::{fg_primitives, AuthorityId as GrandpaId, AuthorityList as GrandpaAuthorityList};
 pub use pallet_im_online::ed25519::AuthorityId as ImOnlineId;
@@ -85,6 +85,8 @@ pub use sp_version::NativeVersion;
 pub use sp_version::RuntimeVersion;
 
 pub use pallet_session::historical as pallet_session_historical;
+
+use sp_core::ByteArray;
 
 use fp_rpc::TransactionStatus;
 use pallet_evm::{
@@ -354,7 +356,21 @@ parameter_types! {
 	pub MaximumSchedulerWeight: Weight = Perbill::from_percent(80) * RuntimeBlockWeights::get().max_block;
 	pub const MaxScheduledPerBlock: u32 = 50;
 	pub const NoPreimagePostponement: Option<u32> = Some(10);
+	pub const PreimageMaxSize: u32 = 4096 * 1024;
+	pub const PreimageBaseDeposit: Balance = 1 * DOLLARS;
 
+
+}
+
+
+impl pallet_preimage::Config for Runtime {
+	type WeightInfo = pallet_preimage::weights::SubstrateWeight<Runtime>;
+	type Event = Event;
+	type Currency = Balances;
+	type ManagerOrigin = EnsureRoot<AccountId>;
+	type MaxSize = PreimageMaxSize;
+	type BaseDeposit = PreimageBaseDeposit;
+	type ByteDeposit = PreimageByteDeposit;
 }
 
 impl pallet_scheduler::Config for Runtime {
@@ -1321,6 +1337,7 @@ construct_runtime!(
 		// REMOVED: NFT: nft::{Pallet, Call, Event<T>} = 44,
 		BaseFee: pallet_base_fee::{Pallet, Call, Storage, Config<T>, Event} = 45,
 		BagsList: pallet_bags_list::{Pallet, Call, Storage, Event<T>} = 46,
+		Preimage: pallet_preimage::{Pallet, Call, Storage, Event<T>} = 47,
 	}
 );
 
@@ -1460,7 +1477,7 @@ Option<Result<(), TransactionValidityError>> { 		match self {
 		match self {
 			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => {
 				Some(call.dispatch(Origin::from(pallet_ethereum::RawOrigin::
-EthereumTransaction(info)))) 			}
+Transaction(info)))) 			}
 			_ => None,
 		}
 	}
@@ -1589,9 +1606,8 @@ impl_runtime_apis! {
 			origin: AccountId,
 			dest: AccountId,
 			value: Balance,
-
-			storage_deposit_limit: u64,
 			gas_limit: u64,
+			storage_deposit_limit: Option<Balance>,// u64,
 			input_data: Vec<u8>,
 		) -> pallet_contracts_primitives::ContractExecResult<Balance> {
 			Contracts::bare_call(origin, dest, value, gas_limit, storage_deposit_limit, input_data, true)
@@ -1605,10 +1621,10 @@ impl_runtime_apis! {
 			code: pallet_contracts_primitives::Code<Hash>,
 			data: Vec<u8>,
 			salt: Vec<u8>,
-			debug: bool,
+		//	debug: bool,
 		) -> pallet_contracts_primitives::ContractInstantiateResult<AccountId, Balance> //new return Balance as well
 		{
-			Contracts::bare_instantiate(origin, value, gas_limit, storage_deposit_limit, code, data, salt, debug)
+			Contracts::bare_instantiate(origin, value, gas_limit, storage_deposit_limit, code, data, salt, true)//set debug to true 
 		}
 
 		fn upload_code(
@@ -1659,7 +1675,7 @@ impl_runtime_apis! {
 	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
 		fn trace_transaction(
 			_extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			_traced_transaction: &EthereumTransaction,
+			_traced_transaction: pallet_ethereum::Transaction,
 		) -> Result<
 			(),
 			sp_runtime::DispatchError,
@@ -1879,11 +1895,11 @@ impl_runtime_apis! {
 
 		fn extrinsic_filter(
 			xts: Vec<<Block as BlockT>::Extrinsic>,
-		) -> Vec<EthereumTransaction> {
+		) -> Vec<Transaction> {
 			xts.into_iter().filter_map(|xt| match xt.function {
 				Call::Ethereum(transact { transaction }) => Some(transaction),
 				_ => None
-			}).collect::<Vec<EthereumTransaction>>()
+			}).collect::<Vec<Transaction>>()
 		}
 	}
 
