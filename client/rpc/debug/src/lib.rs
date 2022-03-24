@@ -145,7 +145,7 @@ where
 	B: BlockT<Hash = H256> + Send + Sync + 'static,
 	C::Api: BlockBuilder<B>,
 	C::Api: DebugRuntimeApi<B>,
-	C::Api: EthereumRuntimeRPCApi<B>,
+	C::Api: EthereumRuntimeRPCApi<B + pallet_ethereum::Transaction>,
 {
 	/// Task spawned at service level that listens for messages on the rpc channel and spawns
 	/// blocking tasks using a permit pool.
@@ -346,7 +346,7 @@ where
 		// Get the extrinsics.
 		let ext = blockchain.body(reference_id).unwrap().unwrap();
 		// Known ethereum transaction hashes.
-		let eth_tx_hashes = statuses
+		let eth_tx_hashes = statuses //: pallet_ethereum::Transaction
 			.unwrap()
 			.iter()
 			.map(|t| t.transaction_hash)

@@ -23,6 +23,8 @@ sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "polka
 serde = { version = "1.0", features = ["derive"], optional = true }
 serde_json = { version = "1.0", optional = true }
 hex = { version = "0.4", features = ["serde"], optional = true}
+pallet-ethereum = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["runtime-benchmarks"] }
+
 
 [features]
 default = ["std"]
@@ -37,6 +39,7 @@ std = [
 	"ethereum-types/std",
 	"environmental/std",
 	"serde",
+	"pallet-ethereum/std",
 	"serde_json",
 	"hex"
 ]

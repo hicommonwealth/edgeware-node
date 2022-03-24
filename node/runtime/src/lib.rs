@@ -25,7 +25,7 @@ pub use edgeware_primitives::{AccountId, AccountIndex, Balance, BlockNumber, Has
 use frame_support::{
 	construct_runtime, parameter_types,
 	traits::{
-		Currency, EqualPrivilegeOnly, ConstU128, EnsureOneOf, Everything, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier,
+		Currency, EqualPrivilegeOnly, EnsureOneOf, Everything, FindAuthor, Imbalance, KeyOwnerProofSystem, LockIdentifier,
 		OnUnbalanced, U128CurrencyToVote,
 	},
 	weights::{
@@ -42,7 +42,7 @@ use codec::{Decode, Encode, MaxEncodedLen};
 use edgeware_rpc_primitives_txpool::TxPoolResponse;
 use frame_support::traits::InstanceFilter;
 use frame_system::{
-	ensure_signed,
+	//ensure_signed,
 	limits::{BlockLength, BlockWeights},
 	EnsureRoot,
 };
@@ -1675,7 +1675,7 @@ impl_runtime_apis! {
 	impl edgeware_rpc_primitives_debug::DebugRuntimeApi<Block> for Runtime {
 		fn trace_transaction(
 			_extrinsics: Vec<<Block as BlockT>::Extrinsic>,
-			_traced_transaction: pallet_ethereum::Transaction,
+			_traced_transaction: &pallet_ethereum::Transaction,//pallet_ethereum::Transaction,
 		) -> Result<
 			(),
 			sp_runtime::DispatchError,

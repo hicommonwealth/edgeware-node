@@ -17,7 +17,8 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use codec::{Decode, Encode};
-use ethereum::TransactionV2 as Transaction;
+use pallet_ethereum::Transaction;
+//use ethereum::TransactionV2 as Transaction;
 use ethereum_types::H256;
 use sp_std::vec::Vec;
 
