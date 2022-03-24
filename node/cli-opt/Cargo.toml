@@ -1,13 +1,13 @@
  [package]
 name = 'edgeware-cli-opt'
-homepage = 'https://moonbeam.network'
+homepage = 'https://edgware.re'
 license = 'GPL-3.0-only'
 version = '0.14.2'
-authors = ["PureStake"]
-edition = '2018'
+authors = ["Filip @ Edgeware"]
+edition = '2021'
 
 [dependencies]
-sp-runtime = { git = "https://github.com/edgeware-network/substrate", branch = "erup-5" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
 structopt = "0.3.8"
 tiny-bip39 = "0.8"
 libsecp256k1 = "0.7"

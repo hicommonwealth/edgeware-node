@@ -2,18 +2,18 @@
 name = "edgeware-rpc-core-txpool"
 version = '0.6.0'
 authors = ['PureStake']
-edition = '2018'
+edition = '2021'
 homepage = 'https://moonbeam.network'
 license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
 ethereum = { version = "0.10.0", default-features = false, features = ["with-codec"] }
-ethereum-types = "0.12.0"
+ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"] }
 jsonrpc-core = "18.0.0"
 jsonrpc-core-client = "18.0.0"
 jsonrpc-derive = "18.0.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
-fc-rpc-core = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5" }
+fc-rpc-core = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }

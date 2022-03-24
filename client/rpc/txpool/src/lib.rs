@@ -24,7 +24,7 @@ use jsonrpc_core::Result as RpcResult;
 // feature. Is it only for tests? Should we use it here?
 use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
 use ethereum::TransactionV2 as EthereumTransaction;
-use sc_transaction_pool::test_helpers::{ChainApi, Pool};
+use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::InPoolTransaction;
 use serde::Serialize;
 use sha3::{Digest, Keccak256};
