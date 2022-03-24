@@ -1877,6 +1877,10 @@ impl_runtime_apis! {
 			Ethereum::current_block()
 		}
 
+		fn elasticity() -> Option<Permill> {
+			Ethereum::elasticity()
+		}
+
 		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
 			Ethereum::current_receipts()
 		}
