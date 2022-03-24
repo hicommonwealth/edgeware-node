@@ -1780,7 +1780,7 @@ dependencies = [
 name = "edgeware-rpc-primitives-txpool"
 version = "0.6.0"
 dependencies = [
- "ethereum 0.10.0",
+ "pallet-ethereum",
  "parity-scale-codec 2.3.1",
  "sp-api",
  "sp-io 4.0.0",

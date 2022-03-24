@@ -145,7 +145,7 @@ where
 	B: BlockT<Hash = H256> + Send + Sync + 'static,
 	C::Api: BlockBuilder<B>,
 	C::Api: DebugRuntimeApi<B>,
-	C::Api: EthereumRuntimeRPCApi<B + pallet_ethereum::Transaction>,
+	C::Api: EthereumRuntimeRPCApi<B>,
 {
 	/// Task spawned at service level that listens for messages on the rpc channel and spawns
 	/// blocking tasks using a permit pool.

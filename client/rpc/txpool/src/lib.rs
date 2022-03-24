@@ -15,7 +15,7 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 pub use edgeware_rpc_core_txpool::{
-	GetT, Summary, Transaction, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
+	GetT, Summary, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
 };
 use ethereum_types::{H160, H256, U256};
 use fc_rpc::{internal_err, public_key};
@@ -23,7 +23,7 @@ use jsonrpc_core::Result as RpcResult;
 // TODO @tgmichel It looks like this graph stuff moved to the test-helpers
 // feature. Is it only for tests? Should we use it here?
 use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
-use ethereum::TransactionV2;
+use ethereum::TransactionV2 as Transaction;
 use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::InPoolTransaction;
 use serde::Serialize;
@@ -135,7 +135,7 @@ where
 	C: Send + Sync + 'static,
 	B: BlockT<Hash = H256> + Send + Sync + 'static,
 	A: ChainApi<Block = B> + 'static,
-	C::Api: TxPoolRuntimeApi<B>,
+	C::Api: TxPoolRuntimeApi<B> + Serialize,
 {
 	fn content(&self) -> RpcResult<TxPoolResult<TransactionMap<Transaction>>> {
 		self.map_build::<Transaction>()

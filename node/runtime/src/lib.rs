@@ -1002,6 +1002,9 @@ parameter_types! {
 	pub const MaxAuthorities: u32 = 100;
 }
 
+
+
+
 impl pallet_grandpa::Config for Runtime {
 	type Call = Call;
 	type Event = Event;
@@ -1343,6 +1346,7 @@ construct_runtime!(
 
 pub struct TransactionConverter;
 
+
 impl fp_rpc::ConvertTransaction<UncheckedExtrinsic> for TransactionConverter {
 	fn convert_transaction(&self, transaction: pallet_ethereum::Transaction) -> UncheckedExtrinsic {
 		UncheckedExtrinsic::new_unsigned(pallet_ethereum::Call::<Runtime>::transact { transaction }.into())
@@ -1523,6 +1527,9 @@ impl_runtime_apis! {
 		}
 	}
 
+
+
+
 	impl sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block> for Runtime {
 		fn validate_transaction(
 			source: TransactionSource,
@@ -1538,6 +1545,8 @@ impl_runtime_apis! {
 			Executive::offchain_worker(header)
 		}
 	}
+
+
 
 	impl fg_primitives::GrandpaApi<Block> for Runtime {
 		fn grandpa_authorities() -> GrandpaAuthorityList {
@@ -1847,6 +1856,8 @@ impl_runtime_apis! {
 			max_priority_fee_per_gas: Option<U256>,
 			nonce: Option<U256>,
 			estimate: bool,
+		   access_list: Option<Vec<(H160, Vec<H256>)>>,
+
 		) -> Result<pallet_evm::CreateInfo, sp_runtime::DispatchError> {
 			let config = if estimate {
 				let mut config = <Runtime as pallet_evm::Config>::config().clone();
@@ -1864,7 +1875,7 @@ impl_runtime_apis! {
 				max_fee_per_gas,
 				max_priority_fee_per_gas,
 				nonce,
-				Vec::new(),
+				access_list.unwrap_or(Vec::new()),//Vec::new(),
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
 			).map_err(|err| err.into())
 		}
@@ -1878,7 +1889,8 @@ impl_runtime_apis! {
 		}
 
 		fn elasticity() -> Option<Permill> {
-			Ethereum::elasticity()
+			Some(Permill::default()) //test
+			//	<Runtime as pallet_evm::Config>::config::<Runtime>().elasticity()
 		}
 
 		fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
@@ -1899,7 +1911,7 @@ impl_runtime_apis! {
 
 		fn extrinsic_filter(
 			xts: Vec<<Block as BlockT>::Extrinsic>,
-		) -> Vec<Transaction> {
+		) -> Vec<pallet_ethereum::Transaction> {
 			xts.into_iter().filter_map(|xt| match xt.function {
 				Call::Ethereum(transact { transaction }) => Some(transaction),
 				_ => None
