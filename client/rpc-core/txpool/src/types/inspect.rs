@@ -44,36 +44,38 @@ impl Serialize for Summary {
 }
 
 impl GetT for Summary {
-	fn get(hash: H256, from_address: H160, txn: &EthereumTransaction) -> Self {
+	fn get(_hash: H256, _from_address: H160, txn: &EthereumTransaction) -> Self {
+	
+
 		Self {
 			to: match txn {
 				EthereumTransaction::Legacy(tx) => match tx.action {
-					TransactionAction::Call(to) => Some(to),
+					TransactionAction::Call(to) => Some(to.as_fixed_bytes().into()),
 					_ => None,
 				},
 				EthereumTransaction::EIP2930(tx) => match tx.action {
-					TransactionAction::Call(to) => Some(to),
+					TransactionAction::Call(to) => Some(to.as_fixed_bytes().into()),
 					_ => None,
 				},
 				EthereumTransaction::EIP1559(tx) => match tx.action {
-					TransactionAction::Call(to) => Some(to),
+					TransactionAction::Call(to) => Some(to.as_fixed_bytes().into()),
 					_ => None,
 				},
 			},
 			value: match txn {
-				EthereumTransaction::Legacy(tx) => tx.value,
-				EthereumTransaction::EIP2930(tx) => tx.value,
-				EthereumTransaction::EIP1559(tx) => tx.value,
+				EthereumTransaction::Legacy(tx) =>  ethereum_types::U256::from(tx.value.into()),
+				EthereumTransaction::EIP2930(tx) => ethereum_types::U256::from(tx.value.into()),
+				EthereumTransaction::EIP1559(tx) =>  ethereum_types::U256::from(tx.value.into()),
 			},
 			gas_price: match txn {
-				EthereumTransaction::Legacy(tx) => tx.gas_price,
-				EthereumTransaction::EIP2930(tx) => tx.gas_price,
-				EthereumTransaction::EIP1559(tx) => tx.max_fee_per_gas,
+				EthereumTransaction::Legacy(tx) =>  ethereum_types::U256::from(tx.gas_price.into()),
+				EthereumTransaction::EIP2930(tx) => ethereum_types::U256::from(tx.gas_price.into()),
+				EthereumTransaction::EIP1559(tx) =>  ethereum_types::U256::from(tx.max_fee_per_gas.into()),
 			},
 			gas: match txn {
-				EthereumTransaction::Legacy(tx) => tx.gas_limit,
-				EthereumTransaction::EIP2930(tx) => tx.gas_limit,
-				EthereumTransaction::EIP1559(tx) => tx.gas_limit,
+				EthereumTransaction::Legacy(tx) =>  ethereum_types::U256::from(tx.gas_limit.into()),
+				EthereumTransaction::EIP2930(tx) =>  ethereum_types::U256::from(tx.gas_limit.into()),
+				EthereumTransaction::EIP1559(tx) =>  ethereum_types::U256::from(tx.gas_limit.into()),
 			},
 		}
 	}

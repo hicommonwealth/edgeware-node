@@ -13,7 +13,6 @@
 
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
-
 use crate::GetT;
 use ethereum::{TransactionAction, TransactionV2 as EthereumTransaction};
 use ethereum_types::{H160, H256, U256};
@@ -63,46 +62,51 @@ where
 	serializer.serialize_str(&format!("0x{:x}", hash.unwrap_or_default()))
 }
 
+
 impl GetT for Transaction {
 	fn get(hash: H256, from_address: H160, txn: &EthereumTransaction) -> Self {
+		
 		Self {
 			hash,
 			nonce: match txn {
-				EthereumTransaction::Legacy(tx) => tx.nonce,
-				EthereumTransaction::EIP2930(tx) => tx.nonce,
-				EthereumTransaction::EIP1559(tx) => tx.nonce,
+				EthereumTransaction::Legacy(tx) => {
+					let out: ethereum_types::U256 = ethereum_types::U256::from(tx.nonce.into());
+					out
+				}
+				EthereumTransaction::EIP2930(tx) => ethereum_types::U256::from(tx.nonce.into()),
+				EthereumTransaction::EIP1559(tx) =>  ethereum_types::U256::from(tx.nonce.into()),
 			},
 			block_hash: None,
 			block_number: None,
 			from: from_address,
 			to: match txn {
 				EthereumTransaction::Legacy(tx) => match tx.action {
-					TransactionAction::Call(to) => Some(to),
+					TransactionAction::Call(to) => Some(to.as_fixed_bytes().into()),
 					_ => None,
 				},
 				EthereumTransaction::EIP2930(tx) => match tx.action {
-					TransactionAction::Call(to) => Some(to),
+					TransactionAction::Call(to) => Some(to.as_fixed_bytes().into()),
 					_ => None,
 				},
 				EthereumTransaction::EIP1559(tx) => match tx.action {
-					TransactionAction::Call(to) => Some(to),
+					TransactionAction::Call(to) => Some(to.as_fixed_bytes().into()),
 					_ => None,
 				},
 			},
 			value: match txn {
-				EthereumTransaction::Legacy(tx) => tx.value,
-				EthereumTransaction::EIP2930(tx) => tx.value,
-				EthereumTransaction::EIP1559(tx) => tx.value,
+				EthereumTransaction::Legacy(tx) =>  ethereum_types::U256::from(tx.value.into()),
+				EthereumTransaction::EIP2930(tx) =>  ethereum_types::U256::from(tx.value.into()),
+				EthereumTransaction::EIP1559(tx) =>  ethereum_types::U256::from(tx.value.into()),
 			},
 			gas_price: match txn {
-				EthereumTransaction::Legacy(tx) => tx.gas_price,
-				EthereumTransaction::EIP2930(tx) => tx.gas_price,
-				EthereumTransaction::EIP1559(tx) => tx.max_fee_per_gas,
+				EthereumTransaction::Legacy(tx) =>  ethereum_types::U256::from(tx.gas_price.into()),
+				EthereumTransaction::EIP2930(tx) => ethereum_types::U256::from(tx.gas_price.into()),
+				EthereumTransaction::EIP1559(tx) => ethereum_types::U256::from(tx.max_fee_per_gas.into()),
 			},
 			gas: match txn {
-				EthereumTransaction::Legacy(tx) => tx.gas_limit,
-				EthereumTransaction::EIP2930(tx) => tx.gas_limit,
-				EthereumTransaction::EIP1559(tx) => tx.gas_limit,
+				EthereumTransaction::Legacy(tx) =>  ethereum_types::U256::from(tx.gas_limit.into()),
+				EthereumTransaction::EIP2930(tx) => ethereum_types::U256::from(tx.gas_limit.into()),
+				EthereumTransaction::EIP1559(tx) => ethereum_types::U256::from(tx.gas_limit.into()),
 			},
 			input: match txn {
 				EthereumTransaction::Legacy(tx) => Bytes(tx.input.clone()),
