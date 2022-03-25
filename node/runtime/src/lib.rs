@@ -61,6 +61,7 @@ pub use sp_core::{
 	u32_trait::{_1, _2, _3, _4, _5},
 	OpaqueMetadata, H160, H256, U256,
 };
+//pub use ethereum_types::{U256, H256};
 #[cfg(feature = "enable-commented")]
 use sp_runtime::{
 	traits::PostDispatchInfoOf,

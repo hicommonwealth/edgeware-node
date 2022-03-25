@@ -24,14 +24,17 @@ use pallet_ethereum::Transaction;
 //use ethereum::TransactionV2 as Transaction;
 use sp_runtime::traits::Block as BlockT;
 use sp_std::vec::Vec;
+//use sp_runtime::Serialize;
 
-#[derive(Eq, PartialEq, Clone, Encode, Decode, sp_runtime::RuntimeDebug)]
+
+#[derive(Eq, PartialEq, Clone, Encode, Decode, sp_runtime::RuntimeDebug, serde::Serialize, serde::Deserialize)]
 pub struct TxPoolResponse {
 	pub ready: Vec<Transaction>,
 	pub future: Vec<Transaction>,
 }
 
 sp_api::decl_runtime_apis! {
+//	#[derive(serde::Serialize, serde::Deserialize)]
 	pub trait TxPoolRuntimeApi {
 		fn extrinsic_filter(
 			xt_ready: Vec<<Block as BlockT>::Extrinsic>,

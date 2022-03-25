@@ -167,7 +167,7 @@ pub fn testnet_genesis(
 	if create_evm_alice {
 		evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
 			nonce: 0u32.into(),
-			balance: U256::from(123456_123_000_000_000_000_000u128),
+			balance: ethereum_types::U256::from(123456_123_000_000_000_000_000u128),
 			storage: BTreeMap::new(),
 			code: vec![],
 		});

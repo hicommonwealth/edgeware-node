@@ -15,8 +15,9 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 pub use edgeware_rpc_core_txpool::{
-	GetT, Summary, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
+	GetT, Summary, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer, Transaction as t1,
 };
+use ethereum::{TransactionAction, TransactionV2 as EthereumTransaction};
 use ethereum_types::{H160, H256, U256};
 use fc_rpc::{internal_err, public_key};
 use jsonrpc_core::Result as RpcResult;
@@ -87,15 +88,15 @@ where
 				Ok(pk) => H160::from(H256::from_slice(Keccak256::digest(&pk).as_slice())),
 				Err(_e) => H160::default(),
 			};
-			let nonce = match txn {
-				Transaction::Legacy(tx) => tx.nonce,
-				Transaction::EIP2930(tx) => tx.nonce,
-				Transaction::EIP1559(tx) => tx.nonce,
-			};
+			let nonce: EthereumTransaction = txn.nonce;// match txn {
+		//		EthereumTransaction::Legacy(tx) => tx.nonce,
+		//		EthereumTransaction::EIP2930(tx) => tx.nonce,
+		//		EthereumTransaction::EIP1559(tx) => tx.nonce,
+		//	};
 			pending
 				.entry(from_address)
 				.or_insert_with(HashMap::new)
-				.insert(nonce, T::get(hash, from_address, txn));
+				.insert(nonce.into(), T::get(hash, from_address, txn));
 		}
 		let mut queued = TransactionMap::<T>::new();
 		for txn in ethereum_txns.future.iter() {
@@ -105,9 +106,9 @@ where
 				Err(_e) => H160::default(),
 			};
 			let nonce = match txn {
-				Transaction::Legacy(tx) => tx.nonce,
-				Transaction::EIP2930(tx) => tx.nonce,
-				Transaction::EIP1559(tx) => tx.nonce,
+				EthereumTransaction::Legacy(tx) => tx.nonce,
+				EthereumTransaction::EIP2930(tx) => tx.nonce,
+				EthereumTransaction::EIP1559(tx) => tx.nonce,
 			};
 			queued
 				.entry(from_address)
@@ -137,8 +138,8 @@ where
 	A: ChainApi<Block = B> + 'static,
 	C::Api: TxPoolRuntimeApi<B> + Serialize,
 {
-	fn content(&self) -> RpcResult<TxPoolResult<TransactionMap<Transaction>>> {
-		self.map_build::<Transaction>()
+	fn content(&self) -> RpcResult<TxPoolResult<TransactionMap<t1>>> {
+		self.map_build::<t1>()
 	}
 
 	fn inspect(&self) -> RpcResult<TxPoolResult<TransactionMap<Summary>>> {

@@ -19,7 +19,7 @@ use ethereum::{TransactionAction, TransactionV2 as EthereumTransaction};
 use ethereum_types::{H160, H256, U256};
 use serde::{Serialize, Serializer};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Summary {
 	pub to: Option<H160>,
 	pub value: U256,
@@ -44,7 +44,7 @@ impl Serialize for Summary {
 }
 
 impl GetT for Summary {
-	fn get(_hash: H256, _from_address: H160, txn: &EthereumTransaction) -> Self {
+	fn get(hash: H256, from_address: H160, txn: &EthereumTransaction) -> Self {
 		Self {
 			to: match txn {
 				EthereumTransaction::Legacy(tx) => match tx.action {

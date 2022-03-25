@@ -477,10 +477,22 @@ version = "0.20.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7774144344a4faa177370406a7ff5f1da24303817368584c6206c8303eb07848"
 dependencies = [
- "funty",
- "radium",
+ "funty 1.1.0",
+ "radium 0.6.2",
  "tap",
- "wyz",
+ "wyz 0.2.0",
+]
+
+[[package]]
+name = "bitvec"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1489fcb93a5bb47da0462ca93ad252ad6af2145cce58d10d46a83931ba9f016b"
+dependencies = [
+ "funty 2.0.0",
+ "radium 0.7.0",
+ "tap",
+ "wyz 0.5.0",
 ]
 
 [[package]]
@@ -1559,7 +1571,7 @@ name = "edgeware-cli-opt"
 version = "0.14.2"
 dependencies = [
  "libsecp256k1 0.7.0",
- "primitive-types 0.10.1",
+ "primitive-types 0.11.1",
  "sha3 0.9.1",
  "sp-runtime 4.1.0-dev",
  "structopt",
@@ -1710,7 +1722,7 @@ dependencies = [
 name = "edgeware-rpc-core-txpool"
 version = "0.6.0"
 dependencies = [
- "ethereum 0.10.0",
+ "ethereum 0.12.0",
  "ethereum-types 0.12.1",
  "fc-rpc-core",
  "jsonrpc-core",
@@ -1738,7 +1750,7 @@ dependencies = [
  "edgeware-rpc-core-debug",
  "edgeware-rpc-core-types",
  "edgeware-rpc-primitives-debug",
- "ethereum 0.10.0",
+ "ethereum 0.12.0",
  "ethereum-types 0.12.1",
  "fc-consensus",
  "fc-db",
@@ -1762,7 +1774,7 @@ name = "edgeware-rpc-primitives-debug"
 version = "0.1.0"
 dependencies = [
  "environmental",
- "ethereum 0.10.0",
+ "ethereum 0.12.0",
  "ethereum-types 0.12.1",
  "hex 0.4.3",
  "pallet-ethereum",
@@ -1780,8 +1792,10 @@ dependencies = [
 name = "edgeware-rpc-primitives-txpool"
 version = "0.6.0"
 dependencies = [
+ "ethereum 0.12.0",
  "pallet-ethereum",
  "parity-scale-codec 2.3.1",
+ "serde",
  "sp-api",
  "sp-io 4.0.0",
  "sp-runtime 4.1.0-dev",
@@ -1796,7 +1810,7 @@ dependencies = [
  "edgeware-rpc-core-trace",
  "edgeware-rpc-core-types",
  "edgeware-rpc-primitives-debug",
- "ethereum 0.10.0",
+ "ethereum 0.12.0",
  "ethereum-types 0.12.1",
  "fc-consensus",
  "fc-rpc",
@@ -1851,7 +1865,7 @@ dependencies = [
  "edgeware-primitives",
  "edgeware-rpc-primitives-debug",
  "edgeware-rpc-primitives-txpool",
- "ethereum 0.11.1",
+ "ethereum 0.12.0",
  "evm-runtime",
  "evm-tracing-events",
  "fp-rpc",
@@ -2061,25 +2075,6 @@ dependencies = [
 
 [[package]]
 name = "ethereum"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81fb916554a4dba293ea69c69ad5653e21d770a9d0c2496b5fa0a1f5a3946d87"
-dependencies = [
- "bytes 1.1.0",
- "ethereum-types 0.12.1",
- "hash-db",
- "hash256-std-hasher",
- "parity-scale-codec 2.3.1",
- "rlp",
- "rlp-derive",
- "scale-info 1.0.0",
- "serde",
- "sha3 0.9.1",
- "triehash",
-]
-
-[[package]]
-name = "ethereum"
 version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "34c90e0a755da706ce0970ec0fa8cc48aabcc8e8efa1245336acf718dab06ffe"
@@ -2111,6 +2106,7 @@ dependencies = [
  "rlp",
  "rlp-derive",
  "scale-info 2.0.1",
+ "serde",
  "sha3 0.10.1",
  "triehash",
 ]
@@ -2179,7 +2175,7 @@ version = "0.33.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4dfe4f2a56c4c05a8107b8596380e2332fc2019ffcf56b8f2d01971393a30c4d"
 dependencies = [
- "funty",
+ "funty 1.1.0",
  "parity-scale-codec 2.3.1",
  "primitive-types 0.10.1",
  "scale-info 1.0.0",
@@ -2215,7 +2211,7 @@ name = "evm-tracing-events"
 version = "0.1.0"
 dependencies = [
  "environmental",
- "ethereum 0.10.0",
+ "ethereum 0.11.1",
  "ethereum-types 0.12.1",
  "evm",
  "evm-gasometer",
@@ -2838,6 +2834,12 @@ name = "funty"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fed34cd105917e91daa4da6b3728c47b068749d6a62c59811f06ed2ac71d9da7"
+
+[[package]]
+name = "funty"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c"
 
 [[package]]
 name = "futures"
@@ -6008,7 +6010,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "373b1a4c1338d9cd3d1fa53b3a11bdab5ab6bd80a20f7f7becd76953ae2be909"
 dependencies = [
  "arrayvec 0.7.2",
- "bitvec",
+ "bitvec 0.20.4",
  "byte-slice-cast",
  "impl-trait-for-tuples",
  "parity-scale-codec-derive 2.3.1",
@@ -6022,9 +6024,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e8b44461635bbb1a0300f100a841e571e7d919c81c73075ef5d152ffdb521066"
 dependencies = [
  "arrayvec 0.7.2",
+ "bitvec 1.0.0",
  "byte-slice-cast",
  "impl-trait-for-tuples",
  "parity-scale-codec-derive 3.1.2",
+ "serde",
 ]
 
 [[package]]
@@ -6495,6 +6499,7 @@ dependencies = [
  "fixed-hash",
  "impl-codec 0.6.0",
  "impl-rlp",
+ "impl-serde",
  "scale-info 2.0.1",
  "uint",
 ]
@@ -6715,6 +6720,12 @@ name = "radium"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "643f8f41a8ebc4c5dc4515c82bb8abd397b527fc20fd681b7c011c2aee5d44fb"
+
+[[package]]
+name = "radium"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09"
 
 [[package]]
 name = "rand"
@@ -8001,7 +8012,7 @@ version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5c55b744399c25532d63a0d2789b109df8d46fc93752d46b0782991a931a782f"
 dependencies = [
- "bitvec",
+ "bitvec 0.20.4",
  "cfg-if 1.0.0",
  "derive_more",
  "parity-scale-codec 2.3.1",
@@ -8015,6 +8026,7 @@ version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0563970d79bcbf3c537ce3ad36d859b30d36fc5b190efd227f1f7a84d7cf0d42"
 dependencies = [
+ "bitvec 1.0.0",
  "cfg-if 1.0.0",
  "derive_more",
  "parity-scale-codec 3.1.2",
@@ -10780,6 +10792,15 @@ name = "wyz"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "85e60b0d1b5f99db2556934e21937020776a5d31520bf169e851ac44e6420214"
+
+[[package]]
+name = "wyz"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30b31594f29d27036c383b53b59ed3476874d518f0efb151b27a4c275141390e"
+dependencies = [
+ "tap",
+]
 
 [[package]]
 name = "x25519-dalek"

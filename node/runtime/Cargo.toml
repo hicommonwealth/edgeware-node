@@ -105,7 +105,7 @@ fp-rpc = { default-features = false, git = "https://github.com/edgeware-network/
 fp-self-contained = { default-features = false, git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
 pallet-evm = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", default-features = false }
 pallet-ethereum = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", default-features = false, features = ["runtime-benchmarks"] }
-ethereum = { version = "0.11.1", features=["with-codec"]}
+ethereum = { version = "0.12.0", features=["with-codec"]}
 pallet-evm-precompile-simple = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", default-features = false }
 pallet-evm-precompile-blake2 = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", default-features = false }
 pallet-evm-precompile-modexp = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", default-features = false }
