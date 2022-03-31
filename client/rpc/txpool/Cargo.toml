@@ -1,11 +1,11 @@
 [package]
 name = "edgeware-rpc-txpool"
 version = '0.6.0'
-authors = ['PureStake']
+authors = ['']
 edition = '2021'
-homepage = 'https://moonbeam.network'
+homepage = ''
 license = 'GPL-3.0-only'
-repository = 'https://github.com/PureStake/moonbeam/'
+repository = ''
 
 [dependencies]
 rlp = "0.5"

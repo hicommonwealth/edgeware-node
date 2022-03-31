@@ -28,7 +28,7 @@ pub use rpc_impl_TxPool::gen_server::TxPool as TxPoolServer;
 #[rpc(server)]
 pub trait TxPool {
 	#[rpc(name = "txpool_content")]
-	fn content(&self) -> Result<TxPoolResult<TransactionMap<ethtrans>>>;
+	fn content(&self) -> Result<TxPoolResult<TransactionMap<Transaction>>>;
 
 	#[rpc(name = "txpool_inspect")]
 	fn inspect(&self) -> Result<TxPoolResult<TransactionMap<Summary>>>;

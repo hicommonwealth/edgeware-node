@@ -79,7 +79,7 @@ pub struct LightDeps<C, F, P> {
 	/// Transaction pool instance.
 	pub pool: Arc<P>,
 	/// Remote access to the blockchain (async).
-	pub remote_blockchain: Arc<dyn sc_client_api::light::RemoteBlockchain<Block>>,
+	pub remote_blockchain: Arc<dyn sc_client_api::light::RemoteBlockchain::Header<Block>>,
 	/// Fetcher instance.
 	pub fetcher: Arc<F>,
 }

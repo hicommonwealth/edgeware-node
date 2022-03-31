@@ -9,13 +9,12 @@ repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "2.2", default-features = false }
-#ethereum = { version = "0.10.0", default-features = false, features = ["with-codec"] }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
-pallet-ethereum = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["runtime-benchmarks"] }
-ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
+# pallet-ethereum = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["runtime-benchmarks"] }
+ethereum = { version = "0.11.1", default-features = false, features = ["with-codec"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 
 [features]
@@ -25,7 +24,6 @@ std = [
 	"sp-runtime/std",
 	"sp-io/std",
 	"sp-std/std",
-	"pallet-ethereum/std",
 	"ethereum/std",
 	"serde/std",
 ]

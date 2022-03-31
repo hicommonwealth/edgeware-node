@@ -22,8 +22,7 @@ use ethereum::{TransactionAction, TransactionV2};
 use ethereum_types::{H160, H256, U256};
 use fc_rpc::{internal_err, public_key};
 use jsonrpc_core::Result as RpcResult;
-// TODO @tgmichel It looks like this graph stuff moved to the test-helpers
-// feature. Is it only for tests? Should we use it here?
+
 use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
 //use ethereum::TransactionV2 as Transaction;
 use sc_transaction_pool::{ChainApi, Pool};
@@ -168,7 +167,7 @@ where
 	A: ChainApi<Block = B> + 'static,
 	C::Api: TxPoolRuntimeApi<B>,
 {
-	fn content(&self) -> RpcResult<TxPoolResult<TransactionMap<T>>> {
+	fn content(&self) -> RpcResult<TxPoolResult<TransactionMap<Transaction>>> {
 		self.map_build::<Transaction>()
 	}
 
