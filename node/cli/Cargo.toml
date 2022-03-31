@@ -86,6 +86,7 @@ pallet-staking = { git = "https://github.com/paritytech/substrate", branch = "po
 pallet-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 pallet-dynamic-fee = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
 pallet-evm = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
+ethereum-types = { version = "0.12.1", default-features = false, features = ["codec", "std"] }
 
 # node-specific dependencies
 edgeware-runtime = { path = "../runtime", default-features = false }
@@ -133,6 +134,7 @@ nix = "0.17"
 serde_json = "1.0"
 regex = "1"
 platforms = "2.0.0"
+ethereum-types = { version = "0.12.1", default-features = false, features = ["codec", "std"] }
 
 [build-dependencies]
 structopt = { version = "0.3", optional = true }
@@ -151,6 +153,7 @@ cli = [
 	"substrate-frame-cli",
 	"sc-service/db",
 	"structopt",
+	"ethereum-types/std",
 	"substrate-build-script-utils",
 	"edgeware-cli-opt"
 ]

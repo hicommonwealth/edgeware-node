@@ -12,7 +12,7 @@ tokio = { version = "1.12.0", features = ["time", "sync"] }
 futures = { version = "0.3", features = ["compat"] }
 jsonrpc-core = "18.0.0"
 
-ethereum = { version = "0.12.0", default-features = false, features = ["with-codec"] }
+ethereum = { version = "0.11.1", default-features = false, features = ["with-codec"] }
 ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"] }
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
 sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }

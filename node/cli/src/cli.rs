@@ -17,6 +17,7 @@
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
 use structopt::StructOpt;
 use edgeware_cli_opt::EthApi;
+//use ethereum_types::{H160, H256, U256};
 
 #[allow(missing_docs)]
 #[derive(Debug, StructOpt)]

@@ -1490,6 +1490,7 @@ dependencies = [
  "edgeware-rpc-trace",
  "edgeware-rpc-txpool",
  "edgeware-runtime",
+ "ethereum-types 0.12.1",
  "fc-consensus",
  "fc-db",
  "fc-mapping-sync",
@@ -1722,7 +1723,7 @@ dependencies = [
 name = "edgeware-rpc-core-txpool"
 version = "0.6.0"
 dependencies = [
- "ethereum 0.12.0",
+ "ethereum 0.11.1",
  "ethereum-types 0.12.1",
  "fc-rpc-core",
  "jsonrpc-core",
@@ -1750,7 +1751,7 @@ dependencies = [
  "edgeware-rpc-core-debug",
  "edgeware-rpc-core-types",
  "edgeware-rpc-primitives-debug",
- "ethereum 0.12.0",
+ "ethereum 0.11.1",
  "ethereum-types 0.12.1",
  "fc-consensus",
  "fc-db",
@@ -1774,7 +1775,7 @@ name = "edgeware-rpc-primitives-debug"
 version = "0.1.0"
 dependencies = [
  "environmental",
- "ethereum 0.12.0",
+ "ethereum 0.11.1",
  "ethereum-types 0.12.1",
  "hex 0.4.3",
  "pallet-ethereum",
@@ -1810,7 +1811,7 @@ dependencies = [
  "edgeware-rpc-core-trace",
  "edgeware-rpc-core-types",
  "edgeware-rpc-primitives-debug",
- "ethereum 0.12.0",
+ "ethereum 0.11.1",
  "ethereum-types 0.12.1",
  "fc-consensus",
  "fc-rpc",
@@ -1840,7 +1841,7 @@ version = "0.6.0"
 dependencies = [
  "edgeware-rpc-core-txpool",
  "edgeware-rpc-primitives-txpool",
- "ethereum 0.12.0",
+ "ethereum 0.11.1",
  "ethereum-types 0.12.1",
  "fc-rpc",
  "frame-system",
