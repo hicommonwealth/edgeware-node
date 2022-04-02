@@ -72,8 +72,8 @@ use substrate_frame_rpc_system::{FullSystem, SystemApi};
 pub mod client;
 use client::RuntimeApiCollection;
 
-mod formatge;
-pub use formatge::Geth as GethFormatter;
+//mod formatge;
+//pub use formatge::Geth as GethFormatter;
 
 ///
 pub mod tracing;
@@ -264,7 +264,7 @@ where
 		is_authority,
 		max_past_logs,
 		block_data_cache.clone(),
-		GethFormatter,
+		fc_rpc::format::Geth,
 		fee_history_limit,
 		fee_history_cache,
 	)));

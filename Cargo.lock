@@ -68,7 +68,7 @@ version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fcb51a0695d8f838b1ee009b3fbf66bda078cd64590202a864a8f3e8c4315c47"
 dependencies = [
- "getrandom 0.2.5",
+ "getrandom 0.2.6",
  "once_cell",
  "version_check",
 ]
@@ -189,9 +189,9 @@ dependencies = [
 
 [[package]]
 name = "async-global-executor"
-version = "2.0.3"
+version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c026b7e44f1316b567ee750fea85103f87fcb80792b860e979f221259796ca0a"
+checksum = "c290043c9a95b05d45e952fb6383c67bcb61471f60cfa21e890dba6654234f43"
 dependencies = [
  "async-channel",
  "async-executor",
@@ -307,9 +307,9 @@ checksum = "30696a84d817107fc028e049980e09d5e140e8da8f1caeb17e8e950658a3cea9"
 
 [[package]]
 name = "async-trait"
-version = "0.1.52"
+version = "0.1.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "061a7acccaa286c011ddc30970520b98fa40e00c9d644633fb26b5fc63a265e3"
+checksum = "ed6aa3524a2dfcf9fe180c51eae2b58738348d819517ceadf95789c51fff7600"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -718,7 +718,7 @@ checksum = "4acbb09d9ee8e23699b9634375c72795d095bf268439da88562cf9b501f181fa"
 dependencies = [
  "camino",
  "cargo-platform",
- "semver 1.0.6",
+ "semver 1.0.7",
  "serde",
  "serde_json",
 ]
@@ -2253,7 +2253,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2279,7 +2279,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-storage",
  "kvdb",
@@ -2295,7 +2295,7 @@ dependencies = [
 [[package]]
 name = "fc-mapping-sync"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fc-consensus",
  "fc-db",
@@ -2313,7 +2313,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ethereum 0.11.1",
  "ethereum-types 0.12.1",
@@ -2359,7 +2359,7 @@ dependencies = [
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ethereum 0.11.1",
  "ethereum-types 0.12.1",
@@ -2473,7 +2473,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ethereum 0.11.1",
  "parity-scale-codec 2.3.1",
@@ -2487,7 +2487,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "3.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "evm",
  "parity-scale-codec 2.3.1",
@@ -2499,7 +2499,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "3.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ethereum 0.11.1",
  "ethereum-types 0.12.1",
@@ -2516,7 +2516,7 @@ dependencies = [
 [[package]]
 name = "fp-self-contained"
 version = "1.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ethereum 0.11.1",
  "frame-support 4.0.0-dev (git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.17)",
@@ -2534,7 +2534,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "2.0.0"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 
 [[package]]
 name = "frame-benchmarking"
@@ -3005,9 +3005,9 @@ dependencies = [
 
 [[package]]
 name = "getrandom"
-version = "0.2.5"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d39cd93900197114fa1fcb7ae84ca742095eed9442088988ae74fa744e930e77"
+checksum = "9be70c98951c83b8d2f8f60d7065fa6d5146873094452a1008da8c2f1e4205ad"
 dependencies = [
  "cfg-if 1.0.0",
  "libc",
@@ -3074,9 +3074,9 @@ dependencies = [
 
 [[package]]
 name = "h2"
-version = "0.3.12"
+version = "0.3.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "62eeb471aa3e3c9197aa4bfeabfe02982f6dc96f750486c0bb0009ac58b26d2b"
+checksum = "37a82c6d637fc9515a4694bbf1cb2457b79d81ce52b3108bdeea58b07dd34a57"
 dependencies = [
  "bytes 1.1.0",
  "fnv",
@@ -3087,7 +3087,7 @@ dependencies = [
  "indexmap",
  "slab",
  "tokio 1.17.0",
- "tokio-util",
+ "tokio-util 0.7.1",
  "tracing",
 ]
 
@@ -3447,9 +3447,9 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "1.8.0"
+version = "1.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "282a6247722caba404c065016bbfa522806e51714c34f5dfc3e4a3a46fcb4223"
+checksum = "0f647032dfaa1f8b6dc29bd3edb7bbef4861b8b8007ebb118d6db284fd59f6ee"
 dependencies = [
  "autocfg",
  "hashbrown 0.11.2",
@@ -3668,7 +3668,7 @@ dependencies = [
  "log",
  "tokio 1.17.0",
  "tokio-stream",
- "tokio-util",
+ "tokio-util 0.6.9",
  "unicase",
 ]
 
@@ -4496,10 +4496,11 @@ dependencies = [
 
 [[package]]
 name = "lock_api"
-version = "0.4.6"
+version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88943dd7ef4a2e5a4bfa2753aaab3013e34ce2533d1996fb18ef591e315e2b3b"
+checksum = "327fa5b6a6940e4699ec49a9beae1ea4845c6bab9314e4f84ac68742139d8c53"
 dependencies = [
+ "autocfg",
  "scopeguard",
 ]
 
@@ -5264,7 +5265,7 @@ dependencies = [
 [[package]]
 name = "pallet-base-fee"
 version = "1.0.0"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "frame-support 4.0.0-dev (git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.16)",
  "frame-system",
@@ -5413,7 +5414,7 @@ dependencies = [
 [[package]]
 name = "pallet-dynamic-fee"
 version = "4.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "async-trait",
  "frame-support 4.0.0-dev (git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.16)",
@@ -5468,7 +5469,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "4.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ethereum 0.11.1",
  "ethereum-types 0.12.1",
@@ -5498,7 +5499,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "6.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -5526,7 +5527,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-blake2"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-evm",
  "sp-core 4.1.0-dev",
@@ -5536,7 +5537,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-bn128"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-evm",
  "sp-core 4.1.0-dev",
@@ -5547,7 +5548,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-curve25519"
 version = "1.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "curve25519-dalek 4.0.0-pre.1",
  "fp-evm",
@@ -5560,7 +5561,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-dispatch"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-evm",
  "frame-support 4.0.0-dev (git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.16)",
@@ -5573,7 +5574,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-ed25519"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "ed25519-dalek",
  "fp-evm",
@@ -5584,7 +5585,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-evm",
  "num",
@@ -5595,7 +5596,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-evm",
  "sp-core 4.1.0-dev",
@@ -5606,7 +5607,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
-source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#ea37e8ff2e51c8236d60b0953dec160463f26d6d"
+source = "git+https://github.com/edgeware-network/frontier?branch=erup-5-latest#bc11690dc57ef7f12ef78889d801b3bc8ea2580b"
 dependencies = [
  "fp-evm",
  "ripemd160",
@@ -6161,7 +6162,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7d17b78036a60663b797adeaee46f5c9dfebb86948d1255007a1d6be0271ff99"
 dependencies = [
  "instant",
- "lock_api 0.4.6",
+ "lock_api 0.4.7",
  "parking_lot_core 0.8.5",
 ]
 
@@ -6188,16 +6189,16 @@ dependencies = [
  "cfg-if 1.0.0",
  "instant",
  "libc",
- "redox_syscall 0.2.11",
+ "redox_syscall 0.2.13",
  "smallvec",
  "winapi 0.3.9",
 ]
 
 [[package]]
 name = "paste"
-version = "1.0.6"
+version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0744126afe1a6dd7f394cb50a716dbe086cb06e255e53d8d0185d82828358fb5"
+checksum = "0c520e05135d6e763148b6426a837e239041653ba7becd2e538c076c738025fc"
 
 [[package]]
 name = "pbkdf2"
@@ -6358,9 +6359,9 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 
 [[package]]
 name = "pkg-config"
-version = "0.3.24"
+version = "0.3.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "58893f751c9b0412871a09abd62ecd2a00298c6c83befa223ef98c52aef40cbe"
+checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 
 [[package]]
 name = "platforms"
@@ -6709,9 +6710,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.16"
+version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4af2ec4714533fcdf07e886f17025ace8b997b9ce51204ee69b6da831c3da57"
+checksum = "632d02bff7f874a36f33ea8bb416cd484b90cc66c1194b1a1110d067a7013f58"
 dependencies = [
  "proc-macro2",
 ]
@@ -6788,7 +6789,7 @@ version = "0.6.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d34f1408f55294453790c48b2f1ebbb1c5b4b7563eb1f418bcfcfdbb06ebb4e7"
 dependencies = [
- "getrandom 0.2.5",
+ "getrandom 0.2.6",
 ]
 
 [[package]]
@@ -6858,21 +6859,21 @@ checksum = "41cc0f7e4d5d4544e8861606a285bb08d3e70712ccc7d2b84d7c0ccfaf4b05ce"
 
 [[package]]
 name = "redox_syscall"
-version = "0.2.11"
+version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8380fe0152551244f0747b1bf41737e0f8a74f97a14ccefd1148187271634f3c"
+checksum = "62f25bc4c7e55e0b0b7a1d43fb893f4fa1361d0abe38b9ce4f323c2adfe6ef42"
 dependencies = [
  "bitflags",
 ]
 
 [[package]]
 name = "redox_users"
-version = "0.4.2"
+version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7776223e2696f1aa4c6b0170e83212f47296a00424305117d013dfe86fb0fe55"
+checksum = "b033d837a7cf162d7993aded9304e30a83213c648b6e389db233191f891e5c2b"
 dependencies = [
- "getrandom 0.2.5",
- "redox_syscall 0.2.11",
+ "getrandom 0.2.6",
+ "redox_syscall 0.2.13",
  "thiserror",
 ]
 
@@ -7079,7 +7080,7 @@ version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bfa0f585226d2e68097d4f95d113b15b83a82e819ab25717ec0590d9584ef366"
 dependencies = [
- "semver 1.0.6",
+ "semver 1.0.7",
 ]
 
 [[package]]
@@ -8169,9 +8170,9 @@ dependencies = [
 
 [[package]]
 name = "semver"
-version = "1.0.6"
+version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4a3381e03edd24287172047536f20cabde766e2cd3e65e6b00fb3af51c4f38d"
+checksum = "d65bd28f48be7196d222d95b9243287f48d27aca604e08497513019ff0502cc4"
 dependencies = [
  "serde",
 ]
@@ -9662,9 +9663,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "syn"
-version = "1.0.89"
+version = "1.0.90"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ea297be220d52398dcc07ce15a209fce436d361735ac1db700cab3b6cdfb9f54"
+checksum = "704df27628939572cd88d33f171cd6f896f4eaca85252c6e0a72d8d8287ee86f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -9704,7 +9705,7 @@ dependencies = [
  "cfg-if 1.0.0",
  "fastrand",
  "libc",
- "redox_syscall 0.2.11",
+ "redox_syscall 0.2.13",
  "remove_dir_all",
  "winapi 0.3.9",
 ]
@@ -9925,6 +9926,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "tokio-util"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0edfdeb067411dba2044da6d1cb2df793dd35add7888d73c16e3381ded401764"
+dependencies = [
+ "bytes 1.1.0",
+ "futures-core",
+ "futures-sink",
+ "pin-project-lite 0.2.8",
+ "tokio 1.17.0",
+ "tracing",
+]
+
+[[package]]
 name = "toml"
 version = "0.5.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10013,7 +10028,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "matchers",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.2",
  "regex",
  "serde",
  "serde_json",

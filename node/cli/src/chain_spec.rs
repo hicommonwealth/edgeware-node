@@ -206,7 +206,7 @@ pub fn testnet_genesis(
 	GenesisConfig {
 		system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
-			changes_trie_config: Default::default(),
+		//	changes_trie_config: Default::default(),
 		},
 		balances: BalancesConfig {
 			balances: endowed_balances,
@@ -243,7 +243,7 @@ pub fn testnet_genesis(
 		grandpa: GrandpaConfig { authorities: vec![] },
 		treasury: Default::default(),
 		phragmen_election: Default::default(),
-		sudo: SudoConfig { key: _root_key },
+		sudo: SudoConfig { key: Some(_root_key) },
 		vesting: VestingConfig { vesting },
 		ethereum: Default::default(),
 		base_fee: Default::default(),
@@ -437,7 +437,7 @@ pub fn mainnet_genesis(
 	GenesisConfig {
 		system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
-			changes_trie_config: Default::default(),
+			//changes_trie_config: Default::default(),
 		},
 		balances: BalancesConfig {
 			balances: founder_allocation
@@ -482,7 +482,7 @@ pub fn mainnet_genesis(
 		treasury: Default::default(),
 		phragmen_election: Default::default(),
 		sudo: SudoConfig {
-			key: crate::mainnet_fixtures::get_mainnet_root_key(),
+			key: Some(crate::mainnet_fixtures::get_mainnet_root_key()),
 		},
 		vesting: VestingConfig { vesting },
 		ethereum: Default::default(),
