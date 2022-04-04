@@ -27,7 +27,7 @@ use edgeware_executor::NativeElseWasmExecutor;
 use edgeware_runtime::RuntimeApi;
 #[cfg(feature = "frontier-block-import")]
 use fc_consensus::FrontierBlockImport;
-
+use sc_client_api::BlockBackend;
 
 use fc_rpc_core::types::{FilterPool};
 use futures::prelude::*;
@@ -144,6 +144,7 @@ pub fn new_partial(
 		config.wasm_method,
 		config.default_heap_pages,
 		config.max_runtime_instances,
+		config.runtime_cache_size,
 	);
 
 	let (
@@ -271,6 +272,8 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		.network
 		.extra_sets
 		.push(sc_finality_grandpa::grandpa_peers_set_config());
+
+
 
 	let warp_sync: Option<Arc<dyn WarpSyncProvider<Block>>> = {
 		config
@@ -503,8 +506,17 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		None
 	};
 
+	let protocol_name = sc_finality_grandpa::protocol_standard_name(
+		&client.block_hash(0).ok().flatten().expect("Genesis block exists; qed"),
+		&config.chain_spec,
+	);
+
+//	let proto_name =  sc_finality_grandpa::protocol_standard_name {
+//genesis_hash: , // &Hash 
+//chain_spec: config.chain_spec.id(),	 // chain_spec
+//}; // Return a Cow<static sting>
+
 	let config = sc_finality_grandpa::Config {
-		// FIXME #1578 make this available through chainspec
 		gossip_duration: Duration::from_millis(333),
 		justification_period: 512,
 		name: Some(name),
@@ -512,6 +524,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		keystore,
 		local_role: role,
 		telemetry: telemetry.as_ref().map(|x| x.handle()),
+		protocol_name: protocol_name,
 	};
 
 	if enable_grandpa {

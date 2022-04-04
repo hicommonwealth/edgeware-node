@@ -293,8 +293,8 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 	let boot_nodes = crate::testnet_fixtures::get_beresheet_bootnodes();
 
 	ChainSpec::from_genesis(
-		&testnet_name,
-		&testnet_node_name,
+		&testnet_name, //name
+		&testnet_node_name, // id
 		ChainType::Development,
 		edgeware_testnet_config_genesis,
 		boot_nodes,
@@ -303,6 +303,7 @@ pub fn edgeware_testnet_config(testnet_name: String, testnet_node_name: String) 
 				.expect("Staging telemetry url is valid; qed"),
 		),
 		Some(DEFAULT_PROTOCOL_ID),
+		Default::default(),
 		properties,
 		Default::default(),
 	)
@@ -361,6 +362,7 @@ pub fn development_config() -> ChainSpec {
 		vec![],
 		None,
 		None,
+		Default::default(),
 		properties,
 		Default::default(),
 	)
@@ -383,6 +385,7 @@ pub fn multi_development_config() -> ChainSpec {
 		vec![],
 		None,
 		None,
+		Default::default(),
 		properties,
 		Default::default(),
 	)
@@ -414,6 +417,7 @@ pub fn local_testnet_config() -> ChainSpec {
 		vec![],
 		None,
 		None,
+		Default::default(),
 		None,
 		Default::default(),
 	)
@@ -541,17 +545,18 @@ pub fn edgeware_mainnet_config() -> ChainSpec {
 	let properties = serde_json::from_str(data).unwrap();
 	let boot_nodes = crate::mainnet_fixtures::get_mainnet_bootnodes();
 	ChainSpec::from_genesis(
-		"Edgeware",
-		"edgeware",
-		ChainType::Live,
-		edgeware_mainnet_config_genesis,
-		boot_nodes,
+		"Edgeware",// name
+		"edgeware", // chain id
+		ChainType::Live, //chain type
+		edgeware_mainnet_config_genesis, //constructor
+		boot_nodes, //boot noodes Vec<MultiaddrWithPeerId>
 		Some(
 			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
 				.expect("Staging telemetry url is valid; qed"),
-		),
-		Some(DEFAULT_PROTOCOL_ID),
-		properties,
-		Default::default(),
+		), // telemetry in Option
+		Some(DEFAULT_PROTOCOL_ID), //protocol_id
+		Default::default(), // fork_id
+		properties,//Properties
+		Default::default(), //extensions
 	)
 }
