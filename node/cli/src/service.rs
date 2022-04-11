@@ -271,7 +271,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 	config
 		.network
 		.extra_sets
-		.push(sc_finality_grandpa::grandpa_peers_set_config(protocol_name));
+		.push(sc_finality_grandpa::grandpa_peers_set_config(protocol_name.clone()));
 
 	
 
@@ -310,13 +310,22 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 	let name = config.network.node_name.clone();
 	let enable_grandpa = !config.disable_grandpa;
 	let prometheus_registry = config.prometheus_registry().cloned();
-
-	edgeware_rpc::spawn_essential_tasks(edgeware_rpc::SpawnTasksParams {
+	let fee_history_cache: fc_rpc_core::types::FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
+	//let ch = config.clone();
+//	let chainspec_copy = ch.chain_spec;
+	let overrides = edgeware_rpc::overrides_handle(client.clone());
+	
+	
+	edgeware_rpc::spawn_essential_tasks(edgeware_rpc::SpawnTasksParams2 {
 		task_manager: &task_manager,
 		client: client.clone(),
 		substrate_backend: backend.clone(),
 		frontier_backend: frontier_backend.clone(),
 		filter_pool: filter_pool.clone(),
+		fee_history_cache:  fee_history_cache.clone(),
+		fee_history_limit: 2048,
+		overrides: overrides,
+
 	});
 	let ethapi_cmd = rpc_config.ethapi.clone();
 	let tracing_requesters =
@@ -372,7 +381,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 				network: network.clone(),
 				is_authority,
 				deny_unsafe,
-				fee_history_cache,
+				fee_history_cache: fee_history_cache.clone(),
 				fee_history_limit,
 				// Grandpa
 				grandpa: edgeware_rpc::GrandpaDeps {
@@ -417,7 +426,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 //		remote_blockchain: None,
 		backend: backend.clone(),
 		system_rpc_tx,
-		config,
+		config: config,
 		telemetry: telemetry.as_mut(),
 	})?;
 
@@ -511,10 +520,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		None
 	};
 
-	let protocol_name = sc_finality_grandpa::protocol_standard_name(
-		&client.block_hash(0).ok().flatten().expect("Genesis block exists; qed"),
-		&config.chain_spec,
-	);
+	let protocol_name: Cow<'static, str> = Cow::Borrowed("Edgeware");
 
 //	let proto_name =  sc_finality_grandpa::protocol_standard_name {
 //genesis_hash: , // &Hash 
@@ -529,7 +535,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		keystore,
 		local_role: role,
 		telemetry: telemetry.as_ref().map(|x| x.handle()),
-		protocol_name: protocol_name,
+		protocol_name: protocol_name.clone(),
 	};
 
 	if enable_grandpa {

@@ -46,6 +46,9 @@ use sc_client_api::{
 	client::BlockchainEvents,
 	BlockOf,
 };
+use fc_rpc::EthTask;
+use futures::StreamExt;
+//use async_std::stream::stream::StreamExt;
 use sc_finality_grandpa::{FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState};
 use sc_finality_grandpa_rpc::GrandpaRpcHandler;
 use sc_network::NetworkService;
@@ -64,6 +67,7 @@ use fc_rpc::{
 	EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi, EthPubSubApiServer,
 	EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api, Web3ApiServer,
 };
+use fc_mapping_sync::MappingSyncWorker;
 use pallet_contracts_rpc::{Contracts, ContractsApi};
 use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 use substrate_frame_rpc_system::{FullSystem, SystemApi};
@@ -322,4 +326,81 @@ pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
 	pub filter_pool: Option<FilterPool>,
 }
 
+#[allow(missing_docs)]
+pub struct SpawnTasksParams2<'a, B: BlockT, C, BE> {
+	pub task_manager: &'a TaskManager,
+	pub client: Arc<C>,
+	pub substrate_backend: Arc<BE>,
+	pub frontier_backend: Arc<fc_db::Backend<B>>,
+	pub filter_pool: Option<FilterPool>,
+	pub overrides: Arc<OverrideHandle<B>>,
+	pub fee_history_limit: u64,
+	pub fee_history_cache: FeeHistoryCache,
+}
 
+pub fn spawn_essential_tasks<B, C, BE>(params: SpawnTasksParams2<B, C, BE>)
+where
+	C: ProvideRuntimeApi<B> + BlockOf,
+	C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + 'static,
+	C: BlockchainEvents<B> + StorageProvider<B, BE>,
+	C: Send + Sync + 'static,
+	C::Api: EthereumRuntimeRPCApi<B>,
+	C::Api: BlockBuilder<B>,
+	B: BlockT<Hash = H256> + Send + Sync + 'static,
+	B::Header: HeaderT<Number = u32>,
+	BE: Backend<B> + 'static,
+	BE::State: StateBackend<BlakeTwo256>,
+{
+	// Frontier offchain DB task. Essential.
+	// Maps emulated ethereum data to substrate native data.
+	params.task_manager.spawn_essential_handle().spawn(
+		"frontier-mapping-sync-worker",
+		Some("frontier"),
+		MappingSyncWorker::new(
+			params.client.import_notification_stream(), //Notification stream
+			Duration::new(6, 0), // timeout
+			params.client.clone(), // client
+			params.substrate_backend.clone(), // substrate backend
+			params.frontier_backend.clone(), // frontier backend
+			fc_mapping_sync::SyncStrategy::Normal, // Normal Non-parachain
+		)
+		.for_each(|()| futures::future::ready(())),
+	);
+
+	// Frontier `EthFilterApi` maintenance.
+	// Manages the pool of user-created Filters.
+	if let Some(filter_pool) = params.filter_pool {
+		// Each filter is allowed to stay in the pool for 100 blocks.
+		const FILTER_RETAIN_THRESHOLD: u64 = 100;
+		params.task_manager.spawn_essential_handle().spawn(
+			"frontier-filter-pool",
+			Some("frontier"),
+			EthTask::filter_pool_task(
+				Arc::clone(&params.client),
+				filter_pool,
+				FILTER_RETAIN_THRESHOLD,
+			),
+		);
+	}
+
+	params.task_manager.spawn_essential_handle().spawn(
+		"frontier-schema-cache-task",
+		Some("frontier"),
+		EthTask::ethereum_schema_cache_task(
+			Arc::clone(&params.client),
+			Arc::clone(&params.frontier_backend),
+		),
+	);
+
+	// Spawn Frontier FeeHistory cache maintenance task.
+	params.task_manager.spawn_essential_handle().spawn(
+		"frontier-fee-history",
+		Some("frontier"),
+		fc_rpc::EthTask::fee_history_task(
+			Arc::clone(&params.client),
+			Arc::clone(&params.overrides),
+			params.fee_history_cache,
+			params.fee_history_limit,
+		),
+	);
+}
