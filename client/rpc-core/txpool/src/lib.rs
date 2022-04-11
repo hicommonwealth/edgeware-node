@@ -21,7 +21,7 @@ use jsonrpc_derive::rpc;
 mod types;
 
 pub use crate::types::{Get as GetT, Summary, Transaction, TransactionMap, TxPoolResult};
-use pallet_ethereum::Transaction as ethtrans;
+//use pallet_ethereum::Transaction as ethtrans;
 
 pub use rpc_impl_TxPool::gen_server::TxPool as TxPoolServer;
 

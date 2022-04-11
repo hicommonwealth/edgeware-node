@@ -17,7 +17,7 @@
 pub use edgeware_rpc_core_txpool::{
 	GetT, Summary, Transaction, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
 };
-use ethereum::{TransactionAction, TransactionV2};
+use ethereum::TransactionV2;//TransactionAction
 
 use ethereum_types::{H160, H256, U256};
 use fc_rpc::{internal_err, public_key};

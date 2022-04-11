@@ -1421,7 +1421,7 @@ mod custom_migration {
 
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
-			let mut weight = 0;
+			let weight = 0; // mut
 			// custom migration for edgeware.
 // todo , temporary disable due to testing
 //			weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
@@ -1824,7 +1824,7 @@ impl_runtime_apis! {
 			max_priority_fee_per_gas: Option<U256>,
 			nonce: Option<U256>,
 			estimate: bool,
-			access_list: Option<Vec<(H160, Vec<H256>)>>
+			_access_list: Option<Vec<(H160, Vec<H256>)>>
 		) -> Result<pallet_evm::CallInfo, sp_runtime::DispatchError> {
 			let config = if estimate {
 				let mut config = <Runtime as pallet_evm::Config>::config().clone();
