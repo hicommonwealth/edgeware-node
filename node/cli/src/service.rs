@@ -359,7 +359,10 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		let is_authority = config.role.clone().is_authority();
 		let _keystore = keystore_container.sync_keystore();
 		let subscription_executor = sc_rpc::SubscriptionTaskExecutor::new(task_manager.spawn_handle());
-
+		let fee_history_cache: fc_rpc_core::types::FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
+		
+		let fee_history_limit: u64 = 2048;
+		
 		let rpc_extensions_builder = move |deny_unsafe, _| {
 			let deps = edgeware_rpc::FullDeps {
 				client: client.clone(),
@@ -369,6 +372,8 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 				network: network.clone(),
 				is_authority,
 				deny_unsafe,
+				fee_history_cache,
+				fee_history_limit,
 				// Grandpa
 				grandpa: edgeware_rpc::GrandpaDeps {
 					shared_voter_state: shared_voter_state.clone(),
