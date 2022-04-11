@@ -28,7 +28,7 @@ use edgeware_runtime::RuntimeApi;
 #[cfg(feature = "frontier-block-import")]
 use fc_consensus::FrontierBlockImport;
 use sc_client_api::BlockBackend;
-
+use codec::alloc::borrow::Cow;
 use fc_rpc_core::types::{FilterPool};
 use futures::prelude::*;
 use sc_cli::SubstrateCli;
@@ -160,7 +160,7 @@ pub fn new_partial(
 	let client = Arc::new(client);
 
 	let telemetry = telemetry.map(|(worker, telemetry)| {
-		task_manager.spawn_handle().spawn("telemetry", worker.run());
+		task_manager.spawn_handle().spawn("telemetry", None, worker.run());
 		telemetry
 	});
 
@@ -267,19 +267,19 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 	} = new_partial(&config, cli)?;
 
 	let (block_import, grandpa_link) = consensus_result;
-
+	let protocol_name: Cow<'static, str> = Cow::Borrowed("Edgeware"); // name of the protocl
 	config
 		.network
 		.extra_sets
-		.push(sc_finality_grandpa::grandpa_peers_set_config());
+		.push(sc_finality_grandpa::grandpa_peers_set_config(protocol_name));
 
-
+	
 
 	let warp_sync: Option<Arc<dyn WarpSyncProvider<Block>>> = {
 		config
 			.network
 			.extra_sets
-			.push(sc_finality_grandpa::grandpa_peers_set_config());
+			.push(sc_finality_grandpa::grandpa_peers_set_config(protocol_name));
 		Some(Arc::new(
 			sc_finality_grandpa::warp_proof::NetworkProvider::new(
 				backend.clone(),
@@ -473,7 +473,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		// fails we take down the service with it.
 		task_manager
 			.spawn_essential_handle()
-			.spawn_blocking("aura-proposer", aura);
+			.spawn_blocking("aura-proposer", None, aura);
 	}
 
 	// Spawn authority discovery module.
@@ -495,7 +495,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 
 		task_manager
 			.spawn_handle()
-			.spawn("authority-discovery-worker", authority_discovery_worker.run());
+			.spawn("authority-discovery-worker", None, authority_discovery_worker.run());
 	}
 
 	// if the node isn't actively participating in consensus then it doesn't
@@ -548,7 +548,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 		// if it fails we take down the service with it.
 		task_manager
 			.spawn_essential_handle()
-			.spawn_blocking("grandpa-voter", sc_finality_grandpa::run_grandpa_voter(grandpa_config)?);
+			.spawn_blocking("grandpa-voter", None, sc_finality_grandpa::run_grandpa_voter(grandpa_config)?);
 	}
 
 	network_starter.start_network();
