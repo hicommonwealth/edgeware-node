@@ -1,14 +1,15 @@
 use super::*;
 use crate as treasury_reward;
 use frame_support::{construct_runtime, parameter_types, traits::GenesisBuild, weights::Weight, PalletId};
-use frame_system::mocking::{MockBlock, MockUncheckedExtrinsic};
-use sp_runtime::{traits::One, Permill};
-
+use frame_system::{
+	mocking::{MockBlock, MockUncheckedExtrinsic},
+	ConsumerLimits,
+};
 use sp_core::H256;
 use sp_runtime::{
 	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup},
-	AccountId32, Perbill,
+	traits::{BlakeTwo256, IdentityLookup, One},
+	AccountId32, Perbill, Permill,
 };
 
 pub(crate) type Balance = u64;
@@ -48,6 +49,7 @@ impl frame_system::Config for Test {
 	type BaseCallFilter = frame_support::traits::Everything;
 	type BlockHashCount = BlockHashCount;
 	type BlockLength = ();
+	// todo set these configs
 	type BlockNumber = BlockNumber;
 	type BlockWeights = ();
 	type Call = Call;
@@ -58,6 +60,7 @@ impl frame_system::Config for Test {
 	type Header = Header;
 	type Index = u64;
 	type Lookup = IdentityLookup<Self::AccountId>;
+	type MaxConsumers = frame_support::traits::ConstU32<16>;
 	type OnKilledAccount = ();
 	type OnNewAccount = ();
 	type OnSetCode = ();
@@ -109,6 +112,7 @@ impl pallet_treasury::Config for Test {
 	type OnSlash = ();
 	type PalletId = TreasuryPalletId;
 	type ProposalBond = ProposalBond;
+	type ProposalBondMaximum = ();
 	type ProposalBondMinimum = ProposalBondMinimum;
 	type RejectOrigin = frame_system::EnsureRoot<AccountId>;
 	type SpendFunds = ();
