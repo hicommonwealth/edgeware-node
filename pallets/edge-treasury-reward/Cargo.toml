@@ -13,7 +13,7 @@ targets = ["x86_64-unknown-linux-gnu"]
 serde = { version = "1.0", default-features = false, optional = true }
 scale-info = { version = "1.0.0", default-features = false, features = ["derive"] }
 safe-mix = { version = "1.0", default-features = false }
-codec = { package = "parity-scale-codec", version = "2.0.0", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = ["derive"] }
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 frame-support = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
@@ -22,7 +22,7 @@ pallet-authorship = { git = "https://github.com/paritytech/substrate", branch = 
 pallet-staking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 pallet-balances = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
 pallet-treasury = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
-
+getrandom = { version = "0.2.6", features = ["js"] }
 
 [dev-dependencies]
 sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
@@ -41,6 +41,7 @@ std = [
 	"codec/std",
 	"sp-std/std",
 	"sp-runtime/std",
+#	"sp-core/std",
 	"pallet-authorship/std",
 	"pallet-balances/std",
 	"frame-support/std",

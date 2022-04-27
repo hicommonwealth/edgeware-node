@@ -11,11 +11,11 @@ targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
 trie-root = "0.16.0"
-codec = { package = "parity-scale-codec", version = "2.0.0" }
+codec = { package = "parity-scale-codec", version = "3.0.0" }
 sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
 sp-state-machine = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
 sc-executor = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
+sp-core =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16"  }
 sp-trie = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
 

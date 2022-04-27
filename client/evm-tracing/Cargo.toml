@@ -3,12 +3,12 @@ name = "edgeware-client-evm-tracing"
 version = '0.1.0'
 authors = ['PureStake']
 edition = '2021'
-homepage = 'https://moonbeam.network'
+homepage = 'https://edgewa.re'
 license = 'GPL-3.0-only'
-repository = 'https://github.com/PureStake/moonbeam/'
+repository = 'https://github.com/edgeware/edgeware-node'
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "2.2", default-features = false }
+codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false }
 edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug" }
 evm-tracing-events = { path = "../../primitives/rpc/evm-tracing-events" }
 ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"] }
