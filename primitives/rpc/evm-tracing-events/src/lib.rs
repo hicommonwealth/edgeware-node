@@ -47,6 +47,7 @@ use codec::{Decode, Encode};
 use ethereum_types::{H160, U256};
 use evm::Opcode;
 
+//#[macro_use] //extern crate environmental;
 environmental::environmental!(listener: dyn Listener + 'static);
 
 pub fn using<R, F: FnOnce() -> R>(l: &mut (dyn Listener + 'static), f: F) -> R {
