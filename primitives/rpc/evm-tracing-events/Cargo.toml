@@ -8,17 +8,17 @@ license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
-environmental = { version = "1.1.3", features=["std"] }
 
-codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false, features = ["full"] }
-ethereum = { version = "0.11.1", default-features = false, features = ["with-codec"] }
-ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"] }
+codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false, features = ["full"] }
+ethereum = { version = "0.12", default-features = false, features = ["with-codec"] }
+ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp","codec", "scale-info"] }
 
-evm = { version = "0.33.0", default-features = false, features = ["with-codec"] }
-evm-runtime = { version = "0.33.0", default-features = false }
-evm-gasometer = { version = "0.33.0", default-features = false }
+evm = { version = "0.35.0", default-features = false, features = ["with-codec"] }
+evm-runtime = { version = "0.35.0", default-features = false }
+evm-gasometer = { version = "0.35.0", default-features = false, features = ["tracing"]}
 sp-runtime-interface = { version = "6.0.0", default-features = false }
-
+primitive-types = { version = "0.11.1", features = ["scale-info"] }
+environmental = { version = "1.1.2", features=["std"], default-features = false }
 
 [features]
 default = ["std"]

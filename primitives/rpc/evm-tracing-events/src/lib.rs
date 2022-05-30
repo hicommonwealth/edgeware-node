@@ -31,8 +31,10 @@
 //! This module provide mirror types and conversion into them from the original
 //! events.
 
-#![cfg_attr(not(feature = "std"), no_std)]
+//#![cfg_attr(not(feature = "std"), no_std)]
 extern crate alloc;
+
+use crate::alloc::borrow::ToOwned;
 
 pub mod evm_utils;
 pub mod gasometer;
@@ -93,9 +95,10 @@ pub struct Context {
 
 impl From<evm_runtime::Context> for Context {
 	fn from(i: evm_runtime::Context) -> Self {
+		let myaddress: H160 = i.address;
 		Self {
-			address: i.address,
-			caller: i.caller,
+			address: myaddress,
+			caller: i.caller.to_owned(),
 			apparent_value: i.apparent_value,
 		}
 	}

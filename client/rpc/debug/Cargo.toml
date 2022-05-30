@@ -12,16 +12,16 @@ tokio = { version = "1.12.0", features = ["time", "sync"] }
 futures = { version = "0.3", features = ["compat"] }
 jsonrpc-core = "18.0.0"
 
-ethereum = { version = "0.11.1", default-features = false, features = ["with-codec"] }
-ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"] }
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sc-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
+ethereum = { version = "0.12", default-features = false, features = ["with-codec"] }
+ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp", "codec"] }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sc-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
 
 edgeware-rpc-core-debug = { path = "../../rpc-core/debug" }
 edgeware-rpc-core-types = { path = "../../rpc-core/types" }

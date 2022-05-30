@@ -15,6 +15,7 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 extern crate alloc;
+use crate::alloc::borrow::ToOwned;
 
 use alloc::vec::Vec;
 use codec::{Decode, Encode};
@@ -33,8 +34,9 @@ pub struct Transfer {
 
 impl From<evm_runtime::Transfer> for Transfer {
 	fn from(i: evm_runtime::Transfer) -> Self {
+		let mysource: H160 = i.source.to_owned();
 		Self {
-			source: i.source,
+			source: mysource,
 			target: i.target,
 			value: i.value,
 		}
@@ -74,7 +76,7 @@ impl From<evm_runtime::CreateScheme> for CreateScheme {
 				code_hash,
 				salt,
 			},
-			evm_runtime::CreateScheme::Fixed(address) => Self::Fixed(address),
+			evm_runtime::CreateScheme::Fixed(address) => Self::Fixed(address.into()),
 		}
 	}
 }

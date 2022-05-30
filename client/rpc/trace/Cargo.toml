@@ -11,8 +11,8 @@ repository = 'https://github.com/PureStake/moonbeam/'
 # Utils
 serde = { version = "1.0", features = ["derive"] }
 sha3 = "0.9"
-ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"]}
-ethereum = { version = "0.11.1", features = ["with-codec"] }
+ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp", "codec"]}
+ethereum = { version = "0.12", features = ["with-codec"] }
 
 # Async and logs
 tokio = { version = "1.12.0", features = ["time", "sync"] }
@@ -20,21 +20,21 @@ futures = { version = "0.3" }
 tracing = "0.1.25"
 
 # Primitives
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sc-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sc-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sp-block-builder = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
 fp-rpc = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
 edgeware-rpc-primitives-debug = { path = "../../../primitives/rpc/debug" }
 
 # Client and RPC
 jsonrpc-core = "18.0.0"
-sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
-sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16" }
+sc-client-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
 fc-rpc = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["rpc_binary_search_estimate"] }
 fc-consensus = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
 fc-rpc-core = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }

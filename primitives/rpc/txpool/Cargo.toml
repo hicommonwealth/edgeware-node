@@ -8,13 +8,13 @@ license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
-codec = { package = "parity-scale-codec", version = "2.2.0", default-features = false }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
-sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.16", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 # pallet-ethereum = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["runtime-benchmarks"] }
-ethereum = { version = "0.11.1", default-features = false, features = ["with-codec"] }
+ethereum = { version = "0.12", default-features = false, features = ["with-codec"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 
 [features]

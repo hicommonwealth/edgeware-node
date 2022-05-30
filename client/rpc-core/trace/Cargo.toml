@@ -8,7 +8,7 @@ license = 'GPL-3.0-only'
 repository = 'https://github.com/PureStake/moonbeam/'
 
 [dependencies]
-ethereum-types = { version = "0.12.1", default-features = false, features = ["codec"] }
+ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp","codec"] }
 jsonrpc-core = "18.0.0"
 jsonrpc-core-client = "18.0.0"
 jsonrpc-derive = "18.0.0"
