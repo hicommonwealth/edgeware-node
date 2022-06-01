@@ -48,7 +48,7 @@ integer-sqrt = { opt-level = 3 }
 keccak = { opt-level = 3 }
 libm = { opt-level = 3 }
 librocksdb-sys = { opt-level = 3 }
-libsecp256k1 = { opt-level = 3 }
+libsecp256k1 = { opt-level = 3, version = "0.7" }
 libz-sys = { opt-level = 3 }
 mio = { opt-level = 3 }
 nalgebra = { opt-level = 3 }
@@ -73,7 +73,13 @@ zeroize = { opt-level = 3 }
 # Generated with: `cargo lock -s | grep substrate.git | cut -d' ' -f2 | awk '{print $0, "= { git = \"https://github.com/edgeware-network/substrate\", rev = \"22f09c602704aeee2b59b14f427f73f6cb8b5e2f\" }"}'`
 # Make sure to have cargo-lock installed with: `cargo install cargo-lock --features=cli`
 
-# [patch.crates-io]
+[patch.crates-io]
+sp-storage = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-externalities = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-runtime-interface =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+
+
+
 # # frontier deps
 # fc-consensus = { git = "https://github.com/edgeware-network/frontier", rev = "c43937170fc08cec1d11a0ff37aa33622f9447f1" }
 # fc-rpc = { git = "https://github.com/edgeware-network/frontier", rev = "c43937170fc08cec1d11a0ff37aa33622f9447f1" }
@@ -218,3 +224,20 @@ zeroize = { opt-level = 3 }
 # substrate-frame-cli = { git = "https://github.com/edgeware-network/substrate", rev = "cc789d4f32f093bd5ca6d1f5b3957f06f45d4876" }
 # substrate-frame-rpc-system = { git = "https://github.com/edgeware-network/substrate", rev = "cc789d4f32f093bd5ca6d1f5b3957f06f45d4876" }
 # substrate-prometheus-endpoint = { git = "https://github.com/edgeware-network/substrate", rev = "cc789d4f32f093bd5ca6d1f5b3957f06f45d4876" }
+
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."https://github.com/edgeware-network/frontier"]
+git = "https://github.com/edgeware-network/frontier"
+branch = "erup-5-latest"
+replace-with = "vendored-sources"
+
+[source."https://github.com/paritytech/substrate"]
+git = "https://github.com/paritytech/substrate"
+branch = "polkadot-v0.9.18"
+replace-with = "vendored-sources"
+
+#[source.vendored-sources]
+#directory = "vendor"

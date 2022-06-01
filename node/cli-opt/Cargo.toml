@@ -12,5 +12,5 @@ structopt = "0.3.8"
 tiny-bip39 = "0.8"
 libsecp256k1 = "0.7"
 primitive-types = { version = "0.11.1", features= ["std", "serde", "scale-info"] } 
-sha3 = "0.9"
+sha3 = "0.10.1"
 tiny-hderive = "0.3.0"
