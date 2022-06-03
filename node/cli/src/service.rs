@@ -27,7 +27,7 @@ use edgeware_executor::NativeElseWasmExecutor;
 use edgeware_runtime::RuntimeApi;
 #[cfg(feature = "frontier-block-import")]
 use fc_consensus::FrontierBlockImport;
-use sc_client_api::BlockBackend;
+//use sc_client_api::BlockBackend;
 use codec::alloc::borrow::Cow;
 use fc_rpc_core::types::{FilterPool};
 use futures::prelude::*;
@@ -36,7 +36,7 @@ use sc_consensus_aura::{self, ImportQueueParams, SlotProportion, StartAuraParams
 use sc_network::{Event, NetworkService};
 use sc_service::{config::Configuration, error::Error as ServiceError, BasePath, ChainSpec, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryWorker};
-use sp_consensus::SlotData;
+//use sp_consensus::SlotData;
 use sp_core::U256;
 use sp_runtime::traits::Block as BlockT;
 use std::{
@@ -189,7 +189,7 @@ pub fn new_partial(
 	let frontier_block_import =
 		FrontierBlockImport::new(grandpa_block_import.clone(), client.clone(), frontier_backend.clone());
 
-	let slot_duration = sc_consensus_aura::slot_duration(&*client)?.slot_duration();
+	let slot_duration = sc_consensus_aura::slot_duration(&*client)?;//.as_duration();
 	let target_gas_price = U256::from(cli.run.target_gas_price);
 
 	let import_queue =
@@ -204,7 +204,7 @@ pub fn new_partial(
 			let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
 
 			let slot =
-				sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+				sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
 					*timestamp,
 					slot_duration,
 				);
@@ -447,7 +447,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 			sp_consensus::CanAuthorWithNativeVersion::new(client.executor().clone());
 
 		let slot_duration = sc_consensus_aura::slot_duration(&*client)?;
-		let raw_slot_duration = slot_duration.slot_duration();
+		let raw_slot_duration: sc_consensus_aura::SlotDuration = slot_duration.clone();
 		let target_gas_price = U256::from(cli.run.target_gas_price);
 
 		let aura = sc_consensus_aura::start_aura::<sp_consensus_aura::ed25519::AuthorityPair, _, _, _, _, _, _, _, _, _, _, _>(
@@ -461,7 +461,7 @@ pub fn new_full_base(mut config: Configuration, cli: &Cli, rpc_config: RpcConfig
 					let timestamp = sp_timestamp::InherentDataProvider::from_system_time();
 
 					let slot =
-						sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_duration(
+						sp_consensus_aura::inherents::InherentDataProvider::from_timestamp_and_slot_duration(
 							*timestamp,
 							raw_slot_duration,
 						);

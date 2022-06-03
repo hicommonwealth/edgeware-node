@@ -58,7 +58,7 @@ pub use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 pub use sp_consensus_aura::ed25519::AuthorityId as AuraId;
 pub use sp_core::{
 	crypto::KeyTypeId,
-	u32_trait::{_1, _2, _3, _4, _5},
+//	u32_trait::{_1, _2, _3, _4, _5},
 	OpaqueMetadata, H160, H256, U256,
 };
 //pub use ethereum_types::{U256, H256};
@@ -118,7 +118,7 @@ pub use precompiles::EdgewarePrecompiles;
 /// Constant values used within the runtime.
 pub mod constants;
 use constants::{currency::*, time::*};
-use pallet_contracts::weights::WeightInfo;
+//use pallet_contracts::weights::WeightInfo;
 use sp_runtime::generic::Era;
 
 // Make the WASM binary available.
@@ -636,6 +636,7 @@ impl pallet_election_provider_multi_phase::Config for Runtime {
 	type DataProvider = Staking;
 	type EstimateCallFee = TransactionPayment;
 	type Event = Event;
+	type GovernanceFallback = frame_election_provider_support::onchain::OnChainSequentialPhragmen<Self>;
 	type Fallback = pallet_election_provider_multi_phase::NoFallback<Self>;
 	type ForceOrigin = EnsureRootOrHalfCouncil;
 	type MinerMaxLength = MinerMaxLength;
@@ -668,13 +669,18 @@ pub struct StakingBenchmarkingConfig;
 impl pallet_staking::BenchmarkingConfig for StakingBenchmarkingConfig {
 	type MaxNominators = frame_support::traits::ConstU32<1000>;
 	type MaxValidators = frame_support::traits::ConstU32<1000>;
-}
+	}
 
+parameter_types!{
+	pub const MAX_UNLOCKING_CHUNKS: u32 = 1024; //change me 
+}
 
 
 impl pallet_staking::Config for Runtime {
 	type BondingDuration = BondingDuration;
 	type Currency = Balances;
+	type MaxNominations = frame_support::traits::ConstU32<1000>;
+	type MaxUnlockingChunks = MAX_UNLOCKING_CHUNKS;
 	type CurrencyToVote = U128CurrencyToVote;
 	type ElectionProvider = ElectionProviderMultiPhase;
 	type EraPayout = pallet_staking::ConvertCurve<RewardCurve>;
@@ -693,7 +699,7 @@ impl pallet_staking::Config for Runtime {
 	/// A super-majority of the council can cancel the slash.
 	type SlashCancelOrigin = EnsureOneOf<
 		EnsureRoot<AccountId>,
-		pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>,
 	>;
 	type SlashDeferDuration = SlashDeferDuration;
 	// Alternatively, use pallet_staking::UseNominatorsMap<Runtime> to just use the
@@ -703,7 +709,8 @@ impl pallet_staking::Config for Runtime {
 	type UnixTime = Timestamp;
 	type WeightInfo = pallet_staking::weights::SubstrateWeight<Runtime>;
 	type BenchmarkingConfig = StakingBenchmarkingConfig;
-	const MAX_NOMINATIONS: u32 = MAX_NOMINATIONS;
+	//type MaxNominations = frame_support::traits::ConstU32<1000>;
+//	const MAX_NOMINATIONS: u32 = MAX_NOMINATIONS;
 }
 
 parameter_types! {
@@ -726,12 +733,12 @@ impl pallet_democracy::Config for Runtime {
 	// be unanimous or Root must agree.
 	type CancelProposalOrigin = EnsureOneOf<
 		EnsureRoot<AccountId>,
-		pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 1, 1>, //_1, _1,
 	>;
 	// To cancel a proposal which has been passed, 2/3 of the council must agree to
 	// it.
 	type CancellationOrigin = EnsureOneOf<
-		pallet_collective::EnsureProportionAtLeast<_2, _3, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 2, 3>, // _2, _3, 
 		frame_system::EnsureRoot<AccountId>,
 	>;
 	type CooloffPeriod = CooloffPeriod;
@@ -741,23 +748,23 @@ impl pallet_democracy::Config for Runtime {
 	/// A unanimous council can have the next scheduled referendum be a straight
 	/// default-carries (NTB) vote.
 	type ExternalDefaultOrigin = EnsureOneOf<
-		pallet_collective::EnsureProportionAtLeast<_1, _1, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 1, 1>,
 		frame_system::EnsureRoot<AccountId>,
 	>;
 	/// A 60% super-majority can have the next scheduled referendum be a
 	/// straight majority-carries vote.
 	type ExternalMajorityOrigin = EnsureOneOf<
-		pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>,
 		frame_system::EnsureRoot<AccountId>,
 	>;
 	/// A straight majority of the council can decide what their next motion is.
-	type ExternalOrigin = pallet_collective::EnsureProportionAtLeast<_1, _2, AccountId, CouncilCollective>;
+	type ExternalOrigin = pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 1, 2>;
 	/// Three fourths of the committee can have an
 	/// ExternalMajority/ExternalDefault vote be tabled immediately and with a
 	/// shorter voting/enactment period.
 	type FastTrackOrigin = EnsureOneOf<
 		frame_system::EnsureRoot<AccountId>,
-		pallet_collective::EnsureProportionAtLeast<_3, _4, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>,
 	>;
 	type FastTrackVotingPeriod = FastTrackVotingPeriod;
 	type InstantAllowed = InstantAllowed;
@@ -854,7 +861,7 @@ parameter_types! {
 impl pallet_treasury::Config for Runtime {
 	type ApproveOrigin = EnsureOneOf<
 		EnsureRoot<AccountId>,
-		pallet_collective::EnsureProportionAtLeast<_3, _5, AccountId, CouncilCollective>,
+		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>,
 	>;
 	type Burn = Burn;
 	type BurnDestination = ();
@@ -1030,7 +1037,7 @@ parameter_types! {
 
 type EnsureRootOrHalfCouncil = EnsureOneOf<
 	EnsureRoot<AccountId>,
-	pallet_collective::EnsureProportionMoreThan<_1, _2, AccountId, CouncilCollective>,
+	pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>,
 >;
 
 impl pallet_identity::Config for Runtime {
@@ -1109,6 +1116,7 @@ impl pallet_sudo::Config for Runtime {
 	type Event = Event;
 }
 
+/*
 parameter_types! {
 	pub const DepositPerItem: Balance = deposit(1, 0);
 		pub const DepositPerByte: Balance = deposit(0, 1);
@@ -1155,6 +1163,8 @@ impl pallet_contracts::Config for Runtime {
 	type WeightPrice = pallet_transaction_payment::Pallet<Self>;
 	type AddressGenerator = pallet_contracts::DefaultAddressGenerator;
 }
+
+*/
 
 #[cfg(not(feature = "beresheet-runtime"))]
 parameter_types! {
@@ -1311,7 +1321,7 @@ construct_runtime!(
 		PhragmenElection: pallet_elections_phragmen::{Pallet, Call, Storage, Event<T>, Config<T>} = 12,
 		Grandpa: pallet_grandpa::{Pallet, Call, Storage, Config, Event, ValidateUnsigned} = 14,
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>} = 15,
-		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
+//		Contracts: pallet_contracts::{Pallet, Call, Storage, Event<T>} = 16,
 		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 17,
 		ImOnline: pallet_im_online::{Pallet, Call, Storage, Event<T>, ValidateUnsigned, Config<T>} = 18,
 		AuthorityDiscovery: pallet_authority_discovery::{Pallet, Config} = 19,
@@ -1606,7 +1616,7 @@ impl_runtime_apis! {
 			System::account_nonce(account)
 		}
 	}
-
+/*
 	impl pallet_contracts_rpc_runtime_api::ContractsApi<
 		Block, AccountId, Balance, BlockNumber, Hash,
 	>
@@ -1657,7 +1667,7 @@ impl_runtime_apis! {
 		}
 	}
 
-
+*/
 	impl pallet_transaction_payment_rpc_runtime_api::TransactionPaymentApi<
 		Block,
 		Balance,

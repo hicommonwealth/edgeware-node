@@ -68,7 +68,7 @@ use fc_rpc::{
 	EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api, Web3ApiServer,
 };
 use fc_mapping_sync::MappingSyncWorker;
-use pallet_contracts_rpc::{Contracts, ContractsApi};
+//use pallet_contracts_rpc::{Contracts, ContractsApi};
 use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
@@ -172,7 +172,7 @@ where
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
 	C: Send + Sync + 'static,
 	C: BlockchainEvents<Block>,
-	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
+//	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
 	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
@@ -241,7 +241,7 @@ where
 	// Making synchronous calls in light client freezes the browser currently,
 	// more context: https://github.com/paritytech/substrate/pull/3480
 	// These RPCs should use an asynchronous caller instead.
-	io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));
+//	io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));
 	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(
 		client.clone(),
 	)));

@@ -14,78 +14,91 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+
+// 2022 rewrite by flipchan @ edgeware
+
 use sc_cli::{KeySubcommand, SignCmd, VanityCmd, VerifyCmd};
-use structopt::StructOpt;
+//use structopt::StructOpt;
 use edgeware_cli_opt::EthApi;
+use clap::Parser;
+
 //use ethereum_types::{H160, H256, U256};
 
 #[allow(missing_docs)]
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
 pub struct RunCmd {
 	#[allow(missing_docs)]
-	#[structopt(flatten)]
+	#[clap(flatten)]
 	pub base: sc_cli::RunCmd,
 
-	#[structopt(long = "enable-dev-signer")]
+	#[clap(long = "enable-dev-signer")]
 	pub enable_dev_signer: bool,
 
 	/// The dynamic-fee pallet target gas price set by block author
-	#[structopt(long, default_value = "1")]
+	#[clap(long, default_value = "1")]
 	pub target_gas_price: u64,
 
 	/// Enable EVM tracing module on a non-authority node.
-	#[structopt(
+	#[clap(
 		long,
 		conflicts_with = "collator",
 		conflicts_with = "validator",
-		require_delimiter = true
+		use_value_delimiter = true,
+		require_value_delimiter = true,
+		multiple_values = true
 	)]
 	pub ethapi: Vec<EthApi>,
 
 	/// Number of concurrent tracing tasks. Meant to be shared by both "debug"
 	/// and "trace" modules.
-	#[structopt(long, default_value = "10")]
+	#[clap(long, default_value = "10")]
 	pub ethapi_max_permits: u32,
 
 	/// Maximum number of trace entries a single request of `trace_filter` is
 	/// allowed to return. A request asking for more or an unbounded one going
 	/// over this limit will both return an error.
-	#[structopt(long, default_value = "500")]
+	#[clap(long, default_value = "500")]
 	pub ethapi_trace_max_count: u32,
 
 	/// Duration (in seconds) after which the cache of `trace_filter` for a
 	/// given block will be discarded.
-	#[structopt(long, default_value = "300")]
+	#[clap(long, default_value = "300")]
 	pub ethapi_trace_cache_duration: u64,
 
 	/// Size of the LRU cache for block data and their transaction statuses.
-	#[structopt(long, default_value = "3000")]
+	#[clap(long, default_value = "3000")]
 	pub eth_log_block_cache: usize,
 
 	/// Maximum number of logs in a query.
-	#[structopt(long, default_value = "10000")]
+	#[clap(long, default_value = "10000")]
 	pub max_past_logs: u32,
 }
 
 /// An overarching CLI command definition.
-#[derive(Debug, StructOpt)]
+#[derive(Debug, Parser)]
+#[clap(
+	propagate_version = true,
+	args_conflicts_with_subcommands = true,
+	subcommand_negates_reqs = true
+)]
 pub struct Cli {
 	/// Possible subcommand with parameters.
-	#[structopt(subcommand)]
+	#[clap(subcommand)]
 	pub subcommand: Option<Subcommand>,
 	#[allow(missing_docs)]
-	#[structopt(flatten)]
+	#[clap(flatten)]
 	pub run: RunCmd,
 }
 
 /// Possible subcommands of the main binary.
-#[derive(Debug, StructOpt)]
+#[derive(Debug, clap::Subcommand)]
 pub enum Subcommand {
 	/// Key management cli utilities
+	#[clap(subcommand)]
 	Key(KeySubcommand),
 
 	/// The custom benchmark subcommmand benchmarking runtime pallets.
-	#[structopt(name = "benchmark", about = "Benchmark runtime pallets.")]
+	#[clap(name = "benchmark", about = "Benchmark runtime pallets.")]
 	Benchmark(frame_benchmarking_cli::BenchmarkCmd),
 
 	/// Verify a signature for a message, provided on STDIN, with a given
