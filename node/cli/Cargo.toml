@@ -45,7 +45,7 @@ hex = "0.3.2"
 serde_json = "1.0"
 
 # primitives
-sp-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-authority-discovery = { git = "https://github.com/paritytech/substrate", features=["std"], branch = "polkadot-v0.9.18", default-features = false }
 sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 sp-consensus-aura = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 sp-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
@@ -90,7 +90,7 @@ frame-support = { git = "https://github.com/paritytech/substrate", branch = "pol
 pallet-im-online = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 pallet-authority-discovery = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 pallet-staking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-pallet-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+pallet-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false, features=["std"] }
 pallet-dynamic-fee = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
 pallet-evm = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest" }
 ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp","codec", "std"] }
@@ -165,6 +165,7 @@ cli = [
 	"substrate-frame-cli",
 	"sc-service/db",
 	"clap",
+#	"sp-finality-grandpa/std",
 #	"pallet-contracts/std",
 	"sp-sandbox/std",
 	"ethereum-types/std",

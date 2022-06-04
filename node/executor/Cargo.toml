@@ -32,7 +32,7 @@ pallet-session = { git = "https://github.com/paritytech/substrate", branch = "po
 frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
 pallet-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
 pallet-treasury = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-pallet-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
+pallet-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", features=["std"] }
 pallet-indices = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
 wabt = "0.10.0"
 criterion = "0.3.0"
