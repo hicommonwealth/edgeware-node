@@ -384,6 +384,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "auto_impl"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42cbf586c80ada5e5ccdecae80d3ef0854f224e2dd74435f8d87e6831b8d0a38"
+dependencies = [
+ "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1559,10 +1571,10 @@ name = "edgeware-evm-tracer"
 version = "0.1.0"
 dependencies = [
  "edgeware-rpc-primitives-debug",
- "ethereum-types",
- "evm",
- "evm-gasometer",
- "evm-runtime",
+ "ethereum-types 0.11.0",
+ "evm 0.31.0",
+ "evm-gasometer 0.27.0",
+ "evm-runtime 0.27.0",
  "fp-evm",
  "pallet-evm",
  "sp-core",
@@ -1687,7 +1699,7 @@ name = "edgeware-rpc-core-debug"
 version = "0.1.0"
 dependencies = [
  "edgeware-rpc-primitives-debug",
- "ethereum-types",
+ "ethereum-types 0.11.0",
  "futures 0.3.17",
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 14.2.0",
@@ -1702,7 +1714,7 @@ name = "edgeware-rpc-core-trace"
 version = "0.6.0"
 dependencies = [
  "edgeware-rpc-primitives-debug",
- "ethereum-types",
+ "ethereum-types 0.11.0",
  "futures 0.3.17",
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 14.2.0",
@@ -1715,8 +1727,8 @@ dependencies = [
 name = "edgeware-rpc-core-txpool"
 version = "0.6.0"
 dependencies = [
- "ethereum",
- "ethereum-types",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
  "fc-rpc-core",
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 14.2.0",
@@ -1731,8 +1743,8 @@ version = "0.1.0"
 dependencies = [
  "edgeware-rpc-core-debug",
  "edgeware-rpc-primitives-debug",
- "ethereum",
- "ethereum-types",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
  "fc-consensus",
  "fc-db",
  "fc-rpc",
@@ -1754,8 +1766,8 @@ dependencies = [
 name = "edgeware-rpc-primitives-debug"
 version = "0.1.0"
 dependencies = [
- "ethereum",
- "ethereum-types",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
  "hex 0.4.3",
  "parity-scale-codec",
  "serde",
@@ -1771,7 +1783,7 @@ dependencies = [
 name = "edgeware-rpc-primitives-txpool"
 version = "0.1.0"
 dependencies = [
- "ethereum",
+ "ethereum 0.7.1",
  "parity-scale-codec",
  "sp-api",
  "sp-io",
@@ -1785,8 +1797,8 @@ version = "0.6.0"
 dependencies = [
  "edgeware-rpc-core-trace",
  "edgeware-rpc-primitives-debug",
- "ethereum",
- "ethereum-types",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
  "fc-consensus",
  "fc-rpc",
  "fc-rpc-core",
@@ -1816,8 +1828,8 @@ version = "0.6.0"
 dependencies = [
  "edgeware-rpc-core-txpool",
  "edgeware-rpc-primitives-txpool",
- "ethereum",
- "ethereum-types",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
  "fc-rpc",
  "frame-system",
  "jsonrpc-core 15.1.0",
@@ -1841,8 +1853,8 @@ dependencies = [
  "edgeware-primitives",
  "edgeware-rpc-primitives-debug",
  "edgeware-rpc-primitives-txpool",
- "evm",
- "evm-runtime",
+ "evm 0.31.0",
+ "evm-runtime 0.27.0",
  "fp-rpc",
  "frame-benchmarking",
  "frame-executive",
@@ -2042,8 +2054,26 @@ version = "0.7.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "567ce064a8232c16e2b2c2173a936b91fbe35c2f2c5278871f5a1a31688b42e9"
 dependencies = [
- "ethereum-types",
+ "ethereum-types 0.11.0",
  "funty",
+ "hash-db",
+ "hash256-std-hasher",
+ "parity-scale-codec",
+ "rlp",
+ "rlp-derive",
+ "serde",
+ "sha3 0.9.1",
+ "triehash",
+]
+
+[[package]]
+name = "ethereum"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "42ccff962ede8fe7c3ec53d46b8316f3c53377a701a30c0325918b38ce04a497"
+dependencies = [
+ "bytes 1.1.0",
+ "ethereum-types 0.12.1",
  "hash-db",
  "hash256-std-hasher",
  "parity-scale-codec",
@@ -2065,7 +2095,23 @@ dependencies = [
  "impl-codec",
  "impl-rlp",
  "impl-serde",
- "primitive-types",
+ "primitive-types 0.9.1",
+ "uint",
+]
+
+[[package]]
+name = "ethereum-types"
+version = "0.12.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05136f7057fe789f06e6d41d07b34e6f70d8c86e5693b60f97aaa6553553bdaf"
+dependencies = [
+ "ethbloom",
+ "fixed-hash",
+ "impl-codec",
+ "impl-rlp",
+ "impl-serde",
+ "primitive-types 0.10.1",
+ "scale-info",
  "uint",
 ]
 
@@ -2082,13 +2128,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f833b0e642bec8286b80f00ad6cc6a95e50210c77949b9cb484637e6a05ed596"
 dependencies = [
  "environmental",
- "ethereum",
- "evm-core",
- "evm-gasometer",
- "evm-runtime",
+ "ethereum 0.7.1",
+ "evm-core 0.27.1",
+ "evm-gasometer 0.27.0",
+ "evm-runtime 0.27.0",
  "log",
  "parity-scale-codec",
- "primitive-types",
+ "primitive-types 0.9.1",
+ "rlp",
+ "serde",
+ "sha3 0.8.2",
+]
+
+[[package]]
+name = "evm"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cb94c481a21063359d39234a79009741435d37e1d2fb1fef6fdbd6d0ae685615"
+dependencies = [
+ "auto_impl",
+ "environmental",
+ "ethereum 0.8.0",
+ "evm-core 0.31.0",
+ "evm-gasometer 0.31.0",
+ "evm-runtime 0.31.0",
+ "log",
+ "parity-scale-codec",
+ "primitive-types 0.10.1",
  "rlp",
  "serde",
  "sha3 0.8.2",
@@ -2102,7 +2168,19 @@ checksum = "908739da31125d17a69533c290a6c818b494176e59a2ce8accbf122f7d76835c"
 dependencies = [
  "funty",
  "parity-scale-codec",
- "primitive-types",
+ "primitive-types 0.9.1",
+ "serde",
+]
+
+[[package]]
+name = "evm-core"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5bb30090cebf1d85781189859bd6de7a759f6c4cffd7cd2a7b05e7eccb769b60"
+dependencies = [
+ "funty",
+ "parity-scale-codec",
+ "primitive-types 0.10.1",
  "serde",
 ]
 
@@ -2113,9 +2191,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4118f952ce320c11e1b7b8a575e477d70bc86a3b92ea23e427174d979cf1da26"
 dependencies = [
  "environmental",
- "evm-core",
- "evm-runtime",
- "primitive-types",
+ "evm-core 0.27.1",
+ "evm-runtime 0.27.0",
+ "primitive-types 0.9.1",
+]
+
+[[package]]
+name = "evm-gasometer"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c38e0842db6f66df571675f02018264abf92dbea4d1fb5a92b3a029088663fd"
+dependencies = [
+ "environmental",
+ "evm-core 0.31.0",
+ "evm-runtime 0.31.0",
+ "primitive-types 0.10.1",
 ]
 
 [[package]]
@@ -2125,8 +2215,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "952296b416c3b334b26933ad1f9cfa9203e251691586fb317e411872886ca31b"
 dependencies = [
  "environmental",
- "evm-core",
- "primitive-types",
+ "evm-core 0.27.1",
+ "primitive-types 0.9.1",
+ "sha3 0.8.2",
+]
+
+[[package]]
+name = "evm-runtime"
+version = "0.31.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "86158aeca104c31ef15b67afc80e8e4f32705bd9f98ac55c6911ab6185a234a4"
+dependencies = [
+ "auto_impl",
+ "environmental",
+ "evm-core 0.31.0",
+ "primitive-types 0.10.1",
  "sha3 0.8.2",
 ]
 
@@ -2246,9 +2349,9 @@ name = "fc-rpc"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "ethereum",
- "ethereum-types",
- "evm",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
+ "evm 0.27.0",
  "fc-consensus",
  "fc-db",
  "fc-rpc-core",
@@ -2287,7 +2390,7 @@ name = "fc-rpc-core"
 version = "1.1.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "ethereum-types",
+ "ethereum-types 0.11.0",
  "jsonrpc-core 15.1.0",
  "jsonrpc-core-client 14.2.0",
  "jsonrpc-derive 14.2.2",
@@ -2392,7 +2495,7 @@ name = "fp-consensus"
 version = "1.0.0"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "ethereum",
+ "ethereum 0.7.1",
  "parity-scale-codec",
  "rlp",
  "sha3 0.8.2",
@@ -2406,7 +2509,7 @@ name = "fp-evm"
 version = "2.0.0"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "impl-trait-for-tuples 0.1.3",
  "parity-scale-codec",
  "serde",
@@ -2419,8 +2522,8 @@ name = "fp-rpc"
 version = "2.0.0"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "ethereum",
- "ethereum-types",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
  "fp-evm",
  "parity-scale-codec",
  "sp-api",
@@ -2438,7 +2541,7 @@ source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c67898
 [[package]]
 name = "frame-benchmarking"
 version = "3.1.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2508,7 +2611,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "13.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -2545,7 +2648,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "Inflector",
  "frame-support-procedural-tools",
@@ -2557,7 +2660,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate 1.1.0",
@@ -2569,7 +2672,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -5190,9 +5293,9 @@ name = "pallet-ethereum"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "ethereum",
- "ethereum-types",
- "evm",
+ "ethereum 0.7.1",
+ "ethereum-types 0.11.0",
+ "evm 0.27.0",
  "fp-consensus",
  "fp-evm",
  "fp-rpc",
@@ -5218,9 +5321,9 @@ name = "pallet-evm"
 version = "4.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
- "evm-gasometer",
- "evm-runtime",
+ "evm 0.27.0",
+ "evm-gasometer 0.27.0",
+ "evm-runtime 0.27.0",
  "fp-evm",
  "frame-support",
  "frame-system",
@@ -5228,7 +5331,7 @@ dependencies = [
  "pallet-balances",
  "pallet-timestamp",
  "parity-scale-codec",
- "primitive-types",
+ "primitive-types 0.9.1",
  "rlp",
  "serde",
  "sha3 0.8.2",
@@ -5243,7 +5346,7 @@ name = "pallet-evm-precompile-blake2"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "sp-core",
  "sp-io",
@@ -5254,7 +5357,7 @@ name = "pallet-evm-precompile-bn128"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "sp-core",
  "sp-io",
@@ -5267,7 +5370,7 @@ version = "1.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
  "curve25519-dalek 3.2.0",
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "frame-support",
  "parity-scale-codec",
@@ -5280,7 +5383,7 @@ name = "pallet-evm-precompile-dispatch"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "frame-support",
  "pallet-evm",
@@ -5295,7 +5398,7 @@ version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
  "ed25519-dalek",
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "sp-core",
  "sp-io",
@@ -5306,7 +5409,7 @@ name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "num",
  "sp-core",
@@ -5318,7 +5421,7 @@ name = "pallet-evm-precompile-sha3fips"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "sp-core",
  "sp-io",
@@ -5330,7 +5433,7 @@ name = "pallet-evm-precompile-simple"
 version = "2.0.0-dev"
 source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c678983015ebc1fa88e296fb515bb82b1d0b3"
 dependencies = [
- "evm",
+ "evm 0.27.0",
  "fp-evm",
  "ripemd160",
  "sp-core",
@@ -5771,7 +5874,7 @@ dependencies = [
  "impl-trait-for-tuples 0.2.1",
  "parity-util-mem-derive",
  "parking_lot 0.11.2",
- "primitive-types",
+ "primitive-types 0.9.1",
  "smallvec 1.6.1",
  "winapi 0.3.9",
 ]
@@ -6203,6 +6306,20 @@ dependencies = [
  "impl-codec",
  "impl-rlp",
  "impl-serde",
+ "uint",
+]
+
+[[package]]
+name = "primitive-types"
+version = "0.10.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "05e4722c697a58a99d5d06a08c30821d7c082a4632198de1eaa5a6c22ef42373"
+dependencies = [
+ "fixed-hash",
+ "impl-codec",
+ "impl-rlp",
+ "impl-serde",
+ "scale-info",
  "uint",
 ]
 
@@ -8328,7 +8445,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "hash-db",
  "log",
@@ -8345,7 +8462,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate 1.1.0",
@@ -8369,7 +8486,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "integer-sqrt",
  "num-traits",
@@ -8534,7 +8651,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -8554,7 +8671,7 @@ dependencies = [
  "parity-scale-codec",
  "parity-util-mem",
  "parking_lot 0.11.2",
- "primitive-types",
+ "primitive-types 0.9.1",
  "rand 0.7.3",
  "regex",
  "schnorrkel",
@@ -8587,7 +8704,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8597,7 +8714,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -8639,7 +8756,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "futures 0.3.17",
  "hash-db",
@@ -8675,7 +8792,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -8692,7 +8809,7 @@ dependencies = [
 [[package]]
 name = "sp-maybe-compressed-blob"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "ruzstd",
  "zstd",
@@ -8735,7 +8852,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "backtrace",
 ]
@@ -8754,7 +8871,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -8779,7 +8896,7 @@ source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206f
 dependencies = [
  "impl-trait-for-tuples 0.2.1",
  "parity-scale-codec",
- "primitive-types",
+ "primitive-types 0.9.1",
  "sp-externalities",
  "sp-runtime-interface-proc-macro",
  "sp-std",
@@ -8993,7 +9110,7 @@ dependencies = [
 [[package]]
 name = "sp-version-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "parity-scale-codec",
  "proc-macro-crate 1.1.0",
@@ -9005,7 +9122,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "impl-trait-for-tuples 0.2.1",
  "parity-scale-codec",
