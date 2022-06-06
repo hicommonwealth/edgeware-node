@@ -1548,7 +1548,7 @@ dependencies = [
  "substrate-build-script-utils",
  "substrate-frame-cli",
  "tempfile",
- "tokio 0.2.25",
+ "tokio 1.8.4",
  "tracing",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -1666,7 +1666,7 @@ dependencies = [
  "sp-storage",
  "sp-transaction-pool",
  "substrate-frame-rpc-system",
- "tokio 0.2.25",
+ "tokio 1.8.4",
 ]
 
 [[package]]
@@ -1747,7 +1747,7 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-utils",
- "tokio 0.2.25",
+ "tokio 1.8.4",
 ]
 
 [[package]]
@@ -1806,7 +1806,7 @@ dependencies = [
  "sp-std",
  "sp-transaction-pool",
  "sp-utils",
- "tokio 0.2.25",
+ "tokio 1.8.4",
  "tracing",
 ]
 
@@ -2438,7 +2438,7 @@ source = "git+https://github.com/webb-tools/frontier.git?branch=erup-4#0d3c67898
 [[package]]
 name = "frame-benchmarking"
 version = "3.1.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -2508,7 +2508,7 @@ dependencies = [
 [[package]]
 name = "frame-metadata"
 version = "13.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "parity-scale-codec",
  "serde",
@@ -2545,7 +2545,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "Inflector",
  "frame-support-procedural-tools",
@@ -2557,7 +2557,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "frame-support-procedural-tools-derive",
  "proc-macro-crate 1.1.0",
@@ -2569,7 +2569,7 @@ dependencies = [
 [[package]]
 name = "frame-support-procedural-tools-derive"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8328,7 +8328,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "hash-db",
  "log",
@@ -8345,7 +8345,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "blake2-rfc",
  "proc-macro-crate 1.1.0",
@@ -8369,7 +8369,7 @@ dependencies = [
 [[package]]
 name = "sp-arithmetic"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "integer-sqrt",
  "num-traits",
@@ -8534,7 +8534,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "base58",
  "blake2-rfc",
@@ -8587,7 +8587,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -8597,7 +8597,7 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.9.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "environmental",
  "parity-scale-codec",
@@ -8639,7 +8639,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "futures 0.3.17",
  "hash-db",
@@ -8675,7 +8675,7 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.9.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -8692,7 +8692,7 @@ dependencies = [
 [[package]]
 name = "sp-maybe-compressed-blob"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "ruzstd",
  "zstd",
@@ -8735,7 +8735,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "backtrace",
 ]
@@ -8754,7 +8754,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "either",
  "hash256-std-hasher",
@@ -8993,7 +8993,7 @@ dependencies = [
 [[package]]
 name = "sp-version-proc-macro"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "parity-scale-codec",
  "proc-macro-crate 1.1.0",
@@ -9005,7 +9005,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "3.0.0"
-source = "git+https://github.com/webb-tools/substrate.git?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
+source = "git+https://github.com/webb-tools/substrate?branch=erup-4#656e206faaf0353c7e7f14689779379018bbb02a"
 dependencies = [
  "impl-trait-for-tuples 0.2.1",
  "parity-scale-codec",
@@ -9461,8 +9461,18 @@ dependencies = [
  "pin-project-lite 0.1.12",
  "signal-hook-registry",
  "slab",
- "tokio-macros",
  "winapi 0.3.9",
+]
+
+[[package]]
+name = "tokio"
+version = "1.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50dae83881bc9b0403dd5b44ea9deed3e939856cc8722d5be37f0d6e5c6d53dd"
+dependencies = [
+ "autocfg",
+ "pin-project-lite 0.2.7",
+ "tokio-macros",
 ]
 
 [[package]]
@@ -9531,9 +9541,9 @@ dependencies = [
 
 [[package]]
 name = "tokio-macros"
-version = "0.2.6"
+version = "1.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e44da00bfc73a25f814cd8d7e57a68a5c31b74b3152a0a1d1f590c97ed06265a"
+checksum = "9724f9a975fb987ef7a3cd9be0350edcbe130698af5b8f7a631e23d42d052484"
 dependencies = [
  "proc-macro2",
  "quote",

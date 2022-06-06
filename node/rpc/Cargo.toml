@@ -40,7 +40,7 @@ sp-transaction-pool = { version = "3.0" }
 sc-transaction-pool = { version = "3.0" }
 sc-transaction-graph = { version = "3.0" }
 substrate-frame-rpc-system = { version = "3.0" }
-tokio = { version = "0.2.13", features = ["macros", "sync"] }
+tokio = { version = "1.8.4", features = ["macros", "sync"] }
 
 pallet-ethereum = { git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
 fc-rpc = { default-features = false, git = "https://github.com/webb-tools/frontier", branch = "erup-4" }
