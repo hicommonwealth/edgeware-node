@@ -65,7 +65,7 @@ smallvec = { opt-level = 3 }
 snow = { opt-level = 3 }
 twox-hash = { opt-level = 3 }
 uint = { opt-level = 3 }
-wasmi = { opt-level = 3 }
+wasmi = { opt-level = 3, version = "0.11.0" }
 x25519-dalek = { opt-level = 3 }
 yamux = { opt-level = 3 }
 zeroize = { opt-level = 3 }
@@ -75,9 +75,11 @@ zeroize = { opt-level = 3 }
 
 [patch.crates-io]
 sp-storage = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-externalities = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-runtime-interface =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+#sp-externalities = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+#sp-runtime-interface =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 
+#sp-finality-grandpa =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+#sp-runtime-interface =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 
 
 # # frontier deps
@@ -229,15 +231,15 @@ sp-runtime-interface =  { git = "https://github.com/paritytech/substrate", branc
 [source.crates-io]
 replace-with = "vendored-sources"
 
-[source."https://github.com/edgeware-network/frontier"]
-git = "https://github.com/edgeware-network/frontier"
-branch = "erup-5-latest"
-replace-with = "vendored-sources"
+#[source."https://github.com/edgeware-network/frontier"]
+#git = "https://github.com/edgeware-network/frontier"
+#branch = "erup-5-latest"
+#replace-with = "vendored-sources"
 
-[source."https://github.com/paritytech/substrate"]
-git = "https://github.com/paritytech/substrate"
-branch = "polkadot-v0.9.18"
-replace-with = "vendored-sources"
+#[source."https://github.com/paritytech/substrate"]
+#git = "https://github.com/paritytech/substrate"
+#branch = "polkadot-v0.9.18"
+#replace-with = "vendored-sources"
 
 #[source.vendored-sources]
 #directory = "vendor"

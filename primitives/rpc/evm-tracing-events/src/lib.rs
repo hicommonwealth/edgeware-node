@@ -32,6 +32,7 @@
 //! events.
 
 //#![cfg_attr(not(feature = "std"), no_std)]
+
 extern crate alloc;
 
 use crate::alloc::borrow::ToOwned;
