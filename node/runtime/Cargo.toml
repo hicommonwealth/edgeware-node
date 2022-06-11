@@ -10,7 +10,7 @@ description = "Edgeware runtime library"
 [package.metadata.wasm-pack.profile.release]
 # `wasm-opt` has some problems on linux, see
 # https://github.com/rustwasm/wasm-pack/issues/781 etc.
-wasm-opt = true
+wasm-opt = false
 
 [package.metadata.docs.rs]
 targets = ["x86_64-unknown-linux-gnu"]
@@ -37,6 +37,7 @@ sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+sp-runtime-interface = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 sp-staking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
 sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", optional = true }
 
@@ -138,7 +139,7 @@ beresheet-runtime = []
 std = [
 	"sha3/std",
 	"scale-info/std",
-#	"sp-authority-discovery/std",
+	"sp-authority-discovery/std",
 	"pallet-assets/std",
 	"pallet-authority-discovery/std",
 	"pallet-authorship/std",
@@ -178,6 +179,7 @@ std = [
 	"pallet-session/std",
 	"sp-api/std",
 	"sp-runtime/std",
+	"sp-runtime-interface/std",
 	"sp-staking/std",
 	"pallet-staking/std",
 	"sp-keyring",

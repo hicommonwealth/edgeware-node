@@ -1,6 +1,6 @@
 // Copyright 2019-2021 PureStake Inc.
 // This file is part of Moonbeam.
-
+#![cfg_attr(not(feature = "std"), no_std)]
 // Moonbeam is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
@@ -31,7 +31,7 @@
 //! This module provide mirror types and conversion into them from the original
 //! events.
 
-//#![cfg_attr(not(feature = "std"), no_std)]
+
 
 extern crate alloc;
 
