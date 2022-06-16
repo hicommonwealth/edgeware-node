@@ -16,13 +16,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-
-// Don't need to generate auto complete with clap cli parsing // flipchan
-
 fn main() {
 	#[cfg(feature = "cli")]
 	cli::main();
 }
+
 
 #[cfg(feature = "cli")]
 mod cli {
@@ -30,9 +28,8 @@ mod cli {
 
 //	#[cfg(feature = "cli-completion")]
 //	use sc_cli::structopt::clap::Shell;
-	#[cfg(feature = "cli-completion")]
-	use std::{env, fs, path::Path};
-	use substrate_build_script_utils::{generate_cargo_keys, rerun_if_git_head_changed};
+	
+	use substrate_build_script_utils::rerun_if_git_head_changed;
 
 	pub fn main() {
 //		#[cfg(feature = "cli-completion")]
@@ -72,3 +69,4 @@ mod cli {
 //		Cli::clap().gen_completions("substrate-node", *shell, &path);
 //	}
 }
+

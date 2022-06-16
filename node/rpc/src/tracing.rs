@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -15,7 +15,25 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 use super::*;
+use sp_blockchain::{
+	Backend as BlockchainBackend, Error as BlockChainError, HeaderBackend, HeaderMetadata,
+};
 
+use std::{sync::Arc, time::Duration};
+use crate::client::RuntimeApiCollection;
+use fp_rpc::EthereumRuntimeRPCApi;
+use sp_block_builder::BlockBuilder;
+use edgeware_cli_opt::EthApi as EthApiCmd;
+use sc_client_api::{
+	backend::{AuxStore, Backend, StateBackend, StorageProvider},
+	client::BlockchainEvents,
+	BlockOf,
+};
+use sp_core::H256;
+use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
+use sp_api::{HeaderT, ProvideRuntimeApi};
+
+use edgeware_primitives::Block;
 use edgeware_rpc_debug::{Debug, DebugHandler, DebugRequester, DebugServer};
 use edgeware_rpc_trace::{CacheRequester as TraceFilterCacheRequester, CacheTask, Trace, TraceServer};
 use tokio::sync::Semaphore;
@@ -65,6 +83,7 @@ pub fn spawn_tracing_tasks<B, C, BE>(
 ) -> RpcRequesters
 where
 	C: ProvideRuntimeApi<B> + BlockOf,
+	C: StorageProvider<B, BE>,
 	C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + 'static,
 	C: BlockchainEvents<B>,
 	C: Send + Sync + 'static,
@@ -77,12 +96,14 @@ where
 {
 	let permit_pool = Arc::new(Semaphore::new(rpc_config.ethapi_max_permits as usize));
 
-	let (trace_filter_task, trace_filter_requester) = if rpc_config.ethapi.contains(&EthApiCmd::Trace) {
+	let (trace_filter_task, trace_filter_requester) = 
+		if rpc_config.ethapi.contains(&EthApiCmd::Trace) {
 		let (trace_filter_task, trace_filter_requester) = CacheTask::create(
 			Arc::clone(&params.client),
 			Arc::clone(&params.substrate_backend),
 			Duration::from_secs(rpc_config.ethapi_trace_cache_duration),
 			Arc::clone(&permit_pool),
+			Arc::clone(&params.overrides),
 		);
 		(Some(trace_filter_task), Some(trace_filter_requester))
 	} else {
@@ -95,6 +116,7 @@ where
 			Arc::clone(&params.substrate_backend),
 			Arc::clone(&params.frontier_backend),
 			Arc::clone(&permit_pool),
+			Arc::clone(&params.overrides),
 		);
 		(Some(debug_task), Some(debug_requester))
 	} else {

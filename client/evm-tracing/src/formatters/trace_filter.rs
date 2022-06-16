@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -15,12 +15,12 @@
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
 use super::blockscout::BlockscoutCallInner as CallInner;
-use crate::{
-	listeners::call_list::Listener,
-	types::{
-		block::{TransactionTrace, TransactionTraceAction, TransactionTraceOutput, TransactionTraceResult},
-		CallResult, CreateResult, CreateType,
+use crate::listeners::call_list::Listener;
+use crate::types::{
+	block::{
+		TransactionTrace, TransactionTraceAction, TransactionTraceOutput, TransactionTraceResult,
 	},
+	CallResult, CreateResult, CreateType,
 };
 use ethereum_types::H256;
 
@@ -89,12 +89,16 @@ impl super::ResponseFormatter for Formatter {
 								CreateResult::Success {
 									created_contract_address_hash,
 									created_contract_code,
-								} => TransactionTraceOutput::Result(TransactionTraceResult::Create {
-									gas_used: trace.gas_used,
-									code: created_contract_code,
-									address: created_contract_address_hash,
-								}),
-								CreateResult::Error { error } => TransactionTraceOutput::Error(error),
+								} => {
+									TransactionTraceOutput::Result(TransactionTraceResult::Create {
+										gas_used: trace.gas_used,
+										code: created_contract_code,
+										address: created_contract_address_hash,
+									})
+								}
+								CreateResult::Error { error } => {
+									TransactionTraceOutput::Error(error)
+								}
 							},
 							subtraces: trace.subtraces,
 							trace_address: trace.trace_address.clone(),

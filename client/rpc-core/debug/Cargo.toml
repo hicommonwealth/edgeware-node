@@ -1,22 +1,21 @@
 [package]
 name = "edgeware-rpc-core-debug"
-version = '0.1.0'
-authors = ['PureStake']
-edition = '2021'
-homepage = 'https://moonbeam.network'
-license = 'GPL-3.0-only'
-repository = 'https://github.com/PureStake/moonbeam/'
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = [ "PureStake" ]
+edition = "2021"
+homepage = "https://moonbeam.network"
+license = "GPL-3.0-only"
+repository = "https://github.com/PureStake/moonbeam/"
+version = "0.1.0"
 
 [dependencies]
-futures = { version = "0.3", features = ["compat"] }
-ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp","codec"] }
+ethereum-types = "0.13.1"
+futures = { version = "0.3", features = [ "compat" ] }
 jsonrpc-core = "18.0.0"
 jsonrpc-core-client = "18.0.0"
 jsonrpc-derive = "18.0.0"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-sp-core =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18"  }
 edgeware-client-evm-tracing = { path = "../../evm-tracing" }
 edgeware-rpc-core-types = { path = "../types" }
+serde = { version = "1.0", features = [ "derive" ] }
+serde_json = "1.0"
+
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }

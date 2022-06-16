@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -43,17 +43,17 @@ impl super::ResponseFormatter for Formatter {
 		for entry in listener.entries.iter() {
 			let mut result: Vec<Call> = entry
 				.into_iter()
-				.filter_map(|(_, it)| {
+				.map(|(_, it)| {
 					let from = it.from;
 					let trace_address = it.trace_address.clone();
 					let value = it.value;
 					let gas = it.gas;
 					let gas_used = it.gas_used;
 					let inner = it.inner.clone();
-					Some(Call::CallTracer(CallTracerCall {
-						from,
-						gas,
-						gas_used,
+					Call::CallTracer(CallTracerCall {
+						from: from,
+						gas: gas,
+						gas_used: gas_used,
 						trace_address: Some(trace_address.clone()),
 						inner: match inner.clone() {
 							BlockscoutCallInner::Call {
@@ -88,29 +88,31 @@ impl super::ResponseFormatter for Formatter {
 								},
 								output: match res {
 									CreateResult::Success {
-										created_contract_code, ..
+										created_contract_code,
+										..
 									} => Some(created_contract_code),
 									CreateResult::Error { .. } => None,
 								},
-								value,
+								value: value,
 								call_type: "CREATE".as_bytes().to_vec(),
 							},
-							BlockscoutCallInner::SelfDestruct { balance, to } => CallTracerInner::SelfDestruct {
-								value: balance,
-								to,
-								call_type: "SELFDESTRUCT".as_bytes().to_vec(),
-							},
+							BlockscoutCallInner::SelfDestruct { balance, to } => {
+								CallTracerInner::SelfDestruct {
+									value: balance,
+									to,
+									call_type: "SELFDESTRUCT".as_bytes().to_vec(),
+								}
+							}
 						},
 						calls: Vec::new(),
-					}))
+					})
 				})
-				.map(|x| x)
 				.collect();
 			// Geth's `callTracer` expects a tree of nested calls and we have a stack.
 			//
 			// We iterate over the sorted stack, and push each children to it's
-			// parent (the item which's `trace_address` matches &T[0..T.len()-1]) until
-			// there is a single item on the list.
+			// parent (the item which's `trace_address` matches &T[0..T.len()-1]) until there
+			// is a single item on the list.
 			//
 			// The last remaining item is the context call with all it's descendants. I.e.
 			//
@@ -151,14 +153,16 @@ impl super::ResponseFormatter for Formatter {
 				//
 				// We consider an item to be `Ordering::Less` when:
 				// 	- Is closer to the root or
-				// 	- Is greater than its sibling.
+				//	- Is greater than its sibling.
 				result.sort_by(|a, b| match (a, b) {
 					(
 						Call::CallTracer(CallTracerCall {
-							trace_address: Some(a), ..
+							trace_address: Some(a),
+							..
 						}),
 						Call::CallTracer(CallTracerCall {
-							trace_address: Some(b), ..
+							trace_address: Some(b),
+							..
 						}),
 					) => {
 						let a_len = a.len();
@@ -185,39 +189,52 @@ impl super::ResponseFormatter for Formatter {
 				});
 				// Stack pop-and-push.
 				while result.len() > 1 {
-					let mut last = result.pop().unwrap();
+					let mut last = result
+						.pop()
+						.expect("result.len() > 1, so pop() necessarily returns an element");
 					// Find the parent index.
-					if let Some(index) = result.iter().position(|current| match (last.clone(), current) {
-						(
-							Call::CallTracer(CallTracerCall {
-								trace_address: Some(a), ..
-							}),
-							Call::CallTracer(CallTracerCall {
-								trace_address: Some(b), ..
-							}),
-						) => &b[..] == &a[0..a.len() - 1],
-						_ => unreachable!(),
-					}) {
+					if let Some(index) =
+						result
+							.iter()
+							.position(|current| match (last.clone(), current) {
+								(
+									Call::CallTracer(CallTracerCall {
+										trace_address: Some(a),
+										..
+									}),
+									Call::CallTracer(CallTracerCall {
+										trace_address: Some(b),
+										..
+									}),
+								) => &b[..] == &a[0..a.len() - 1],
+								_ => unreachable!(),
+							}) {
 						// Remove `trace_address` from result.
 						if let Call::CallTracer(CallTracerCall {
-							ref mut trace_address, ..
+							ref mut trace_address,
+							..
 						}) = last
 						{
 							*trace_address = None;
 						}
 						// Push the children to parent.
-						if let Some(Call::CallTracer(CallTracerCall { calls, .. })) = result.get_mut(index) {
+						if let Some(Call::CallTracer(CallTracerCall { calls, .. })) =
+							result.get_mut(index)
+						{
 							calls.push(last);
 						}
 					}
 				}
 			}
 			// Remove `trace_address` from result.
-			if let Some(Call::CallTracer(CallTracerCall { trace_address, .. })) = result.get_mut(0) {
+			if let Some(Call::CallTracer(CallTracerCall { trace_address, .. })) = result.get_mut(0)
+			{
 				*trace_address = None;
 			}
 			if result.len() == 1 {
-				traces.push(TransactionTrace::CallListNested(result.pop().unwrap()));
+				traces.push(TransactionTrace::CallListNested(result.pop().expect(
+					"result.len() == 1, so pop() necessarily returns this element",
+				)));
 			}
 		}
 		if traces.is_empty() {
@@ -276,7 +293,10 @@ pub enum CallTracerInner {
 			serialize_with = "option_bytes_0x_serialize"
 		)]
 		output: Option<Vec<u8>>,
-		#[serde(skip_serializing_if = "Option::is_none", serialize_with = "option_string_serialize")]
+		#[serde(
+			skip_serializing_if = "Option::is_none",
+			serialize_with = "option_string_serialize"
+		)]
 		error: Option<Vec<u8>>,
 		value: U256,
 	},

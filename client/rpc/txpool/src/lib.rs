@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -14,26 +14,25 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-pub use edgeware_rpc_core_txpool::{
-	GetT, Summary, Transaction, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
-};
-use ethereum::TransactionV2;//TransactionAction
-
 use ethereum_types::{H160, H256, U256};
 use fc_rpc::{internal_err, public_key};
 use jsonrpc_core::Result as RpcResult;
-
-use edgeware_rpc_primitives_txpool::{TxPoolResponse, TxPoolRuntimeApi};
-//use ethereum::TransactionV2 as Transaction;
+pub use edgeware_rpc_core_txpool::{
+	GetT, Summary, Transaction, TransactionMap, TxPool as TxPoolT, TxPoolResult, TxPoolServer,
+};
 use sc_transaction_pool::{ChainApi, Pool};
 use sc_transaction_pool_api::InPoolTransaction;
 use serde::Serialize;
 use sha3::{Digest, Keccak256};
-use sp_api::{BlockId, ProvideRuntimeApi, ApiExt};
+use sp_api::{ApiExt, BlockId, ProvideRuntimeApi};
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_runtime::traits::Block as BlockT;
-use std::{collections::HashMap, marker::PhantomData, sync::Arc};
+use std::collections::HashMap;
+use std::{marker::PhantomData, sync::Arc};
 
+use edgeware_rpc_primitives_txpool::{
+	Transaction as TransactionV2, TxPoolResponse, TxPoolRuntimeApi,
+};
 
 pub struct TxPool<B: BlockT, C, A: ChainApi> {
 	client: Arc<C>,

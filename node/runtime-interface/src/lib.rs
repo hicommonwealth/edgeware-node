@@ -14,6 +14,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Edgeware.  If not, see <http://www.gnu.org/licenses/>.
 
+#![cfg_attr(not(feature = "std"), no_std)]
+#![recursion_limit = "128"]
+
 use sp_runtime_interface::runtime_interface;
 
 #[runtime_interface]

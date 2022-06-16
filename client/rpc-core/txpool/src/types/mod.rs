@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -22,7 +22,8 @@ use ethereum_types::{H160, H256, U256};
 use serde::Serialize;
 use std::collections::HashMap;
 
-pub use self::{content::Transaction, inspect::Summary};
+pub use self::content::Transaction;
+pub use self::inspect::Summary;
 
 pub type TransactionMap<T> = HashMap<H160, HashMap<U256, T>>;
 

@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -14,34 +14,32 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-use crate::{
-	formatters::blockscout::{BlockscoutCall as Call, BlockscoutCallInner as CallInner},
-	types::{CallResult, CallType, ContextType, CreateResult},
-};
+use crate::formatters::blockscout::BlockscoutCall as Call;
+use crate::formatters::blockscout::BlockscoutCallInner as CallInner;
+use crate::types::{CallResult, CallType, ContextType, CreateResult};
 use ethereum_types::{H160, U256};
 use evm_tracing_events::{
 	runtime::{Capture, ExitError, ExitReason, ExitSucceed},
-	Event, EvmEvent, GasometerEvent, Listener as ListenerT, RuntimeEvent,
+	Event, EvmEvent, GasometerEvent, Listener as ListenerT, RuntimeEvent, StepEventFilter,
 };
 use std::{collections::btree_map::BTreeMap, vec, vec::Vec};
 
 /// Enum of the different "modes" of tracer for multiple runtime versions and
 /// the kind of EVM events that are emitted.
 enum TracingVersion {
-	/// The first event of the transaction is `EvmEvent::TransactX`. It goes
-	/// along other events such as `EvmEvent::Exit`. All contexts should have
-	/// clear start/end boundaries.
+	/// The first event of the transaction is `EvmEvent::TransactX`. It goes along other events
+	/// such as `EvmEvent::Exit`. All contexts should have clear start/end boundaries.
 	EarlyTransact,
 	/// Older version in which the events above didn't existed.
-	/// It means that we cannot rely on those events to perform any task, and
-	/// must rely only on other events.
+	/// It means that we cannot rely on those events to perform any task, and must rely only
+	/// on other events.
 	Legacy,
 }
 
 pub struct Listener {
 	/// Version of the tracing.
-	/// Defaults to legacy, and switch to a more modern version if recently
-	/// added events are received.
+	/// Defaults to legacy, and switch to a more modern version if recently added events are
+	/// received.
 	version: TracingVersion,
 
 	// Transaction cost that must be added to the first context cost.
@@ -61,10 +59,10 @@ pub struct Listener {
 	// call type, to be used when the following `Call` event is received.
 	call_type: Option<CallType>,
 
-	/// When `EvmEvent::TransactX` is received it creates its own context.
-	/// However it will usually be followed by an `EvmEvent::Call/Create` that
-	/// will also create a context, which must be prevented. It must however not
-	/// be skipped if `EvmEvent::TransactX` was not received (in legacy mode).
+	/// When `EvmEvent::TransactX` is received it creates its own context. However it will usually
+	/// be followed by an `EvmEvent::Call/Create` that will also create a context, which must be
+	/// prevented. It must however not be skipped if `EvmEvent::TransactX` was not received
+	/// (in legacy mode).
 	skip_next_context: bool,
 
 	// /// To handle EvmEvent::Exit no emitted by previous runtimes versions,
@@ -73,14 +71,13 @@ pub struct Listener {
 	/// See `RuntimeEvent::StepResult` event explanatioins.
 	step_result_entry: Option<(u32, Call)>,
 
-	/// When tracing a block `Event::CallListNew` is emitted before each
-	/// Ethereum transaction is processed. Since we use that event to **finish**
-	/// the transaction, we must ignore the first one.
+	/// When tracing a block `Event::CallListNew` is emitted before each Ethereum transaction is
+	/// processed. Since we use that event to **finish** the transaction, we must ignore the first
+	/// one.
 	call_list_first_transaction: bool,
 
-	/// True if only the `GasometerEvent::RecordTransaction` event has been
-	/// received. Allow to correctly handle transactions that cannot pay for the
-	/// tx data in Legacy mode.
+	/// True if only the `GasometerEvent::RecordTransaction` event has been received.
+	/// Allow to correctly handle transactions that cannot pay for the tx data in Legacy mode.
 	record_transaction_event_only: bool,
 }
 
@@ -147,7 +144,8 @@ impl Listener {
 			let entry = match context.context_type {
 				ContextType::Call(call_type) => {
 					let res = CallResult::Error(
-						b"early exit (out of gas, stack overflow, direct call to precompile, ...)".to_vec(),
+						b"early exit (out of gas, stack overflow, direct call to precompile, ...)"
+							.to_vec(),
 					);
 					Call {
 						from: context.from,
@@ -166,8 +164,8 @@ impl Listener {
 				}
 				ContextType::Create => {
 					let res = CreateResult::Error {
-						error: b"early exit (out of gas, stack overflow, direct call to precompile, ...)".to_vec(),
-					};
+							error: b"early exit (out of gas, stack overflow, direct call to precompile, ...)".to_vec(),
+						};
 
 					Call {
 						value: context.value,
@@ -193,7 +191,8 @@ impl Listener {
 		// context (and exited **early in the transaction**).
 		else if self.record_transaction_event_only {
 			let res = CallResult::Error(
-				b"transaction could not pay its own data cost (impossible to gather more info)".to_vec(),
+				b"transaction could not pay its own data cost (impossible to gather more info)"
+					.to_vec(),
 			);
 
 			let entry = Call {
@@ -368,6 +367,7 @@ impl Listener {
 			}
 
 			EvmEvent::Call {
+				code_address,
 				input,
 				is_static,
 				context,
@@ -391,12 +391,21 @@ impl Listener {
 						vec![]
 					};
 
+					// For subcalls we want to have "from" always be the parent context address
+					// instead of `context.caller`, since the latter will not have the correct
+					// value inside a DelegateCall.
+					let from = if let Some(parent_context) = self.context_stack.last() {
+						parent_context.to.clone()
+					} else {
+						context.caller
+					};
+
 					self.context_stack.push(Context {
 						entries_index: self.entries_next_index,
 
 						context_type: ContextType::Call(call_type),
 
-						from: context.caller,
+						from,
 						trace_address,
 						subtraces: 0,
 						value: context.apparent_value,
@@ -405,7 +414,7 @@ impl Listener {
 						start_gas: None,
 
 						data: input.to_vec(),
-						to: context.address,
+						to: code_address,
 					});
 
 					self.entries_next_index += 1;
@@ -470,21 +479,27 @@ impl Listener {
 					vec![]
 				};
 
-				if self.entries.is_empty() {
-					self.entries.push(BTreeMap::new());
-				}
-				self.entries.last_mut().unwrap().insert(self.entries_next_index, Call {
-					from: address, // this contract is self destructing
-					trace_address,
-					subtraces: 0,
-					value: 0.into(),
-					gas: 0.into(),
-					gas_used: 0.into(),
-					inner: CallInner::SelfDestruct { to: target, balance },
-				});
+				self.insert_entry(
+					self.entries_next_index,
+					Call {
+						from: address, // this contract is self destructing
+						trace_address,
+						subtraces: 0,
+						value: 0.into(),
+						gas: 0.into(),
+						gas_used: 0.into(),
+						inner: CallInner::SelfDestruct {
+							to: target,
+							balance,
+						},
+					},
+				);
 				self.entries_next_index += 1;
 			}
-			EvmEvent::Exit { reason, return_value } => {
+			EvmEvent::Exit {
+				reason,
+				return_value,
+			} => {
 				// We know we're in `TracingVersion::EarlyTransact` mode.
 
 				self.record_transaction_event_only = false;
@@ -498,6 +513,13 @@ impl Listener {
 					self.insert_entry(key, entry);
 				}
 			}
+			EvmEvent::PrecompileSubcall { .. } => {
+				// In a precompile subcall there is no CALL opcode result to observe, thus
+				// we need this new event. Precompile subcall might use non-standard call
+				// behavior (like batch precompile does) thus we simply consider this a call.
+				self.call_type = Some(CallType::Call);
+			}
+
 			// We ignore other kinds of message if any (new ones may be added in the future).
 			#[allow(unreachable_patterns)]
 			_ => (),
@@ -505,75 +527,88 @@ impl Listener {
 	}
 
 	fn insert_entry(&mut self, key: u32, entry: Call) {
-		if self.entries.is_empty() {
-			self.entries.push(BTreeMap::new());
+		if let Some(ref mut last) = self.entries.last_mut() {
+			last.insert(key, entry);
+		} else {
+			let mut btree_map = BTreeMap::new();
+			btree_map.insert(key, entry);
+			self.entries.push(btree_map);
 		}
-
-		self.entries.last_mut().unwrap().insert(key, entry);
 	}
 
-	fn pop_context_to_entry(&mut self, reason: ExitReason, return_value: Vec<u8>) -> Option<(u32, Call)> {
+	fn pop_context_to_entry(
+		&mut self,
+		reason: ExitReason,
+		return_value: Vec<u8>,
+	) -> Option<(u32, Call)> {
 		if let Some(context) = self.context_stack.pop() {
 			let mut gas_used = context.start_gas.unwrap_or(0) - context.gas;
 			if context.entries_index == 0 {
 				gas_used += self.transaction_cost;
 			}
 
-			Some((context.entries_index, match context.context_type {
-				ContextType::Call(call_type) => {
-					let res = match &reason {
-						ExitReason::Succeed(ExitSucceed::Returned) => CallResult::Output(return_value.to_vec()),
-						ExitReason::Succeed(_) => CallResult::Output(vec![]),
-						ExitReason::Error(error) => CallResult::Error(error_message(error)),
+			Some((
+				context.entries_index,
+				match context.context_type {
+					ContextType::Call(call_type) => {
+						let res = match &reason {
+							ExitReason::Succeed(ExitSucceed::Returned) => {
+								CallResult::Output(return_value.to_vec())
+							}
+							ExitReason::Succeed(_) => CallResult::Output(vec![]),
+							ExitReason::Error(error) => CallResult::Error(error_message(error)),
 
-						ExitReason::Revert(_) => CallResult::Error(b"execution reverted".to_vec()),
-						ExitReason::Fatal(_) => CallResult::Error(vec![]),
-					};
+							ExitReason::Revert(_) => {
+								CallResult::Error(b"execution reverted".to_vec())
+							}
+							ExitReason::Fatal(_) => CallResult::Error(vec![]),
+						};
 
-					Call {
-						from: context.from,
-						trace_address: context.trace_address,
-						subtraces: context.subtraces,
-						value: context.value,
-						gas: context.gas.into(),
-						gas_used: gas_used.into(),
-						inner: CallInner::Call {
-							call_type,
-							to: context.to,
-							input: context.data,
-							res,
-						},
+						Call {
+							from: context.from,
+							trace_address: context.trace_address,
+							subtraces: context.subtraces,
+							value: context.value,
+							gas: context.gas.into(),
+							gas_used: gas_used.into(),
+							inner: CallInner::Call {
+								call_type,
+								to: context.to,
+								input: context.data,
+								res,
+							},
+						}
 					}
-				}
-				ContextType::Create => {
-					let res = match &reason {
-						ExitReason::Succeed(_) => CreateResult::Success {
-							created_contract_address_hash: context.to,
-							created_contract_code: return_value.to_vec(),
-						},
-						ExitReason::Error(error) => CreateResult::Error {
-							error: error_message(error),
-						},
-						ExitReason::Revert(_) => CreateResult::Error {
-							error: b"execution reverted".to_vec(),
-						},
-						ExitReason::Fatal(_) => CreateResult::Error { error: vec![] },
-					};
+					ContextType::Create => {
+						let res = match &reason {
+							ExitReason::Succeed(_) => CreateResult::Success {
+								created_contract_address_hash: context.to,
+								created_contract_code: return_value.to_vec(),
+							},
+							ExitReason::Error(error) => CreateResult::Error {
+								error: error_message(error),
+							},
+							ExitReason::Revert(_) => CreateResult::Error {
+								error: b"execution reverted".to_vec(),
+							},
+							ExitReason::Fatal(_) => CreateResult::Error { error: vec![] },
+						};
 
-					Call {
-						value: context.value,
-						trace_address: context.trace_address,
-						subtraces: context.subtraces,
-						gas: context.gas.into(),
-						gas_used: gas_used.into(),
-						from: context.from,
-						inner: CallInner::Create {
-							init: context.data,
-							res,
-						},
+						Call {
+							value: context.value,
+							trace_address: context.trace_address,
+							subtraces: context.subtraces,
+							gas: context.gas.into(),
+							gas_used: gas_used.into(),
+							from: context.from,
+							inner: CallInner::Create {
+								init: context.data,
+								res,
+							},
+						}
 					}
-				}
-			}))
+				},
+			))
 		} else {
 			None
 		}
@@ -617,6 +652,13 @@ impl ListenerT for Listener {
 			}
 		};
 	}
+
+	fn step_event_filter(&self) -> StepEventFilter {
+		StepEventFilter {
+			enable_memory: false,
+			enable_stack: false,
+		}
+	}
 }
 
 #[cfg(test)]
@@ -625,7 +667,7 @@ mod tests {
 	use super::*;
 	use ethereum_types::H256;
 	use evm_tracing_events::{
-		evm_utils::CreateScheme,
+		evm::CreateScheme,
 		gasometer::Snapshot,
 		runtime::{Memory, Stack},
 		Context as EvmContext,
@@ -670,19 +712,12 @@ mod tests {
 		}
 	}
 
-	fn test_stack() -> Stack {
-		Stack {
-			data: Vec::new(),
-			limit: 0u64,
-		}
+	fn test_stack() -> Option<Stack> {
+		None
 	}
 
-	fn test_memory() -> Memory {
-		Memory {
-			data: Vec::new(),
-			effective_len: U256::zero(),
-			limit: 0u64,
-		}
+	fn test_memory() -> Option<Memory> {
+		None
 	}
 
 	fn test_snapshot() -> Snapshot {
@@ -694,7 +729,11 @@ mod tests {
 		}
 	}
 
-	fn test_emit_evm_event(event_type: TestEvmEvent, is_static: bool, exit_reason: Option<ExitReason>) -> EvmEvent {
+	fn test_emit_evm_event(
+		event_type: TestEvmEvent,
+		is_static: bool,
+		exit_reason: Option<ExitReason>,
+	) -> EvmEvent {
 		match event_type {
 			TestEvmEvent::Call => EvmEvent::Call {
 				code_address: H160::default(),
@@ -804,11 +843,17 @@ mod tests {
 	}
 
 	fn do_transact_create_event(listener: &mut Listener) {
-		listener.evm_event(test_emit_evm_event(TestEvmEvent::TransactCreate, false, None));
+		listener.evm_event(test_emit_evm_event(
+			TestEvmEvent::TransactCreate,
+			false,
+			None,
+		));
 	}
 
 	fn do_gasometer_event(listener: &mut Listener) {
-		listener.gasometer_event(test_emit_gasometer_event(TestGasometerEvent::RecordTransaction));
+		listener.gasometer_event(test_emit_gasometer_event(
+			TestGasometerEvent::RecordTransaction,
+		));
 	}
 
 	fn do_exit_event(listener: &mut Listener) {
@@ -853,8 +898,8 @@ mod tests {
 		assert_eq!(listener.entries[0].len(), 1);
 	}
 
-	// Early exit somewhere between the first callstack event and stepping the
-	// bytecode. I.e. precompile call.
+	// Early exit somewhere between the first callstack event and stepping the bytecode.
+	// I.e. precompile call.
 	#[test]
 	fn call_early_exit_before_runtime() {
 		let mut listener = Listener::default();
@@ -925,8 +970,8 @@ mod tests {
 		assert_eq!(listener.entries[0].len(), 1);
 	}
 
-	// Early exit somewhere between the first callstack event and stepping the
-	// bytecode I.e. precompile call..
+	// Early exit somewhere between the first callstack event and stepping the bytecode
+	// I.e. precompile call..
 	#[test]
 	fn create_early_exit_before_runtime() {
 		let mut listener = Listener::default();
@@ -1079,8 +1124,7 @@ mod tests {
 		listener.finish_transaction();
 		assert_eq!(listener.entries.len(), 1);
 		// Each nested call contains 11 elements in the callstack (main + 10 subcalls).
-		// There are 5 main nested calls for a total of 56 elements in the callstack: 1
-		// main + 55 nested.
+		// There are 5 main nested calls for a total of 56 elements in the callstack: 1 main + 55 nested.
 		assert_eq!(listener.entries[0].len(), (depth * (subdepth + 1)) + 1);
 	}
 }

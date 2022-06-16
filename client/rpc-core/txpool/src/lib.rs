@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -21,7 +21,6 @@ use jsonrpc_derive::rpc;
 mod types;
 
 pub use crate::types::{Get as GetT, Summary, Transaction, TransactionMap, TxPoolResult};
-//use pallet_ethereum::Transaction as ethtrans;
 
 pub use rpc_impl_TxPool::gen_server::TxPool as TxPoolServer;
 

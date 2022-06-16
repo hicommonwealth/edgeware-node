@@ -65,13 +65,21 @@ pub struct RunCmd {
 	#[clap(long, default_value = "300")]
 	pub ethapi_trace_cache_duration: u64,
 
-	/// Size of the LRU cache for block data and their transaction statuses.
-	#[clap(long, default_value = "3000")]
+	/// Size in bytes of the LRU cache for block data.
+	#[clap(long, default_value = "300000000")]
 	pub eth_log_block_cache: usize,
+
+	/// Size in bytes of the LRU cache for transactions statuses data.
+	#[clap(long, default_value = "300000000")]
+	pub eth_statuses_cache: usize,
 
 	/// Maximum number of logs in a query.
 	#[clap(long, default_value = "10000")]
 	pub max_past_logs: u32,
+
+	/// Maximum fee history cache size.
+	#[clap(long, default_value = "2048")]
+	pub fee_history_limit: u64,
 }
 
 /// An overarching CLI command definition.
@@ -98,7 +106,8 @@ pub enum Subcommand {
 	Key(KeySubcommand),
 
 	/// The custom benchmark subcommmand benchmarking runtime pallets.
-	#[clap(name = "benchmark", about = "Benchmark runtime pallets.")]
+	// #[clap(name = "benchmark", about = "Benchmark runtime pallets.")]
+	#[clap(subcommand)]
 	Benchmark(frame_benchmarking_cli::BenchmarkCmd),
 
 	/// Verify a signature for a message, provided on STDIN, with a given

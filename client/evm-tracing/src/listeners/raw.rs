@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@ use std::{collections::btree_map::BTreeMap, vec, vec::Vec};
 use crate::types::{convert_memory, single::RawStepLog, ContextType};
 use evm_tracing_events::{
 	runtime::{Capture, ExitReason},
-	Event, GasometerEvent, Listener as ListenerT, RuntimeEvent,
+	Event, GasometerEvent, Listener as ListenerT, RuntimeEvent, StepEventFilter,
 };
 
 #[derive(Debug)]
@@ -102,7 +102,9 @@ impl Listener {
 					self.final_gas = snapshot.used_gas;
 				}
 			}
-			GasometerEvent::RecordDynamicCost { gas_cost, snapshot, .. } => {
+			GasometerEvent::RecordDynamicCost {
+				gas_cost, snapshot, ..
+			} => {
 				if let Some(context) = self.context_stack.last_mut() {
 					// Register opcode cost. (ignore costs not between Step and StepResult)
 					if let Some(step) = &mut context.current_step {
@@ -153,17 +155,30 @@ impl Listener {
 						memory: if self.disable_memory {
 							None
 						} else {
-							Some(memory.data.clone())
+							Some(
+								memory
+									.expect("memory data to not be filtered out")
+									.data
+									.clone(),
+							)
 						},
 						stack: if self.disable_stack {
 							None
 						} else {
-							Some(stack.data.clone())
+							Some(
+								stack
+									.expect("stack data to not be filtered out")
+									.data
+									.clone(),
+							)
 						},
 					});
 				}
 			}
-			RuntimeEvent::StepResult { result, return_value } => {
+			RuntimeEvent::StepResult {
+				result,
+				return_value,
+			} => {
 				// StepResult is expected to be emited after a step (in a context).
 				// Only case StepResult will occur without a Step before is in a transfer
 				// transaction to a non-contract address. However it will not contain any
@@ -221,10 +236,14 @@ impl Listener {
 										.insert(context.address, context.storage_cache);
 
 									// Apply storage changes to parent, either updating its cache or map of changes.
-									for (address, mut storage) in context.global_storage_changes.into_iter() {
+									for (address, mut storage) in
+										context.global_storage_changes.into_iter()
+									{
 										// Same address => We update its cache (only tracked keys)
 										if parent_context.address == address {
-											for (cached_key, cached_value) in parent_context.storage_cache.iter_mut() {
+											for (cached_key, cached_value) in
+												parent_context.storage_cache.iter_mut()
+											{
 												if let Some(value) = storage.remove(cached_key) {
 													*cached_value = value;
 												}
@@ -279,5 +298,12 @@ impl ListenerT for Listener {
 			Event::Runtime(e) => self.runtime_event(e),
 			_ => {}
 		};
+	}
+
+	fn step_event_filter(&self) -> StepEventFilter {
+		StepEventFilter {
+			enable_memory: !self.disable_memory,
+			enable_stack: !self.disable_stack,
+		}
 	}
 }

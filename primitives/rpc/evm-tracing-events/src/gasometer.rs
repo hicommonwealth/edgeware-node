@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -30,7 +30,6 @@ impl Snapshot {
 	}
 }
 
-
 #[cfg(feature = "evm-tracing")]
 impl From<Option<evm_gasometer::Snapshot>> for Snapshot {
 	fn from(i: Option<evm_gasometer::Snapshot>) -> Self {
@@ -46,18 +45,6 @@ impl From<Option<evm_gasometer::Snapshot>> for Snapshot {
 		}
 	}
 }
-
-//#[cfg(feature = "evm-tracing")]
-//impl From<evm_gasometer::Snapshot> for Snapshot {
-//	fn from(i: evm_gasometer::Snapshot) -> Self {
-//		Self {
-//			gas_limit: i.gas_limit,
-//			memory_gas: i.memory_gas,
-//			used_gas: i.used_gas,
-//			refunded_gas: i.refunded_gas,
-//		}
-//	}
-//}
 
 #[derive(Debug, Copy, Clone, Encode, Decode, PartialEq, Eq)]
 pub enum GasometerEvent {
@@ -85,43 +72,6 @@ pub enum GasometerEvent {
 	},
 }
 
-
-/*
-#[cfg(feature = "evm-tracing")]
-impl From<evm_gasometer::tracing::Event> for GasometerEvent {
-	fn from(i: evm_gasometer::tracing::Event) -> Self {
-		match i {
-			evm_gasometer::tracing::Event::RecordCost { cost, snapshot } => Self::RecordCost {
-				cost,
-				snapshot: Option<Snapshot>,// snapshot,
-			},
-			evm_gasometer::tracing::Event::RecordRefund { refund, snapshot } => Self::RecordRefund {
-				refund,
-				snapshot: snapshot.into(),
-			},
-			evm_gasometer::tracing::Event::RecordStipend { stipend, snapshot } => Self::RecordStipend {
-				stipend,
-				snapshot: snapshot.into(),
-			},
-			evm_gasometer::tracing::Event::RecordDynamicCost {
-				gas_cost,
-				memory_gas,
-				gas_refund,
-				snapshot,
-			} => Self::RecordDynamicCost {
-				gas_cost,
-				memory_gas,
-				gas_refund,
-				snapshot: snapshot.into(),
-			},
-			evm_gasometer::tracing::Event::RecordTransaction { cost, snapshot } => Self::RecordTransaction {
-				cost,
-				snapshot: snapshot.into(),
-			},
-		}
-	}
-}
-*/
 #[cfg(feature = "evm-tracing")]
 impl From<evm_gasometer::tracing::Event> for GasometerEvent {
 	fn from(i: evm_gasometer::tracing::Event) -> Self {

@@ -2,7 +2,7 @@
 name = "edgeware-primitives"
 version = "3.4.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
-edition = "2021"
+edition = "2018"
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
 description = "Edgeware runtime primitives"
 
@@ -10,24 +10,31 @@ description = "Edgeware runtime primitives"
 targets = ["x86_64-unknown-linux-gnu"]
 
 [dependencies]
+bstringify = "0.1.2"
+serde = { version = "1.0", default-features = false, optional = true }
 codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false, features = ["derive"] }
+num_enum = { version = "0.5.1", default-features = false }
 scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-core =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18"  }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
+frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 
 [dev-dependencies]
-sp-serializer = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-pretty_assertions = "0.6.1"
+#sp-serializer = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+#pretty_assertions = "0.6.1"
 
 [features]
 default = ["std"]
 std = [
+	"serde",
 	"codec/std",
+	"num_enum/std",
 	"scale-info/std",
 	"frame-system/std",
 	"sp-application-crypto/std",
-	"sp-core/std",
 	"sp-runtime/std",
+	"sp-core/std",
+	"sp-std/std",
 ]

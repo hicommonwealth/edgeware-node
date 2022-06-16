@@ -1,4 +1,4 @@
-// Copyright 2019-2021 PureStake Inc.
+// Copyright 2019-2022 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-use ethereum_types::H160;//, {U256, U64}};
+use ethereum_types::H160;
 use futures::future::BoxFuture;
 use jsonrpc_derive::rpc;
 use edgeware_client_evm_tracing::types::block::TransactionTrace;

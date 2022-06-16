@@ -34,9 +34,9 @@ use sp_runtime::{
 	traits::{IdentifyAccount, One, Verify},
 	Perbill,
 };
-
 pub use edgeware_primitives::{AccountId, Balance, BlockNumber, Signature};
 pub use edgeware_runtime::{constants::time::*, GenesisConfig};
+use fp_evm::GenesisAccount;
 
 use hex::FromHex;
 use serde_json::Result;
@@ -165,7 +165,7 @@ pub fn testnet_genesis(
 	let alice_evm_account_id = H160::from_str("19e7e376e7c213b7e7e7e46cc70a5dd086daff2a").unwrap();
 	let mut evm_accounts = BTreeMap::new();
 	if create_evm_alice {
-		evm_accounts.insert(alice_evm_account_id, pallet_evm::GenesisAccount {
+		evm_accounts.insert(alice_evm_account_id, GenesisAccount {
 			nonce: 0u32.into(),
 			balance: ethereum_types::U256::from(123456_123_000_000_000_000_000u128),
 			storage: BTreeMap::new(),
@@ -245,6 +245,9 @@ pub fn testnet_genesis(
 		phragmen_election: Default::default(),
 		sudo: SudoConfig { key: Some(_root_key) },
 		vesting: VestingConfig { vesting },
+		assets: Default::default(),
+		transaction_payment: Default::default(),
+		dynamic_fee: Default::default(),
 		ethereum: Default::default(),
 		base_fee: Default::default(),
 		evm: EVMConfig { accounts: evm_accounts },
@@ -489,6 +492,9 @@ pub fn mainnet_genesis(
 			key: Some(crate::mainnet_fixtures::get_mainnet_root_key()),
 		},
 		vesting: VestingConfig { vesting },
+		assets: Default::default(),
+		transaction_payment: Default::default(),
+		dynamic_fee: Default::default(),
 		ethereum: Default::default(),
 		base_fee: Default::default(),
 		evm: Default::default(),

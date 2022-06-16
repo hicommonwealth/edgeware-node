@@ -1,29 +1,28 @@
 [package]
 name = "edgeware-rpc-primitives-txpool"
-version = '0.6.0'
-authors = ['PureStake']
-edition = '2021'
-homepage = 'https://moonbeam.network'
-license = 'GPL-3.0-only'
-repository = 'https://github.com/PureStake/moonbeam/'
+authors = [ "PureStake" ]
+edition = "2021"
+homepage = "https://moonbeam.network"
+license = "GPL-3.0-only"
+repository = "https://github.com/PureStake/moonbeam/"
+version = "0.6.0"
 
 [dependencies]
+ethereum = { version = "0.12.0", default-features = false, features = [ "with-codec" ] }
+
+# Substrate
 codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18", default-features = false }
-# pallet-ethereum = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["runtime-benchmarks"] }
-ethereum = { version = "0.12", default-features = false, features = ["with-codec"] }
-serde = { version = "1.0", default-features = false, features = ["derive"] }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 
 [features]
-default = ["std"]
+default = [ "std" ]
 std = [
-	"sp-api/std",
-	"sp-runtime/std",
-	"sp-io/std",
-	"sp-std/std",
 	"ethereum/std",
-	"serde/std",
+	"sp-api/std",
+	"sp-io/std",
+	"sp-runtime/std",
+	"sp-std/std",
 ]

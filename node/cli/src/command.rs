@@ -16,7 +16,6 @@
 
 use crate::{chain_spec, service, service::new_partial, Cli, Subcommand};
 use edgeware_cli_opt::RpcConfig;
-use edgeware_runtime::Block;
 use sc_cli::{ChainSpec, Result, RuntimeVersion, SubstrateCli};
 use sc_service::PartialComponents;
 
@@ -26,7 +25,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn impl_version() -> String {
-		env!("SUBSTRATE_CLI_IMPL_VERSION").into()
+		"erup-5".into()
 	}
 
 	fn description() -> String {
@@ -38,7 +37,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn support_url() -> String {
-		"https://github.com/hicommonwealth/edgeware-node/issues/new".into()
+		"https://github.com/edgeware-network/edgeware-node/issues/new".into()
 	}
 
 	fn copyright_start_year() -> i32 {
@@ -75,16 +74,10 @@ pub fn run() -> Result<()> {
 	let cli = Cli::from_args();
 
 	match &cli.subcommand {
-		Some(Subcommand::Benchmark(cmd)) => {
-			if cfg!(feature = "runtime-benchmarks") {
-				let runner = cli.create_runner(cmd)?;
-
-				runner.sync_run(|config| cmd.run::<Block, edgeware_executor::EdgewareExecutor>(config))
-			} else {
-				Err("Benchmarking wasn't enabled when building the node. \
-				You can enable it with `--features runtime-benchmarks`."
-					.into())
-			}
+		Some(Subcommand::Benchmark(_cmd)) => {
+			Err("Benchmarking wasn't enabled when building the node. \
+			You can enable it with `--features runtime-benchmarks`."
+				.into())
 		}
 		Some(Subcommand::Key(cmd)) => cmd.run(&cli),
 		Some(Subcommand::Sign(cmd)) => cmd.run(),
@@ -143,13 +136,12 @@ pub fn run() -> Result<()> {
 		Some(Subcommand::Revert(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents {
-					client,
-					task_manager,
-					backend,
-					..
-				} = new_partial(&config, &cli)?;
-				Ok((cmd.run(client, backend), task_manager))
+				let PartialComponents { client, task_manager, backend, .. } = new_partial(&config,&cli)?;
+				let aux_revert = Box::new(move |client,_, blocks| {
+					sc_finality_grandpa::revert(client, blocks)?;
+					Ok(())
+				});
+				Ok((cmd.run(client, backend, Some(aux_revert)), task_manager))
 			})
 		}
 		None => {
@@ -161,7 +153,10 @@ pub fn run() -> Result<()> {
 				ethapi_trace_max_count: cli.run.ethapi_trace_max_count,
 				ethapi_trace_cache_duration: cli.run.ethapi_trace_cache_duration,
 				eth_log_block_cache: cli.run.eth_log_block_cache,
+				eth_statuses_cache: cli.run.eth_statuses_cache,
+				fee_history_limit: cli.run.fee_history_limit,
 				max_past_logs: cli.run.max_past_logs,
+				relay_chain_rpc_url: None,
 			};
 
 			runner.run_node_until_exit(|config| async move {

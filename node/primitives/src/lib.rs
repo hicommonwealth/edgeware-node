@@ -19,11 +19,6 @@
 #![warn(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
-
-
-use scale_info::prelude::format;
-use scale_info::prelude::string::String;
-
 use sp_runtime::{
 	generic,
 	traits::{BlakeTwo256, IdentifyAccount, Verify},
@@ -66,7 +61,7 @@ pub type Hash = sp_core::H256;
 pub type Timestamp = u64;
 
 /// Digest item type.
-pub type DigestItem = generic::DigestItem;//<Hash>;
+pub type DigestItem = generic::DigestItem;
 /// Header type.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
 /// Block type.
@@ -78,36 +73,3 @@ pub type BlockId = generic::BlockId<Block>;
 pub type AssetId = u32;
 /// Token amount type for tokens module
 pub type Amount = i128;
-/// Currency id for tokens module
-pub type CurrencyId = u64;
-
-/// App-specific crypto used for reporting equivocation/misbehavior in AURA and
-/// GRANDPA. Any rewards for misbehavior reporting will be paid out to this
-/// account.
-pub mod report {
-	use super::{Signature, Verify};
-	use frame_system::offchain::AppCrypto;
-	use sp_core::crypto::KeyTypeId;
-
-	/// Key type for the reporting module. Used for reporting GRANDPA
-	/// equivocations.
-	pub const KEY_TYPE: KeyTypeId = KeyTypeId(*b"fish");
-
-	mod app {
-		use sp_application_crypto::{app_crypto, ed25519};
-		app_crypto!(ed25519, super::KEY_TYPE);
-	}
-
-	/// Identity of the equivocation/misbehavior reporter.
-	pub type ReporterId = app::Public;
-
-	/// An `AppCrypto` type to allow submitting signed transactions using the
-	/// reporting application key as signer.
-	pub struct ReporterAppCrypto;
-
-	impl AppCrypto<<Signature as Verify>::Signer, Signature> for ReporterAppCrypto {
-		type GenericPublic = sp_core::ed25519::Public;
-		type GenericSignature = sp_core::ed25519::Signature;
-		type RuntimeAppPublic = ReporterId;
-	}
-}

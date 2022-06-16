@@ -1,28 +1,32 @@
 [package]
 name = "edgeware-rpc-txpool"
-version = '0.6.0'
-authors = ['']
-edition = '2021'
-homepage = ''
-license = 'GPL-3.0-only'
-repository = ''
+authors = [ "PureStake" ]
+edition = "2021"
+homepage = "https://moonbeam.network"
+license = "GPL-3.0-only"
+repository = "https://github.com/PureStake/moonbeam/"
+version = "0.6.0"
 
 [dependencies]
-rlp = "0.5"
-sha3 = "0.9"
 jsonrpc-core = "18.0.0"
-ethereum-types = { version = "0.13.1", default-features = false, features = ["rlp","codec", "std"] }
-ethereum = { version = "0.12", default-features = false, features = ["with-codec"] }
-edgeware-rpc-core-txpool = { path = "../../rpc-core/txpool" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-sc-transaction-pool-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.18" }
-serde = { version = "1.0", features = ["derive"] }
+rlp = "0.5"
+serde = { version = "1.0", features = [ "derive" ] }
+sha3 = "0.9"
 
+# Moonbeam
+edgeware-rpc-core-txpool = { path = "../../rpc-core/txpool" }
 edgeware-rpc-primitives-txpool = { path = "../../../primitives/rpc/txpool" }
-fc-rpc = { git = "https://github.com/edgeware-network/frontier", branch = "erup-5-latest", features = ["rpc_binary_search_estimate"] }
+
+# Substrate
+frame-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sc-transaction-pool-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sp-api = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sp-blockchain = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
+
+# Frontier
+ethereum-types = "0.13.1"
+fc-rpc = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", features = [ "rpc_binary_search_estimate" ] }

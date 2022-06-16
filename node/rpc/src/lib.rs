@@ -1,4 +1,3 @@
-// Copyright 2018-2020 Commonwealth Labs, Inc.
 // This file is part of Edgeware.
 
 // Edgeware is free software: you can redistribute it and/or modify
@@ -18,72 +17,61 @@
 //!
 //! Since `substrate` core functionality makes no assumptions
 //! about the modules used inside the runtime, so do
-//! RPC methods defined in `substrate-rpc` crate.
+//! RPC methods defined in `sc-rpc` crate.
 //! It means that `client/rpc` can't have any methods that
 //! need some strong assumptions about the particular runtime.
 //!
 //! The RPCs available in this crate however can make some assumptions
-//! about how the runtime is constructed and what `SRML` modules
+//! about how the runtime is constructed and what FRAME pallets
 //! are part of it. Therefore all node-runtime-specific RPCs can
-//! be placed here or imported from corresponding `SRML` RPC definitions.
+//! be placed here or imported from corresponding FRAME RPC definitions.
 
 #![warn(missing_docs)]
 
 use edgeware_cli_opt::EthApi as EthApiCmd;
-use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash};
+use edgeware_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Index};
 use edgeware_rpc_txpool::{TxPool, TxPoolServer};
-use fc_rpc::{
-	EthBlockDataCache, OverrideHandle, RuntimeApiStorageOverride, SchemaV1Override, SchemaV2Override,
-	StorageOverride,
+use sc_finality_grandpa::{
+	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
-use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
-use fp_rpc::EthereumRuntimeRPCApi;
-//use fc_rpc::format::Geth;
+use sc_finality_grandpa_rpc::GrandpaRpcHandler;
+use sc_rpc::SubscriptionTaskExecutor;
+use sc_rpc_api::DenyUnsafe;
+use sc_transaction_pool_api::TransactionPool;
+use sp_api::{HeaderT, ProvideRuntimeApi};
+use sp_block_builder::BlockBuilder;
+use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
+
+use std::{collections::BTreeMap, sync::Arc, time::Duration};
+
 use jsonrpc_pubsub::manager::SubscriptionManager;
-use pallet_ethereum::EthereumStorageSchema;
+// Substrate
 use sc_client_api::{
 	backend::{AuxStore, Backend, StateBackend, StorageProvider},
 	client::BlockchainEvents,
 	BlockOf,
 };
-use fc_rpc::EthTask;
-use futures::StreamExt;
-//use async_std::stream::stream::StreamExt;
-use sc_finality_grandpa::{FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState};
-use sc_finality_grandpa_rpc::GrandpaRpcHandler;
+use sc_consensus_manual_seal::rpc::{ManualSeal, ManualSealApi};
 use sc_network::NetworkService;
-use sc_rpc::SubscriptionTaskExecutor;
-pub use sc_rpc_api::DenyUnsafe;
-use sc_service::{TaskManager, TransactionPool};
 use sc_transaction_pool::{ChainApi, Pool};
-use sp_api::{HeaderT, ProvideRuntimeApi};
-use sp_block_builder::BlockBuilder;
-use sp_blockchain::{Backend as BlockchainBackend, Error as BlockChainError, HeaderBackend, HeaderMetadata};
-use sp_consensus::SelectChain;
-use sp_core::H256;
 use sp_runtime::traits::{BlakeTwo256, Block as BlockT};
-use std::{collections::BTreeMap, sync::Arc, time::Duration};
+// Frontier
 use fc_rpc::{
-	EthApi, EthApiServer, EthDevSigner, EthFilterApi, EthFilterApiServer, EthPubSubApi, EthPubSubApiServer,
-	EthSigner, HexEncodedIdProvider, NetApi, NetApiServer, Web3Api, Web3ApiServer,
+	EthBlockDataCacheTask, EthTask, OverrideHandle, RuntimeApiStorageOverride, 
+	SchemaV1Override, SchemaV2Override, SchemaV3Override, StorageOverride,
 };
-use fc_mapping_sync::MappingSyncWorker;
-//use pallet_contracts_rpc::{Contracts, ContractsApi};
-use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
-use substrate_frame_rpc_system::{FullSystem, SystemApi};
+use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
+use fp_storage::EthereumStorageSchema;
+use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 
+use sp_core::H256;
+use sc_service::TaskManager;
+use futures::StreamExt;
 /// RPC Client
 pub mod client;
-use client::RuntimeApiCollection;
-
-//mod formatge;
-//pub use formatge::Geth as GethFormatter;
-
-///
+/// Tracing module
 pub mod tracing;
-
-/// Public io handler for exporting into other modules
-pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
+use client::RuntimeApiCollection;
 
 /// Extra dependencies for GRANDPA
 pub struct GrandpaDeps<B> {
@@ -91,8 +79,7 @@ pub struct GrandpaDeps<B> {
 	pub shared_voter_state: SharedVoterState,
 	/// Authority set info.
 	pub shared_authority_set: SharedAuthoritySet<Hash, BlockNumber>,
-	/// Receives notifications about justification
-	///  events from Grandpa.
+	/// Receives notifications about justification events from Grandpa.
 	pub justification_stream: GrandpaJustificationStream<Block>,
 	/// Executor to drive the subscription manager in the Grandpa RPC handler.
 	pub subscription_executor: SubscriptionTaskExecutor,
@@ -101,46 +88,56 @@ pub struct GrandpaDeps<B> {
 }
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B, A: ChainApi> {
+pub struct FullDeps<C, P, BE, A: ChainApi> {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
 	pub pool: Arc<P>,
+	/// Whether to deny unsafe calls
+	pub deny_unsafe: DenyUnsafe,
+	/// GRANDPA specific dependencies.
+	pub grandpa: GrandpaDeps<BE>,
+
 	/// Graph pool instance.
-	pub graph: Arc<Pool<A>>,
-	/// The SelectChain Strategy
-	pub select_chain: SC,
+	pub graph: Arc<Pool<A>>,	
 	/// The Node authority flag
 	pub is_authority: bool,
 	/// Whether to enable dev signer
 	pub enable_dev_signer: bool,
 	/// Network service
 	pub network: Arc<NetworkService<Block, Hash>>,
-	/// Whether to deny unsafe calls
-	pub deny_unsafe: DenyUnsafe,
-	/// GRANDPA specific dependencies.
-	pub grandpa: GrandpaDeps<B>,
 	/// EthFilterApi pool.
 	pub filter_pool: Option<FilterPool>,
+	/// The list of optional RPC extensions.
+	pub ethapi_cmd: Vec<EthApiCmd>,
 	/// Backend.
 	pub backend: Arc<fc_db::Backend<Block>>,
 	/// Maximum number of logs in a query.
 	pub max_past_logs: u32,
-	/// Maximum fee history cache size.
-	pub fee_history_limit: u64,
 	/// Fee history cache.
 	pub fee_history_cache: FeeHistoryCache,
-	/// The list of optional RPC extensions.
-	pub ethapi_cmd: Vec<EthApiCmd>,
+	/// Maximum fee history cache size.
+	pub fee_history_cache_limit: FeeHistoryCacheLimit,
+	/// Ethereum data access overrides.
+	pub overrides: Arc<OverrideHandle<Block>>,
+	/// Cache for Ethereum block data.
+	pub block_data_cache: Arc<EthBlockDataCacheTask<Block>>,
+	/// Manual seal command sink
+	pub command_sink:
+		Option<futures::channel::mpsc::Sender<sc_consensus_manual_seal::rpc::EngineCommand<Hash>>>,
 }
 
+/// A IO handler that uses all Full RPC extensions.
+pub type IoHandler = jsonrpc_core::IoHandler<sc_rpc::Metadata>;
 ///
 pub fn overrides_handle<C, BE>(client: Arc<C>) -> Arc<OverrideHandle<Block>>
 where
 	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError>,
 	C: Send + Sync + 'static,
-	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+	C::Api: sp_api::ApiExt<Block>
+		+ fp_rpc::EthereumRuntimeRPCApi<Block>,
+		// + fp_rpc::ConvertTransactionRuntimeApi<Block>,
 	BE: Backend<Block> + 'static,
 	BE::State: StateBackend<BlakeTwo256>,
 {
@@ -155,6 +152,11 @@ where
 		Box::new(SchemaV2Override::new(client.clone()))
 			as Box<dyn StorageOverride<_> + Send + Sync>,
 	);
+	overrides_map.insert(
+		EthereumStorageSchema::V3,
+		Box::new(SchemaV3Override::new(client.clone()))
+			as Box<dyn StorageOverride<_> + Send + Sync>,
+	);
 
 	Arc::new(OverrideHandle {
 		schemas: overrides_map,
@@ -163,47 +165,53 @@ where
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B, A>(
-	deps: FullDeps<C, P, SC, B, A>,
+pub fn create_full<C, P, BE, A>(
+	deps: FullDeps<C, P, BE, A>,
 	subscription_task_executor: SubscriptionTaskExecutor,
+	// backend: Arc<BE>,
 ) -> jsonrpc_core::IoHandler<sc_rpc::Metadata>
+// ) -> Result<jsonrpc_core::IoHandler<sc_rpc_api::Metadata>, Box<dyn std::error::Error + Send + Sync>>
 where
-	C: ProvideRuntimeApi<Block> + StorageProvider<Block, B> + AuxStore,
-	C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError> + 'static,
-	C: Send + Sync + 'static,
-	C: BlockchainEvents<Block>,
-//	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
-	C::Api: BlockBuilder<Block>,
+	C: ProvideRuntimeApi<Block>
+		+ sc_client_api::BlockBackend<Block>
+		+ StorageProvider<Block, BE>
+		+ HeaderBackend<Block>
+		+ AuxStore
+		+ HeaderMetadata<Block, Error = BlockChainError>
+		+ BlockchainEvents<Block>
+		+ Sync
+		+ Send
+		+ 'static,
+	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
+	C::Api: pallet_contracts_rpc::ContractsRuntimeApi<Block, AccountId, Balance, BlockNumber, Hash>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
 	C::Api: BlockBuilder<Block>,
+	C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
+	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+	C::Api: RuntimeApiCollection<StateBackend = BE::State>,
 	P: TransactionPool<Block = Block> + 'static,
-	SC: SelectChain<Block> + 'static,
-	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
-	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashFor<Block>>,
+	BE: Backend<Block> + Send + Sync + 'static,
+	BE::State: StateBackend<BlakeTwo256>,
 	A: ChainApi<Block = Block> + 'static,
-	C::Api: RuntimeApiCollection<StateBackend = B::State>,
-	//dyn fc_rpc::format::Formatter: GethFormatter,
 {
+	use pallet_contracts_rpc::{Contracts, ContractsApi};
+	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
+	use sc_rpc::dev::{Dev, DevApi};
+	use substrate_frame_rpc_system::{FullSystem, SystemApi};
+
+	use fc_rpc::{
+		Eth, EthApi, EthDevSigner, EthFilter, EthFilterApi, EthPubSub, EthPubSubApi, EthSigner,
+		HexEncodedIdProvider, Net, NetApi, Web3, Web3Api,
+	};
 
 	let mut io = jsonrpc_core::IoHandler::default();
-	let FullDeps {
-		client,
-		pool,
-		graph,
-		select_chain: _,
-		enable_dev_signer,
-		is_authority,
-		network,
-		deny_unsafe,
-		grandpa,
-		filter_pool,
-		backend,
-		max_past_logs,
-		fee_history_limit,
-		fee_history_cache,
-		ethapi_cmd,
-	} = deps;
+	let FullDeps { client, pool, deny_unsafe, grandpa,
+		
+		graph, is_authority, enable_dev_signer, network, filter_pool,
+		ethapi_cmd, backend, max_past_logs, fee_history_cache, 
+		fee_history_cache_limit, overrides, block_data_cache,
+		command_sink, } = deps;
+
 	let GrandpaDeps {
 		shared_voter_state,
 		shared_authority_set,
@@ -212,89 +220,73 @@ where
 		finality_provider,
 	} = grandpa;
 
+	io.extend_with(SystemApi::to_delegate(FullSystem::new(client.clone(), pool.clone(), deny_unsafe)));
+	// Making synchronous calls in light client freezes the browser currently,
+	// more context: https://github.com/paritytech/substrate/pull/3480
+	// These RPCs should use an asynchronous caller instead.
+	io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));	
+	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
+
+	io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(GrandpaRpcHandler::new(
+		shared_authority_set.clone(),
+		shared_voter_state,
+		justification_stream,
+		subscription_executor,
+		finality_provider,
+	)));
+	// io.extend_with(substrate_state_trie_migration_rpc::StateMigrationApi::to_delegate(
+	// 	substrate_state_trie_migration_rpc::MigrationRpc::new(client.clone(), backend, deny_unsafe),
+	// ));
+	// io.extend_with(sc_sync_state_rpc::SyncStateRpcApi::to_delegate(
+	// 	sc_sync_state_rpc::SyncStateRpcHandler::new(
+	// 		chain_spec,
+	// 		client.clone(),
+	// 		shared_authority_set,
+	// 		shared_epoch_changes,
+	// 	)?,
+	// ));
+	io.extend_with(DevApi::to_delegate(Dev::new(client.clone(), deny_unsafe)));
 	let mut signers = Vec::new();
 	if enable_dev_signer {
 		signers.push(Box::new(EthDevSigner::new()) as Box<dyn EthSigner>);
 	}
-	let mut overrides_map = BTreeMap::new();
-	overrides_map.insert(
-		EthereumStorageSchema::V1,
-		Box::new(SchemaV1Override::new(client.clone())) as Box<dyn StorageOverride<_> + Send + Sync>,
-	);
-	overrides_map.insert(
-		EthereumStorageSchema::V2,
-		Box::new(SchemaV2Override::new(client.clone())) as Box<dyn StorageOverride<_> + Send + Sync>,
-	);
 
-	let overrides = Arc::new(OverrideHandle {
-		schemas: overrides_map,
-		fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
-	});
-
-	let block_data_cache = Arc::new(EthBlockDataCache::new(50, 50));
-
-	io.extend_with(SystemApi::to_delegate(FullSystem::new(
-		client.clone(),
-		pool.clone(),
-		deny_unsafe,
-	)));
-	// Making synchronous calls in light client freezes the browser currently,
-	// more context: https://github.com/paritytech/substrate/pull/3480
-	// These RPCs should use an asynchronous caller instead.
-//	io.extend_with(ContractsApi::to_delegate(Contracts::new(client.clone())));
-	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(
-		client.clone(),
-	)));
-
-	io.extend_with(sc_finality_grandpa_rpc::GrandpaApi::to_delegate(
-		GrandpaRpcHandler::new(
-			shared_authority_set,
-			shared_voter_state,
-			justification_stream,
-			subscription_executor,
-			finality_provider,
-		),
-	));
-
-	io.extend_with(EthApiServer::to_delegate(EthApi::new(
+	io.extend_with(EthApi::to_delegate(Eth::new(
 		client.clone(),
 		pool.clone(),
 		graph.clone(),
-		edgeware_runtime::TransactionConverter,
+		Some(edgeware_runtime::TransactionConverter),
 		network.clone(),
 		signers,
 		overrides.clone(),
 		backend.clone(),
 		is_authority,
-		max_past_logs,
 		block_data_cache.clone(),
-		fc_rpc::format::Geth,
-		fee_history_limit,
 		fee_history_cache,
+		fee_history_cache_limit,
 	)));
 
 	if let Some(filter_pool) = filter_pool {
-		io.extend_with(EthFilterApiServer::to_delegate(EthFilterApi::new(
+		io.extend_with(EthFilterApi::to_delegate(EthFilter::new(
 			client.clone(),
 			backend,
 			filter_pool.clone(),
 			500 as usize, // max stored filters
-			overrides.clone(),
 			max_past_logs,
 			block_data_cache.clone(),
 		)));
 	}
 
-	io.extend_with(NetApiServer::to_delegate(NetApi::new(
+	io.extend_with(NetApi::to_delegate(Net::new(
 		client.clone(),
 		network.clone(),
 		// Whether to format the `peer_count` response as Hex (default) or not.
 		true,
 	)));
 
-	io.extend_with(Web3ApiServer::to_delegate(Web3Api::new(client.clone())));
+	io.extend_with(Web3Api::to_delegate(Web3::new(client.clone())));
 
-	io.extend_with(EthPubSubApiServer::to_delegate(EthPubSubApi::new(
+	io.extend_with(EthPubSubApi::to_delegate(EthPubSub::new(
 		pool.clone(),
 		client.clone(),
 		network.clone(),
@@ -304,30 +296,26 @@ where
 		),
 		overrides,
 	)));
-
 	if ethapi_cmd.contains(&EthApiCmd::Txpool) {
-		io.extend_with(TxPoolServer::to_delegate(TxPool::new(Arc::clone(&client), graph)));
+		io.extend_with(TxPoolServer::to_delegate(TxPool::new(
+			Arc::clone(&client),
+			graph,
+		)));
+	}
+
+	if let Some(command_sink) = command_sink {
+		io.extend_with(
+			// We provide the rpc handler with the sending end of the channel to allow the rpc
+			// send EngineCommands to the background block authorship task.
+			ManualSealApi::to_delegate(ManualSeal::new(command_sink)),
+		);
 	}
 
 	io
 }
 
-///
-pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
-	///
-	pub task_manager: &'a TaskManager,
-	///
-	pub client: Arc<C>,
-	///
-	pub substrate_backend: Arc<BE>,
-	///
-	pub frontier_backend: Arc<fc_db::Backend<B>>,
-	///
-	pub filter_pool: Option<FilterPool>,
-}
-
 #[allow(missing_docs)]
-pub struct SpawnTasksParams2<'a, B: BlockT, C, BE> {
+pub struct SpawnTasksParams<'a, B: BlockT, C, BE> {
 	pub task_manager: &'a TaskManager,
 	pub client: Arc<C>,
 	pub substrate_backend: Arc<BE>,
@@ -338,13 +326,14 @@ pub struct SpawnTasksParams2<'a, B: BlockT, C, BE> {
 	pub fee_history_cache: FeeHistoryCache,
 }
 
-pub fn spawn_essential_tasks<B, C, BE>(params: SpawnTasksParams2<B, C, BE>)
+/// Spawn the tasks that are required to run Edgeware.
+pub fn spawn_essential_tasks<B, C, BE>(params: SpawnTasksParams<B, C, BE>)
 where
 	C: ProvideRuntimeApi<B> + BlockOf,
 	C: HeaderBackend<B> + HeaderMetadata<B, Error = BlockChainError> + 'static,
 	C: BlockchainEvents<B> + StorageProvider<B, BE>,
 	C: Send + Sync + 'static,
-	C::Api: EthereumRuntimeRPCApi<B>,
+	C::Api: fp_rpc::EthereumRuntimeRPCApi<B>,
 	C::Api: BlockBuilder<B>,
 	B: BlockT<Hash = H256> + Send + Sync + 'static,
 	B::Header: HeaderT<Number = u32>,
@@ -362,7 +351,9 @@ where
 			params.client.clone(), // client
 			params.substrate_backend.clone(), // substrate backend
 			params.frontier_backend.clone(), // frontier backend
-			fc_mapping_sync::SyncStrategy::Normal, // Normal Non-parachain
+            3,
+            0,
+			SyncStrategy::Normal, // Normal Non-parachain
 		)
 		.for_each(|()| futures::future::ready(())),
 	);
@@ -396,7 +387,7 @@ where
 	params.task_manager.spawn_essential_handle().spawn(
 		"frontier-fee-history",
 		Some("frontier"),
-		fc_rpc::EthTask::fee_history_task(
+		EthTask::fee_history_task(
 			Arc::clone(&params.client),
 			Arc::clone(&params.overrides),
 			params.fee_history_cache,
