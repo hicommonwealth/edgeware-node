@@ -15,5 +15,5 @@ jsonrpc-core-client = "18.0.0"
 jsonrpc-derive = "18.0.0"
 serde = { version = "1.0", features = [ "derive" ] }
 serde_json = "1.0"
-
-fc-rpc-core = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19" }
+evm = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false, features = [ "with-codec" ] } # 
+fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19" }

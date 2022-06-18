@@ -36,7 +36,9 @@ sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }
 
 # Frontier
-fc-consensus = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19" }
-fc-rpc = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", features = [ "rpc_binary_search_estimate" ] }
-fc-rpc-core = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19" }
-fp-rpc = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19" }
+evm = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false, features = [ "with-codec" ] } # 
+fc-consensus = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19" }
+fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", features = [ "rpc_binary_search_estimate" ] }
+fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19" }
+fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19" }
+

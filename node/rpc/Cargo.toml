@@ -42,14 +42,14 @@ sc-transaction-pool-api = { git = "https://github.com/paritytech/substrate", bra
 
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 tokio = { version = "1.10", features = ["macros", "sync"] }
-
-pallet-ethereum = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", features = ["runtime-benchmarks"] }
-fc-rpc = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", default-features = false }
-fp-rpc = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", default-features = false }
-fc-rpc-core = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", default-features = false }
-fc-db = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", default-features = false }
-fp-storage = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", default-features = false }
-fc-mapping-sync = { git = "https://github.com/remzrn/frontier", branch = "attempt-v0.9.19", default-features = false }
+evm = { git = "https://github.com/rust-blockchain/evm", branch = "master", default-features = false, features = [ "with-codec" ] } # 
+pallet-ethereum = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", features = ["runtime-benchmarks"] }
+fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", default-features = false }
+fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", default-features = false }
+fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", default-features = false }
+fc-db = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", default-features = false }
+fp-storage = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", default-features = false }
+fc-mapping-sync = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.19", default-features = false }
 
 edgeware-primitives = { path = "../primitives" }
 edgeware-runtime = { path = "../runtime" }
