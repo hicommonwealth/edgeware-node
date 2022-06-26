@@ -3,6 +3,8 @@ use crate as treasury_reward;
 use frame_support::{construct_runtime, parameter_types, traits::GenesisBuild, weights::Weight, PalletId};
 use frame_system::mocking::{MockBlock, MockUncheckedExtrinsic};
 use sp_runtime::{traits::One, Permill};
+use sp_std::convert::{TryFrom, TryInto};
+use frame_support::pallet_prelude::ConstU32;
 
 use sp_core::H256;
 use sp_runtime::{
@@ -65,7 +67,8 @@ impl frame_system::Config for Test {
 	type PalletInfo = PalletInfo;
 	type SS58Prefix = Prefix;
 	type SystemWeightInfo = ();
-	type Version = ();
+	type Version = (); 
+	type MaxConsumers = ConstU32<16>;
 }
 
 parameter_types! {
@@ -114,6 +117,7 @@ impl pallet_treasury::Config for Test {
 	type SpendFunds = ();
 	type SpendPeriod = SpendPeriod;
 	type WeightInfo = ();
+	type ProposalBondMaximum = ();
 }
 
 impl Config for Test {
