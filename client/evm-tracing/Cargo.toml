@@ -18,5 +18,5 @@ evm-tracing-events = { path = "../../primitives/rpc/evm-tracing-events" }
 edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug" }
 
 # Substrate
-codec = { package = "parity-scale-codec", version = "3.1.2", default-features = false }
+codec = { package = "parity-scale-codec", version = "3.1.2", features=["derive"], default-features = false }
 sp-std = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19" }

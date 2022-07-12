@@ -92,9 +92,8 @@ pub mod impls;
 //use impls::{Author, CreditToBlockAuthor};
 use impls::Author;
 
-//Storage migrations
-mod migrations;
 
+mod migrations;
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -144,10 +143,10 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// and set impl_version to equal spec_version. If only runtime
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
-	spec_version: 52,
-	impl_version: 52,
+	spec_version: 52, // erup-5 will be spec_version 52
+	impl_version: 52, // one up
 	apis: RUNTIME_API_VERSIONS,
-	transaction_version: 2,
+	transaction_version: 2, // erup-4 = 2
 	state_version: 52,
 };
 
@@ -161,7 +160,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	// implementation changes and behavior does not, then leave spec_version as
 	// is and increment impl_version.
 	spec_version: 10052,
-	impl_version: 10052,
+	impl_version: 10052, //one up
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 2,
 	state_version: 52,
@@ -1488,6 +1487,9 @@ pub type Executive =
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
 
+
+
+
 /// Custom runtime upgrade to execute the balances migration before the account
 /// migration.
 mod custom_migration {
@@ -1501,13 +1503,25 @@ mod custom_migration {
 		type Pallet = PhragmenElection;
 	}
 
+
+
+
 	impl OnRuntimeUpgrade for Upgrade {
 		fn on_runtime_upgrade() -> Weight {
-			let weight = 0; // mut
+			let mut weight = 0; // mut
 			// custom migration for edgeware.
 // todo , temporary disable due to testing
-//			weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
+			weight +=  frame_support::migrations::migrate_from_pallet_version_to_storage_version::<
+            AllPalletsWithSystem,
+        >(&RocksDbWeight::get());
+			
+			weight += frame_system::storage::migrat
+
+			weight += migrations::Executive::execute_on_runtime_upgrade();
+		//	weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
 			// old VotingBond
+		//	weight += Executive::try_runtime_upgrade();//?.weights;
+		//	(weight, RuntimeBlockWeights::get().max_block)
 			let old_voter_bond: Balance = 10 * DOLLARS;
 			// old CandidacyBond
 			let old_candidacy_bond: Balance = 1_000 * DOLLARS;

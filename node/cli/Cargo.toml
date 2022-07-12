@@ -26,7 +26,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # third-party dependencies
-codec = { package = "parity-scale-codec", version = "3.1.2" }
+codec = { package = "parity-scale-codec", features=["derive"], version = "3.1.2" }
 serde = { version = "1.0", features = ["derive"] }
 futures = { version = "0.3.1", features = ["compat"] }
 hex-literal = "0.3.1"
@@ -108,7 +108,7 @@ edgeware-rpc-primitives-debug = { path = "../../primitives/rpc/debug" }
 edgeware-rpc-trace = { path = "../../client/rpc/trace" }
 
 # CLI-specific dependencies
-sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true, features = ["wasmtime"] }
+sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true }
 frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true }
 edgeware-cli-opt = { package = "edgeware-cli-opt", path = "../cli-opt", optional = true }
 
@@ -153,7 +153,7 @@ clap = { version = "3.1.8", features = [ "derive" ], optional = true }
 frame-benchmarking-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true }
 substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true }
 substrate-frame-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true }
-sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true, features = ["wasmtime"] }
+sc-cli = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", optional = true }
 edgeware-cli-opt = { package = "edgeware-cli-opt", path = "../cli-opt", optional = true }
 
 [features]
