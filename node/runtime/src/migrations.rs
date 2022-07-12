@@ -17,7 +17,6 @@ use frame_support::weights::Weight;
 use pallet_indices::Accounts;
 use sp_runtime::traits::{One, Zero};
 
-
 // Migration for scheduler(Preimage) pallet | https://github.com/paritytech/substrate/pull/10356
 pub struct SchedulerMigrationV3;
 impl OnRuntimeUpgrade for SchedulerMigrationV3 {
@@ -38,9 +37,6 @@ impl OnRuntimeUpgrade for SchedulerMigrationV3 {
 
 // Phragment election upgrade | pallet-elections-phragmen│   │   ├── pallet-elections-phragmen v5.0.0-dev (https://github.com/paritytech/substrate?branch=polkadot-v0.9.19#174735ea)
 //pub struct PhragmenElectionUpgrade;
-
-
-
 
 /* old stuff by Alex:
 
