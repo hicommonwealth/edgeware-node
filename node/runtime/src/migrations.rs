@@ -1,4 +1,4 @@
-// storage migrations for edgeware
+// Runtime storage migration file for edgeware
 
 use super::*;
 use frame_support::traits::OnRuntimeUpgrade;
