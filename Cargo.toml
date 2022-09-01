@@ -18,6 +18,8 @@ members = [
 	"node/runtime-interface",
 	"primitives/rpc/debug",
 	"primitives/rpc/txpool",
+	"utils/frame/generate-bags",
+	"utils/frame/generate-bags/node-runtime",
 ]
 exclude = ["vendor"]
 

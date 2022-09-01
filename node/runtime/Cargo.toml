@@ -26,6 +26,8 @@ serde = { version = "1.0", default-features = false, optional = true }
 static_assertions = "1.1.0"
 log = { version = "0.4.14", default-features = false }
 rlp = { version = "0.5", optional = true, default-features = false }
+# for migrations
+impl-trait-for-tuples = "0.2.1"
 
 # primitives
 sp-application-crypto = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }

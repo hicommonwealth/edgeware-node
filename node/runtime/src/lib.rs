@@ -91,7 +91,7 @@ pub use sp_runtime::BuildStorage;
 pub mod impls;
 //use impls::{Author, CreditToBlockAuthor};
 use impls::Author;
-
+mod migrations; 
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -1378,46 +1378,47 @@ construct_runtime!(
 		NodeBlock = edgeware_primitives::Block,
 		UncheckedExtrinsic = UncheckedExtrinsic
 	{
-		System: frame_system,
-		Utility: pallet_utility,
-		Aura: pallet_aura,
-		Timestamp: pallet_timestamp,
-		Authorship: pallet_authorship,
-		Indices: pallet_indices,
-		Balances: pallet_balances,
-		TransactionPayment: pallet_transaction_payment,
+		System: frame_system = 0,
+		Utility: pallet_utility = 1,
+		Aura: pallet_aura = 2,
+		Timestamp: pallet_timestamp = 3,
+		Authorship: pallet_authorship = 4,
+		Indices: pallet_indices = 5,
+		Balances: pallet_balances = 6,
+		TransactionPayment: pallet_transaction_payment = 7,
 //		AssetTxPayment: pallet_asset_tx_payment,
-		ElectionProviderMultiPhase: pallet_election_provider_multi_phase,
-		Staking: pallet_staking,
-		Session: pallet_session,
-		Democracy: pallet_democracy,
-		Council: pallet_collective::<Instance1>,
-		PhragmenElection: pallet_elections_phragmen,
-		Grandpa: pallet_grandpa,
-		Treasury: pallet_treasury,
-		Contracts: pallet_contracts,
-		Sudo: pallet_sudo,
-		ImOnline: pallet_im_online,
-		AuthorityDiscovery: pallet_authority_discovery,
-		Offences: pallet_offences,
-		Historical: pallet_session_historical::{Pallet},
-		RandomnessCollectiveFlip: pallet_randomness_collective_flip,
-		Identity: pallet_identity,
-		Recovery: pallet_recovery,
-		Vesting: pallet_vesting,
-		Scheduler: pallet_scheduler,
-		Proxy: pallet_proxy,
-		Multisig: pallet_multisig,
-		Assets: pallet_assets,
-		TreasuryReward: treasury_reward,
-		Ethereum: pallet_ethereum,
-		EVM: pallet_evm,
-		Bounties: pallet_bounties,
-		Tips: pallet_tips,
-		DynamicFee: pallet_dynamic_fee,
-		BaseFee: pallet_base_fee,
-		BagsList: pallet_bags_list,
-		Preimage: pallet_preimage,
+//		ElectionProviderMultiPhase: pallet_election_provider_multi_phase,
+		Staking: pallet_staking = 8,
+		Session: pallet_session = 9,
+		Democracy: pallet_democracy = 10,
+		Council: pallet_collective::<Instance1> = 11,
+		PhragmenElection: pallet_elections_phragmen = 12,
+		Grandpa: pallet_grandpa = 14,
+		Treasury: pallet_treasury = 15,
+		Contracts: pallet_contracts = 16,
+		Sudo: pallet_sudo = 17,
+		ImOnline: pallet_im_online = 18,
+		AuthorityDiscovery: pallet_authority_discovery = 19,
+		Offences: pallet_offences = 20,
+		Historical: pallet_session_historical::{Pallet} = 21,
+		RandomnessCollectiveFlip: pallet_randomness_collective_flip = 22,
+		Identity: pallet_identity = 23,
+		Recovery: pallet_recovery = 24,
+		Vesting: pallet_vesting = 25,
+		Scheduler: pallet_scheduler = 26,
+		Proxy: pallet_proxy = 27,
+		Multisig: pallet_multisig = 28,
+		Assets: pallet_assets = 29,
+		TreasuryReward: treasury_reward = 32,
+		Ethereum: pallet_ethereum = 33,
+		EVM: pallet_evm = 34,
+		Bounties: pallet_bounties = 37,
+		Tips: pallet_tips = 38,
+		ElectionProviderMultiPhase: pallet_election_provider_multi_phase = 39,
+		DynamicFee: pallet_dynamic_fee = 40,
+		BaseFee: pallet_base_fee = 41,
+		BagsList: pallet_bags_list = 42,
+		Preimage: pallet_preimage = 43,
 //		Referenda: pallet_referenda,
 //		ConvictionVoting: pallet_conviction_voting,
 	}
@@ -1481,46 +1482,9 @@ pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExt
 
 /// Executive: handles dispatch to the various modules.
 pub type Executive =
-	frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllPalletsWithSystem>;
+	frame_executive::Executive<Runtime, Block, frame_system::ChainContext<Runtime>, Runtime, AllPalletsWithSystem, migrations::AllEdgewareMigrations>;
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
-
-/// Custom runtime upgrade to execute the balances migration before the account
-/// migration.
-mod custom_migration {
-	use super::*;
-	use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
-
-	pub struct Upgrade;
-	impl pallet_elections_phragmen::migrations::v3::V2ToV3 for Upgrade {
-		type AccountId = AccountId;
-		type Balance = Balance;
-		type Pallet = PhragmenElection;
-	}
-
-	impl OnRuntimeUpgrade for Upgrade {
-		fn on_runtime_upgrade() -> Weight {
-			let weight = 0; // mut
-			// custom migration for edgeware.
-// todo , temporary disable due to testing
-//			weight += frame_system::migrations::migrate_for_edgeware::<Runtime>();
-			// old VotingBond
-			let old_voter_bond: Balance = 10 * DOLLARS;
-			// old CandidacyBond
-			let old_candidacy_bond: Balance = 1_000 * DOLLARS;
-			// elections migrations.
-			pallet_elections_phragmen::migrations::v3::migrate_voters_to_recorded_deposit::<Self>(old_voter_bond);
-			pallet_elections_phragmen::migrations::v3::migrate_candidates_to_recorded_deposit::<Self>(
-				old_candidacy_bond,
-			);
-			pallet_elections_phragmen::migrations::v3::migrate_runners_up_to_recorded_deposit::<Self>(
-				old_candidacy_bond,
-			);
-			pallet_elections_phragmen::migrations::v3::migrate_members_to_recorded_deposit::<Self>(old_candidacy_bond);
-			weight
-		}
-	}
-}
 
 #[cfg(feature = "enable-commented")]
 impl fp_self_contained::SelfContainedCall for Call {
