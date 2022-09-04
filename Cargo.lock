@@ -1544,7 +1544,7 @@ dependencies = [
  "sc-client-api",
  "sc-client-db",
  "sc-consensus",
- "sc-consensus-aura 0.10.0-dev (git+https://github.com/flipchan/edg-aura)",
+ "sc-consensus-aura 0.10.0-dev (git+https://github.com/edgeware-network/edg-aura)",
  "sc-consensus-epochs",
  "sc-consensus-slots",
  "sc-finality-grandpa",
@@ -1897,7 +1897,6 @@ dependencies = [
  "frame-system-rpc-runtime-api",
  "getrandom 0.2.7",
  "hex-literal",
- "impl-trait-for-tuples",
  "integer-sqrt",
  "log",
  "pallet-assets",
@@ -7301,7 +7300,7 @@ dependencies = [
 [[package]]
 name = "sc-consensus-aura"
 version = "0.10.0-dev"
-source = "git+https://github.com/flipchan/edg-aura#c903a78b1a0ef4130fd87c1d0a635a3ac076ace1"
+source = "git+https://github.com/edgeware-network/edg-aura#c92b1fab4ea61232841710f7ac275cdb963a51c2"
 dependencies = [
  "async-trait",
  "futures 0.3.21",

@@ -64,7 +64,7 @@ sc-chain-spec = { git = "https://github.com/paritytech/substrate", branch = "pol
 sc-consensus = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 sc-transaction-pool = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 sc-network = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
-sc-consensus-aura = { git = "https://github.com/flipchan/edg-aura", default-features = false }
+sc-consensus-aura = { git = "https://github.com/edgeware-network/edg-aura", default-features = false }
 sc-finality-grandpa = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 sc-consensus-slots =  { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }
 sc-client-db = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.19", default-features = false }

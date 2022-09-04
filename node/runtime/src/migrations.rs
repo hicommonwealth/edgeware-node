@@ -201,6 +201,58 @@ impl OnRuntimeUpgrade for AllContractsMigrations {
 	}
 }
 
+use sp_io::hashing::blake2_128;
+/// Crediting back the w3f.
+pub struct Web3AccountCreditMigration;
+impl OnRuntimeUpgrade for Web3AccountCreditMigration {
+	fn on_runtime_upgrade() -> frame_support::weights::Weight {
+		// The public key of the account of the web3 foundation to credit.
+		// /!\ for now we don't have the destination account so we use the 
+		// following (original web3 account funded at genesis) as a placeholder.
+		// "0x765169492c492ee29f2af9af46f9e1b117aa0283b73a4361ae12ace1c41a6c72"
+		let web3_id = hex_literal::hex!(
+			"765169492c492ee29f2af9af46f9e1b117aa0283b73a4361ae12ace1c41a6c72"
+		);
+		// We do credit 150 Mo EDG to the account. 
+		// Here "DOLLARS" stands for 1^18 units of the lowest denomination, i.e. 1EDG.
+		let to_credit = 150_000_000 * DOLLARS;
+		// Overriding the storage below.
+		let pfx: [u8; 32] = [38, 170, 57, 78, 234, 86, 48, 224,
+							 124, 72, 174, 12, 149, 88, 206, 247,
+							 185, 157, 136, 14, 198, 129, 121, 156,
+							 12, 243, 14, 136, 134, 55, 29, 169]; 
+		let mut sk = [0u8; 80];
+		sk[..32].copy_from_slice(&pfx);
+		sk[32..48].copy_from_slice(&blake2_128(&web3_id[..]));
+		sk[48..].copy_from_slice(&web3_id[..]);
+		let sv : Option<[u128;5]> = frame_support::storage::unhashed::take(&sk);
+		match sv {
+			Some(mut a) => 
+			{
+				frame_support::log::info!("web3 balance before = {:?}", &a[1]);
+				a[1] += to_credit;
+				frame_support::storage::unhashed::put(&sk,&a);
+			},
+			None => {
+				frame_support::log::info!("web3 balance before = {:?}", 0);				
+				frame_support::storage::unhashed::put(&sk,&[
+					// Necessary after migration. = 2^64
+					// It does not affect the balance of course!
+					// only the second parameter does.
+					18446744073709551616u128, 
+					to_credit, 
+					0, 
+					0, 
+					0
+				]);
+			},
+		}
+		let sv: [u128;5] = frame_support::storage::unhashed::get(&sk).unwrap();
+		frame_support::log::info!("web3 balance after = {:?}", &sv[1]);
+		0
+	}
+}
+
 use frame_support::{traits::OnRuntimeUpgrade, weights::Weight};
 pub struct AllEdgewareMigrations;
 impl OnRuntimeUpgrade for AllEdgewareMigrations {
@@ -220,6 +272,7 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
 
 		// #7930 Allow validators to block and kick their nominator set	
 		// #8113 Decouple Staking and Election - Part 2.1: Unleash Multi Phase
+		// #9507 Implement pallet-bags-list and its interfaces with pallet-staking 
 		// changes up to v9.
         frame_support::log::info!("💥 AllStakingMigrations start");
         weight += <AllStakingMigrations as OnRuntimeUpgrade>::on_runtime_upgrade();
@@ -240,10 +293,6 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
         frame_support::traits::StorageVersion::new(0).put::<Council>();
         weight += <CouncilStoragePrefixMigration as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 CouncilStoragePrefixMigration end");
-
-		// placeholder for staking/bag list 
-		// #9507 Implement pallet-bags-list and its interfaces with pallet-staking 
-		// TBD
 
         // #9566 Bounties Pallet to FrameV2
         frame_support::log::info!("💥 BountiesPrefixMigration start");
@@ -270,6 +319,11 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
         frame_support::log::info!("💥 AllContractsMigrations start");
         weight += <AllContractsMigrations as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 AllContractsMigrations end");
+
+		// Web3 foundation specific migration to undo the burning of their inital balance.
+        frame_support::log::info!("💥 Web3AccountCreditMigration start");
+        weight += <Web3AccountCreditMigration as OnRuntimeUpgrade>::on_runtime_upgrade();
+        frame_support::log::info!("😎 Web3AccountCreditMigration end");
 		
         weight
     }
