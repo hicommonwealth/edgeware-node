@@ -136,6 +136,7 @@ substrate-wasm-builder = { package = "substrate-wasm-builder", git = "https://gi
 default = ["std"]
 no-reaping = []
 beresheet-runtime = []
+fast-runtime = []
 std = [
 	"sha3/std",
 	"scale-info/std",

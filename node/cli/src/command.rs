@@ -25,7 +25,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn impl_version() -> String {
-		"erup-5".into()
+		"polkadot-v0.9.19".into()
 	}
 
 	fn description() -> String {
@@ -54,8 +54,8 @@ impl SubstrateCli for Cli {
 			"multi-dev" | "multi" => Box::new(chain_spec::multi_development_config()),
 			"local" => Box::new(chain_spec::local_testnet_config()),
 			"testnet-conf" => Box::new(chain_spec::edgeware_testnet_config(
-				"Beresheet v3".to_string(),
-				"beresheet_v3_edgeware_testnet".to_string(),
+				"Beresheet".to_string(),
+				"beresheet_edgeware_testnet".to_string(),
 			)),
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
 			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),

@@ -514,6 +514,13 @@ impl_opaque_keys! {
 	}
 }
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+	pub const Period: BlockNumber = 1 * MINUTES;
+	pub const Offset: BlockNumber = 0;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 	pub const Period: BlockNumber = 1 * HOURS;
 	pub const Offset: BlockNumber = 0;
@@ -547,6 +554,18 @@ pallet_staking_reward_curve::build! {
 	);
 }
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+	pub const SessionsPerEra: sp_staking::SessionIndex = 3;
+	pub const BondingDuration: EraIndex = 1;   // = 3 mins
+	pub const SlashDeferDuration: EraIndex = 1;    // = 3 mins
+	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
+	pub const MaxNominatorRewardedPerValidator: u32 = 256;
+	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
+	pub OffchainRepeat: BlockNumber = 5;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 	pub const SessionsPerEra: sp_staking::SessionIndex = 6;
 	pub const BondingDuration: EraIndex = 2 * 28;   // = 14 days
@@ -709,6 +728,9 @@ impl pallet_election_provider_multi_phase::Config for Runtime {
 	type RewardHandler = (); // nothing to do upon rewards
 	type DataProvider = Staking;
 	type Solution = NposSolution16;
+	#[cfg(feature = "fast-runtime")]
+	type Fallback = onchain::UnboundedExecution<OnChainSeqPhragmen>;
+	#[cfg(not(feature = "fast-runtime"))]
 	type Fallback = pallet_election_provider_multi_phase::NoFallback<Self>;
 	type GovernanceFallback = onchain::BoundedExecution<OnChainSeqPhragmen>;
 	type Solver = SequentialPhragmen<AccountId, SolutionAccuracyOf<Self>, OffchainRandomBalancing>;
@@ -731,6 +753,12 @@ impl pallet_bags_list::Config for Runtime {
 	type Score = VoteWeight;
 }
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+	pub const VoteLockingPeriod: BlockNumber = 1 * MINUTES;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 	pub const VoteLockingPeriod: BlockNumber = 7 * DAYS;
 }
@@ -745,10 +773,18 @@ parameter_types! {
 // 	type Polls = Referenda;
 // }
 
+#[cfg(feature = "fast-runtime")]
 parameter_types! {
 	pub const AlarmInterval: BlockNumber = 1;
 	pub const SubmissionDeposit: Balance = 100 * DOLLARS;
 	pub const UndecidingTimeout: BlockNumber = 28 * DAYS;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
+parameter_types! {
+	pub const AlarmInterval: BlockNumber = 1;
+	pub const SubmissionDeposit: Balance = 100 * DOLLARS;
+	pub const UndecidingTimeout: BlockNumber = 3 * MINUTES;
 }
 
 // pub struct TracksInfo;
@@ -808,7 +844,20 @@ parameter_types! {
 // 	type Tracks = TracksInfo;
 // }
 
-parameter_types! {
+
+#[cfg(feature = "fast-runtime")]
+parameter_types! {	
+	pub const LaunchPeriod: BlockNumber = 1 * MINUTES;
+	pub const VotingPeriod: BlockNumber = 3 * MINUTES;
+	pub const FastTrackVotingPeriod: BlockNumber = 1 * MINUTES;
+	pub const MinimumDeposit: Balance = 100 * DOLLARS;
+	pub const EnactmentPeriod: BlockNumber = 1 * MINUTES;
+	pub const CooloffPeriod: BlockNumber = 2 * MINUTES;
+	pub const MaxProposals: u32 = 100;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
+parameter_types! {	
 	pub const LaunchPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const FastTrackVotingPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
@@ -874,6 +923,14 @@ impl pallet_democracy::Config for Runtime {
 	type MaxProposals = MaxProposals;
 }
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+	pub const CouncilMotionDuration: BlockNumber = 3 * MINUTES;
+	pub const CouncilMaxProposals: u32 = 100;
+	pub const CouncilMaxMembers: u32 = 100;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 	pub const CouncilMotionDuration: BlockNumber = 14 * DAYS;
 	pub const CouncilMaxProposals: u32 = 100;
@@ -892,6 +949,20 @@ impl pallet_collective::Config<CouncilCollective> for Runtime {
 	type WeightInfo = pallet_collective::weights::SubstrateWeight<Runtime>;
 }
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+	pub const CandidacyBond: Balance = 1_000 * DOLLARS;
+	// 1 storage item created, key size is 32 bytes, value size is 16+16.
+	pub const VotingBondBase: Balance = deposit(1, 64);
+	// additional data per vote is 32 bytes (account id).
+	pub const VotingBondFactor: Balance = deposit(0, 32);
+	pub const TermDuration: BlockNumber = 6 * MINUTES;
+	pub const DesiredMembers: u32 = 13;
+	pub const DesiredRunnersUp: u32 = 7;
+	pub const ElectionsPhragmenPalletId: LockIdentifier = *b"phrelect";
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 	pub const CandidacyBond: Balance = 1_000 * DOLLARS;
 	// 1 storage item created, key size is 32 bytes, value size is 16+16.
@@ -931,6 +1002,22 @@ type EnsureRootOrHalfCouncil = EnsureOneOf<
 	pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>,
 >;
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+	pub const ProposalBond: Permill = Permill::from_percent(5);
+	pub const ProposalBondMinimum: Balance = 1_000 * DOLLARS;
+	pub const SpendPeriod: BlockNumber = 3 * MINUTES;
+	pub const Burn: Permill = Permill::from_percent(0);
+	pub const TipCountdown: BlockNumber = 2 * MINUTES;
+	pub const TipFindersFee: Percent = Percent::from_percent(20);
+	pub const TipReportDepositBase: Balance = 1 * DOLLARS;
+	pub const DataDepositPerByte: Balance = 1 * CENTS;
+	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
+	pub const MaximumReasonLength: u32 = 16384;
+	pub const MaxApprovals: u32 = 100;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
 	pub const ProposalBondMinimum: Balance = 1_000 * DOLLARS;

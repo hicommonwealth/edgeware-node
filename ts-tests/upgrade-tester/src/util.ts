@@ -21,7 +21,7 @@ export function makeTx(api: ApiPromise, tx: SubmittableExtrinsic<'promise'>, sig
               let errorInfo: string;
               if (errorData.isModule) {
                 const details = api.registry.findMetaError(errorData.asModule.toU8a());
-                errorInfo = `${details.section}::${details.name}: ${details.documentation[0]}`;
+                errorInfo = `${details.section}::${details.name}: ${details.docs[0]}`;
               } else if (errorData.isBadOrigin) {
                 errorInfo = 'TX Error: invalid sender origin';
               } else if (errorData.isCannotLookup) {

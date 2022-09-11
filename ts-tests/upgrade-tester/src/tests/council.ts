@@ -1,4 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
+// augment API
+import '@polkadot/api-augment';
 import { BalanceOf, AccountId, Voter } from '@polkadot/types/interfaces';
 import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';

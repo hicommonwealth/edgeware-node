@@ -1,6 +1,6 @@
 use super::*;
 use crate as treasury_reward;
-use frame_support::{construct_runtime, parameter_types, traits::GenesisBuild, weights::Weight, PalletId};
+use frame_support::{construct_runtime, parameter_types, traits::{ConstU32, GenesisBuild}, weights::Weight, PalletId};
 use frame_system::mocking::{MockBlock, MockUncheckedExtrinsic};
 use sp_runtime::{traits::One, Permill};
 
@@ -10,6 +10,7 @@ use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	AccountId32, Perbill,
 };
+use sp_std::convert::{TryFrom, TryInto};
 
 pub(crate) type Balance = u64;
 pub type Amount = i128;
@@ -66,6 +67,7 @@ impl frame_system::Config for Test {
 	type SS58Prefix = Prefix;
 	type SystemWeightInfo = ();
 	type Version = ();
+	type MaxConsumers = ConstU32<16>;
 }
 
 parameter_types! {
@@ -110,6 +112,7 @@ impl pallet_treasury::Config for Test {
 	type PalletId = TreasuryPalletId;
 	type ProposalBond = ProposalBond;
 	type ProposalBondMinimum = ProposalBondMinimum;
+	type ProposalBondMaximum = ();
 	type RejectOrigin = frame_system::EnsureRoot<AccountId>;
 	type SpendFunds = ();
 	type SpendPeriod = SpendPeriod;

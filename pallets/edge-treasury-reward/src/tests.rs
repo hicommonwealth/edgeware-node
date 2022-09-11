@@ -16,7 +16,7 @@
 
 use super::*;
 use crate::mock::*;
-use mock::{last_event, Event};
+use mock::last_event;
 
 use frame_support::traits::OnFinalize;
 

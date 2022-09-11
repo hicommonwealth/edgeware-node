@@ -1,26 +1,39 @@
-/* eslint-disable prefer-template */
-import { spec } from '@edgeware/node-types';
-import { ApiPromise } from '@polkadot/api';
-import { HttpProvider } from '@polkadot/rpc-provider';
-import { xxhashAsHex } from '@polkadot/util-crypto';
-import fs from 'fs';
-import path from 'path';
-import chalk from 'chalk';
-import { execFileSync, execSync } from 'child_process';
+// This is copied from fork-off-substrate
+// https://github.com/maxsam4/fork-off-substrate
+// with minimal adapation to fit into the test suite.
+const fs = require('fs');
+const path = require('path');
+const chalk = require('chalk');
+const cliProgress = require('cli-progress');
+require("dotenv").config();
 
-// input paths
-const binaryPath = '../../target/release/edgeware';
-const wasmPath = '../../../../edgeware-node/edgeware_runtime.wasm';
-
-// output paths
-const outputDir = path.join(__dirname, 'forker-data');
-const hexPath = path.join(outputDir, 'runtime.hex');
-const originalSpecPath = path.join(outputDir, 'genesis.json');
-const forkedSpecPath = path.join(outputDir, 'fork.json');
-const storagePath = path.join(outputDir, 'storage.json');
+const { spec } = require('@edgeware/node-types');
+const { ApiPromise } = require('@polkadot/api');
+const { HttpProvider } = require('@polkadot/rpc-provider');
+const { xxhashAsHex } = require('@polkadot/util-crypto');
+const execFileSync = require('child_process').execFileSync;
+const execSync = require('child_process').execSync;
+const binaryPath = path.join(__dirname, 'forker-data', 'binary');
+const wasmPath = path.join(__dirname, 'forker-data', 'runtime.wasm');
+const schemaPath = path.join(__dirname, 'forker-data', 'schema.json');
+const hexPath = path.join(__dirname, 'forker-data', 'runtime.hex');
+const originalSpecPath = path.join(__dirname, 'forker-data', 'genesis.json');
+const forkedSpecPath = path.join(__dirname, 'forker-data', 'fork.json');
+const storagePath = path.join(__dirname, 'forker-data', 'storage.json');
 
 // Using http endpoint since substrate's Ws endpoint has a size limit.
-const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://beresheet2.edgewa.re:9933');
+const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://localhost:9933')
+// The storage download will be split into 256^chunksLevel chunks.
+const chunksLevel = process.env.FORK_CHUNKS_LEVEL || 1;
+const totalChunks = Math.pow(256, chunksLevel as number);
+
+const alice = process.env.ALICE || ''
+const originalChain = process.env.ORIG_CHAIN || '';
+const forkChain = process.env.FORK_CHAIN || '';
+
+let chunksFetched = 0;
+let separator = false;
+const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
 
 /**
  * All module prefixes except those mentioned in the skippedModulesPrefix will be added to this by the script.
@@ -35,58 +48,94 @@ const provider = new HttpProvider(process.env.HTTP_RPC_ENDPOINT || 'http://beres
  * For module hashing, do it via xxhashAsHex,
  * e.g. console.log(xxhashAsHex('System', 128)).
  */
-const prefixes = [
-  // '0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9' /* System.Account */
-];
-const skippedModulesPrefix = ['System', 'Session', 'Aura', 'Grandpa', 'GrandpaFinality', 'FinalityTracker'];
+let prefixes = ['0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9' /* System.Account */];
+const skippedModulesPrefix = ['System', 'Session', 'Aura', 'Babe', 'Grandpa', 'GrandpaFinality', 'FinalityTracker', 'Authorship'];
+
+async function fixParachinStates (api, forkedSpec) {
+  const skippedKeys = [
+    api.query.parasScheduler.sessionStartBlock.key()
+  ];
+  for (const k of skippedKeys) {
+    delete forkedSpec.genesis.raw.top[k];
+  }
+}
 
 async function main() {
   if (!fs.existsSync(binaryPath)) {
-    console.log(chalk.red('Binary missing.'));
+    console.log(chalk.red('Binary missing. Please copy the binary of your substrate node to the data folder and rename the binary to "binary"'));
     process.exit(1);
   }
   execFileSync('chmod', ['+x', binaryPath]);
 
   if (!fs.existsSync(wasmPath)) {
-    console.log(chalk.red('WASM missing.'));
+    console.log(chalk.red('WASM missing. Please copy the WASM blob of your substrate node to the data folder and rename it to "runtime.wasm"'));
     process.exit(1);
   }
-
-  // create data folder if needed
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir);
-  }
-
   execSync('cat ' + wasmPath + ' | hexdump -ve \'/1 "%02x"\' > ' + hexPath);
 
-  console.log(chalk.green('We are intentionally using the HTTP endpoint. '
-    + 'If you see any warnings about that, please ignore them.'));
-  const api = await ApiPromise.create({ provider, ...spec });
+  let api;
+  console.log(chalk.green('We are intentionally using the HTTP endpoint. If you see any warnings about that, please ignore them.'));
+  if (!fs.existsSync(schemaPath)) {
+    console.log(chalk.yellow('Custom Schema missing, using default schema.'));
+    api = await ApiPromise.create({ provider, ...spec });
+  } else {
+    const { types, rpc } = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+    api = await ApiPromise.create({
+      provider,
+      types,
+      rpc,
+    });
+  }
 
-  // Download state of original chain
-  console.log(chalk.green('Fetching current state of the live chain. '
-    + 'Please wait, it can take a while depending on the size of your chain.'));
-  const pairs = await provider.send('state_getPairs', ['0x']);
-  fs.writeFileSync(storagePath, JSON.stringify(pairs));
+  if (fs.existsSync(storagePath)) {
+    console.log(chalk.yellow('Reusing cached storage. Delete ./data/storage.json and rerun the script if you want to fetch latest storage'));
+  } else {
+    // Download state of original chain
+    console.log(chalk.green('Fetching current state of the live chain. Please wait, it can take a while depending on the size of your chain.'));
+    let at = (await api.rpc.chain.getBlockHash()).toString();
+    progressBar.start(totalChunks, 0);
+    const stream = fs.createWriteStream(storagePath, { flags: 'a' });
+    stream.write("[");
+    await fetchChunks("0x", chunksLevel, stream, at);
+    stream.write("]");
+    stream.end();
+    progressBar.stop();
+  }
 
-  const metadata: any = await api.rpc.state.getMetadata();
+  const metadata = await api.rpc.state.getMetadata();
   // Populate the prefixes array
-  const modules = JSON.parse(metadata.asLatest.modules);
-  modules.forEach((m) => {
-    if (m.storage) {
-      if (!skippedModulesPrefix.includes(m.storage.prefix)) {
-        prefixes.push(xxhashAsHex(m.storage.prefix, 128));
+  // const modules = JSON.parse(metadata.asLatest.modules);
+  // modules.forEach((module) => {
+  //   if (module.storage) {
+  //     if (!skippedModulesPrefix.includes(module.storage.prefix)) {
+  //       prefixes.push(xxhashAsHex(module.storage.prefix, 128));
+  //     }
+  //   }
+  // });
+  const modules = metadata.asLatest.pallets;
+  modules.forEach((module) => {
+    if (module.storage) {
+      if (!skippedModulesPrefix.includes(module.name)) {
+        prefixes.push(xxhashAsHex(module.name, 128));
       }
     }
   });
 
   // Generate chain spec for original and forked chains
-  execSync(`${binaryPath} build-spec --raw --chain=beresheet > ${originalSpecPath}`);
-  execSync(`${binaryPath} build-spec --dev --raw > ${forkedSpecPath}`);
+  if (originalChain == '') {
+    execSync(binaryPath + ` build-spec --raw > ` + originalSpecPath);
+  } else {
+    execSync(binaryPath + ` build-spec --chain ${originalChain} --raw > ` + originalSpecPath);
+  }
+  if (forkChain == '') {
+    execSync(binaryPath + ` build-spec --dev --raw > ` + forkedSpecPath);
+  } else {
+    execSync(binaryPath + ` build-spec --chain ${forkChain} --raw > ` + forkedSpecPath);
+  }
 
-  const storage = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
-  const originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
-  const forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
+  let storage = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
+  let originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
+  let forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
 
   // Modify chain name and id
   forkedSpec.name = originalSpec.name + '-fork';
@@ -96,12 +145,12 @@ async function main() {
   // Grab the items to be moved, then iterate through and insert into storage
   storage
     .filter((i) => prefixes.some((prefix) => i[0].startsWith(prefix)))
-    .forEach(([key, value]) => {
-      forkedSpec.genesis.raw.top[key] = value;
-    });
+    .forEach(([key, value]) => (forkedSpec.genesis.raw.top[key] = value));
 
   // Delete System.LastRuntimeUpgrade to ensure that the on_runtime_upgrade event is triggered
   delete forkedSpec.genesis.raw.top['0x26aa394eea5630e07c48ae0c9558cef7f9cce9c888469bb1a0dceaa129672ef8'];
+
+  fixParachinStates(api, forkedSpec);
 
   // Set the code to the current runtime code
   forkedSpec.genesis.raw.top['0x3a636f6465'] = '0x' + fs.readFileSync(hexPath, 'utf8').trim();
@@ -109,14 +158,40 @@ async function main() {
   // To prevent the validator set from changing mid-test, set Staking.ForceEra to ForceNone ('0x02')
   forkedSpec.genesis.raw.top['0x5f3e4907f716ac89b6347d15ececedcaf7dad0317324aecae8744b87fc95f2f3'] = '0x02';
 
-  // To make testing easier, set Sudo.Key to //Alice
-  const sudoKeyHash = xxhashAsHex('Sudo', 128) + xxhashAsHex('Key', 128).slice(2);
-  forkedSpec.genesis.raw.top[sudoKeyHash] = '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
+  if (alice !== '') {
+    // Set sudo key to //Alice
+    forkedSpec.genesis.raw.top['0x5c0d1176a568c1f92944340dbfed9e9c530ebca703c85910e7164cb7d1c9e47b'] = '0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d';
+  }
 
   fs.writeFileSync(forkedSpecPath, JSON.stringify(forkedSpec, null, 4));
 
-  console.log(`Forked genesis generated successfully. Find it at ${outputDir}/fork.json`);
+  console.log('Forked genesis generated successfully. Find it at ./forker-data/fork.json');
   process.exit();
 }
 
 main();
+
+async function fetchChunks(prefix, levelsRemaining, stream, at) {
+  if (levelsRemaining <= 0) {
+    const pairs = await provider.send('state_getPairs', [prefix, at]);
+    if (pairs.length > 0) {
+      separator ? stream.write(",") : separator = true;
+      stream.write(JSON.stringify(pairs).slice(1, -1));
+    }
+    progressBar.update(++chunksFetched);
+    return;
+  }
+
+  // Async fetch the last level
+  if (process.env.QUICK_MODE && levelsRemaining == 1) {
+    let promises = [];
+    for (let i = 0; i < 256; i++) {
+      promises.push(fetchChunks(prefix + i.toString(16).padStart(2, "0"), levelsRemaining - 1, stream, at));
+    }
+    await Promise.all(promises);
+  } else {
+    for (let i = 0; i < 256; i++) {
+      await fetchChunks(prefix + i.toString(16).padStart(2, "0"), levelsRemaining - 1, stream, at);
+    }
+  }
+}

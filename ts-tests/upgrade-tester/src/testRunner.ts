@@ -1,13 +1,15 @@
 import child_process from 'child_process';
 import fs from 'fs';
 import rimraf from 'rimraf';
-import BN from 'bn.js';
 
 import { ApiPromise, WsProvider, Keyring } from '@polkadot/api';
 import { UnsubscribePromise } from '@polkadot/api/types';
+import { u128 } from '@polkadot/types';
 import { compactAddLength } from '@polkadot/util';
 import { spec } from '@edgeware/node-types';
 import StateTest from './stateTest';
+const path = require('path');
+const schemaPath = path.join(__dirname, 'forker-data', 'schema.json');
 
 import { makeTx } from './util';
 import { factory, formatFilename } from './logging';
@@ -73,7 +75,7 @@ class TestRunner {
     private options: ITestOptions,
   ) {
     // verify options args
-    if (!options.chainspec) {
+    if (!options.chainspec || !fs.existsSync(options.chainspec)) {
       throw new Error('missing chainspec!');
     }
     if (!options.binaryPath || !fs.existsSync(options.binaryPath)) {
@@ -96,8 +98,8 @@ class TestRunner {
       log.info('Will not perform upgrade during testing.');
     }
     if (!options.wsUrl) {
-      log.info('No websocket URL found, defaulting to ws://localhost:9944.');
-      options.wsUrl = 'ws://localhost:9944';
+      log.info('No websocket URL found, defaulting to ws://localhost:9744.');
+      options.wsUrl = 'ws://localhost:9744';
     }
   }
 
@@ -139,8 +141,10 @@ class TestRunner {
       '--alice', // TODO: abstract this into accounts somehow
       '--force-authoring',
       '--no-telemetry',
-      '--no-prometheus',
+      '--no-prometheus',      
       '-linfo',
+      '--rpc-port', '9733',
+      '--ws-port', '9744'
     ];
     log.info(`Executing ${this.options.binaryPath} with args ${JSON.stringify(args)}`);
     this._chainProcess = child_process.spawn(
@@ -208,8 +212,20 @@ class TestRunner {
     });
     unsubscribe();
 
-    // initialize the API itself
-    this._api = await ApiPromise.create({ provider, ...spec });
+    // initialize the API itself    
+    if (!fs.existsSync(schemaPath)) {
+      this._api = await ApiPromise.create({ provider, ...spec });
+    } else {
+      const { types, rpc } = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
+      this._api = await ApiPromise.create({
+        provider,
+        types,
+        rpc,
+      });
+    }
+
+
+    // this._api = await ApiPromise.create({ provider, ...spec });
 
     // fetch and print chain information
     const chainInfo = await this._api.rpc.state.getRuntimeVersion();
@@ -265,14 +281,14 @@ class TestRunner {
     // TODO: move this set-balance into a test case
     if (this.options.upgrade.sudoSeed && preUpgrade) {
       const sudoKeyring = (new Keyring({ ss58Format: this.options.ss58Prefix, type: 'sr25519' }))
-        .addFromUri(this.options.upgrade.sudoSeed);
-      const newBalance = new BN('1000000000000000000000000');
+        .addFromUri(this.options.upgrade.sudoSeed);              
+      const newBalance = new u128(this._api.registry, '1000000000000000000000000');
       const setBalanceTx = this._api.tx.sudo.sudo(
         this._api.tx.balances.setBalance(sudoKeyring.address, newBalance, 0)
       );
       await makeTx(this._api, setBalanceTx, sudoKeyring);
     }
-
+    log.info(`KR KR KR '${true}' .`);
     let rpcSubscription: UnsubscribePromise;
 
     // run all tests, then perform upgrade if needed

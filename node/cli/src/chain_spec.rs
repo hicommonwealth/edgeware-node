@@ -80,7 +80,7 @@ pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
 /// Mainnet configuration
 pub fn edgeware_mainnet_official() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/mainnet.chainspec.json")[..]) {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/mainnet.chainspec.raw.json")[..]) {
 		Ok(spec) => spec,
 		Err(e) => panic!("{}", e),
 	}
@@ -88,7 +88,7 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 
 /// Beresheet Testnet configuration
 pub fn edgeware_beresheet_official() -> ChainSpec {
-	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheetv3.chainspec.json")[..]) {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheet.chainspec.json")[..]) {
 		Ok(spec) => spec,
 		Err(e) => panic!("{}", e),
 	}
@@ -154,7 +154,7 @@ pub fn testnet_genesis(
 		ImOnlineId,
 		AuthorityDiscoveryId,
 	)>,
-	_root_key: AccountId,
+	root_key: AccountId,
 	endowed_accounts: Option<Vec<AccountId>>,
 	_enable_println: bool,
 	_balances: Vec<(AccountId, Balance)>,
@@ -188,8 +188,9 @@ pub fn testnet_genesis(
 			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 		]
 	});
-
-	endowed_accounts.push(_root_key.clone());
+	if !endowed_accounts.contains(&root_key) {
+		endowed_accounts.push(root_key.clone());
+	}
 
 	initial_authorities.iter().for_each(|x| {
 		if !endowed_accounts.contains(&x.0) {
@@ -206,7 +207,7 @@ pub fn testnet_genesis(
 	GenesisConfig {
 		system: SystemConfig {
 			code: wasm_binary_unwrap().to_vec(),
-		//	changes_trie_config: Default::default(),
+			// changes_trie_config: Default::default(),
 		},
 		balances: BalancesConfig {
 			balances: endowed_balances,
@@ -243,7 +244,7 @@ pub fn testnet_genesis(
 		grandpa: GrandpaConfig { authorities: vec![] },
 		treasury: Default::default(),
 		phragmen_election: Default::default(),
-		sudo: SudoConfig { key: Some(_root_key) },
+		sudo: SudoConfig { key: Some(root_key) },
 		vesting: VestingConfig { vesting },
 		assets: Default::default(),
 		transaction_payment: Default::default(),
