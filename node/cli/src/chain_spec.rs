@@ -86,6 +86,14 @@ pub fn edgeware_mainnet_official() -> ChainSpec {
 	}
 }
 
+/// Beresheet Testnet configuration for runtime spec 46
+pub fn edgeware_beresheet_v46() -> ChainSpec {
+	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheet_v46.raw.json")[..]) {
+		Ok(spec) => spec,
+		Err(e) => panic!("{}", e),
+	}
+}
+
 /// Beresheet Testnet configuration
 pub fn edgeware_beresheet_official() -> ChainSpec {
 	match ChainSpec::from_json_bytes(&include_bytes!("../res/beresheet.chainspec.json")[..]) {

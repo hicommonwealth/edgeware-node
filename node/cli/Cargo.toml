@@ -176,3 +176,6 @@ runtime-benchmarks = [
 	"edgeware-runtime/runtime-benchmarks",
 	"frame-benchmarking-cli",
 ]
+fast-runtime = [
+	"edgeware-runtime/fast-runtime",
+]

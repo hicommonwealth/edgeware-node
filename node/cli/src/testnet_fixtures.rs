@@ -26,7 +26,6 @@ use sp_finality_grandpa::AuthorityId as GrandpaId;
 
 /// Testnet root key
 pub fn get_testnet_root_key() -> AccountId {
-	// Beresheet sudo key: 5EWXn1BjwHcJYrez3ARPMmszAaQVrkDv1yuSjDVedzdMB6Nf
 	AccountId::from_ss58check("5HbAMQtwKrtUwAx3B22MGxBWpyLeWmEDhBuhXfVLwjAzUPpa").unwrap()
 }
 
