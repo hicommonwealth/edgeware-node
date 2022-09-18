@@ -32,7 +32,7 @@ use frame_support::{
 	traits::{
 		/*AsEnsureOriginWithArg,*/ ConstU128, ConstU16, ConstU32, Currency, EnsureOneOf,
 		EqualPrivilegeOnly, Everything, Imbalance, InstanceFilter, KeyOwnerProofSystem,
-		LockIdentifier, Nothing, OnUnbalanced, U128CurrencyToVote, FindAuthor, 
+		LockIdentifier, Nothing, OnUnbalanced, U128CurrencyToVote, FindAuthor,
 	},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, RocksDbWeight, WEIGHT_PER_SECOND},
@@ -91,7 +91,7 @@ pub use sp_runtime::BuildStorage;
 pub mod impls;
 //use impls::{Author, CreditToBlockAuthor};
 use impls::Author;
-mod migrations; 
+mod migrations;
 
 /// Constant values used within the runtime.
 pub mod constants;
@@ -560,7 +560,7 @@ parameter_types! {
 	pub const BondingDuration: EraIndex = 1;   // = 3 mins
 	pub const SlashDeferDuration: EraIndex = 1;    // = 3 mins
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
-	pub const MaxNominatorRewardedPerValidator: u32 = 256;
+	pub const MaxNominatorRewardedPerValidator: u32 = 128;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub OffchainRepeat: BlockNumber = 5;
 }
@@ -571,7 +571,7 @@ parameter_types! {
 	pub const BondingDuration: EraIndex = 2 * 28;   // = 14 days
 	pub const SlashDeferDuration: EraIndex = 28;    // = 7 days
 	pub const RewardCurve: &'static PiecewiseLinear<'static> = &REWARD_CURVE;
-	pub const MaxNominatorRewardedPerValidator: u32 = 256;
+	pub const MaxNominatorRewardedPerValidator: u32 = 128;
 	pub const OffendingValidatorsThreshold: Perbill = Perbill::from_percent(17);
 	pub OffchainRepeat: BlockNumber = 5;
 }
@@ -846,7 +846,7 @@ parameter_types! {
 
 
 #[cfg(feature = "fast-runtime")]
-parameter_types! {	
+parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 1 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 3 * MINUTES;
 	pub const FastTrackVotingPeriod: BlockNumber = 1 * MINUTES;
@@ -857,7 +857,7 @@ parameter_types! {
 }
 
 #[cfg(not(feature = "fast-runtime"))]
-parameter_types! {	
+parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 7 * 24 * 60 * MINUTES;
 	pub const FastTrackVotingPeriod: BlockNumber = 2 * 24 * 60 * MINUTES;
@@ -1056,6 +1056,19 @@ impl pallet_treasury::Config for Runtime {
 	type MaxApprovals = MaxApprovals;
 }
 
+#[cfg(feature = "fast-runtime")]
+parameter_types! {
+//	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
+	pub const BountyValueMinimum: Balance = 100 * DOLLARS;
+	pub const BountyDepositBase: Balance = 10 * DOLLARS;
+	pub const CuratorDepositMultiplier: Permill = Permill::from_percent(50);
+	pub const CuratorDepositMin: Balance = 1 * DOLLARS;
+	pub const CuratorDepositMax: Balance = 100 * DOLLARS;
+	pub const BountyDepositPayoutDelay: BlockNumber = 2 * MINUTES;
+	pub const BountyUpdatePeriod: BlockNumber = 2 * MINUTES;
+}
+
+#[cfg(not(feature = "fast-runtime"))]
 parameter_types! {
 //	pub const BountyCuratorDeposit: Permill = Permill::from_percent(50);
 	pub const BountyValueMinimum: Balance = 100 * DOLLARS;
@@ -1064,7 +1077,7 @@ parameter_types! {
 	pub const CuratorDepositMin: Balance = 1 * DOLLARS;
 	pub const CuratorDepositMax: Balance = 100 * DOLLARS;
 	pub const BountyDepositPayoutDelay: BlockNumber = 7 * DAYS;
-	pub const BountyUpdatePeriod: BlockNumber = 30 * DAYS;
+	pub const BountyUpdatePeriod: BlockNumber = 3 * DAYS;
 }
 
 impl pallet_bounties::Config for Runtime {
@@ -2061,15 +2074,15 @@ impl_runtime_apis! {
 			use frame_system_benchmarking::Pallet as SystemBench;
 
 			let mut list = Vec::<BenchmarkList>::new();
-   
+
 			list_benchmark!(list, extra, frame_system, SystemBench::<Runtime>);
 			//list_benchmark!(list, extra, parachain_staking, ParachainStakingBench::<Runtime>);
-		
+
 			let storage_info = AllPalletsWithSystem::storage_info();
-   
+
 			return (list, storage_info)
 	}
-   
+
 		fn dispatch_benchmark(
 			config: frame_benchmarking::BenchmarkConfig
 		) -> Result<Vec<frame_benchmarking::BenchmarkBatch>, sp_runtime::RuntimeString> {

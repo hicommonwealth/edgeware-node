@@ -58,6 +58,7 @@ impl SubstrateCli for Cli {
 				"beresheet_edgeware_testnet".to_string(),
 			)),
 			"mainnet-conf" => Box::new(chain_spec::edgeware_mainnet_config()),
+			"beresheet-v46-fast" => Box::new(chain_spec::edgeware_beresheet_v46_fast()),
 			"beresheet-v46" => Box::new(chain_spec::edgeware_beresheet_v46()),
 			"beresheet" => Box::new(chain_spec::edgeware_beresheet_official()),
 			"edgeware" => Box::new(chain_spec::edgeware_mainnet_official()),
