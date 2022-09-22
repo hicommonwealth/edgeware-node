@@ -78,8 +78,8 @@ impl OnRuntimeUpgrade for AllStakingMigrations {
 pub struct SystemToTripleRefCount;
 impl frame_system::migrations::V2ToV3 for SystemToTripleRefCount {
 	type Pallet = System;
-	type AccountId = AccountId;	
-	type Index = Index;	
+	type AccountId = AccountId;
+	type Index = Index;
 	type AccountData = pallet_balances::AccountData<Balance>;
 }
 impl OnRuntimeUpgrade for SystemToTripleRefCount {
@@ -180,7 +180,7 @@ impl OnRuntimeUpgrade for SchedulerMigrationV3 {
 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
 		Scheduler::migrate_v1_to_v3()
 	}
-	
+
 	#[cfg(feature = "try-runtime")]
 	fn pre_upgrade() -> Result<(), &'static str> {
 		Scheduler::pre_migrate_to_v3()
@@ -207,42 +207,45 @@ pub struct Web3AccountCreditMigration;
 impl OnRuntimeUpgrade for Web3AccountCreditMigration {
 	fn on_runtime_upgrade() -> frame_support::weights::Weight {
 		// The public key of the account of the web3 foundation to credit.
-		// /!\ for now we don't have the destination account so we use the 
-		// following (original web3 account funded at genesis) as a placeholder.
-		// "0x765169492c492ee29f2af9af46f9e1b117aa0283b73a4361ae12ace1c41a6c72"
+		// /!\ for now the destination account has been communicated but
+		// without cryptographic guarantees, so we use this account only
+		// as a placeholder.
+		// "0xd96fd7613d51508eedc40cc848108290179fea6ffe8cc1d1f86631a18e0ac55f"
+		// public key corresponding to the Edgeware address
+		// nRiRbxgTpkyxjoQdQuJZmwwzXf25JWNDormRLWwbgukkXJP
 		let web3_id = hex_literal::hex!(
-			"765169492c492ee29f2af9af46f9e1b117aa0283b73a4361ae12ace1c41a6c72"
+			"0xd96fd7613d51508eedc40cc848108290179fea6ffe8cc1d1f86631a18e0ac55f"
 		);
-		// We do credit 150 Mo EDG to the account. 
+		// We do credit 150 Mo EDG to the account.
 		// Here "DOLLARS" stands for 1^18 units of the lowest denomination, i.e. 1EDG.
 		let to_credit = 150_000_000 * DOLLARS;
 		// Overriding the storage below.
 		let pfx: [u8; 32] = [38, 170, 57, 78, 234, 86, 48, 224,
 							 124, 72, 174, 12, 149, 88, 206, 247,
 							 185, 157, 136, 14, 198, 129, 121, 156,
-							 12, 243, 14, 136, 134, 55, 29, 169]; 
+							 12, 243, 14, 136, 134, 55, 29, 169];
 		let mut sk = [0u8; 80];
 		sk[..32].copy_from_slice(&pfx);
 		sk[32..48].copy_from_slice(&blake2_128(&web3_id[..]));
 		sk[48..].copy_from_slice(&web3_id[..]);
 		let sv : Option<[u128;5]> = frame_support::storage::unhashed::take(&sk);
 		match sv {
-			Some(mut a) => 
+			Some(mut a) =>
 			{
 				frame_support::log::info!("web3 balance before = {:?}", &a[1]);
 				a[1] += to_credit;
 				frame_support::storage::unhashed::put(&sk,&a);
 			},
 			None => {
-				frame_support::log::info!("web3 balance before = {:?}", 0);				
+				frame_support::log::info!("web3 balance before = {:?}", 0);
 				frame_support::storage::unhashed::put(&sk,&[
 					// Necessary after migration. = 2^64
 					// It does not affect the balance of course!
 					// only the second parameter does.
-					18446744073709551616u128, 
-					to_credit, 
-					0, 
-					0, 
+					18446744073709551616u128,
+					to_credit,
+					0,
+					0,
 					0
 				]);
 			},
@@ -259,7 +262,7 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
     fn on_runtime_upgrade() -> Weight {
         let mut weight = 0;
 
-        // #9165 Move PalletVersion away from the crate version 
+        // #9165 Move PalletVersion away from the crate version
         frame_support::log::info!("💥 MigratePalletVersionToStorageVersion start");
         weight += <MigratePalletVersionToStorageVersion as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 MigratePalletVersionToStorageVersion end");
@@ -270,9 +273,9 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
         weight += <PhragmenElectionDepositRuntimeUpgrade as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 PhragmenElectionDepositRuntimeUpgrade end");
 
-		// #7930 Allow validators to block and kick their nominator set	
+		// #7930 Allow validators to block and kick their nominator set
 		// #8113 Decouple Staking and Election - Part 2.1: Unleash Multi Phase
-		// #9507 Implement pallet-bags-list and its interfaces with pallet-staking 
+		// #9507 Implement pallet-bags-list and its interfaces with pallet-staking
 		// changes up to v9.
         frame_support::log::info!("💥 AllStakingMigrations start");
         weight += <AllStakingMigrations as OnRuntimeUpgrade>::on_runtime_upgrade();
@@ -288,7 +291,7 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
         weight += <OffencesDelayCleaningMigration as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 OffencesDelayCleaningMigration end");
 
-        // #9115 Migrate pallet-collective to the new pallet attribute macro 
+        // #9115 Migrate pallet-collective to the new pallet attribute macro
         frame_support::log::info!("💥 CouncilStoragePrefixMigration start");
         frame_support::traits::StorageVersion::new(0).put::<Council>();
         weight += <CouncilStoragePrefixMigration as OnRuntimeUpgrade>::on_runtime_upgrade();
@@ -310,8 +313,8 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
         frame_support::log::info!("💥 SchedulerMigrationV3 start");
         weight += <SchedulerMigrationV3 as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 SchedulerMigrationV3 end");
-		
-		// #8231 contracts: Expose rent parameter to contracts 
+
+		// #8231 contracts: Expose rent parameter to contracts
 		// #8773 contracts: Move Schedule from Storage to Config
 		// #9669 contracts: Remove state rent
 		// #10082 contracts: Add storage deposits
@@ -324,7 +327,7 @@ impl OnRuntimeUpgrade for AllEdgewareMigrations {
         frame_support::log::info!("💥 Web3AccountCreditMigration start");
         weight += <Web3AccountCreditMigration as OnRuntimeUpgrade>::on_runtime_upgrade();
         frame_support::log::info!("😎 Web3AccountCreditMigration end");
-		
+
         weight
     }
 }

@@ -64,10 +64,10 @@ use sp_runtime::{
 	curve::PiecewiseLinear,
 	generic, impl_opaque_keys,
 	traits::{
-		self, BlakeTwo256, Block as BlockT, ConvertInto, NumberFor, OpaqueKeys,
-		SaturatedConversion, StaticLookup,
+		self, BlakeTwo256, Block as BlockT, ConvertInto, Dispatchable, NumberFor,
+		OpaqueKeys, PostDispatchInfoOf, SaturatedConversion, StaticLookup,
 	},
-	transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity},
+	transaction_validity::{TransactionPriority, TransactionSource, TransactionValidity, TransactionValidityError},
 	ApplyExtrinsicResult, FixedPointNumber, Perbill, Percent, Permill, Perquintill,
 };
 use sp_std::{marker::PhantomData, prelude::*};
@@ -1569,9 +1569,8 @@ pub type SignedExtra = (
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
 );
 /// Unchecked extrinsic type as expected by this runtime.
-// pub type UncheckedExtrinsic = fp_self_contained::UncheckedExtrinsic<Address,
-// Call, Signature, SignedExtra>;
-pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+pub type UncheckedExtrinsic = fp_self_contained::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+// pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
 
 /// The payload being signed in transactions.
 pub type SignedPayload = generic::SignedPayload<Call, SignedExtra>;
@@ -1586,7 +1585,6 @@ pub type Executive =
 
 pub type Extrinsic = <Block as BlockT>::Extrinsic;
 
-#[cfg(feature = "enable-commented")]
 impl fp_self_contained::SelfContainedCall for Call {
 	type SignedInfo = H160;
 
@@ -1597,22 +1595,22 @@ impl fp_self_contained::SelfContainedCall for Call {
 		}
 	}
 
-	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo,
-TransactionValidityError>> { 		match self {
+	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo, TransactionValidityError>> {
+		match self {
 			Call::Ethereum(call) => call.check_self_contained(),
 			_ => None,
 		}
 	}
 
-	fn validate_self_contained(&self, info: &Self::SignedInfo) ->
-Option<TransactionValidity> { 		match self {
+	fn validate_self_contained(&self, info: &Self::SignedInfo) -> Option<TransactionValidity> {
+		match self {
 			Call::Ethereum(call) => call.validate_self_contained(info),
 			_ => None,
 		}
 	}
 
-	fn pre_dispatch_self_contained(&self, info: &Self::SignedInfo) ->
-Option<Result<(), TransactionValidityError>> { 		match self {
+	fn pre_dispatch_self_contained(&self, info: &Self::SignedInfo) -> Option<Result<(), TransactionValidityError>> {
+		match self {
 			Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
 			_ => None,
 		}
@@ -1624,8 +1622,7 @@ Option<Result<(), TransactionValidityError>> { 		match self {
 	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
 		match self {
 			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => {
-				Some(call.dispatch(Origin::from(pallet_ethereum::RawOrigin::
-Transaction(info)))) 			}
+				Some(call.dispatch(Origin::from(pallet_ethereum::RawOrigin::EthereumTransaction(info)))) 			}
 			_ => None,
 		}
 	}
@@ -1911,14 +1908,14 @@ impl_runtime_apis! {
 			TxPoolResponse {
 				ready: xts_ready
 					.into_iter()
-					.filter_map(|xt| match xt.function {
+					.filter_map(|xt| match xt.0.function {
 						Call::Ethereum(transact { transaction }) => Some(transaction),
 						_ => None,
 					})
 					.collect(),
 				future: xts_future
 					.into_iter()
-					.filter_map(|xt| match xt.function {
+					.filter_map(|xt| match xt.0.function {
 						Call::Ethereum(transact { transaction }) => Some(transaction),
 						_ => None,
 					})
@@ -2051,7 +2048,7 @@ impl_runtime_apis! {
 		fn extrinsic_filter(
 			xts: Vec<<Block as BlockT>::Extrinsic>,
 		) -> Vec<EthereumTransaction> {
-			xts.into_iter().filter_map(|xt| match xt.function {
+			xts.into_iter().filter_map(|xt| match xt.0.function {
 				Call::Ethereum(transact { transaction }) => Some(transaction),
 				_ => None
 			}).collect::<Vec<EthereumTransaction>>()
