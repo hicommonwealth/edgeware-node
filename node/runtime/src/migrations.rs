@@ -214,7 +214,7 @@ impl OnRuntimeUpgrade for Web3AccountCreditMigration {
 		// public key corresponding to the Edgeware address
 		// nRiRbxgTpkyxjoQdQuJZmwwzXf25JWNDormRLWwbgukkXJP
 		let web3_id = hex_literal::hex!(
-			"0xd96fd7613d51508eedc40cc848108290179fea6ffe8cc1d1f86631a18e0ac55f"
+			"d96fd7613d51508eedc40cc848108290179fea6ffe8cc1d1f86631a18e0ac55f"
 		);
 		// We do credit 150 Mo EDG to the account.
 		// Here "DOLLARS" stands for 1^18 units of the lowest denomination, i.e. 1EDG.
