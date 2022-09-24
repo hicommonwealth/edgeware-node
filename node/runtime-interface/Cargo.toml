@@ -1,6 +1,6 @@
 [package]
 name = "edgeware-runtime-interface"
-version = "3.4.0"
+version = "4.0.0"
 authors = ["Commonwealth Labs <hello@commonwealth.im>"]
 description = "Edgeware runtime interface helpers and functions"
 edition = "2018"

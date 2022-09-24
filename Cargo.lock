@@ -1470,10 +1470,6 @@ dependencies = [
  "frame-system",
  "pallet-authorship",
  "pallet-balances",
- "pallet-session",
- "pallet-staking",
- "pallet-staking-reward-curve",
- "pallet-timestamp",
  "pallet-treasury",
  "parity-scale-codec",
  "scale-info",
@@ -1481,13 +1477,12 @@ dependencies = [
  "sp-core",
  "sp-io",
  "sp-runtime",
- "sp-staking",
  "sp-std",
 ]
 
 [[package]]
 name = "edgeware-cli"
-version = "3.4.0"
+version = "4.0.0"
 dependencies = [
  "assert_cmd",
  "clap 3.2.5",
@@ -1607,7 +1602,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-executor"
-version = "3.4.0"
+version = "4.0.0"
 dependencies = [
  "criterion",
  "edgeware-primitives",
@@ -1636,7 +1631,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-primitives"
-version = "3.4.0"
+version = "4.0.0"
 dependencies = [
  "bstringify",
  "frame-system",
@@ -1652,7 +1647,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-rpc"
-version = "0.1.0"
+version = "4.0.0"
 dependencies = [
  "edgeware-cli-opt",
  "edgeware-executor",
@@ -1878,7 +1873,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime"
-version = "3.4.0"
+version = "4.0.0"
 dependencies = [
  "edge-treasury-reward",
  "edgeware-primitives",
@@ -1979,7 +1974,7 @@ dependencies = [
 
 [[package]]
 name = "edgeware-runtime-interface"
-version = "3.4.0"
+version = "4.0.0"
 dependencies = [
  "edgeware-primitives",
  "parity-scale-codec",

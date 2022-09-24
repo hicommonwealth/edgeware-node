@@ -25,7 +25,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn impl_version() -> String {
-		"polkadot-v0.9.19".into()
+		"4.0.0".into()
 	}
 
 	fn description() -> String {
